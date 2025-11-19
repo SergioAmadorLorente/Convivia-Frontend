@@ -13,7 +13,7 @@ import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
-import { GLOBAL_STYLES } from './styles'; // Ajusta la ruta si es necesario
+import { GLOBAL_STYLES } from '../styles/styles'; // Ajusta la ruta si es necesario
 
 
 const Bienvenida = () => {
@@ -80,9 +80,9 @@ const Bienvenida = () => {
         <View style={GLOBAL_STYLES.verificacionOverlay}>
             <View style={GLOBAL_STYLES.verificacionPopup}>
             <Image
-                source={require('../../assets/pnglogout.png')}
-                style={GLOBAL_STYLES.verificacionLogo}
-                resizeMode="contain"
+              source={require('../assets/pnglogout.png')}
+              style={GLOBAL_STYLES.verificacionLogo}
+              resizeMode="contain"
             />
             <Text style={GLOBAL_STYLES.verificacionPopupTextTitle}>
                 ¿Estás seguro de que quieres cerrar la sesión?

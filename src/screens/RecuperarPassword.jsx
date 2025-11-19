@@ -13,7 +13,7 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
-import { GLOBAL_STYLES, COLORS } from './styles'; // Ajusta la ruta según tu estructura
+import { GLOBAL_STYLES, COLORS } from '../styles/styles'; // Ajusta la ruta según tu estructura
 
 const RecuperarPassword = () => {
   // Estado para el correo electrónico y validación

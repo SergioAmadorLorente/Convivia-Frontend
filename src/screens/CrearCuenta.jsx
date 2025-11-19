@@ -20,8 +20,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { moderateScale } from 'react-native-size-matters';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { GLOBAL_STYLES, COLORS } from './styles';
-import { auth } from '../firebaseConfig';
+import { GLOBAL_STYLES, COLORS } from '../styles/styles';
+import { auth } from '../configs/firebaseConfig';
 
 const CrearCuenta = () => {
   const [email, setEmail] = useState('');
@@ -282,7 +282,7 @@ const CrearCuenta = () => {
                   {modalTipo === 'exito' ? (
                     <>
                       <Image
-                        source={require('../../assets/pngsuccessful.png')}
+                        source={require('../assets/pngsuccessful.png')}
                         style={GLOBAL_STYLES.verificacionLogo}
                         resizeMode="contain"
                       />

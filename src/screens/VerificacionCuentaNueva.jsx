@@ -18,7 +18,7 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { GLOBAL_STYLES, COLORS } from './styles'; // Ajusta la ruta según tu estructura
+import { GLOBAL_STYLES, COLORS } from '../styles/styles'; // Ajusta la ruta según tu estructura
 
 //NOOOOOOOOOOOO BORRRRARRRRRRRRR
 
@@ -215,7 +215,7 @@ const VerificacionCuentaNueva = () => {
                   {modalTipo === 'exito' ? (
                     <>
                       <Image
-                        source={require('../../assets/pngsuccessful.png')}
+                        source={require('../assets/pngsuccessful.png')}
                         style={GLOBAL_STYLES.verificacionLogo}
                         resizeMode="contain"
                       />
@@ -236,7 +236,7 @@ const VerificacionCuentaNueva = () => {
                   ) : (
                     <>
                       <Image
-                        source={require('../../assets/pngsuccessful.png')}
+                        source={require('../assets/pngsuccessful.png')}
                         style={GLOBAL_STYLES.verificacionLogo}
                         resizeMode="contain"
                       />

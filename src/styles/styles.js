@@ -839,4 +839,31 @@ buttonLogout: {
   shadowRadius: 3,
   elevation: 5,
 }
+
+  ,
+
+  // Standard primary button used by UI components
+  primaryButton: {
+    paddingVertical: verticalScale(8),
+    borderRadius: 15,
+    width: wp('80%'),
+    alignSelf: 'center',
+    marginTop: hp('3%'),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+
+  primaryButtonText: {
+    color: COLORS.secondary,
+    fontSize: SIZES.buttonText,
+    textAlign: 'center',
+    fontFamily: FONTS.regular,
+  },
+
+  disabledButton: {
+    opacity: 0.8,
+  },
 });

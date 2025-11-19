@@ -5,38 +5,31 @@ import {
   View,
   ActivityIndicator,
   TouchableOpacity,
-  TextInput,
   Keyboard,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useFonts } from 'expo-font';
-import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
-import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../firebaseConfig';
+import { auth } from '../configs/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
+import useLoadFonts from '../hooks/useLoadFonts';
+import useEmailValidation from '../hooks/useEmailValidation';
+import TextField from '../components/ui/TextField';
+import PasswordField from '../components/ui/PasswordField';
+import PrimaryButton from '../components/ui/PrimaryButton';
 
 const IniciarSesion = () => {
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
+  const { value: email, validate: validateEmail, error: emailError, isValid: isValidEmail } = useEmailValidation('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  const [fontsLoaded] = useFonts({
-    DMSerifDisplay_400Regular,
-    Montserrat_400Regular,
-    Montserrat_700Bold,
-  });
+  const fontsLoaded = useLoadFonts();
 
   if (!fontsLoaded) {
     return (
@@ -46,11 +39,7 @@ const IniciarSesion = () => {
     );
   }
 
-  const validateEmail = (text) => {
-    setEmail(text);
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setEmailError(!emailRegex.test(text) ? 'Por favor, introduce un correo válido' : '');
-  };
+  // Replaced by useEmailValidation.validate
 
   const handleLogin = async () => {
     setLoading(true);
@@ -78,42 +67,12 @@ const IniciarSesion = () => {
           <Text style={styles.titulo}>Iniciar sesión</Text>
           <Text style={styles.subtitulo}>¡Ya estás a punto de poder utilizar la{'\n'} aplicación de Convivia!</Text>
 
-          {/* Correo */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Correo electrónico:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="usuario@dominio"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={email}
-              onChangeText={validateEmail}
-            />
-            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-          </View>
+          <TextField label="Correo electrónico:" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
 
-          {/* Contraseña + Recuperar */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Contraseña:</Text>
-            <View style={styles.inputPasswordContainer}>
-              <TextInput
-                style={styles.inputPassword}
-                placeholder="• • • • • • • •"
-                secureTextEntry={!showPassword}
-                autoCorrect={false}
-                value={password}
-                maxLength={8}
-                onChangeText={setPassword}
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIconButton}>
-                <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={moderateScale(22)} color="#ACBF8A" />
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity style={styles.recuperarContainer} onPress={() => navigation.navigate('RecuperarPassword')}>
-              <Text style={styles.recuperarPassword}>Recuperar contraseña</Text>
-            </TouchableOpacity>
-          </View>
+          <PasswordField label="Contraseña:" value={password} onChangeText={setPassword} placeholder="• • • • • • • •" />
+          <TouchableOpacity style={styles.recuperarContainer} onPress={() => navigation.navigate('RecuperarPassword')}>
+            <Text style={styles.recuperarPassword}>Recuperar contraseña</Text>
+          </TouchableOpacity>
 
           {/* Recordarme */}
           <TouchableOpacity style={styles.checkboxContainer} onPress={() => setIsChecked(!isChecked)}>
@@ -123,14 +82,14 @@ const IniciarSesion = () => {
             <Text style={styles.labelRecordarme}>Recordarme</Text>
           </TouchableOpacity>
 
-          {/* Botón */}
-          <TouchableOpacity
-            style={[styles.botonLogearse, { backgroundColor: isValidEmail ? '#E6ECDC' : '#ccc' }]}
-            disabled={!isValidEmail || loading}
+          <PrimaryButton
             onPress={() => handleLogin()}
+            disabled={!isValidEmail || loading}
+            loading={loading}
+            style={{ backgroundColor: isValidEmail ? '#E6ECDC' : '#ccc', width: wp('80%'), marginTop: hp('3%') }}
           >
-            {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={styles.textoBotonLogearse}>Entrar</Text>}
-          </TouchableOpacity>
+            Entrar
+          </PrimaryButton>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

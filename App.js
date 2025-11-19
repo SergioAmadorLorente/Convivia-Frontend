@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useFonts } from 'expo-font';
-import SplashScreen from './src/components/SplashScreen';
+import SplashScreen from './src/screens/SplashScreen';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Main from './src/components/Main';
-import CrearCuenta from './src/components/CrearCuenta';
-import IniciarSesion from './src/components/IniciarSesion';
-import RecuperarPassword from './src/components/RecuperarPassword';
-import VerificacionCuentaNueva from './src/components/VerificacionCuentaNueva';
-import RestablecerPassword from './src/components/RestablecerPassword';
-import DashBoardPersonal from './src/components/DashBoardPersonal';
-import NuevaResidencia from './src/components/NuevaResidencia';
-import UnirResidencia from './src/components/UnirResidencia';
-import Bienvenida from './src/components/Bienvenida';
+import Main from './src/screens/Main';
+import CrearCuenta from './src/screens/CrearCuenta';
+import IniciarSesion from './src/screens/IniciarSesion';
+import RecuperarPassword from './src/screens/RecuperarPassword';
+import VerificacionCuentaNueva from './src/screens/VerificacionCuentaNueva';
+import RestablecerPassword from './src/screens/RestablecerPassword';
+import DashBoardPersonal from './src/screens/DashBoardPersonal';
+import NuevaResidencia from './src/screens/NuevaResidencia';
+import UnirResidencia from './src/screens/UnirResidencia';
+import Bienvenida from './src/screens/Bienvenida';
 import { View, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -81,7 +81,7 @@ const CustomHeader = ({ onLogout }) => (
       marginTop: 50,
     }}>
       <Image
-        source={require('./assets/logo_completo.png')}
+        source={require('./src/assets/logo_completo.png')}
         style={{
           width: 250,
           height: 70,
@@ -89,7 +89,7 @@ const CustomHeader = ({ onLogout }) => (
         }}
       />
       <Image
-        source={require('./assets/dibujo.png')}
+        source={require('./src/assets/dibujo.png')}
         style={{
           width: 230,
           height: 200,
