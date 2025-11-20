@@ -18,7 +18,8 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import GLOBAL_STYLES, { COLORS } from '../styles/styles';
+import GLOBAL_STYLES from '../styles/styles';
+import { COLORS } from '../styles/theme';
 
 const VerificacionCuentaNueva: React.FC = () => {
   const navigation = useNavigation<any>();

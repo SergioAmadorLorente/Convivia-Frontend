@@ -1,38 +1,7 @@
 import { StyleSheet } from 'react-native';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import theme, { COMMON, HELPERS, COLORS, FONTS, SIZES } from './theme';
 
-export const COLORS = {
-  background: '#fff',
-  primary: '#6B705C',
-  secondary: '#4B4741',
-  accent: '#ACBF8A',
-  inputBackground: '#F5F4F2',
-  border: '#CCC',
-  error: 'red',
-  disabled: '#ccc',
-  success: '#E6ECDC',
-};
-
-export const FONTS = {
-  title: 'DMSerifDisplay_400Regular',
-  regular: 'Montserrat_400Regular',
-  bold: 'Montserrat_700Bold',
-};
-
-export const SIZES = {
-  title: moderateScale(40),
-  subtitle: moderateScale(13),
-  label: moderateScale(15),
-  input: moderateScale(13),
-  passwordInput: moderateScale(14),
-  smallText: moderateScale(12),
-  buttonText: moderateScale(15),
-  paddingHorizontal: wp('5%'),
-  paddingVertical: verticalScale(8),
-  marginBottom: verticalScale(10),
-  borderRadius: moderateScale(10),
-};
+const { wp, hp, moderateScale, verticalScale } = HELPERS;
 
 export const GLOBAL_STYLES = StyleSheet.create({
   container: {
@@ -68,13 +37,8 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginLeft: wp('1%'),
   },
   input: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: SIZES.borderRadius,
+    ...(COMMON.INPUT_BASE as any),
     paddingHorizontal: wp('4%'),
-    paddingVertical: SIZES.paddingVertical,
-    fontSize: SIZES.input,
-    backgroundColor: COLORS.inputBackground,
   },
   errorText: {
     color: COLORS.error,
@@ -82,14 +46,9 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginTop: hp('0.5%'),
   },
   inputPasswordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: SIZES.borderRadius,
+    ...(COMMON.INPUT_CONTAINER as any),
     paddingHorizontal: wp('4%'),
     height: verticalScale(40),
-    backgroundColor: COLORS.inputBackground,
   },
   inputPassword: {
     flex: 1,
@@ -132,16 +91,8 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   botonLogearse: {
-    paddingVertical: verticalScale(8),
-    borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
-    marginTop: hp('3%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.BUTTON_BASE as any),
+    ...(COMMON.SHADOW as any),
   },
   textoBotonLogearse: {
     color: COLORS.secondary,
@@ -210,28 +161,15 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
   botonCrearCuenta: {
     backgroundColor: COLORS.inputBackground,
-    paddingVertical: verticalScale(8),
-    borderRadius: 15,
-    width: wp('80%'),
+    ...(COMMON.BUTTON_BASE as any),
     marginTop: hp('4%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.SHADOW as any),
   },
   botonIniciarSesion: {
     backgroundColor: COLORS.success,
-    paddingVertical: verticalScale(8),
-    borderRadius: 15,
-    width: wp('80%'),
-    marginTop: hp('3%'),
+    ...(COMMON.BUTTON_BASE as any),
     marginBottom: hp('5%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.SHADOW as any),
   },
   textoBoton: {
     color: COLORS.secondary,
@@ -240,15 +178,8 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   inputEmailCrearCuenta: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: moderateScale(10),
-    paddingHorizontal: wp('3%'),
-    paddingVertical: verticalScale(8),
-    fontSize: SIZES.input,
+    ...(COMMON.INPUT_BASE as any),
     marginBottom: verticalScale(5),
-    backgroundColor: COLORS.inputBackground,
-    fontFamily: FONTS.regular,
     width: wp('80%'),
   },
   botonIngresarMail: {
@@ -257,11 +188,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     width: wp('80%'),
     alignSelf: 'center',
     marginTop: hp('2%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.SHADOW as any),
   },
   textoBotonIngresarMail: {
     color: COLORS.secondary,
@@ -306,15 +233,8 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
   recuperarInput: {
     width: '100%',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: SIZES.borderRadius,
-    paddingHorizontal: wp('3%'),
-    paddingVertical: hp('1.5%'),
-    fontSize: SIZES.input,
+    ...(COMMON.INPUT_BASE as any),
     marginBottom: hp('1%'),
-    backgroundColor: COLORS.inputBackground,
-    fontFamily: FONTS.regular,
   },
   recuperarSubTextEmail: {
     fontFamily: FONTS.regular,
@@ -330,11 +250,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     width: wp('80%'),
     alignSelf: 'center',
     marginTop: hp('3%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.SHADOW as any),
   },
   textoRecuperarPassword: {
     color: COLORS.secondary,
@@ -354,11 +270,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     width: wp('80%'),
     alignSelf: 'center',
     marginTop: hp('20%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.SHADOW as any),
     backgroundColor: 'red',
   },
   botonTempText: {
@@ -368,12 +280,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   restablecerContainer: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: hp('5%'),
-    paddingHorizontal: wp('5%'),
+    ...(COMMON.PAGE_CARD as any),
     borderRadius: moderateScale(15),
   },
   restablecerTitulo: {
@@ -403,14 +310,10 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginBottom: hp('0.5%'),
   },
   restablecerInputPasswordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    ...(COMMON.INPUT_CONTAINER as any),
     borderRadius: moderateScale(15),
     paddingHorizontal: wp('4%'),
     height: verticalScale(40),
-    backgroundColor: COLORS.inputBackground,
   },
   restablecerInputPassword: {
     flex: 1,
@@ -432,11 +335,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     width: wp('80%'),
     alignSelf: 'center',
     marginTop: hp('4%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.SHADOW as any),
   },
   restablecerTextoBoton: {
     color: COLORS.secondary,
@@ -462,12 +361,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   verificacionContainer: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: hp('5%'),
-    paddingHorizontal: wp('5%'),
+    ...(COMMON.PAGE_CARD as any),
     borderRadius: moderateScale(25),
   },
   verificacionTitulo: {
@@ -495,15 +389,9 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
   verificacionInputCodigo: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: moderateScale(10),
-    paddingHorizontal: wp('3%'),
-    paddingVertical: verticalScale(8),
+    ...(COMMON.INPUT_BASE as any),
     fontSize: moderateScale(15),
     marginBottom: verticalScale(5),
-    backgroundColor: COLORS.inputBackground,
-    fontFamily: FONTS.regular,
     width: wp('80%'),
   },
   verificacionEnviarCodigoNuevo: {
@@ -550,16 +438,11 @@ export const GLOBAL_STYLES = StyleSheet.create({
     paddingBottom: 0,
   },
   verificacionInputPasswordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    ...(COMMON.INPUT_CONTAINER as any),
     borderRadius: moderateScale(10),
-    paddingHorizontal: wp('3%'),
     width: wp('80%'),
     height: verticalScale(38),
     marginBottom: verticalScale(5),
-    backgroundColor: COLORS.inputBackground,
   },
   verificacionEyeIconButton: {
     padding: 0,
@@ -567,17 +450,10 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
   verificacionBotonFinalizar: {
     backgroundColor: COLORS.success,
-    paddingVertical: verticalScale(5),
-    borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
+    ...(COMMON.BUTTON_BASE as any),
     marginTop: hp('5%'),
     height: verticalScale(45),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.SHADOW as any),
   },
   verificacionTextoBotonFinalizar: {
     color: COLORS.secondary,
@@ -587,18 +463,10 @@ export const GLOBAL_STYLES = StyleSheet.create({
     padding: verticalScale(3),
   },
   verificacionOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    ...(COMMON.OVERLAY as any),
   },
   verificacionPopup: {
-    width: wp('80%'),
-    height: hp('60%'),
-    padding: verticalScale(19),
-    backgroundColor: COLORS.background,
-    borderRadius: moderateScale(25),
-    alignItems: 'center',
+    ...(COMMON.POPUP as any),
   },
   verificacionPopupTextTitle: {
     fontSize: moderateScale(25),
@@ -656,18 +524,10 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
   /* Backwards-compatible aliases used by some screens */
   overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    ...(COMMON.OVERLAY as any),
   },
   popup: {
-    width: wp('80%'),
-    height: hp('60%'),
-    padding: verticalScale(19),
-    backgroundColor: COLORS.background,
-    borderRadius: moderateScale(25),
-    alignItems: 'center',
+    ...(COMMON.POPUP as any),
   },
   popupTextTitle: {
     fontSize: moderateScale(25),
@@ -705,23 +565,11 @@ export const GLOBAL_STYLES = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: COLORS.inputBackground,
     marginHorizontal: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 5,
+    ...(COMMON.SHADOW as any),
   },
   primaryButton: {
-    paddingVertical: verticalScale(8),
-    borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
-    marginTop: hp('3%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+    ...(COMMON.BUTTON_BASE as any),
+    ...(COMMON.SHADOW as any),
   },
   primaryButtonText: {
     color: COLORS.secondary,
@@ -733,5 +581,8 @@ export const GLOBAL_STYLES = StyleSheet.create({
     opacity: 0.8,
   },
 });
+
+// Backwards-compatible named exports for existing imports
+export { COLORS, FONTS, SIZES };
 
 export default GLOBAL_STYLES;
