@@ -3,10 +3,10 @@ import { useState, useCallback } from 'react';
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function useEmailValidation(initial = '') {
-  const [value, setValue] = useState(initial);
-  const [error, setError] = useState('');
+  const [value, setValue] = useState<string>(initial);
+  const [error, setError] = useState<string>('');
 
-  const validate = useCallback((text) => {
+  const validate = useCallback((text: string) => {
     setValue(text);
     setError(emailRegex.test(text) ? '' : 'Por favor, introduce un correo válido');
   }, []);

@@ -1,8 +1,17 @@
 import React from 'react';
-import { View, Text, TextInput } from 'react-native';
-import { GLOBAL_STYLES } from '../../styles/styles';
+import { View, Text, TextInput, TextInputProps } from 'react-native';
+import GLOBAL_STYLES from '../../styles/styles';
 
-const TextField = ({ label, value, onChangeText, placeholder, keyboardType = 'default', error }) => (
+interface TextFieldProps {
+  label?: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  keyboardType?: TextInputProps['keyboardType'];
+  error?: string;
+}
+
+const TextField: React.FC<TextFieldProps> = ({ label, value, onChangeText, placeholder, keyboardType = 'default', error }) => (
   <View style={GLOBAL_STYLES.inputGroup}>
     {label ? <Text style={GLOBAL_STYLES.label}>{label}</Text> : null}
     <TextInput
