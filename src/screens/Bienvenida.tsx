@@ -38,7 +38,7 @@ const Bienvenida: React.FC = () => {
       </TouchableOpacity>
 
       <TouchableOpacity style={GLOBAL_STYLES.botonIniciarSesion} onPress={() => navigation.navigate('UnirResidencia')}>
-        <Text style={GLOBAL_STYLES.textoBoton}>Únete a una residencia</Text>
+        <Text style={GLOBAL_STYLES.textoBoton}>Únete a una residencia!</Text>
       </TouchableOpacity>
 
       <Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
