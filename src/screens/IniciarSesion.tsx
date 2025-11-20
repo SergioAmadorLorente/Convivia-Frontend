@@ -35,14 +35,17 @@ const IniciarSesion: React.FC = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      if (user && !user.emailVerified) {
+      // FOR FUTURE EMAIL VERIFICATION IMPLEMENTATION
+      /*if (user && !user.emailVerified) {
         Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
         // optional: navigate to a screen that explains verification
         navigation.navigate('Main');
       } else {
         Alert.alert('Éxito', 'Login exitoso');
         navigation.navigate('Bienvenida');
-      }
+      }*/
+      Alert.alert('Éxito', 'Login exitoso');
+      navigation.navigate('Bienvenida');
     } catch (error: any) {
       Alert.alert('Error', 'Credenciales incorrectas o usuario no existe');
     }
