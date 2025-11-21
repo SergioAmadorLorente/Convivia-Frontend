@@ -57,7 +57,7 @@ const RecuperarPassword: React.FC = () => {
               try {
                 await sendPasswordResetEmail(auth, email);
                 Alert.alert('Correo enviado', 'Se ha enviado un correo para restablecer la contraseña. Revisa tu bandeja de entrada.');
-                navigation.navigate('Main');
+                navigation.navigate('LandingPage');
               } catch (err: any) {
                 Alert.alert('Error', 'No se pudo enviar el correo: ' + (err?.message ?? String(err)));
               }

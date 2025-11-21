@@ -69,7 +69,7 @@ const VerificacionCuentaNueva: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'android' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'android' ? 80 : 0}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
         <ScrollView contentContainerStyle={GLOBAL_STYLES.verificacionScrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={GLOBAL_STYLES.verificacionContainer}>
             <Text style={GLOBAL_STYLES.verificacionTitulo}>Verificación</Text>
