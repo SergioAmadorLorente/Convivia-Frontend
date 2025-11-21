@@ -19,7 +19,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { moderateScale } from 'react-native-size-matters';
 import { createUserWithEmailAndPassword, sendEmailVerification, User } from 'firebase/auth';
-import GLOBAL_STYLES, { COLORS } from '../styles/styles';
+import GLOBAL_STYLES from '../styles/styles';
+import { COLORS } from '../styles/theme';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
 

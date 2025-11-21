@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   ActivityIndicator,
@@ -11,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import GLOBAL_STYLES from '../styles/styles';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
@@ -40,7 +40,7 @@ const NuevaResidencia: React.FC = () => {
 
   if (!fontsLoaded) {
     return (
-      <View style={[styles.container, { justifyContent: 'center' }]}>
+      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}> 
         <ActivityIndicator size="large" color="#6B705C" />
       </View>
     );
@@ -69,15 +69,15 @@ const NuevaResidencia: React.FC = () => {
         <View style={styles.container}>
           <Text style={styles.titulo}>Crea una nueva residencia</Text>
 
-          <Text style={styles.subtitulo}>
-            <Text style={styles.textoNegrita}>Obtén el código de tu residencia en el apartado </Text>
-            <Text style={styles.textoCursiva}>Perfil - Mi residencia</Text>
+          <Text style={GLOBAL_STYLES.subtitle}>
+            <Text style={{ fontWeight: 'bold' }}>Obtén el código de tu residencia en el apartado </Text>
+            <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
           </Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Nombre de la residencia</Text>
+          <View style={GLOBAL_STYLES.inputGroup}>
+            <Text style={GLOBAL_STYLES.label}>Nombre de la residencia</Text>
             <TextInput
-              style={[styles.input, { borderColor: hasText ? '#28e80eff' : 'red' }]}
+              style={[GLOBAL_STYLES.input, { borderColor: hasText ? '#28e80eff' : 'red' }]}
               placeholder="Piso Tarragona"
               autoCapitalize="words"
               autoCorrect={false}
@@ -86,8 +86,16 @@ const NuevaResidencia: React.FC = () => {
             {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
           </View>
 
-          <TouchableOpacity style={[styles.botonLogearse, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]} disabled={!hasText || loading} onPress={handleCrear}>
-            {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={styles.textoBotonLogearse}>Crear</Text>}
+          <TouchableOpacity
+            style={[GLOBAL_STYLES.primaryButton, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
+            disabled={!hasText || loading}
+            onPress={handleCrear}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#4B4741" />
+            ) : (
+              <Text style={GLOBAL_STYLES.primaryButtonText}>Crear</Text>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -102,84 +110,6 @@ const NuevaResidencia: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingTop: hp('7%'),
-    paddingHorizontal: wp('5%'),
-  },
-  titulo: {
-    fontSize: moderateScale(40),
-    color: '#6B705C',
-    fontFamily: 'DMSerifDisplay_400Regular',
-    textAlign: 'center',
-    marginBottom: hp('1%'),
-  },
-  subtitulo: {
-    fontSize: moderateScale(13),
-    color: '#4B4741',
-    marginVertical: hp('1%'),
-    fontFamily: 'Montserrat_400Regular',
-    textAlign: 'center',
-    lineHeight: moderateScale(18),
-  },
-  inputGroup: {
-    width: wp('80%'),
-    marginTop: hp('5%'),
-  },
-  label: {
-    fontSize: moderateScale(14),
-    color: '#4B4741',
-    fontFamily: 'Montserrat_400Regular',
-    marginBottom: hp('0.5%'),
-    alignSelf: 'flex-start',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#CCC',
-    borderRadius: 10,
-    paddingHorizontal: wp('4%'),
-    paddingVertical: verticalScale(8),
-    fontSize: moderateScale(13),
-    backgroundColor: '#F5F4F2',
-    width: '100%',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: moderateScale(12),
-    marginTop: hp('0.5%'),
-    alignSelf: 'flex-start',
-    fontFamily: 'Montserrat_400Regular',
-  },
-  botonLogearse: {
-    paddingVertical: verticalScale(8),
-    borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
-    marginTop: hp('3%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  textoBotonLogearse: {
-    color: '#4B4741',
-    fontSize: moderateScale(15),
-    textAlign: 'center',
-    fontFamily: 'Montserrat_400Regular',
-  },
-  textoNegrita: {
-    fontFamily: 'Montserrat_700Bold',
-    color: '#4B4741',
-  },
-  textoCursiva: {
-    fontStyle: 'italic',
-    color: '#4B4741',
-    fontFamily: 'Montserrat_400Regular',
-  },
-});
+
 
 export default NuevaResidencia;

@@ -5,7 +5,8 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { Ionicons } from '@expo/vector-icons';
 import { moderateScale } from 'react-native-size-matters';
-import GLOBAL_STYLES, { COLORS } from '../styles/styles';
+import GLOBAL_STYLES from '../styles/styles';
+import { COLORS } from '../styles/theme';
 
 const RestablecerPassword: React.FC = () => {
   const [password, setPassword] = useState<string>('');
