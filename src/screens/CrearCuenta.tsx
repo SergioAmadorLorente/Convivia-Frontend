@@ -3,7 +3,6 @@ import {
   Text,
   View,
   ActivityIndicator,
-  Modal,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -23,6 +22,7 @@ import { createUserWithEmailAndPassword, sendEmailVerification, User } from 'fir
 import GLOBAL_STYLES from '../styles/styles';
 import { COLORS } from '../styles/theme';
 import { auth } from '../configs/firebaseConfig';
+import Popup from '../components/ui/Popup';
 
 const CrearCuenta: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -149,7 +149,7 @@ const CrearCuenta: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'android' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={GLOBAL_STYLES.container}>
             <Text style={GLOBAL_STYLES.title}>Crea tu cuenta</Text>
@@ -251,36 +251,24 @@ const CrearCuenta: React.FC = () => {
 
             {isCounting && <Text style={GLOBAL_STYLES.verificacionContador}></Text>}
 
-            <Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-              <View style={GLOBAL_STYLES.overlay as any || { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-                <View style={GLOBAL_STYLES.popup as any || { width: '80%', padding: 20, backgroundColor: '#fff', borderRadius: 10, alignItems: 'center' }}>
-                  {modalTipo === 'exito' ? (
-                    <>
-                      <Image source={require('../assets/pngsuccessful.png')} style={GLOBAL_STYLES.verificacionLogo} resizeMode="contain" />
-                      <Text style={GLOBAL_STYLES.popupTextTitle as any || { fontSize: 20, fontWeight: 'bold' }}>¡Verificación enviada!</Text>
-                      <Text style={GLOBAL_STYLES.popupTextSubTitle as any || { fontSize: 14, marginVertical: 10 }}>Revisa tu correo</Text>
-                      <TouchableOpacity style={GLOBAL_STYLES.closeButton as any || { backgroundColor: COLORS.accent, padding: 10, borderRadius: 5 }} onPress={() => { setModalVisible(false); navigation.navigate('Main'); }}>
-                        <Text style={GLOBAL_STYLES.closeButtonText as any || { color: 'white' }}>Cerrar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity disabled={isCounting} onPress={handleResend} style={[GLOBAL_STYLES.closeButton as any || { backgroundColor: isCounting ? '#ccc' : COLORS.accent, padding: 10, borderRadius: 5, marginTop: 8 }]}>
-                        <Text style={GLOBAL_STYLES.closeButtonText as any || { color: 'white' }}>{isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo'}</Text>
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <>
-                      <Text style={GLOBAL_STYLES.popupTextTitle as any || { fontSize: 20, fontWeight: 'bold' }}>Código reenviado</Text>
-                      <Text style={GLOBAL_STYLES.popupTextSubTitle as any || { fontSize: 14, marginVertical: 10 }}>Revisa tu correo y spam</Text>
-                      <TouchableOpacity style={GLOBAL_STYLES.closeButton as any || { backgroundColor: COLORS.accent, padding: 10, borderRadius: 5 }} onPress={() => setModalVisible(false)}>
-                        <Text style={GLOBAL_STYLES.closeButtonText as any || { color: 'white' }}>Cerrar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity disabled={isCounting} onPress={handleResend} style={[GLOBAL_STYLES.closeButton as any || { backgroundColor: isCounting ? '#ccc' : COLORS.accent, padding: 10, borderRadius: 5, marginTop: 8 }]}>
-                        <Text style={GLOBAL_STYLES.closeButtonText as any || { color: 'white' }}>{isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo'}</Text>
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
-              </View>
-            </Modal>
+            <Popup
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
+              title={modalTipo === 'exito' ? '¡Verificación enviada!' : 'Código reenviado'}
+              description={modalTipo === 'exito' ? 'Revisa tu correo' : 'Revisa tu correo y spam'}
+              imageType={'success'}
+              buttons={
+                modalTipo === 'exito'
+                  ? [
+                      { text: 'Cerrar', onPress: () => navigation.navigate('Main') },
+                      { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
+                    ]
+                  : [
+                      { text: 'Cerrar', onPress: () => {} },
+                      { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
+                    ]
+              }
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

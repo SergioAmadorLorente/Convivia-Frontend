@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Image, ActivityIndicator, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { Text, View, Image, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import GLOBAL_STYLES from '../styles/styles';
+import Popup from '../components/ui/Popup';
 
 const Bienvenida: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -14,7 +15,7 @@ const Bienvenida: React.FC = () => {
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
   const handleLogout = () => {
-    navigation.navigate('Main');
+    navigation.navigate('LandingPage');
   };
 
   if (!fontsLoaded) {
@@ -41,24 +42,17 @@ const Bienvenida: React.FC = () => {
         <Text style={GLOBAL_STYLES.textoBoton}>Únete a una residencia!</Text>
       </TouchableOpacity>
 
-      <Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-        <View style={GLOBAL_STYLES.verificacionOverlay}>
-          <View style={GLOBAL_STYLES.verificacionPopup}>
-            <Image source={require('../assets/pnglogout.png')} style={GLOBAL_STYLES.verificacionLogo} resizeMode="contain" />
-            <Text style={GLOBAL_STYLES.verificacionPopupTextTitle}>¿Estás seguro de que quieres cerrar la sesión?</Text>
-
-            <View style={GLOBAL_STYLES.verificacionBotonesContainer}>
-              <TouchableOpacity style={GLOBAL_STYLES.verificacionCloseButton} onPress={() => setModalVisible(false)}>
-                <Text style={GLOBAL_STYLES.verificacionCloseButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={[GLOBAL_STYLES.buttonLogout]} onPress={() => { setModalVisible(false); handleLogout(); }}>
-                <Text style={[GLOBAL_STYLES.verificacionCloseButtonText]}>Cerrar sesión</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      <Popup
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title={'¿Estás seguro de que quieres cerrar la sesión?'}
+        description={''}
+        imageType={'logout'}
+        buttons={[
+          { text: 'Cancelar', onPress: () => {} },
+          { text: 'Cerrar sesión', onPress: () => { handleLogout(); } },
+        ]}
+      />
     </ScrollView>
   );
 };

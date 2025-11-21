@@ -9,7 +9,6 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import GLOBAL_STYLES from '../styles/styles';
 import { useFonts } from 'expo-font';
@@ -18,6 +17,7 @@ import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/mo
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
+import Popup from '../components/ui/Popup';
 
 const UnirResidencia: React.FC = () => {
   const [codigoResidencia, setCodigoResidencia] = useState<string>('');
@@ -30,22 +30,31 @@ const UnirResidencia: React.FC = () => {
     Montserrat_700Bold,
   });
 
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupOptions, setPopupOptions] = useState<any>({});
+
+  const showPopup = (opts: any) => {
+    setPopupOptions(opts);
+    setPopupVisible(true);
+  };
+
+  const handleClosePopup = () => setPopupVisible(false);
+
   const formatoValido = /^\d-\d-\d-\d-\d-\d$/;
   const isValidCode = formatoValido.test(codigoResidencia.trim());
 
   const handleUnirse = async () => {
     if (!isValidCode) {
-      Alert.alert('Código inválido', 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.');
+      showPopup({ title: 'Código inválido', description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
       return;
     }
 
     setLoading(true);
     try {
-      Alert.alert('Éxito', 'Te has unido exitosamente a la residencia');
-      navigation.navigate('DashBoardPersonal');
+      showPopup({ title: 'Éxito', description: 'Te has unido exitosamente a la residencia', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }] });
     } catch (error) {
       console.error('Error al unirse a la residencia:', error);
-      Alert.alert('Error', 'No se pudo unir a la residencia. Intenta de nuevo.');
+      showPopup({ title: 'Error', description: 'No se pudo unir a la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
     } finally {
       setLoading(false);
     }
@@ -60,7 +69,8 @@ const UnirResidencia: React.FC = () => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
         <View style={GLOBAL_STYLES.container}>
           <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
@@ -94,7 +104,16 @@ const UnirResidencia: React.FC = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+      <Popup
+        visible={popupVisible}
+        onClose={handleClosePopup}
+        title={popupOptions.title || ''}
+        description={popupOptions.description}
+        imageType={popupOptions.imageType}
+        buttons={popupOptions.buttons}
+      />
+    </>
   );
 };
 

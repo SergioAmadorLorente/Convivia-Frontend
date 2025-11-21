@@ -555,45 +555,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
     padding: verticalScale(3),
   },
-  // Overlay de verificación
-  verificacionOverlay: {
-    ...(COMMON.OVERLAY as any),
-  },
-  // Popup de verificación
-  verificacionPopup: {
-    ...(COMMON.POPUP as any),
-  },
-  // Título del popup de verificación
-  verificacionPopupTextTitle: {
-    fontSize: moderateScale(25),
-    marginBottom: verticalScale(5),
-    textAlign: 'center',
-    fontFamily: FONTS.title,
-    color: COLORS.primary,
-  },
-  // Subtítulo del popup de verificación
-  verificacionPopupTextSubTitle: {
-    fontSize: moderateScale(12),
-    marginBottom: verticalScale(12),
-    textAlign: 'center',
-    fontFamily: FONTS.regular,
-    color: COLORS.secondary,
-  },
-  // Logo en el popup de verificación
-  verificacionLogo: {
-    width: wp('60%'),
-    height: wp('60%'),
-    marginTop: -verticalScale(1),
-    borderRadius: moderateScale(25),
-  },
-  // Botón para cerrar popup de verificación
-  verificacionCloseButton: {
-    backgroundColor: COLORS.accent,
-    paddingVertical: verticalScale(8),
-    paddingHorizontal: wp('5%'),
-    borderRadius: moderateScale(8),
-  },
-  // Contenido scrollable en verificación
   verificacionScrollContent: {
     flexGrow: 1,
     justifyContent: 'flex-start',
@@ -614,57 +575,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 19,
   },
-  // Contenedor de botones en verificación
-  verificacionBotonesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  // Texto del botón cerrar en verificación
-  verificacionCloseButtonText: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-  },
-  /* Backwards-compatible aliases used by some screens */
-  // Overlay genérico reutilizable
-  overlay: {
-    ...(COMMON.OVERLAY as any),
-  },
-  // Popup genérico reutilizable
-  popup: {
-    ...(COMMON.POPUP as any),
-  },
-  // Título del popup genérico
-  popupTextTitle: {
-    fontSize: moderateScale(25),
-    marginBottom: verticalScale(5),
-    textAlign: 'center',
-    fontFamily: FONTS.title,
-    color: COLORS.primary,
-  },
-  // Subtítulo del popup genérico
-  popupTextSubTitle: {
-    fontSize: moderateScale(12),
-    marginBottom: verticalScale(12),
-    textAlign: 'center',
-    fontFamily: FONTS.regular,
-    color: COLORS.secondary,
-  },
-  // Botón para cerrar popups
-  closeButton: {
-    backgroundColor: COLORS.accent,
-    paddingVertical: verticalScale(8),
-    paddingHorizontal: wp('5%'),
-    borderRadius: moderateScale(8),
-  },
-  // Texto del botón cerrar popup
-  closeButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
-  },
-  // Texto junto al checkbox
+  /* Popup-related styles removed: Popup is now handled by src/components/ui/Popup.tsx */
   checkboxText: {
     fontSize: SIZES.input,
     color: COLORS.primary,

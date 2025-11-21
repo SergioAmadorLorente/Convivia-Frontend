@@ -25,7 +25,7 @@ const DashBoardPersonal: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'android' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'android' ? 80 : 0}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', paddingTop: hp('7%'), paddingHorizontal: wp('5%') }}>
             <Text style={{ fontSize: moderateScale(40), color: '#6B705C', fontFamily: 'DMSerifDisplay_400Regular', textAlign: 'center' }}>DashBoardPersonal</Text>

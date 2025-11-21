@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { GLOBAL_STYLES } from '../styles/styles';
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../configs/firebaseConfig';
@@ -12,6 +13,7 @@ import useEmailValidation from '../hooks/useEmailValidation';
 import TextField from '../components/ui/TextField';
 import PasswordField from '../components/ui/PasswordField';
 import PrimaryButton from '../components/ui/PrimaryButton';
+import Popup from '../components/ui/Popup';
 
 
 const IniciarSesion: React.FC = () => {
@@ -36,26 +38,48 @@ const IniciarSesion: React.FC = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      if (user && !user.emailVerified) {
+      // FOR FUTURE EMAIL VERIFICATION IMPLEMENTATION
+      /*if (user && !user.emailVerified) {
         Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
         // optional: navigate to a screen that explains verification
-        navigation.navigate('Main');
+        navigation.navigate('LandingPage');
       } else {
         Alert.alert('Éxito', 'Login exitoso');
         navigation.navigate('Bienvenida');
-      }
+      }*/
+      showPopup({
+        title: 'Éxito',
+        description: 'Login exitoso',
+        imageType: 'success',
+        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('Bienvenida') }],
+      });
     } catch (error: any) {
-      Alert.alert('Error', 'Credenciales incorrectas o usuario no existe');
+      showPopup({
+        title: 'Error',
+        description: 'Credenciales incorrectas o usuario no existe',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+      });
     }
     setLoading(false);
   };
 
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupOptions, setPopupOptions] = useState<any>({});
+
+  const showPopup = (opts: any) => {
+    setPopupOptions(opts);
+    setPopupVisible(true);
+  };
+
+  const handleClosePopup = () => setPopupVisible(false);
+
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
-        <View style={GLOBAL_STYLES.container}>
-          <Text style={GLOBAL_STYLES.titulo}>Iniciar sesión</Text>
-          <Text style={[GLOBAL_STYLES.subtitulo, { textAlign: 'center' }]}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
+    <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
+        <View style={styles.container}>
+          <Text style={styles.titulo}>Iniciar sesión</Text>
+          <Text style={styles.subtitulo}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
 
           <TextField label="Correo electrónico:" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
 
@@ -87,7 +111,14 @@ const IniciarSesion: React.FC = () => {
           </PrimaryButton>
         </View>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    </TouchableWithoutFeedback><Popup
+        visible={popupVisible}
+        onClose={handleClosePopup}
+        title={popupOptions.title || ''}
+        description={popupOptions.description}
+        imageType={popupOptions.imageType}
+        buttons={popupOptions.buttons} />
+    </>
   );
 };
 
