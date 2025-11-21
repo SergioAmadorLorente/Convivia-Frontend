@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { StackNavigationOptions } from '@react-navigation/stack';
 
-import LandingPage from '../screens/LandingPage';
+import Main from '../screens/Main';
 import CrearCuenta from '../screens/CrearCuenta';
 import IniciarSesion from '../screens/IniciarSesion';
 import RecuperarPassword from '../screens/RecuperarPassword';
@@ -48,11 +48,11 @@ const defaultScreenOptions = {
 const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="LandingPage">
+      <Stack.Navigator initialRouteName="Main">
         {/* Pantalla inicial */}
         <Stack.Screen
-          name="LandingPage"
-          component={LandingPage}
+          name="Main"
+          component={Main}
           options={{ headerShown: false }}
         />
 

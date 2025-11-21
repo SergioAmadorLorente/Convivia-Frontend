@@ -42,7 +42,7 @@ const IniciarSesion: React.FC = () => {
       /*if (user && !user.emailVerified) {
         Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
         // optional: navigate to a screen that explains verification
-        navigation.navigate('LandingPage');
+        navigation.navigate('Main');
       } else {
         Alert.alert('Éxito', 'Login exitoso');
         navigation.navigate('Bienvenida');
