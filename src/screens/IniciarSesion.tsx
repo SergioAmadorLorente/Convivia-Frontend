@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { GLOBAL_STYLES } from '../styles/styles';
+import styles from '../styles/styles';
 import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -42,7 +42,7 @@ const IniciarSesion: React.FC = () => {
       /*if (user && !user.emailVerified) {
         Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
         // optional: navigate to a screen that explains verification
-        navigation.navigate('LandingPage');
+        navigation.navigate('Main');
       } else {
         Alert.alert('Éxito', 'Login exitoso');
         navigation.navigate('Bienvenida');
