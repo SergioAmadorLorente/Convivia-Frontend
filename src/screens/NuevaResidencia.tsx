@@ -64,7 +64,7 @@ const NuevaResidencia: React.FC = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
         <View style={styles.container}>
           <Text style={styles.titulo}>Crea una nueva residencia</Text>
@@ -82,8 +82,7 @@ const NuevaResidencia: React.FC = () => {
               autoCapitalize="words"
               autoCorrect={false}
               value={nombreResidencia}
-              onChangeText={setNombreResidencia}
-            />
+              onChangeText={setNombreResidencia} />
             {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
           </View>
 
@@ -92,15 +91,13 @@ const NuevaResidencia: React.FC = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-      <Popup
-      visible={popupVisible}
-      onClose={handleClosePopup}
-      title={popupOptions.title || ''}
-      description={popupOptions.description}
-      imageType={popupOptions.imageType}
-      buttons={popupOptions.buttons}
-    />
+    </TouchableWithoutFeedback><Popup
+        visible={popupVisible}
+        onClose={handleClosePopup}
+        title={popupOptions.title || ''}
+        description={popupOptions.description}
+        imageType={popupOptions.imageType}
+        buttons={popupOptions.buttons} />
     </>
   );
 };

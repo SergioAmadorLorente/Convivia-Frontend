@@ -73,7 +73,7 @@ const IniciarSesion: React.FC = () => {
   const handleClosePopup = () => setPopupVisible(false);
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
         <View style={styles.container}>
           <Text style={styles.titulo}>Iniciar sesión</Text>
@@ -96,15 +96,13 @@ const IniciarSesion: React.FC = () => {
           </PrimaryButton>
         </View>
       </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-      <Popup
+    </TouchableWithoutFeedback><Popup
         visible={popupVisible}
         onClose={handleClosePopup}
         title={popupOptions.title || ''}
         description={popupOptions.description}
         imageType={popupOptions.imageType}
-        buttons={popupOptions.buttons}
-      />
+        buttons={popupOptions.buttons} />
     </>
   );
 };
