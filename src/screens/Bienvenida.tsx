@@ -14,7 +14,7 @@ const Bienvenida: React.FC = () => {
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
   const handleLogout = () => {
-    navigation.navigate('Main');
+    navigation.navigate('LandingPage');
   };
 
   if (!fontsLoaded) {

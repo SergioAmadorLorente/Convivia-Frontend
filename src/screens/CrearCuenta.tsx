@@ -148,7 +148,7 @@ const CrearCuenta: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'android' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={GLOBAL_STYLES.container}>
             <Text style={GLOBAL_STYLES.title}>Crea tu cuenta</Text>
@@ -258,7 +258,7 @@ const CrearCuenta: React.FC = () => {
                       <Image source={require('../assets/pngsuccessful.png')} style={GLOBAL_STYLES.verificacionLogo} resizeMode="contain" />
                       <Text style={GLOBAL_STYLES.popupTextTitle as any || { fontSize: 20, fontWeight: 'bold' }}>¡Verificación enviada!</Text>
                       <Text style={GLOBAL_STYLES.popupTextSubTitle as any || { fontSize: 14, marginVertical: 10 }}>Revisa tu correo</Text>
-                      <TouchableOpacity style={GLOBAL_STYLES.closeButton as any || { backgroundColor: COLORS.accent, padding: 10, borderRadius: 5 }} onPress={() => { setModalVisible(false); navigation.navigate('Main'); }}>
+                      <TouchableOpacity style={GLOBAL_STYLES.closeButton as any || { backgroundColor: COLORS.accent, padding: 10, borderRadius: 5 }} onPress={() => { setModalVisible(false); navigation.navigate('LandingPage'); }}>
                         <Text style={GLOBAL_STYLES.closeButtonText as any || { color: 'white' }}>Cerrar</Text>
                       </TouchableOpacity>
                       <TouchableOpacity disabled={isCounting} onPress={handleResend} style={[GLOBAL_STYLES.closeButton as any || { backgroundColor: isCounting ? '#ccc' : COLORS.accent, padding: 10, borderRadius: 5, marginTop: 8 }]}>
