@@ -9,6 +9,165 @@ const { wp, hp, moderateScale, verticalScale } = HELPERS;
 // ESTILOS GLOBALES PRINCIPALES
 // =========================
 export const GLOBAL_STYLES = StyleSheet.create({
+            // =========================
+            // ESTILOS UNIR RESIDENCIA
+            // =========================
+            unirResidenciaContainer: {
+              flex: 1,
+              backgroundColor: '#fff',
+              alignItems: 'center',
+              paddingTop: hp('7%'),
+              paddingHorizontal: wp('5%'),
+            },
+            unirResidenciaTitulo: {
+              fontSize: moderateScale(40),
+              color: '#6B705C',
+              fontFamily: 'DMSerifDisplay_400Regular',
+              textAlign: 'center',
+              marginBottom: hp('1%'),
+            },
+            unirResidenciaSubtitulo: {
+              fontSize: moderateScale(13),
+              color: '#4B4741',
+              marginVertical: hp('1%'),
+              fontFamily: 'Montserrat_400Regular',
+              textAlign: 'center',
+              lineHeight: moderateScale(18),
+            },
+            unirResidenciaInputGroup: {
+              width: wp('80%'),
+              marginTop: hp('5%'),
+            },
+            unirResidenciaLabel: {
+              fontSize: moderateScale(14),
+              color: '#4B4741',
+              fontFamily: 'Montserrat_400Regular',
+              marginBottom: hp('0.5%'),
+              alignSelf: 'flex-start',
+            },
+            unirResidenciaInput: {
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingHorizontal: wp('4%'),
+              paddingVertical: verticalScale(8),
+              fontSize: moderateScale(13),
+              backgroundColor: '#F5F4F2',
+              width: '100%',
+            },
+            unirResidenciaErrorText: {
+              color: 'red',
+              fontSize: moderateScale(12),
+              marginTop: hp('0.5%'),
+              alignSelf: 'flex-start',
+              fontFamily: 'Montserrat_400Regular',
+            },
+            unirResidenciaBotonLogearse: {
+              paddingVertical: verticalScale(8),
+              borderRadius: 15,
+              width: wp('80%'),
+              alignSelf: 'center',
+              marginTop: hp('3%'),
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.15,
+              shadowRadius: 3,
+              elevation: 3,
+            },
+            unirResidenciaTextoBotonLogearse: {
+              color: '#4B4741',
+              fontSize: moderateScale(15),
+              textAlign: 'center',
+              fontFamily: 'Montserrat_400Regular',
+            },
+            unirResidenciaTextoNegrita: {
+              fontFamily: 'Montserrat_700Bold',
+              color: '#4B4741',
+            },
+            unirResidenciaTextoCursiva: {
+              fontStyle: 'italic',
+              color: '#4B4741',
+              fontFamily: 'Montserrat_400Regular',
+            },
+      // =========================
+      // ESTILOS NUEVA RESIDENCIA
+      // =========================
+      nuevaResidenciaContainer: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        paddingTop: hp('7%'),
+        paddingHorizontal: wp('5%'),
+      },
+      nuevaResidenciaTitulo: {
+        fontSize: moderateScale(40),
+        color: '#6B705C',
+        fontFamily: 'DMSerifDisplay_400Regular',
+        textAlign: 'center',
+        marginBottom: hp('1%'),
+      },
+      nuevaResidenciaSubtitulo: {
+        fontSize: moderateScale(13),
+        color: '#4B4741',
+        marginVertical: hp('1%'),
+        fontFamily: 'Montserrat_400Regular',
+        textAlign: 'center',
+        lineHeight: moderateScale(18),
+      },
+      nuevaResidenciaInputGroup: {
+        width: wp('80%'),
+        marginTop: hp('5%'),
+      },
+      nuevaResidenciaLabel: {
+        fontSize: moderateScale(14),
+        color: '#4B4741',
+        fontFamily: 'Montserrat_400Regular',
+        marginBottom: hp('0.5%'),
+        alignSelf: 'flex-start',
+      },
+      nuevaResidenciaInput: {
+        borderWidth: 1,
+        borderColor: '#CCC',
+        borderRadius: 10,
+        paddingHorizontal: wp('4%'),
+        paddingVertical: verticalScale(8),
+        fontSize: moderateScale(13),
+        backgroundColor: '#F5F4F2',
+        width: '100%',
+      },
+      nuevaResidenciaErrorText: {
+        color: 'red',
+        fontSize: moderateScale(12),
+        marginTop: hp('0.5%'),
+        alignSelf: 'flex-start',
+        fontFamily: 'Montserrat_400Regular',
+      },
+      nuevaResidenciaBotonLogearse: {
+        paddingVertical: verticalScale(8),
+        borderRadius: 15,
+        width: wp('80%'),
+        alignSelf: 'center',
+        marginTop: hp('3%'),
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 3,
+        elevation: 3,
+      },
+      nuevaResidenciaTextoBotonLogearse: {
+        color: '#4B4741',
+        fontSize: moderateScale(15),
+        textAlign: 'center',
+        fontFamily: 'Montserrat_400Regular',
+      },
+      nuevaResidenciaTextoNegrita: {
+        fontFamily: 'Montserrat_700Bold',
+        color: '#4B4741',
+      },
+      nuevaResidenciaTextoCursiva: {
+        fontStyle: 'italic',
+        color: '#4B4741',
+        fontFamily: 'Montserrat_400Regular',
+      },
     // ----------- CONTENEDORES GENERALES -----------
     // ----------- TEXTOS Y TIPOGRAFÍA -----------
     // ----------- INPUTS Y CAMPOS DE FORMULARIO -----------
@@ -678,10 +837,11 @@ export const GLOBAL_STYLES = StyleSheet.create({
   primaryButton: {
     ...(COMMON.BUTTON_BASE as any),
     ...(COMMON.SHADOW as any),
+    backgroundColor: COLORS.success,
   },
   // Texto del botón primario
   primaryButtonText: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontSize: SIZES.buttonText,
     textAlign: 'center',
     fontFamily: FONTS.regular,

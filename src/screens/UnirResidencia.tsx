@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   ActivityIndicator,
@@ -12,6 +11,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import GLOBAL_STYLES from '../styles/styles';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
@@ -53,7 +53,7 @@ const UnirResidencia: React.FC = () => {
 
   if (!fontsLoaded) {
     return (
-      <View style={[styles.container, { justifyContent: 'center' }]}>
+      <View style={[GLOBAL_STYLES.unirResidenciaContainer, { justifyContent: 'center' }]}> 
         <ActivityIndicator size="large" color="#6B705C" />
       </View>
     );
@@ -62,19 +62,19 @@ const UnirResidencia: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
-        <View style={styles.container}>
-          <Text style={styles.titulo}>Únete a una residencia</Text>
+        <View style={GLOBAL_STYLES.unirResidenciaContainer}>
+          <Text style={GLOBAL_STYLES.unirResidenciaTitulo}>Únete a una residencia</Text>
 
-          <Text style={styles.subtitulo}>
-            <Text style={styles.textoNegrita}>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
-            <Text style={styles.textoCursiva}>Perfil - Mi residencia</Text>
+          <Text style={GLOBAL_STYLES.unirResidenciaSubtitulo}>
+            <Text style={GLOBAL_STYLES.unirResidenciaTextoNegrita}>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
+            <Text style={GLOBAL_STYLES.unirResidenciaTextoCursiva}>Perfil - Mi residencia</Text>
           </Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Código de la residencia</Text>
+          <View style={GLOBAL_STYLES.unirResidenciaInputGroup}>
+            <Text style={GLOBAL_STYLES.unirResidenciaLabel}>Código de la residencia</Text>
             <TextInput
               style={[
-                styles.input,
+                GLOBAL_STYLES.unirResidenciaInput,
                 {
                   borderColor: codigoResidencia.length === 0 ? '#CCC' : isValidCode ? '#28e80eff' : 'red',
                 },
@@ -86,11 +86,11 @@ const UnirResidencia: React.FC = () => {
               value={codigoResidencia}
               onChangeText={setCodigoResidencia}
             />
-            {!isValidCode && codigoResidencia.length > 0 && <Text style={styles.errorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
+            {!isValidCode && codigoResidencia.length > 0 && <Text style={GLOBAL_STYLES.unirResidenciaErrorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
           </View>
 
-          <TouchableOpacity style={[styles.botonLogearse, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse}>
-            {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={styles.textoBotonLogearse}>Unirse</Text>}
+          <TouchableOpacity style={[GLOBAL_STYLES.unirResidenciaBotonLogearse, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse}>
+            {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={GLOBAL_STYLES.unirResidenciaTextoBotonLogearse}>Unirse</Text>}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -98,83 +98,6 @@ const UnirResidencia: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    paddingTop: hp('7%'),
-    paddingHorizontal: wp('5%'),
-  },
-  titulo: {
-    fontSize: moderateScale(40),
-    color: '#6B705C',
-    fontFamily: 'DMSerifDisplay_400Regular',
-    textAlign: 'center',
-    marginBottom: hp('1%'),
-  },
-  subtitulo: {
-    fontSize: moderateScale(13),
-    color: '#4B4741',
-    marginVertical: hp('1%'),
-    fontFamily: 'Montserrat_400Regular',
-    textAlign: 'center',
-    lineHeight: moderateScale(18),
-  },
-  inputGroup: {
-    width: wp('80%'),
-    marginTop: hp('5%'),
-  },
-  label: {
-    fontSize: moderateScale(14),
-    color: '#4B4741',
-    fontFamily: 'Montserrat_400Regular',
-    marginBottom: hp('0.5%'),
-    alignSelf: 'flex-start',
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: wp('4%'),
-    paddingVertical: verticalScale(8),
-    fontSize: moderateScale(13),
-    backgroundColor: '#F5F4F2',
-    width: '100%',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: moderateScale(12),
-    marginTop: hp('0.5%'),
-    alignSelf: 'flex-start',
-    fontFamily: 'Montserrat_400Regular',
-  },
-  botonLogearse: {
-    paddingVertical: verticalScale(8),
-    borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
-    marginTop: hp('3%'),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  textoBotonLogearse: {
-    color: '#4B4741',
-    fontSize: moderateScale(15),
-    textAlign: 'center',
-    fontFamily: 'Montserrat_400Regular',
-  },
-  textoNegrita: {
-    fontFamily: 'Montserrat_700Bold',
-    color: '#4B4741',
-  },
-  textoCursiva: {
-    fontStyle: 'italic',
-    color: '#4B4741',
-    fontFamily: 'Montserrat_400Regular',
-  },
-});
+
 
 export default UnirResidencia;
