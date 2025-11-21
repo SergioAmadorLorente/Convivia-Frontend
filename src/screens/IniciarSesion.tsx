@@ -40,7 +40,7 @@ const IniciarSesion: React.FC = () => {
       /*if (user && !user.emailVerified) {
         Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
         // optional: navigate to a screen that explains verification
-        navigation.navigate('Main');
+        navigation.navigate('LandingPage');
       } else {
         Alert.alert('Éxito', 'Login exitoso');
         navigation.navigate('Bienvenida');
@@ -73,9 +73,8 @@ const IniciarSesion: React.FC = () => {
   const handleClosePopup = () => setPopupVisible(false);
 
   return (
-    <>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
         <View style={styles.container}>
           <Text style={styles.titulo}>Iniciar sesión</Text>
           <Text style={styles.subtitulo}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
