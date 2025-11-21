@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Image, Text } from 'react-native';
-import { GLOBAL_STYLES } from '../../styles/styles';
+import GLOBAL_STYLES from '../../styles/styles';
 
-const Logo = () => (
+const Logo: React.FC = () => (
   <>
     <Image
       source={require('../../assets/logoReal.png')}

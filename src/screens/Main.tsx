@@ -5,10 +5,10 @@ import useLoadFonts from '../hooks/useLoadFonts';
 import Loading from '../components/ui/Loading';
 import Logo from '../components/ui/Logo';
 import AuthButtons from '../components/ui/AuthButtons';
-import { GLOBAL_STYLES } from '../styles/styles';
+import GLOBAL_STYLES from '../styles/styles';
 
-const Main = () => {
-  const navigation = useNavigation();
+const Main: React.FC = () => {
+  const navigation = useNavigation<any>();
   const fontsLoaded = useLoadFonts();
 
   if (!fontsLoaded) {
@@ -17,26 +17,18 @@ const Main = () => {
 
   return (
     <ScrollView contentContainerStyle={GLOBAL_STYLES.scrollContainer} keyboardShouldPersistTaps="handled">
-      {/* Título de bienvenida */}
       <Text style={GLOBAL_STYLES.titulo}>¡Hola!</Text>
       <Text style={GLOBAL_STYLES.subtitulo}>Bienvenido a Convivia</Text>
 
-      {/* Párrafo descriptivo */}
       <View style={GLOBAL_STYLES.bloqueTexto}>
         <Text style={GLOBAL_STYLES.parrafo}>
-          Organiza, colabora y cumple tus metas junto a tus compañeros.{'\n'}
-          ¡Aquí la productividad es compartida y las ideas fluyen en sintonía!
+          Organiza, colabora y cumple tus metas junto a tus compañeros.{'\n'}¡Aquí la productividad es compartida y las ideas fluyen en sintonía!
         </Text>
       </View>
 
-      {/* Logo + textos debajo */}
       <Logo />
 
-      {/* Botones */}
-      <AuthButtons
-        onCreate={() => navigation.navigate('CrearCuenta')}
-        onSignIn={() => navigation.navigate('IniciarSesion')}
-      />
+      <AuthButtons onCreate={() => navigation.navigate('CrearCuenta')} onSignIn={() => navigation.navigate('IniciarSesion')} />
     </ScrollView>
   );
 };

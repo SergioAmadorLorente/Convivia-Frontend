@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { GLOBAL_STYLES } from '../../styles/styles';
+import GLOBAL_STYLES from '../../styles/styles';
 import { moderateScale } from 'react-native-size-matters';
 
-const PasswordField = ({ label, value, onChangeText, placeholder }) => {
-  const [show, setShow] = useState(false);
+interface PasswordFieldProps {
+  label?: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+}
+
+const PasswordField: React.FC<PasswordFieldProps> = ({ label, value, onChangeText, placeholder }) => {
+  const [show, setShow] = useState<boolean>(false);
 
   return (
     <View style={GLOBAL_STYLES.inputGroup}>

@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  ActivityIndicator,
-  TouchableOpacity,
-  Keyboard,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../configs/firebaseConfig';
@@ -22,12 +12,13 @@ import TextField from '../components/ui/TextField';
 import PasswordField from '../components/ui/PasswordField';
 import PrimaryButton from '../components/ui/PrimaryButton';
 
-const IniciarSesion = () => {
+
+const IniciarSesion: React.FC = () => {
   const { value: email, validate: validateEmail, error: emailError, isValid: isValidEmail } = useEmailValidation('');
-  const [password, setPassword] = useState('');
-  const [isChecked, setIsChecked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
+  const [password, setPassword] = useState<string>('');
+  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const navigation = useNavigation<any>();
 
   const fontsLoaded = useLoadFonts();
 
@@ -39,33 +30,34 @@ const IniciarSesion = () => {
     );
   }
 
-  // Replaced by useEmailValidation.validate
-
   const handleLogin = async () => {
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-
-      alert('Login exitoso');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      // FOR FUTURE EMAIL VERIFICATION IMPLEMENTATION
+      /*if (user && !user.emailVerified) {
+        Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
+        // optional: navigate to a screen that explains verification
+        navigation.navigate('Main');
+      } else {
+        Alert.alert('Éxito', 'Login exitoso');
+        navigation.navigate('Bienvenida');
+      }*/
+      Alert.alert('Éxito', 'Login exitoso');
       navigation.navigate('Bienvenida');
-
-
-    } catch (error) {
-      setEmailError('Credenciales incorrectas o usuario no existe');
+    } catch (error: any) {
+      Alert.alert('Error', 'Credenciales incorrectas o usuario no existe');
     }
     setLoading(false);
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
         <View style={styles.container}>
           <Text style={styles.titulo}>Iniciar sesión</Text>
-          <Text style={styles.subtitulo}>¡Ya estás a punto de poder utilizar la{'\n'} aplicación de Convivia!</Text>
+          <Text style={styles.subtitulo}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
 
           <TextField label="Correo electrónico:" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
 
@@ -74,20 +66,12 @@ const IniciarSesion = () => {
             <Text style={styles.recuperarPassword}>Recuperar contraseña</Text>
           </TouchableOpacity>
 
-          {/* Recordarme */}
           <TouchableOpacity style={styles.checkboxContainer} onPress={() => setIsChecked(!isChecked)}>
-            <View style={styles.checkbox}>
-              {isChecked && <Ionicons name="checkmark" size={moderateScale(16)} color="#ACBF8A" />}
-            </View>
+            <View style={styles.checkbox}>{isChecked && <Ionicons name="checkmark" size={moderateScale(16)} color="#ACBF8A" />}</View>
             <Text style={styles.labelRecordarme}>Recordarme</Text>
           </TouchableOpacity>
 
-          <PrimaryButton
-            onPress={() => handleLogin()}
-            disabled={!isValidEmail || loading}
-            loading={loading}
-            style={{ backgroundColor: isValidEmail ? '#E6ECDC' : '#ccc', width: wp('80%'), marginTop: hp('3%') }}
-          >
+          <PrimaryButton onPress={() => handleLogin()} disabled={!isValidEmail || loading} loading={loading} style={{ backgroundColor: isValidEmail ? '#E6ECDC' : '#ccc', width: wp('80%'), marginTop: hp('3%') }}>
             Entrar
           </PrimaryButton>
         </View>
