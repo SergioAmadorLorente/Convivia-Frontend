@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { GLOBAL_STYLES } from '../styles/styles';
+import styles from '../styles/styles';
 import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';

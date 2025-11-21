@@ -11,6 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import GLOBAL_STYLES from '../styles/styles';
+import styles from '../styles/styles';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
