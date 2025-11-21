@@ -586,46 +586,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
     padding: verticalScale(3),
   },
-  verificacionOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  verificacionPopup: {
-    width: wp('80%'),
-    height: hp('60%'),
-    padding: verticalScale(19),
-    backgroundColor: COLORS.background,
-    borderRadius: moderateScale(25),
-    alignItems: 'center',
-  },
-  verificacionPopupTextTitle: {
-    fontSize: moderateScale(25),
-    marginBottom: verticalScale(5),
-    textAlign: 'center',
-    fontFamily: FONTS.title,
-    color: COLORS.primary,
-  },
-  verificacionPopupTextSubTitle: {
-    fontSize: moderateScale(12),
-    marginBottom: verticalScale(12),
-    textAlign: 'center',
-    fontFamily: FONTS.regular,
-    color: COLORS.secondary,
-  },
-  verificacionLogo: {
-    width: wp('60%'),
-    height: wp('60%'),
-    marginTop: -verticalScale(1),
-    borderRadius: moderateScale(25),
-  },
-  verificacionCloseButton: {
-    backgroundColor: COLORS.accent,
-    paddingVertical: verticalScale(8),
-    paddingHorizontal: wp('5%'),
-    borderRadius: moderateScale(8),
-  },
   verificacionScrollContent: {
     flexGrow: 1,
     justifyContent: 'flex-start',
@@ -644,56 +604,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 19,
   },
-  verificacionBotonesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  verificacionCloseButtonText: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-  },
-  /* Backwards-compatible aliases used by some screens */
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  popup: {
-    width: wp('80%'),
-    height: hp('60%'),
-    padding: verticalScale(19),
-    backgroundColor: COLORS.background,
-    borderRadius: moderateScale(25),
-    alignItems: 'center',
-  },
-  popupTextTitle: {
-    fontSize: moderateScale(25),
-    marginBottom: verticalScale(5),
-    textAlign: 'center',
-    fontFamily: FONTS.title,
-    color: COLORS.primary,
-  },
-  popupTextSubTitle: {
-    fontSize: moderateScale(12),
-    marginBottom: verticalScale(12),
-    textAlign: 'center',
-    fontFamily: FONTS.regular,
-    color: COLORS.secondary,
-  },
-  closeButton: {
-    backgroundColor: COLORS.accent,
-    paddingVertical: verticalScale(8),
-    paddingHorizontal: wp('5%'),
-    borderRadius: moderateScale(8),
-  },
-  closeButtonText: {
-    fontSize: 16,
-    color: '#fff',
-    textAlign: 'center',
-  },
+  /* Popup-related styles removed: Popup is now handled by src/components/ui/Popup.tsx */
   checkboxText: {
     fontSize: SIZES.input,
     color: COLORS.primary,
@@ -734,4 +645,5 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
 });
 
+ 
 export default GLOBAL_STYLES;

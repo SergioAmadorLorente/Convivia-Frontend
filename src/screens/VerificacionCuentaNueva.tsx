@@ -3,7 +3,6 @@ import {
   Text,
   View,
   ActivityIndicator,
-  Modal,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -19,6 +18,7 @@ import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/mo
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import GLOBAL_STYLES, { COLORS } from '../styles/styles';
+import Popup from '../components/ui/Popup';
 
 const VerificacionCuentaNueva: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -112,31 +112,22 @@ const VerificacionCuentaNueva: React.FC = () => {
               <Text style={GLOBAL_STYLES.verificacionTextoBotonFinalizar}>Finalizar registro</Text>
             </TouchableOpacity>
 
-            <Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-              <View style={GLOBAL_STYLES.verificacionOverlay}>
-                <View style={GLOBAL_STYLES.verificacionPopup}>
-                  {modalTipo === 'exito' ? (
-                    <>
-                      <Image source={require('../assets/pngsuccessful.png')} style={GLOBAL_STYLES.verificacionLogo} resizeMode="contain" />
-                      <Text style={GLOBAL_STYLES.verificacionPopupTextTitle}>¡Felicidades!</Text>
-                      <Text style={GLOBAL_STYLES.verificacionPopupTextSubTitle}>Puedes utilizar tu cuenta</Text>
-                      <TouchableOpacity style={GLOBAL_STYLES.verificacionCloseButton} onPress={() => { setModalVisible(false); navigation.navigate('IniciarSesion'); }}>
-                        <Text style={GLOBAL_STYLES.verificacionCloseButtonText}>Iniciar sesión</Text>
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <>
-                      <Image source={require('../assets/pngsuccessful.png')} style={GLOBAL_STYLES.verificacionLogo} resizeMode="contain" />
-                      <Text style={GLOBAL_STYLES.verificacionPopupTextTitle}>Código reenviado</Text>
-                      <Text style={GLOBAL_STYLES.verificacionPopupTextSubTitle}>Revise su correo y spam</Text>
-                      <TouchableOpacity style={GLOBAL_STYLES.verificacionCloseButton} onPress={() => setModalVisible(false)}>
-                        <Text style={GLOBAL_STYLES.verificacionCloseButtonText}>Cerrar</Text>
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
-              </View>
-            </Modal>
+            <Popup
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
+              title={modalTipo === 'exito' ? '¡Felicidades!' : 'Código reenviado'}
+              description={modalTipo === 'exito' ? 'Puedes utilizar tu cuenta' : 'Revise su correo y spam'}
+              imageType={'success'}
+              buttons={
+                modalTipo === 'exito'
+                  ? [
+                      { text: 'Iniciar sesión', onPress: () => navigation.navigate('IniciarSesion') },
+                    ]
+                  : [
+                      { text: 'Cerrar', onPress: () => {} },
+                    ]
+              }
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TextInput, TouchableWithoutFeedback, Alert } from 'react-native';
+import { Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TextInput, TouchableWithoutFeedback } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import GLOBAL_STYLES, { COLORS } from '../styles/styles';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
+import Popup from '../components/ui/Popup';
 
 const RecuperarPassword: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -16,6 +17,16 @@ const RecuperarPassword: React.FC = () => {
   const navigation = useNavigation<any>();
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
+
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupOptions, setPopupOptions] = useState<any>({});
+
+  const showPopup = (opts: any) => {
+    setPopupOptions(opts);
+    setPopupVisible(true);
+  };
+
+  const handleClosePopup = () => setPopupVisible(false);
 
   if (!fontsLoaded) {
     return (
@@ -36,8 +47,9 @@ const RecuperarPassword: React.FC = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={GLOBAL_STYLES.recuperarContainerPrincipal}>
+    <>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={GLOBAL_STYLES.recuperarContainerPrincipal}>
         <Text style={GLOBAL_STYLES.recuperarTitulo}>Recuperar contraseña</Text>
         <Text style={GLOBAL_STYLES.recuperarSubtitulo}>¿Has olvidado tu contraseña?</Text>
 
@@ -56,10 +68,9 @@ const RecuperarPassword: React.FC = () => {
             onPress={async () => {
               try {
                 await sendPasswordResetEmail(auth, email);
-                Alert.alert('Correo enviado', 'Se ha enviado un correo para restablecer la contraseña. Revisa tu bandeja de entrada.');
-                navigation.navigate('Main');
+                showPopup({ title: 'Correo enviado', description: 'Se ha enviado un correo para restablecer la contraseña. Revisa tu bandeja de entrada.', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('Main') }] });
               } catch (err: any) {
-                Alert.alert('Error', 'No se pudo enviar el correo: ' + (err?.message ?? String(err)));
+                showPopup({ title: 'Error', description: 'No se pudo enviar el correo: ' + (err?.message ?? String(err)), imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
               }
             }}
           >
@@ -70,8 +81,10 @@ const RecuperarPassword: React.FC = () => {
         <TouchableOpacity style={GLOBAL_STYLES.botonTemp} onPress={() => navigation.navigate('RestablecerPassword')}>
           <Text style={GLOBAL_STYLES.botonTempText}>Boton Temporal Restablecer Contraseña</Text>
         </TouchableOpacity>
-      </View>
-    </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+      <Popup visible={popupVisible} onClose={handleClosePopup} title={popupOptions.title || ''} description={popupOptions.description} imageType={popupOptions.imageType} buttons={popupOptions.buttons} />
+    </>
   );
 };
 

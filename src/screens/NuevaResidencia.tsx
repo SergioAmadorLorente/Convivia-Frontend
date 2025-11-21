@@ -10,7 +10,6 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
@@ -18,11 +17,22 @@ import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/mo
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
+import Popup from '../components/ui/Popup';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
+
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupOptions, setPopupOptions] = useState<any>({});
+
+  const showPopup = (opts: any) => {
+    setPopupOptions(opts);
+    setPopupVisible(true);
+  };
+
+  const handleClosePopup = () => setPopupVisible(false);
 
   const hasText = nombreResidencia.trim().length > 0;
 
@@ -38,24 +48,24 @@ const NuevaResidencia: React.FC = () => {
 
   const handleCrear = async () => {
     if (!hasText) {
-      Alert.alert('Campo requerido', 'Por favor, ingresa un nombre para la residencia.');
+      showPopup({ title: 'Campo requerido', description: 'Por favor, ingresa un nombre para la residencia.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
       return;
     }
 
     setLoading(true);
     try {
-      Alert.alert('Éxito', 'Residencia creada exitosamente');
-      navigation.navigate('DashBoardPersonal');
+      showPopup({ title: 'Éxito', description: 'Residencia creada exitosamente', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }] });
     } catch (error) {
       console.error('Error al crear residencia:', error);
-      Alert.alert('Error', 'Error al crear la residencia. Intenta de nuevo.');
+      showPopup({ title: 'Error', description: 'Error al crear la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
         <View style={styles.container}>
           <Text style={styles.titulo}>Crea una nueva residencia</Text>
@@ -83,7 +93,16 @@ const NuevaResidencia: React.FC = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+      <Popup
+      visible={popupVisible}
+      onClose={handleClosePopup}
+      title={popupOptions.title || ''}
+      description={popupOptions.description}
+      imageType={popupOptions.imageType}
+      buttons={popupOptions.buttons}
+    />
+    </>
   );
 };
 
