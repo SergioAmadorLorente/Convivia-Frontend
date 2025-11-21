@@ -53,7 +53,7 @@ const UnirResidencia: React.FC = () => {
 
   if (!fontsLoaded) {
     return (
-      <View style={[GLOBAL_STYLES.unirResidenciaContainer, { justifyContent: 'center' }]}> 
+      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}> 
         <ActivityIndicator size="large" color="#6B705C" />
       </View>
     );
@@ -62,19 +62,19 @@ const UnirResidencia: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
-        <View style={GLOBAL_STYLES.unirResidenciaContainer}>
-          <Text style={GLOBAL_STYLES.unirResidenciaTitulo}>Únete a una residencia</Text>
+        <View style={GLOBAL_STYLES.container}>
+          <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
-          <Text style={GLOBAL_STYLES.unirResidenciaSubtitulo}>
-            <Text style={GLOBAL_STYLES.unirResidenciaTextoNegrita}>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
-            <Text style={GLOBAL_STYLES.unirResidenciaTextoCursiva}>Perfil - Mi residencia</Text>
+          <Text style={GLOBAL_STYLES.subtitle}>
+            <Text style={{ fontWeight: 'bold' }}>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
+            <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
           </Text>
 
-          <View style={GLOBAL_STYLES.unirResidenciaInputGroup}>
-            <Text style={GLOBAL_STYLES.unirResidenciaLabel}>Código de la residencia</Text>
+          <View style={GLOBAL_STYLES.inputGroup}>
+            <Text style={GLOBAL_STYLES.label}>Código de la residencia</Text>
             <TextInput
               style={[
-                GLOBAL_STYLES.unirResidenciaInput,
+                GLOBAL_STYLES.input,
                 {
                   borderColor: codigoResidencia.length === 0 ? '#CCC' : isValidCode ? '#28e80eff' : 'red',
                 },
@@ -86,11 +86,11 @@ const UnirResidencia: React.FC = () => {
               value={codigoResidencia}
               onChangeText={setCodigoResidencia}
             />
-            {!isValidCode && codigoResidencia.length > 0 && <Text style={GLOBAL_STYLES.unirResidenciaErrorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
+            {!isValidCode && codigoResidencia.length > 0 && <Text style={GLOBAL_STYLES.errorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
           </View>
 
-          <TouchableOpacity style={[GLOBAL_STYLES.unirResidenciaBotonLogearse, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse}>
-            {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={GLOBAL_STYLES.unirResidenciaTextoBotonLogearse}>Unirse</Text>}
+          <TouchableOpacity style={[GLOBAL_STYLES.primaryButton, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse}>
+            {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={GLOBAL_STYLES.primaryButtonText}>Unirse</Text>}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

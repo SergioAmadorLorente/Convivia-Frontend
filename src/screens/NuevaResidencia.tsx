@@ -30,7 +30,7 @@ const NuevaResidencia: React.FC = () => {
 
   if (!fontsLoaded) {
     return (
-      <View style={[GLOBAL_STYLES.nuevaResidenciaContainer, { justifyContent: 'center' }]}> 
+      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}> 
         <ActivityIndicator size="large" color="#6B705C" />
       </View>
     );
@@ -57,18 +57,18 @@ const NuevaResidencia: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
-        <View style={GLOBAL_STYLES.nuevaResidenciaContainer}>
-          <Text style={GLOBAL_STYLES.nuevaResidenciaTitulo}>Crea una nueva residencia</Text>
+        <View style={GLOBAL_STYLES.container}>
+          <Text style={GLOBAL_STYLES.title}>Crea una nueva residencia</Text>
 
-          <Text style={GLOBAL_STYLES.nuevaResidenciaSubtitulo}>
-            <Text style={GLOBAL_STYLES.nuevaResidenciaTextoNegrita}>Obtén el código de tu residencia en el apartado </Text>
-            <Text style={GLOBAL_STYLES.nuevaResidenciaTextoCursiva}>Perfil - Mi residencia</Text>
+          <Text style={GLOBAL_STYLES.subtitle}>
+            <Text style={{ fontWeight: 'bold' }}>Obtén el código de tu residencia en el apartado </Text>
+            <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
           </Text>
 
-          <View style={GLOBAL_STYLES.nuevaResidenciaInputGroup}>
-            <Text style={GLOBAL_STYLES.nuevaResidenciaLabel}>Nombre de la residencia</Text>
+          <View style={GLOBAL_STYLES.inputGroup}>
+            <Text style={GLOBAL_STYLES.label}>Nombre de la residencia</Text>
             <TextInput
-              style={[GLOBAL_STYLES.nuevaResidenciaInput, { borderColor: hasText ? '#28e80eff' : 'red' }]}
+              style={[GLOBAL_STYLES.input, { borderColor: hasText ? '#28e80eff' : 'red' }]}
               placeholder="Piso Tarragona"
               autoCapitalize="words"
               autoCorrect={false}
@@ -76,19 +76,19 @@ const NuevaResidencia: React.FC = () => {
               onChangeText={setNombreResidencia}
             />
             {!hasText && nombreResidencia.length > 0 && (
-              <Text style={GLOBAL_STYLES.nuevaResidenciaErrorText}>Ingresa un nombre válido</Text>
+              <Text style={GLOBAL_STYLES.errorText}>Ingresa un nombre válido</Text>
             )}
           </View>
 
           <TouchableOpacity
-            style={[GLOBAL_STYLES.nuevaResidenciaBotonLogearse, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
+            style={[GLOBAL_STYLES.primaryButton, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
             disabled={!hasText || loading}
             onPress={handleCrear}
           >
             {loading ? (
               <ActivityIndicator size="small" color="#4B4741" />
             ) : (
-              <Text style={GLOBAL_STYLES.nuevaResidenciaTextoBotonLogearse}>Crear</Text>
+              <Text style={GLOBAL_STYLES.primaryButtonText}>Crear</Text>
             )}
           </TouchableOpacity>
         </View>

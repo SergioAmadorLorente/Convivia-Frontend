@@ -55,7 +55,7 @@ const IniciarSesion: React.FC = () => {
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
         <View style={GLOBAL_STYLES.container}>
           <Text style={GLOBAL_STYLES.titulo}>Iniciar sesión</Text>
-          <Text style={GLOBAL_STYLES.subtitulo}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
+          <Text style={[GLOBAL_STYLES.subtitulo, { textAlign: 'center' }]}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
 
           <TextField label="Correo electrónico:" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
 
@@ -69,7 +69,20 @@ const IniciarSesion: React.FC = () => {
             <Text style={GLOBAL_STYLES.labelRecordarme}>Recordarme</Text>
           </TouchableOpacity>
 
-          <PrimaryButton onPress={() => handleLogin()} disabled={!isValidEmail || loading} loading={loading} style={GLOBAL_STYLES.botonLogearse}>
+          <PrimaryButton
+            onPress={() => handleLogin()}
+            disabled={!isValidEmail || loading}
+            loading={loading}
+            style={[
+              GLOBAL_STYLES.botonLogearse,
+              (!isValidEmail)
+                ? { backgroundColor: '#888' } // strong gray for invalid email
+                : (loading
+                    ? { backgroundColor: '#ccc' } // light gray for loading
+                    : { backgroundColor: GLOBAL_STYLES.botonLogearse.backgroundColor || '#E6ECDC' }
+                  ),
+            ]}
+          >
             Entrar
           </PrimaryButton>
         </View>
