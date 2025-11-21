@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../configs/firebaseConfig';
@@ -11,6 +11,7 @@ import useEmailValidation from '../hooks/useEmailValidation';
 import TextField from '../components/ui/TextField';
 import PasswordField from '../components/ui/PasswordField';
 import PrimaryButton from '../components/ui/PrimaryButton';
+import Popup from '../components/ui/Popup';
 
 
 const IniciarSesion: React.FC = () => {
@@ -44,13 +45,32 @@ const IniciarSesion: React.FC = () => {
         Alert.alert('Éxito', 'Login exitoso');
         navigation.navigate('Bienvenida');
       }*/
-      Alert.alert('Éxito', 'Login exitoso');
-      navigation.navigate('Bienvenida');
+      showPopup({
+        title: 'Éxito',
+        description: 'Login exitoso',
+        imageType: 'success',
+        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('Bienvenida') }],
+      });
     } catch (error: any) {
-      Alert.alert('Error', 'Credenciales incorrectas o usuario no existe');
+      showPopup({
+        title: 'Error',
+        description: 'Credenciales incorrectas o usuario no existe',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+      });
     }
     setLoading(false);
   };
+
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupOptions, setPopupOptions] = useState<any>({});
+
+  const showPopup = (opts: any) => {
+    setPopupOptions(opts);
+    setPopupVisible(true);
+  };
+
+  const handleClosePopup = () => setPopupVisible(false);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -76,7 +96,16 @@ const IniciarSesion: React.FC = () => {
           </PrimaryButton>
         </View>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+      <Popup
+        visible={popupVisible}
+        onClose={handleClosePopup}
+        title={popupOptions.title || ''}
+        description={popupOptions.description}
+        imageType={popupOptions.imageType}
+        buttons={popupOptions.buttons}
+      />
+    </>
   );
 };
 
