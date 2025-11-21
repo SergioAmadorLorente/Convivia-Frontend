@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Text,
   View,
@@ -19,10 +19,11 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { moderateScale } from 'react-native-size-matters';
 import { createUserWithEmailAndPassword, sendEmailVerification, User } from 'firebase/auth';
-import GLOBAL_STYLES from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { COLORS } from '../styles/theme';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
+import { useKeyboardAware } from '../hooks';
 
 const CrearCuenta: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -74,6 +75,9 @@ const CrearCuenta: React.FC = () => {
 
     return () => clearInterval(timer);
   }, [contador, isCounting]);
+
+  const containerRef = useRef<any>(null);
+  useKeyboardAware({ containerRef, padding: 12 });
 
   const validateEmail = (text: string) => {
     setEmail(text);
@@ -150,8 +154,8 @@ const CrearCuenta: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <View style={GLOBAL_STYLES.container}>
+        <ScrollView ref={containerRef} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
             <Text style={GLOBAL_STYLES.title}>Crea tu cuenta</Text>
             <Text style={GLOBAL_STYLES.subtitle}>¿Quieres empezar tu experiencia con Convivia?</Text>
 

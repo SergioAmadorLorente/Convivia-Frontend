@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, TextInput } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { Ionicons } from '@expo/vector-icons';
 import { moderateScale } from 'react-native-size-matters';
-import GLOBAL_STYLES from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { COLORS } from '../styles/theme';
+import { useKeyboardAware } from '../hooks';
 
 const RestablecerPassword: React.FC = () => {
   const [password, setPassword] = useState<string>('');
@@ -16,6 +17,9 @@ const RestablecerPassword: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
+
+  const containerRef = useRef<any>(null);
+  useKeyboardAware({ containerRef, padding: 12 });
 
   const isPasswordValid = password.length >= 8 && password === confirmPassword;
 
@@ -50,7 +54,7 @@ const RestablecerPassword: React.FC = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={GLOBAL_STYLES.restablecerContainer}>
+      <View ref={containerRef} style={[GLOBAL_STYLES.restablecerContainer, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
         <Text style={GLOBAL_STYLES.restablecerTitulo}>Restablecer contraseña</Text>
         <Text style={GLOBAL_STYLES.restablecerSubtitulo}>Cambia tu contraseña si no te acuerdas de ella</Text>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Text,
   View,
@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import GLOBAL_STYLES from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import styles from '../styles/styles';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
@@ -19,6 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
+import { useKeyboardAware } from '../hooks';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -38,6 +39,9 @@ const NuevaResidencia: React.FC = () => {
   const hasText = nombreResidencia.trim().length > 0;
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
+
+  const containerRef = useRef<any>(null);
+  useKeyboardAware({ containerRef, padding: 12 });
 
   if (!fontsLoaded) {
     return (
@@ -67,7 +71,7 @@ const NuevaResidencia: React.FC = () => {
   return (
     <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
-        <View style={styles.container}>
+        <View ref={containerRef} style={[styles.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
           <Text style={styles.titulo}>Crea una nueva residencia</Text>
 
           <Text style={GLOBAL_STYLES.subtitle}>

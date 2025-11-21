@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Text,
   View,
@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import GLOBAL_STYLES from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
@@ -18,6 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
+import { useKeyboardAware } from '../hooks';
 
 const UnirResidencia: React.FC = () => {
   const [codigoResidencia, setCodigoResidencia] = useState<string>('');
@@ -29,6 +30,9 @@ const UnirResidencia: React.FC = () => {
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
+
+  const containerRef = useRef<any>(null);
+  useKeyboardAware({ containerRef, padding: 12 });
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupOptions, setPopupOptions] = useState<any>({});
@@ -72,7 +76,7 @@ const UnirResidencia: React.FC = () => {
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
-        <View style={GLOBAL_STYLES.container}>
+        <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
           <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
           <Text style={GLOBAL_STYLES.subtitle}>

@@ -612,5 +612,14 @@ export const GLOBAL_STYLES = StyleSheet.create({
 // Exportaciones de constantes de tema para uso en otros archivos
 export { COLORS, FONTS, SIZES };
 
+// Helper: reusable web-only full-viewport container style.
+// Use this when you want a scrollable container that matches the visual
+// viewport height on web (works with `visualViewport` and `100dvh`).
+// Example: `<View style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]} />`
+export const WEB_FULL_VIEWPORT: any = {
+  height: '100dvh',
+  overflow: 'auto',
+};
+
 // Exportación por defecto de los estilos globales
 export default GLOBAL_STYLES;

@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TextInput, TouchableWithoutFeedback } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
-import GLOBAL_STYLES from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { COLORS } from '../styles/theme';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
+import { useKeyboardAware } from '../hooks';
 
 const RecuperarPassword: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -21,6 +22,9 @@ const RecuperarPassword: React.FC = () => {
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupOptions, setPopupOptions] = useState<any>({});
+
+  const containerRef = useRef<any>(null);
+  useKeyboardAware({ containerRef, padding: 12 });
 
   const showPopup = (opts: any) => {
     setPopupOptions(opts);
@@ -50,7 +54,7 @@ const RecuperarPassword: React.FC = () => {
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={GLOBAL_STYLES.recuperarContainerPrincipal}>
+        <View ref={containerRef} style={[GLOBAL_STYLES.recuperarContainerPrincipal, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
         <Text style={GLOBAL_STYLES.recuperarTitulo}>Recuperar contraseña</Text>
         <Text style={GLOBAL_STYLES.recuperarSubtitulo}>¿Has olvidado tu contraseña?</Text>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Text,
   View,
@@ -17,8 +17,9 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import GLOBAL_STYLES, { COLORS } from '../styles/styles';
+import GLOBAL_STYLES, { COLORS, WEB_FULL_VIEWPORT } from '../styles/styles';
 import Popup from '../components/ui/Popup';
+import { useKeyboardAware } from '../hooks';
 
 const VerificacionCuentaNueva: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -38,6 +39,9 @@ const VerificacionCuentaNueva: React.FC = () => {
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
+
+  const containerRef = useRef<any>(null);
+  useKeyboardAware({ containerRef, padding: 12 });
 
   if (!fontsLoaded) {
     return (
@@ -70,8 +74,8 @@ const VerificacionCuentaNueva: React.FC = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-        <ScrollView contentContainerStyle={GLOBAL_STYLES.verificacionScrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <View style={GLOBAL_STYLES.verificacionContainer}>
+        <ScrollView ref={containerRef} contentContainerStyle={GLOBAL_STYLES.verificacionScrollContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={[GLOBAL_STYLES.verificacionContainer, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
             <Text style={GLOBAL_STYLES.verificacionTitulo}>Verificación</Text>
             <Text style={GLOBAL_STYLES.verificacionSubtitulo}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
 
