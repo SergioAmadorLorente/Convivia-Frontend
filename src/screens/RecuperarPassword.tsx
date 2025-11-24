@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TextInput, TouchableWithoutFeedback } from 'react-native';
+import { Platform ,Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TextInput, TouchableWithoutFeedback } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
@@ -83,9 +83,7 @@ const RecuperarPassword: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={GLOBAL_STYLES.botonTemp} onPress={() => navigation.navigate('RestablecerPassword')}>
-          <Text style={GLOBAL_STYLES.botonTempText}>Boton Temporal Restablecer Contraseña</Text>
-        </TouchableOpacity>
+       
         </View>
       </TouchableWithoutFeedback>
       <Popup visible={popupVisible} onClose={handleClosePopup} title={popupOptions.title || ''} description={popupOptions.description} imageType={popupOptions.imageType} buttons={popupOptions.buttons} />
