@@ -25,6 +25,7 @@ import { COLORS } from '../styles/theme';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
+import { PrimaryButton } from '../components';
 
 const CrearCuenta: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -236,9 +237,9 @@ const CrearCuenta: React.FC = () => {
               <Text style={GLOBAL_STYLES.labelCheckbox as any}>Cookies</Text>
             </View>
 
-            <TouchableOpacity
+            <PrimaryButton
               style={[
-                GLOBAL_STYLES.botonIngresarMail,
+                GLOBAL_STYLES.botonStyle1,
                 {
                   backgroundColor:
                     (isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword && !isCounting)
@@ -249,8 +250,8 @@ const CrearCuenta: React.FC = () => {
               disabled={isCounting || !(isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword)}
               onPress={handleEnviarVerificacion}
             >
-              <Text style={GLOBAL_STYLES.textoBotonIngresarMail}>{isCounting ? `Reenviando en ${contador}s` : 'Enviar verificación'}</Text>
-            </TouchableOpacity>
+              <Text style={GLOBAL_STYLES.textoBoton}>{isCounting ? `Reenviando en ${contador}s` : 'Enviar verificación'}</Text>
+            </PrimaryButton>
 
             <Text style={GLOBAL_STYLES.verificacionEnviarCodigoNuevo}>¿No te ha llegado?</Text>
 
@@ -265,13 +266,13 @@ const CrearCuenta: React.FC = () => {
               buttons={
                 modalTipo === 'exito'
                   ? [
-                      { text: 'Cerrar', onPress: () => navigation.navigate('Main') },
-                      { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
-                    ]
+                    { text: 'Cerrar', onPress: () => navigation.navigate('Main') },
+                    { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
+                  ]
                   : [
-                      { text: 'Cerrar', onPress: () => {} },
-                      { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
-                    ]
+                    { text: 'Cerrar', onPress: () => { } },
+                    { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
+                  ]
               }
             />
           </View>

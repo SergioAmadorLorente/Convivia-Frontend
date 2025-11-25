@@ -19,6 +19,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
+import { PrimaryButton } from '../components';
 
 const UnirResidencia: React.FC = () => {
   const [codigoResidencia, setCodigoResidencia] = useState<string>('');
@@ -49,7 +50,7 @@ const UnirResidencia: React.FC = () => {
 
   const handleUnirse = async () => {
     if (!isValidCode) {
-      showPopup({ title: 'Código inválido', description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
+      showPopup({ title: 'Código inválido', description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
       return;
     }
 
@@ -58,7 +59,7 @@ const UnirResidencia: React.FC = () => {
       showPopup({ title: 'Éxito', description: 'Te has unido exitosamente a la residencia', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }] });
     } catch (error) {
       console.error('Error al unirse a la residencia:', error);
-      showPopup({ title: 'Error', description: 'No se pudo unir a la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
+      showPopup({ title: 'Error', description: 'No se pudo unir a la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,7 @@ const UnirResidencia: React.FC = () => {
 
   if (!fontsLoaded) {
     return (
-      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}> 
+      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}>
         <ActivityIndicator size="large" color="#6B705C" />
       </View>
     );
@@ -75,39 +76,38 @@ const UnirResidencia: React.FC = () => {
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
-        <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-          <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
+        <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
+          <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
+            <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
-          <Text style={GLOBAL_STYLES.subtitle}>
-            <Text style={{ fontWeight: 'bold' }}>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
-            <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
-          </Text>
+            <Text style={GLOBAL_STYLES.subtitle}>
+              <Text style={{ fontWeight: 'bold' }}>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
+              <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
+            </Text>
 
-          <View style={GLOBAL_STYLES.inputGroup}>
-            <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Código de la residencia</Text>
-            <TextInput
-              style={[
-                GLOBAL_STYLES.input,
-                {
-                  borderColor: codigoResidencia.length === 0 ? '#CCC' : isValidCode ? '#28e80eff' : 'red',
-                },
-              ]}
-              placeholder="0-0-0-0-0-0"
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="numeric"
-              value={codigoResidencia}
-              onChangeText={setCodigoResidencia}
-            />
-            {!isValidCode && codigoResidencia.length > 0 && <Text style={GLOBAL_STYLES.errorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
+            <View style={GLOBAL_STYLES.inputGroup}>
+              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Código de la residencia</Text>
+              <TextInput
+                style={[
+                  GLOBAL_STYLES.input,
+                  {
+                    borderColor: codigoResidencia.length === 0 ? '#CCC' : isValidCode ? '#28e80eff' : 'red',
+                  },
+                ]}
+                placeholder="0-0-0-0-0-0"
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="numeric"
+                value={codigoResidencia}
+                onChangeText={setCodigoResidencia}
+              />
+              {!isValidCode && codigoResidencia.length > 0 && <Text style={GLOBAL_STYLES.errorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
+            </View>
+            <PrimaryButton style={[GLOBAL_STYLES.botonStyle1, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse}>
+              {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={GLOBAL_STYLES.textoBoton}>Unirse</Text>}
+            </PrimaryButton>
           </View>
-
-          <TouchableOpacity style={[GLOBAL_STYLES.primaryButton, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse}>
-            {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={GLOBAL_STYLES.primaryButtonText}>Unirse</Text>}
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
       <Popup
         visible={popupVisible}

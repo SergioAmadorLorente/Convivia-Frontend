@@ -9,11 +9,11 @@ interface AuthButtonsProps {
 
 const AuthButtons: React.FC<AuthButtonsProps> = ({ onCreate, onSignIn }) => (
   <>
-    <TouchableOpacity style={GLOBAL_STYLES.botonCrearCuenta} onPress={onCreate}>
+    <TouchableOpacity style={GLOBAL_STYLES.botonStyle2} onPress={onCreate}>
       <Text style={GLOBAL_STYLES.textoBoton}>Crea una cuenta</Text>
     </TouchableOpacity>
 
-    <TouchableOpacity style={GLOBAL_STYLES.botonIniciarSesion} onPress={onSignIn}>
+    <TouchableOpacity style={GLOBAL_STYLES.botonStyle3} onPress={onSignIn}>
       <Text style={GLOBAL_STYLES.textoBoton}>Inicia sesión</Text>
     </TouchableOpacity>
   </>

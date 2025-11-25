@@ -17,7 +17,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({ label, value, onChangeTex
 
   return (
     <View style={GLOBAL_STYLES.inputGroup}>
-      {label ? <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>{label}</Text> : null}
+      {label ? <Text style={[GLOBAL_STYLES.labelBase]}>{label}</Text> : null}
 
       <View style={[GLOBAL_STYLES.inputPasswordContainer, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
         <TextInput
@@ -28,7 +28,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({ label, value, onChangeTex
           value={value}
           onChangeText={onChangeText}
         />
-        <TouchableOpacity onPress={() => setShow(!show)} style={[GLOBAL_STYLES.eyeIconButton, { marginLeft: 8 }] } accessible accessibilityLabel={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
+        <TouchableOpacity onPress={() => setShow(!show)} style={[GLOBAL_STYLES.eyeIconButton, { marginLeft: 8 }]} accessible accessibilityLabel={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}>
           <Ionicons name={show ? 'eye-off' : 'eye'} size={moderateScale(22)} color="#ACBF8A" />
         </TouchableOpacity>
       </View>

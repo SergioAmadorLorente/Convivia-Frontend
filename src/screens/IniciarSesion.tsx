@@ -15,6 +15,8 @@ import TextField from '../components/ui/TextField';
 import PasswordField from '../components/ui/PasswordField';
 import PrimaryButton from '../components/ui/PrimaryButton';
 import Popup from '../components/ui/Popup';
+import { COLORS } from '../styles/theme';
+
 
 
 const IniciarSesion: React.FC = () => {
@@ -23,6 +25,7 @@ const IniciarSesion: React.FC = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
+  const isValidPassword = password.length >= 8 && /\d/.test(password);
 
   const fontsLoaded = useLoadFonts();
   const containerRef = useRef<any>(null);
@@ -66,7 +69,7 @@ const IniciarSesion: React.FC = () => {
         title: 'Error',
         description: 'Credenciales incorrectas o usuario no existe',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
     }
     setLoading(false);
@@ -106,11 +109,21 @@ const IniciarSesion: React.FC = () => {
 
           <PrimaryButton
             onPress={() => handleLogin()}
-            disabled={!isButtonEnabled || loading}
+            disabled={!isValidEmail || loading || !isValidPassword}
             loading={loading}
-            style={[GLOBAL_STYLES.botonLogearse]}
+            style={[
+              GLOBAL_STYLES.botonStyle1,
+              {
+                backgroundColor:
+                  (!isValidEmail || !isValidPassword)
+                    ? COLORS.disabled
+                    : (loading
+                      ? COLORS.border
+                      : COLORS.success)
+              },
+            ]}
           >
-            Entrar
+            <Text style={GLOBAL_STYLES.textoBoton}>Entrar</Text>
           </PrimaryButton>
         </View>
       </KeyboardAvoidingView>

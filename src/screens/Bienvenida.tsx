@@ -6,6 +6,7 @@ import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/mo
 import { useNavigation } from '@react-navigation/native';
 import GLOBAL_STYLES from '../styles/styles';
 import Popup from '../components/ui/Popup';
+import { PrimaryButton } from '../components';
 
 const Bienvenida: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -34,13 +35,13 @@ const Bienvenida: React.FC = () => {
     <ScrollView contentContainerStyle={GLOBAL_STYLES.container} keyboardShouldPersistTaps="handled">
       <Text style={GLOBAL_STYLES.textoBienvenida}>Tu espacio compartido comienza aquí. {'\n'}¿Cómo quieres unirte?</Text>
 
-      <TouchableOpacity style={GLOBAL_STYLES.botonCrearCuenta} onPress={() => navigation.navigate('NuevaResidencia')}>
+      <PrimaryButton style={GLOBAL_STYLES.botonStyle2} onPress={() => navigation.navigate('NuevaResidencia')}>
         <Text style={GLOBAL_STYLES.textoBoton}>Crea una residencia nueva</Text>
-      </TouchableOpacity>
+      </PrimaryButton>
 
-      <TouchableOpacity style={GLOBAL_STYLES.botonIniciarSesion} onPress={() => navigation.navigate('UnirResidencia')}>
+      <PrimaryButton style={GLOBAL_STYLES.botonStyle3} onPress={() => navigation.navigate('UnirResidencia')}>
         <Text style={GLOBAL_STYLES.textoBoton}>Únete a una residencia!</Text>
-      </TouchableOpacity>
+      </PrimaryButton>
 
       <Popup
         visible={modalVisible}
@@ -49,7 +50,7 @@ const Bienvenida: React.FC = () => {
         description={''}
         imageType={'logout'}
         buttons={[
-          { text: 'Cancelar', onPress: () => {} },
+          { text: 'Cancelar', onPress: () => { } },
           { text: 'Cerrar sesión', onPress: () => { handleLogout(); } },
         ]}
       />

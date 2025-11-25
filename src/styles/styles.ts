@@ -1,6 +1,6 @@
 // Importación de utilidades y temas de estilos
-import { StyleSheet } from 'react-native';
-import theme, { COMMON, HELPERS, COLORS, FONTS, SIZES } from './theme';
+import { StyleSheet } from "react-native";
+import theme, { COMMON, HELPERS, COLORS, FONTS, SIZES } from "./theme";
 
 // Helpers para medidas responsivas y escalado
 const { wp, hp, moderateScale, verticalScale } = HELPERS;
@@ -9,36 +9,33 @@ const { wp, hp, moderateScale, verticalScale } = HELPERS;
 // ESTILOS GLOBALES PRINCIPALES
 // =========================
 export const GLOBAL_STYLES = StyleSheet.create({
-
   // ----------- CONTENEDORES GENERALES [#1]-----------
 
   // Contenedor de la pantalla splash
   splashContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: COLORS.background,
   },
-
 
   // Contenedor con scroll para pantallas largas
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: COLORS.background,
-    alignItems: 'center',
-    paddingTop: hp('8%'),
-    paddingHorizontal: wp('5%'),
+    alignItems: "center",
+    paddingTop: hp("8%"),
+    paddingHorizontal: wp("5%"),
   },
-
 
   // Contenedor principal de recuperar contraseña
   recuperarContainerPrincipal: {
     flex: 1,
     backgroundColor: COLORS.background,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: hp('5%'),
-    paddingHorizontal: wp('5%'),
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: hp("5%"),
+    paddingHorizontal: wp("5%"),
     borderRadius: moderateScale(25),
   },
 
@@ -46,48 +43,43 @@ export const GLOBAL_STYLES = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    alignItems: 'center',
-    paddingTop: hp('4%'),
+    alignItems: "center",
+    paddingTop: hp("4%"),
     paddingHorizontal: SIZES.paddingHorizontal,
     borderRadius: moderateScale(25),
   },
 
   // Contenedor para link de recuperar contraseña
   recuperarContainer: {
-    alignItems: 'flex-end',
-    marginTop: hp('0.5%'),
+    alignItems: "flex-end",
+    marginTop: hp("0.5%"),
   },
 
   // Contenedor de input de contraseña
   inputPasswordContainer: {
     ...(COMMON.INPUT_CONTAINER as any),
-    paddingHorizontal: wp('4%'),
+    paddingHorizontal: wp("4%"),
     height: verticalScale(40),
   },
 
-
   // ----------- TEXTOS Y TIPOGRAFÍA [#2]-----------
-
 
   // Texto del botón primario
   primaryButtonText: {
     color: COLORS.primary,
     fontSize: SIZES.buttonText,
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: FONTS.regular,
   },
 
-
   // Texto de bienvenida
   textoBienvenida: {
-    fontSize: moderateScale(29),
+    fontSize: moderateScale(28),
     color: COLORS.primary,
     fontFamily: FONTS.title,
-    textAlign: 'center',
+    textAlign: "center",
     paddingHorizontal: 19,
   },
-
-
 
   // Texto en la pantalla splash
   splashText: {
@@ -97,19 +89,18 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 
-
   // Texto de ayuda o aclaración
   helperText: {
     fontFamily: FONTS.regular,
     color: COLORS.secondary,
     fontSize: moderateScale(11),
-    width: wp('80%'),
+    width: wp("80%"),
   },
   // Texto del botón temporal
   botonTempText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: moderateScale(14),
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: FONTS.regular,
   },
 
@@ -117,71 +108,47 @@ export const GLOBAL_STYLES = StyleSheet.create({
   textoBoton: {
     color: COLORS.secondary,
     fontSize: moderateScale(14),
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: FONTS.regular,
   },
 
-
-
   // Bloque de texto agrupado
   bloqueTexto: {
-    marginTop: hp('1%'),
-    alignItems: 'center',
+    marginTop: hp("1%"),
+    alignItems: "center",
   },
-
 
   // Párrafo de texto
   parrafo: {
     fontSize: moderateScale(13),
-    color: '#333',
-    textAlign: 'center',
+    color: "#333",
+    textAlign: "center",
     fontFamily: FONTS.regular,
-    width: wp('80%'),
+    width: wp("80%"),
   },
-
 
   // Título principal
   title: {
     fontSize: SIZES.title,
     color: COLORS.primary,
     fontFamily: FONTS.title,
-    textAlign: 'center',
+    textAlign: "center",
   },
-
-
-
 
   // Subtítulo principal
   subtitle: {
     fontSize: SIZES.subtitle,
     color: COLORS.secondary,
-    marginVertical: hp('1%'),
+    marginVertical: hp("1%"),
     fontFamily: FONTS.regular,
-    textAlign: 'center',
-  },
-
-  // Texto del botón de login
-  textoBotonLogearse: {
-    color: COLORS.secondary,
-    fontSize: SIZES.buttonText,
-    textAlign: 'center',
-    fontFamily: FONTS.regular,
+    textAlign: "center",
   },
 
   // Texto de error para inputs
   errorText: {
     color: COLORS.error,
     fontSize: SIZES.smallText,
-    marginTop: hp('0.5%'),
-  },
-
-  // Texto del botón de ingresar email
-  textoBotonIngresarMail: {
-    color: COLORS.secondary,
-    fontSize: SIZES.buttonText,
-    textAlign: 'center',
-    fontFamily: FONTS.regular,
-    padding: verticalScale(3),
+    marginTop: hp("0.5%"),
   },
 
   // Título grande para pantallas
@@ -196,104 +163,89 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontSize: moderateScale(14),
     color: COLORS.accent,
     fontFamily: FONTS.bold,
-    marginTop: hp('1%'),
+    marginTop: hp("1%"),
   },
 
   // ----------- INPUTS Y CAMPOS DE FORMULARIO [#3]-----------
   // Grupo de inputs en formularios
   inputGroup: {
-    width: wp('80%'),
-    marginTop: hp('2%'),
+    width: wp("80%"),
+    marginTop: hp("2%"),
   },
 
+  inputPassword: {
+    flex: 1,
+    fontSize: SIZES.passwordInput,
+    fontFamily: FONTS.regular,
+    paddingBottom: 0,
+  },
 
   // Input de email en crear cuenta
   inputEmailCrearCuenta: {
     ...(COMMON.INPUT_BASE as any),
     marginBottom: verticalScale(5),
-    width: wp('80%'),
+    width: wp("80%"),
   },
-
-
 
   // Input de texto estándar
   input: {
     ...(COMMON.INPUT_BASE as any),
-    paddingHorizontal: wp('4%'),
+    paddingHorizontal: wp("4%"),
   },
-
 
   // ----------- CHECKBOXES [#4]-----------
 
-
   // Estilo del checkbox
   checkbox: {
-    width: wp('5%'),
-    height: wp('5%'),
+    width: wp("5%"),
+    height: wp("5%"),
     borderWidth: 1,
     borderRadius: 5,
     borderColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: wp('2%'),
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: wp("2%"),
   },
   // ----------- BOTONES (TODOS LOS TIPOS) [#5]-----------
 
-  // Botón para mostrar/ocultar contraseña OK
-  eyeIconButton: {
-    padding: wp('0.1%'),
-  },
-
-
-  // Estado de botón deshabilitado OK
-  disabledButton: {
-    opacity: 0.8,
-  },
-
-
-  // Botón para logout
-  buttonLogout: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 15,
-    backgroundColor: COLORS.inputBackground,
-    marginHorizontal: 15,
+  botonStyle1: {
+    ...(COMMON.BUTTON_BASE as any),
     ...(COMMON.SHADOW as any),
   },
+
+  botonStyle2: {
+    backgroundColor: COLORS.inputBackground,
+    ...(COMMON.BUTTON_BASE as any),
+    ...(COMMON.SHADOW as any),
+  },
+
+  botonStyle3: {
+    backgroundColor: COLORS.success,
+    ...(COMMON.BUTTON_BASE as any),
+    ...(COMMON.SHADOW as any),
+  },
+
+  // Botón temporal (pruebas o debug)
+  botonTemp: {
+    paddingVertical: hp("1.5%"),
+    borderRadius: 25,
+    width: wp("80%"),
+    alignSelf: "center",
+    marginTop: hp("20%"),
+    ...(COMMON.SHADOW as any),
+    backgroundColor: "red",
+  },
+
+  // Botón para mostrar/ocultar contraseña OK
+  eyeIconButton: {
+    padding: wp("0.1%"),
+  },
+
   // Botón primario reutilizable
   primaryButton: {
     ...(COMMON.BUTTON_BASE as any),
     ...(COMMON.SHADOW as any),
     backgroundColor: COLORS.success,
-  },
-
-
-
-
-
-
-  // Botón para ingresar email
-  botonIngresarMail: {
-    paddingVertical: verticalScale(5),
-    borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
-    marginTop: hp('2%'),
-    ...(COMMON.SHADOW as any),
-  },
-
-  // Botón para iniciar sesión
-  botonIniciarSesion: {
-    backgroundColor: COLORS.success,
-    ...(COMMON.BUTTON_BASE as any),
-    marginBottom: hp('5%'),
-    ...(COMMON.SHADOW as any),
-  },
-
-  // Botón principal para login
-  botonLogearse: {
-    ...(COMMON.BUTTON_BASE as any),
-    ...(COMMON.SHADOW as any),
   },
 
   // ----------- LOGOS Y CONTENEDORES DE LOGO [#6]-----------
@@ -304,100 +256,94 @@ export const GLOBAL_STYLES = StyleSheet.create({
     height: 200,
   },
 
-
   // Contenedor para loading/spinner
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
 
   // Imagen de logo principal
   logo: {
-    width: wp('60%'),
-    height: wp('60%'),
-    marginTop: hp('4%'),
+    width: wp("60%"),
+    height: wp("60%"),
+    marginTop: hp("4%"),
   },
-
 
   // Contenedor del logo
   logoContainer: {
-    width: wp('80%'),
-    alignItems: 'center',
-    marginTop: hp('2%'),
+    width: wp("80%"),
+    alignItems: "center",
+    marginTop: hp("2%"),
   },
   // Título junto al logo
   tituloLogo: {
     fontSize: moderateScale(40),
     color: COLORS.accent,
     fontFamily: FONTS.title,
-    textAlign: 'center',
+    textAlign: "center",
     letterSpacing: 3,
-    width: '100%',
+    width: "100%",
   },
   // Eslogan bajo el logo
   esloganLogo: {
     fontSize: moderateScale(15),
     fontFamily: FONTS.regular,
-    textAlign: 'center',
-    width: '100%',
-    marginTop: -hp('1%'),
+    textAlign: "center",
+    width: "100%",
+    marginTop: -hp("1%"),
     letterSpacing: 1,
   },
 
-
   // ----------- RECUPERAR Y RESTABLECER PASSWORD [#7]-----------
-
 
   // Botón para mostrar/ocultar nueva contraseña
   restablecerEyeIconButton: {
-    padding: wp('0.1%'),
+    padding: wp("0.1%"),
   },
   // Texto de error en restablecer contraseña
   restablecerErrorText: {
     color: COLORS.error,
     fontSize: SIZES.smallText,
-    marginTop: hp('0.5%'),
+    marginTop: hp("0.5%"),
   },
   // Botón para restablecer contraseña
   restablecerBoton: {
     paddingVertical: verticalScale(11),
     borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
-    marginTop: hp('4%'),
+    width: wp("80%"),
+    alignSelf: "center",
+    marginTop: hp("4%"),
     ...(COMMON.SHADOW as any),
   },
   // Texto del botón de restablecer contraseña
   restablecerTextoBoton: {
     color: COLORS.secondary,
     fontSize: moderateScale(16),
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: FONTS.regular,
     padding: verticalScale(3),
   },
-
 
   // Subtítulo en restablecer contraseña
   restablecerSubtitulo: {
     fontSize: moderateScale(12),
     color: COLORS.secondary,
-    marginVertical: hp('1%'),
+    marginVertical: hp("1%"),
     fontFamily: FONTS.regular,
-    width: wp('50%'),
-    textAlign: 'center',
-    marginBottom: hp('1%'),
+    width: wp("50%"),
+    textAlign: "center",
+    marginBottom: hp("1%"),
   },
   // Grupo de inputs en restablecer contraseña
   restablecerInputGroup: {
-    width: wp('80%'),
-    marginTop: hp('1%'),
+    width: wp("80%"),
+    marginTop: hp("1%"),
   },
-
   // Contenedor de input de nueva contraseña
   restablecerInputPasswordContainer: {
     ...(COMMON.INPUT_CONTAINER as any),
     borderRadius: moderateScale(15),
-    paddingHorizontal: wp('4%'),
+    paddingHorizontal: wp("4%"),
     height: verticalScale(40),
   },
   // Input de nueva contraseña
@@ -408,16 +354,14 @@ export const GLOBAL_STYLES = StyleSheet.create({
     paddingBottom: 0,
   },
 
-
   // Título en restablecer contraseña
   restablecerTitulo: {
     fontSize: moderateScale(45),
     color: COLORS.primary,
     fontFamily: FONTS.title,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: moderateScale(55),
   },
-
 
   // Contenedor de restablecer contraseña
   restablecerContainer: {
@@ -427,75 +371,72 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
   // Bloque de contenido en recuperar contraseña
   recuperarBloque: {
-    width: wp('80%'),
-    alignItems: 'center',
-    marginTop: hp('5%'),
+    width: wp("80%"),
+    alignItems: "center",
+    marginTop: hp("5%"),
   },
-
 
   // Título en recuperar contraseña
   recuperarTitulo: {
-    fontSize: wp('10%'),
+    fontSize: wp("10%"),
     color: COLORS.primary,
     fontFamily: FONTS.title,
-    textAlign: 'center',
-    lineHeight: wp('12%'),
+    textAlign: "center",
+    lineHeight: wp("12%"),
   },
 
   // Subtítulo en recuperar contraseña
   recuperarSubtitulo: {
-    fontSize: wp('3%'),
+    fontSize: wp("3%"),
     color: COLORS.secondary,
-    marginVertical: hp('1%'),
+    marginVertical: hp("1%"),
     fontFamily: FONTS.regular,
   },
-
   // Input de correo en recuperar contraseña
   recuperarInput: {
-    width: '100%',
+    width: "100%",
     ...(COMMON.INPUT_BASE as any),
-    marginBottom: hp('1%'),
+    marginBottom: hp("1%"),
   },
   // Texto informativo bajo el input de correo
   recuperarSubTextEmail: {
     fontFamily: FONTS.regular,
     color: COLORS.secondary,
-    fontSize: wp('3%'),
-    textAlign: 'justify',
-    width: wp('80%'),
-    marginTop: hp('1%'),
+    fontSize: wp("3%"),
+    textAlign: "justify",
+    width: wp("80%"),
+    marginTop: hp("1%"),
   },
   // Botón para recuperar contraseña
   botonRecuperarPassword: {
-    paddingVertical: hp('1.5%'),
+    paddingVertical: hp("1.5%"),
     borderRadius: 15,
-    width: wp('80%'),
-    alignSelf: 'center',
-    marginTop: hp('3%'),
+    width: wp("80%"),
+    alignSelf: "center",
+    marginTop: hp("3%"),
     ...(COMMON.SHADOW as any),
   },
   // Texto del botón de recuperar contraseña
   textoRecuperarPassword: {
     color: COLORS.secondary,
-    fontSize: wp('4%'),
-    textAlign: 'center',
+    fontSize: wp("4%"),
+    textAlign: "center",
     fontFamily: FONTS.regular,
   },
   // Texto de error en recuperar contraseña
   recuperarErrorText: {
     color: COLORS.error,
-    fontSize: wp('3.5%'),
-    marginTop: hp('0.5%'),
+    fontSize: wp("3.5%"),
+    marginTop: hp("0.5%"),
     fontFamily: FONTS.regular,
   },
-
 
   // Link de recuperar contraseña
   recuperarPassword: {
     fontSize: SIZES.passwordInput,
     fontFamily: FONTS.regular,
     color: COLORS.accent,
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
 
   // ----------- VERIFICACIÓN DE CUENTA [#8]-----------
@@ -504,7 +445,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
   botonCrearCuenta: {
     backgroundColor: COLORS.inputBackground,
     ...(COMMON.BUTTON_BASE as any),
-    marginTop: hp('4%'),
+    marginTop: hp("4%"),
     ...(COMMON.SHADOW as any),
   },
 
@@ -513,32 +454,31 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontSize: moderateScale(45),
     color: COLORS.primary,
     fontFamily: FONTS.title,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: moderateScale(55),
   },
   // Subtítulo en verificación de cuenta
   verificacionSubtitulo: {
     fontSize: moderateScale(12),
     color: COLORS.secondary,
-    marginVertical: hp('1%'),
+    marginVertical: hp("1%"),
     fontFamily: FONTS.regular,
-    width: wp('75%'),
-    textAlign: 'center',
-    marginBottom: hp('1%'),
+    width: wp("75%"),
+    textAlign: "center",
+    marginBottom: hp("1%"),
   },
-
   // Input para código de verificación
   verificacionInputCodigo: {
     ...(COMMON.INPUT_BASE as any),
     fontSize: moderateScale(15),
     marginBottom: verticalScale(5),
-    width: wp('80%'),
+    width: wp("80%"),
   },
   // Link para reenviar código de verificación
   verificacionEnviarCodigoNuevo: {
     fontSize: moderateScale(14),
     marginTop: verticalScale(8),
-    marginLeft: -wp('45%'),
+    marginLeft: -wp("45%"),
     fontFamily: FONTS.regular,
     color: COLORS.accent,
   },
@@ -546,25 +486,24 @@ export const GLOBAL_STYLES = StyleSheet.create({
   verificacionContador: {
     fontSize: moderateScale(14),
     marginTop: -verticalScale(20),
-    marginLeft: wp('75%'),
+    marginLeft: wp("75%"),
     fontFamily: FONTS.regular,
     color: COLORS.secondary,
   },
   // Contenedor para crear nueva contraseña tras verificación
   verificacionContainerPassword: {
     backgroundColor: COLORS.background,
-    paddingTop: hp('7%'),
-    paddingHorizontal: wp('5%'),
+    paddingTop: hp("7%"),
+    paddingHorizontal: wp("5%"),
     borderRadius: moderateScale(25),
   },
 
-
   // Input de nueva contraseña tras verificación
   verificacionInputPassword: {
-    paddingHorizontal: wp('3%'),
+    paddingHorizontal: wp("3%"),
     paddingVertical: verticalScale(8),
     fontSize: moderateScale(16),
-    width: wp('70%'),
+    width: wp("70%"),
     backgroundColor: COLORS.inputBackground,
     fontFamily: FONTS.regular,
     paddingBottom: 0,
@@ -573,7 +512,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
   verificacionInputPasswordContainer: {
     ...(COMMON.INPUT_CONTAINER as any),
     borderRadius: moderateScale(10),
-    width: wp('80%'),
+    width: wp("80%"),
     height: verticalScale(38),
     marginBottom: verticalScale(5),
   },
@@ -586,7 +525,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
   verificacionBotonFinalizar: {
     backgroundColor: COLORS.success,
     ...(COMMON.BUTTON_BASE as any),
-    marginTop: hp('5%'),
+    marginTop: hp("5%"),
     height: verticalScale(45),
     ...(COMMON.SHADOW as any),
   },
@@ -594,22 +533,19 @@ export const GLOBAL_STYLES = StyleSheet.create({
   verificacionTextoBotonFinalizar: {
     color: COLORS.secondary,
     fontSize: moderateScale(16),
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: FONTS.regular,
     padding: verticalScale(3),
   },
 
-
   // Contenedor del contenido del scroll en verificación
   verificacionScrollContent: {
     flexGrow: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
 
   // -------------- LABELS [#9]----------------
-
-
 
   // Label genérico para formularios
   labelBase: {
@@ -620,11 +556,11 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
   // Variaciones de márgenes para labels
   labelMarginSmall: {
-    marginBottom: hp('0.5%'),
-    marginLeft: wp('1%'),
+    marginBottom: hp("0.5%"),
+    marginLeft: wp("1%"),
   },
   labelMarginTop: {
-    marginTop: hp('2%'),
+    marginTop: hp("2%"),
   },
 
   // Label para checkbox y "Recordarme"
@@ -636,10 +572,10 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
   // Contenedor de checkbox y label
   checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: wp('80%'),
-    marginTop: hp('2%'),
+    flexDirection: "row",
+    alignItems: "center",
+    width: wp("80%"),
+    marginTop: hp("2%"),
   },
 
   // Label para verificación (código y nueva contraseña)
@@ -654,19 +590,16 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
     color: COLORS.secondary,
     fontSize: moderateScale(11),
-    width: wp('80%'),
+    width: wp("80%"),
   },
-
-
 });
 
 // Exportaciones de constantes de tema para uso en otros archivos
 export { COLORS, FONTS, SIZES };
 
-
 export const WEB_FULL_VIEWPORT: any = {
-  height: '100dvh',
-  overflow: 'auto',
+  height: "100dvh",
+  overflow: "auto",
 };
 
 // Exportación por defecto de los estilos globales

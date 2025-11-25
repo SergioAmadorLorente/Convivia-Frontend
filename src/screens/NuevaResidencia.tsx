@@ -20,6 +20,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
+import { PrimaryButton } from '../components';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -45,7 +46,7 @@ const NuevaResidencia: React.FC = () => {
 
   if (!fontsLoaded) {
     return (
-      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}> 
+      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}>
         <ActivityIndicator size="large" color="#6B705C" />
       </View>
     );
@@ -53,7 +54,7 @@ const NuevaResidencia: React.FC = () => {
 
   const handleCrear = async () => {
     if (!hasText) {
-      showPopup({ title: 'Campo requerido', description: 'Por favor, ingresa un nombre para la residencia.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
+      showPopup({ title: 'Campo requerido', description: 'Por favor, ingresa un nombre para la residencia.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
       return;
     }
 
@@ -62,7 +63,7 @@ const NuevaResidencia: React.FC = () => {
       showPopup({ title: 'Éxito', description: 'Residencia creada exitosamente', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }] });
     } catch (error) {
       console.error('Error al crear residencia:', error);
-      showPopup({ title: 'Error', description: 'Error al crear la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => {} }] });
+      showPopup({ title: 'Error', description: 'Error al crear la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
     } finally {
       setLoading(false);
     }
@@ -91,17 +92,16 @@ const NuevaResidencia: React.FC = () => {
             {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
           </View>
 
-          <TouchableOpacity
-            style={[GLOBAL_STYLES.primaryButton, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
+          <PrimaryButton
+            style={[GLOBAL_STYLES.botonStyle1, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
             disabled={!hasText || loading}
-            onPress={handleCrear}
-          >
+            onPress={handleCrear}>
             {loading ? (
               <ActivityIndicator size="small" color="#4B4741" />
             ) : (
-              <Text style={GLOBAL_STYLES.primaryButtonText}>Crear</Text>
+              <Text style={GLOBAL_STYLES.textoBoton}>Crear</Text>
             )}
-          </TouchableOpacity>
+          </PrimaryButton>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback><Popup

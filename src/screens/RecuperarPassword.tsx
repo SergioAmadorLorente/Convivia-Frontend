@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Platform ,Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TextInput, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, Keyboard, ActivityIndicator,Platform, TouchableOpacity, TextInput, TouchableWithoutFeedback } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
@@ -11,6 +11,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
+import { PrimaryButton } from '../components';
 
 const RecuperarPassword: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -67,8 +68,8 @@ const RecuperarPassword: React.FC = () => {
             {`Ingresa tu dirección de correo electrónico y te enviaremos un enlace para que puedas crear una nueva contraseña de forma segura.\n\nLa dirección ingresada debe contar con un formato estándar (por ejemplo, usuario@dominio.com).`}
           </Text>
 
-          <TouchableOpacity
-            style={[GLOBAL_STYLES.botonRecuperarPassword, { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled }]}
+          <PrimaryButton 
+            style={[GLOBAL_STYLES.botonStyle1, { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled }]}
             disabled={!isValidEmail}
             onPress={async () => {
               try {
@@ -79,11 +80,13 @@ const RecuperarPassword: React.FC = () => {
               }
             }}
           >
-            <Text style={GLOBAL_STYLES.textoRecuperarPassword}>Enviar correo</Text>
-          </TouchableOpacity>
+            <Text style={GLOBAL_STYLES.textoBoton}>Enviar correo</Text>
+          </PrimaryButton>
         </View>
 
-       
+        <TouchableOpacity style={GLOBAL_STYLES.botonTemp} onPress={() => navigation.navigate('RestablecerPassword')}>
+          <Text style={GLOBAL_STYLES.botonTempText}>Boton Temporal Restablecer Contraseña</Text>
+        </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
       <Popup visible={popupVisible} onClose={handleClosePopup} title={popupOptions.title || ''} description={popupOptions.description} imageType={popupOptions.imageType} buttons={popupOptions.buttons} />
