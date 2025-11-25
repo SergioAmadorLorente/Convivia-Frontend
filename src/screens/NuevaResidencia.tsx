@@ -80,7 +80,7 @@ const NuevaResidencia: React.FC = () => {
           </Text>
 
           <View style={GLOBAL_STYLES.inputGroup}>
-            <Text style={GLOBAL_STYLES.label}>Nombre de la residencia</Text>
+            <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Nombre de la residencia</Text>
             <TextInput
               style={[GLOBAL_STYLES.input, { borderColor: hasText ? '#28e80eff' : 'red' }]}
               placeholder="Piso Tarragona"

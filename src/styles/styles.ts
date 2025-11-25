@@ -65,13 +65,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     height: verticalScale(40),
   },
 
-  // Contenedor de checkbox y label
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: wp('80%'),
-    marginTop: hp('2%'),
-  },
+
   // ----------- TEXTOS Y TIPOGRAFÍA [#2]-----------
 
 
@@ -154,12 +148,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Label para "Recordarme"
-  labelRecordarme: {
-    fontSize: SIZES.input,
-    color: COLORS.primary,
-    fontFamily: FONTS.regular,
-  },
+
 
 
   // Subtítulo principal
@@ -225,14 +214,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     width: wp('80%'),
   },
 
-  // Etiqueta de campos de formulario
-  label: {
-    fontSize: SIZES.label,
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-    marginBottom: hp('0.5%'),
-    marginLeft: wp('1%'),
-  },
+
 
   // Input de texto estándar
   input: {
@@ -242,13 +224,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
 
   // ----------- CHECKBOXES [#4]-----------
-
-// Texto para el label del checkbox
-checkboxText: {
-    fontSize: SIZES.input,
-    color: COLORS.primary,
-    fontFamily: FONTS.regular,
-  },
 
 
   // Estilo del checkbox
@@ -295,7 +270,7 @@ checkboxText: {
 
 
 
-  
+
 
   // Botón para ingresar email
   botonIngresarMail: {
@@ -417,13 +392,7 @@ checkboxText: {
     width: wp('80%'),
     marginTop: hp('1%'),
   },
-  // Label en restablecer contraseña
-  restablecerLabel: {
-    fontSize: SIZES.label,
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-    marginBottom: hp('0.5%'),
-  },
+
   // Contenedor de input de nueva contraseña
   restablecerInputPasswordContainer: {
     ...(COMMON.INPUT_CONTAINER as any),
@@ -480,14 +449,7 @@ checkboxText: {
     marginVertical: hp('1%'),
     fontFamily: FONTS.regular,
   },
-  // Label para correo en recuperar contraseña
-  recuperarLabelCorreo: {
-    fontSize: wp('3.5%'),
-    alignSelf: 'flex-start',
-    marginBottom: hp('0.1%'),
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-  },
+
   // Input de correo en recuperar contraseña
   recuperarInput: {
     width: '100%',
@@ -564,15 +526,7 @@ checkboxText: {
     textAlign: 'center',
     marginBottom: hp('1%'),
   },
-  // Label para código de verificación
-  verificacionLabelCodigo: {
-    marginTop: hp('2%'),
-    fontSize: moderateScale(15),
-    marginBottom: -2,
-    marginLeft: -wp('35%'),
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-  },
+
   // Input para código de verificación
   verificacionInputCodigo: {
     ...(COMMON.INPUT_BASE as any),
@@ -603,22 +557,8 @@ checkboxText: {
     paddingHorizontal: wp('5%'),
     borderRadius: moderateScale(25),
   },
-  // Label para nueva contraseña tras verificación
-  verificacionLabelPassword: {
-    marginTop: -hp('6%'),
-    fontSize: moderateScale(15),
-    marginBottom: -2,
-    marginLeft: wp('2%'),
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-  },
-  // Requisitos de la nueva contraseña
-  verificacionLabelPasswordReq: {
-    fontFamily: FONTS.regular,
-    color: COLORS.secondary,
-    fontSize: moderateScale(11),
-    width: wp('80%'),
-  },
+
+
   // Input de nueva contraseña tras verificación
   verificacionInputPassword: {
     paddingHorizontal: wp('3%'),
@@ -665,6 +605,56 @@ checkboxText: {
     flexGrow: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
+  },
+
+  // -------------- LABELS [#9]----------------
+
+
+
+  // Label genérico para formularios
+  labelBase: {
+    fontSize: SIZES.label,
+    color: COLORS.secondary,
+    fontFamily: FONTS.regular,
+  },
+
+  // Variaciones de márgenes para labels
+  labelMarginSmall: {
+    marginBottom: hp('0.5%'),
+    marginLeft: wp('1%'),
+  },
+  labelMarginTop: {
+    marginTop: hp('2%'),
+  },
+
+  // Label para checkbox y "Recordarme"
+  labelCheckbox: {
+    fontSize: SIZES.input,
+    color: COLORS.primary,
+    fontFamily: FONTS.regular,
+  },
+
+  // Contenedor de checkbox y label
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: wp('80%'),
+    marginTop: hp('2%'),
+  },
+
+  // Label para verificación (código y nueva contraseña)
+  labelVerificacion: {
+    fontSize: moderateScale(15),
+    color: COLORS.secondary,
+    fontFamily: FONTS.regular,
+  },
+
+  // Requisitos de la nueva contraseña
+  labelPasswordReq: {
+    fontFamily: FONTS.regular,
+    color: COLORS.secondary,
+    fontSize: moderateScale(11),
+    width: wp('80%'),
   },
 
 

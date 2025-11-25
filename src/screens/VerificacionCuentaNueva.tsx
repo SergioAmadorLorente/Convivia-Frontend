@@ -79,7 +79,7 @@ const VerificacionCuentaNueva: React.FC = () => {
             <Text style={GLOBAL_STYLES.verificacionTitulo}>Verificación</Text>
             <Text style={GLOBAL_STYLES.verificacionSubtitulo}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
 
-            <Text style={GLOBAL_STYLES.verificacionLabelCodigo}>Código de verificación</Text>
+            <Text style={GLOBAL_STYLES.labelVerificacion}>Código de verificación</Text>
             <TextInput style={GLOBAL_STYLES.verificacionInputCodigo} placeholder="0-0-0-0-0-0" keyboardType="numeric" autoCorrect={false} value={formateado} onChangeText={handleChange} maxLength={11} />
 
             <TouchableOpacity disabled={!activo} onPress={() => { setContador(60); setActivo(false); setModalVisible(true); setModalTipo('reenviar'); }}>
@@ -91,7 +91,7 @@ const VerificacionCuentaNueva: React.FC = () => {
             <Text style={GLOBAL_STYLES.verificacionContador}>{contador}s</Text>
 
             <View style={GLOBAL_STYLES.verificacionContainerPassword}>
-              <Text style={GLOBAL_STYLES.verificacionLabelPassword}>Contraseña</Text>
+              <Text style={GLOBAL_STYLES.labelVerificacion}>Contraseña</Text>
               <View style={GLOBAL_STYLES.verificacionInputPasswordContainer}>
                 <TextInput style={GLOBAL_STYLES.verificacionInputPassword} placeholder="* * * * * * * *" secureTextEntry={!showPassword} autoCorrect={false} value={password} onChangeText={setPassword} />
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={GLOBAL_STYLES.verificacionEyeIconButton}>
@@ -100,10 +100,10 @@ const VerificacionCuentaNueva: React.FC = () => {
               </View>
             </View>
 
-            <Text style={GLOBAL_STYLES.verificacionLabelPasswordReq}>La contraseña requiere al menos 8 símbolos, incluyendo como mínimo un número.</Text>
+            <Text style={GLOBAL_STYLES.labelPasswordReq}>La contraseña requiere al menos 8 símbolos, incluyendo como mínimo un número.</Text>
 
             <View style={GLOBAL_STYLES.verificacionContainerPassword}>
-              <Text style={GLOBAL_STYLES.verificacionLabelPassword}>Confirma la Contraseña</Text>
+              <Text style={GLOBAL_STYLES.labelVerificacion}>Confirma la Contraseña</Text>
               <View style={GLOBAL_STYLES.verificacionInputPasswordContainer}>
                 <TextInput style={GLOBAL_STYLES.verificacionInputPassword} placeholder="* * * * * * * *" secureTextEntry={!showPassword2} autoCorrect={false} value={password2} onChangeText={(text) => { setPassword2(text); if (password !== text) { setErrorMatch('Las contraseñas no coinciden'); } else { setErrorMatch(''); } }} />
                 <TouchableOpacity onPress={() => setShowPassword2(!showPassword2)} style={GLOBAL_STYLES.verificacionEyeIconButton}>

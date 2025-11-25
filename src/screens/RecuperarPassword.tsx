@@ -59,7 +59,7 @@ const RecuperarPassword: React.FC = () => {
         <Text style={GLOBAL_STYLES.recuperarSubtitulo}>¿Has olvidado tu contraseña?</Text>
 
         <View style={GLOBAL_STYLES.recuperarBloque}>
-          <Text style={GLOBAL_STYLES.recuperarLabelCorreo}>Correo electrónico</Text>
+          <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { alignSelf: 'flex-start' }]}>Correo electrónico</Text>
           <TextInput style={GLOBAL_STYLES.recuperarInput} placeholder="usuario@dominio" keyboardType="email-address" autoCapitalize="none" autoCorrect={false} value={email} onChangeText={validateEmail} />
           {emailError ? <Text style={GLOBAL_STYLES.recuperarErrorText}>{emailError}</Text> : null}
 

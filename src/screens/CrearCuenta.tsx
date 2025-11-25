@@ -17,7 +17,8 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { moderateScale } from 'react-native-size-matters';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { createUserWithEmailAndPassword, sendEmailVerification, User } from 'firebase/auth';
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { COLORS } from '../styles/theme';
@@ -160,7 +161,7 @@ const CrearCuenta: React.FC = () => {
             <Text style={GLOBAL_STYLES.subtitle}>¿Quieres empezar tu experiencia con Convivia?</Text>
 
             <View style={{ width: '100%', alignItems: 'center' }}>
-              <Text style={GLOBAL_STYLES.label}>Correo electrónico</Text>
+              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { fontSize: 14, marginBottom: 2 }]}>Correo electrónico</Text>
               <TextInput
                 style={GLOBAL_STYLES.inputEmailCrearCuenta}
                 placeholder="usuario@dominio"
@@ -171,15 +172,14 @@ const CrearCuenta: React.FC = () => {
                 onChangeText={validateEmail}
               />
               {emailError ? <Text style={GLOBAL_STYLES.errorText}>{emailError}</Text> : null}
-
               <Text style={GLOBAL_STYLES.helperText}>
                 La dirección ingresada debe contar con un formato estándar (por ejemplo, usuario@dominio.com).
               </Text>
             </View>
 
-            <View style={GLOBAL_STYLES.verificacionContainerPassword}>
-              <Text style={GLOBAL_STYLES.verificacionLabelPassword}>Contraseña</Text>
-              <View style={GLOBAL_STYLES.verificacionInputPasswordContainer}>
+            <View style={[GLOBAL_STYLES.verificacionContainerPassword, { paddingTop: hp('1%') }] }>
+              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { fontSize: 14, marginBottom: 2 }]}>Contraseña</Text>
+              <View style={[GLOBAL_STYLES.verificacionInputPasswordContainer, { marginBottom: verticalScale(2) }] }>
                 <TextInput
                   style={GLOBAL_STYLES.verificacionInputPassword}
                   placeholder="* * * * * * * *"
@@ -194,11 +194,11 @@ const CrearCuenta: React.FC = () => {
               </View>
             </View>
 
-            <Text style={GLOBAL_STYLES.verificacionLabelPasswordReq}>La contraseña requiere al menos 8 símbolos, incluyendo como mínimo un número.</Text>
+            <Text style={[GLOBAL_STYLES.labelPasswordReq, { marginVertical: verticalScale(1) }]}>La contraseña requiere al menos 8 símbolos, incluyendo como mínimo un número.</Text>
 
-            <View style={GLOBAL_STYLES.verificacionContainerPassword}>
-              <Text style={GLOBAL_STYLES.verificacionLabelPassword}>Confirma la Contraseña</Text>
-              <View style={GLOBAL_STYLES.verificacionInputPasswordContainer}>
+            <View style={[GLOBAL_STYLES.verificacionContainerPassword, { paddingTop: hp('1%') }] }>
+              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { fontSize: 14, marginBottom: 2 }]}>Confirma la Contraseña</Text>
+              <View style={[GLOBAL_STYLES.verificacionInputPasswordContainer, { marginBottom: verticalScale(2) }] }>
                 <TextInput
                   style={GLOBAL_STYLES.verificacionInputPassword}
                   placeholder="* * * * * * * *"
@@ -221,18 +221,19 @@ const CrearCuenta: React.FC = () => {
               {errorMatch ? <Text style={GLOBAL_STYLES.errorText}>{errorMatch}</Text> : null}
             </View>
 
-            <View style={GLOBAL_STYLES.checkboxContainer}>
+            
+            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }] }>
               <TouchableOpacity style={GLOBAL_STYLES.checkbox} onPress={() => setCheckedPolitica(!checkedPolitica)}>
                 {checkedPolitica && <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />}
               </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.checkboxText as any}>Política de privacidad</Text>
+              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Política de privacidad</Text>
             </View>
 
-            <View style={GLOBAL_STYLES.checkboxContainer}>
+            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }] }>
               <TouchableOpacity style={GLOBAL_STYLES.checkbox} onPress={() => setCheckedCookies(!checkedCookies)}>
                 {checkedCookies && <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />}
               </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.checkboxText as any}>Cookies</Text>
+              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Cookies</Text>
             </View>
 
             <TouchableOpacity

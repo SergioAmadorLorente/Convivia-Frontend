@@ -85,7 +85,7 @@ const UnirResidencia: React.FC = () => {
           </Text>
 
           <View style={GLOBAL_STYLES.inputGroup}>
-            <Text style={GLOBAL_STYLES.label}>Código de la residencia</Text>
+            <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Código de la residencia</Text>
             <TextInput
               style={[
                 GLOBAL_STYLES.input,

@@ -13,7 +13,7 @@ interface TextFieldProps {
 
 const TextField: React.FC<TextFieldProps> = ({ label, value, onChangeText, placeholder, keyboardType = 'default', error }) => (
   <View style={GLOBAL_STYLES.inputGroup}>
-    {label ? <Text style={GLOBAL_STYLES.label}>{label}</Text> : null}
+    {label ? <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>{label}</Text> : null}
     <TextInput
       style={GLOBAL_STYLES.input}
       placeholder={placeholder}

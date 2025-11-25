@@ -28,6 +28,11 @@ const IniciarSesion: React.FC = () => {
   const containerRef = useRef<any>(null);
   useKeyboardAware({ containerRef, padding: 12 });
 
+  // Button enabled when both email is valid and password exists
+  const isButtonEnabled = isValidEmail && password.length > 0;
+  // Button-grey condition used for subtitle color
+  const isButtonGrey = !isButtonEnabled;
+
   if (!fontsLoaded) {
     return (
       <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}>
@@ -85,7 +90,7 @@ const IniciarSesion: React.FC = () => {
           Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {},
         ]}>
           <Text style={styles.titulo}>Iniciar sesión</Text>
-          <Text style={styles.subtitulo}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
+          <Text style={[styles.subtitulo, { textAlign: 'center', color: isButtonGrey ? '#888' : '#4B4741' }]}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
 
           <TextField label="Correo electrónico:" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
 
@@ -96,22 +101,14 @@ const IniciarSesion: React.FC = () => {
 
           <TouchableOpacity style={GLOBAL_STYLES.checkboxContainer} onPress={() => setIsChecked(!isChecked)}>
             <View style={GLOBAL_STYLES.checkbox}>{isChecked && <Ionicons name="checkmark" size={moderateScale(16)} color="#ACBF8A" />}</View>
-            <Text style={GLOBAL_STYLES.labelRecordarme}>Recordarme</Text>
+            <Text style={GLOBAL_STYLES.labelCheckbox}>Recordarme</Text>
           </TouchableOpacity>
 
           <PrimaryButton
             onPress={() => handleLogin()}
-            disabled={!isValidEmail || loading}
+            disabled={!isButtonEnabled || loading}
             loading={loading}
-            style={[
-              GLOBAL_STYLES.botonLogearse,
-              (!isValidEmail)
-                ? { backgroundColor: '#888' } // strong gray for invalid email
-                : (loading
-                    ? { backgroundColor: '#ccc' } // light gray for loading
-                    : { backgroundColor: GLOBAL_STYLES.botonLogearse.backgroundColor || '#E6ECDC' }
-                  ),
-            ]}
+            style={[GLOBAL_STYLES.botonLogearse]}
           >
             Entrar
           </PrimaryButton>

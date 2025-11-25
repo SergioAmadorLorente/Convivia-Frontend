@@ -59,7 +59,7 @@ const RestablecerPassword: React.FC = () => {
         <Text style={GLOBAL_STYLES.restablecerSubtitulo}>Cambia tu contraseña si no te acuerdas de ella</Text>
 
           <View style={GLOBAL_STYLES.restablecerInputGroup}>
-          <Text style={GLOBAL_STYLES.restablecerLabel}>Contraseña</Text>
+          <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Contraseña</Text>
           <View style={GLOBAL_STYLES.restablecerInputPasswordContainer}>
             <TextInput style={GLOBAL_STYLES.restablecerInputPassword} placeholder="* * * * * * * *" secureTextEntry={!showPassword} autoCorrect={false} textContentType="newPassword" value={password} onChangeText={setPassword} />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={GLOBAL_STYLES.restablecerEyeIconButton}>
@@ -70,7 +70,7 @@ const RestablecerPassword: React.FC = () => {
         </View>
 
           <View style={GLOBAL_STYLES.restablecerInputGroup}>
-          <Text style={GLOBAL_STYLES.restablecerLabel}>Confirma la contraseña</Text>
+          <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Confirma la contraseña</Text>
           <View style={GLOBAL_STYLES.restablecerInputPasswordContainer}>
             <TextInput style={GLOBAL_STYLES.restablecerInputPassword} placeholder="* * * * * * * *" secureTextEntry={!showConfirmPassword} autoCorrect={false} textContentType="newPassword" value={confirmPassword} onChangeText={setConfirmPassword} />
             <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={GLOBAL_STYLES.restablecerEyeIconButton}>
