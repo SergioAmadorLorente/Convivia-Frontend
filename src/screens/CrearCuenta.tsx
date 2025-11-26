@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Text,
   View,
@@ -15,18 +15,20 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { moderateScale } from 'react-native-size-matters';
+import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { createUserWithEmailAndPassword, sendEmailVerification, User } from 'firebase/auth';
-import GLOBAL_STYLES from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { COLORS } from '../styles/theme';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
+import { useKeyboardAware } from '../hooks';
+import { Button } from '../components';
+import TextField from '../components/ui/TextField';
 import { useCountdown } from '../hooks/useCountdown';
 import { useEmailValidation } from '../hooks/useEmailValidation';
 import { usePasswordValidation } from '../hooks/usePasswordValidation';
-import TextField from '../components/ui/TextField';
-import PasswordField from '../components/ui/PasswordField';
-import PrimaryButton from '../components/ui/PrimaryButton';
+
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
@@ -95,7 +97,7 @@ const CrearCuenta: React.FC = () => {
               error={emailError}
             />
             {/* Password */}
-            <PasswordField
+            <TextField
               label="Contraseña"
               value={password}
               onChangeText={setPassword}
@@ -134,32 +136,43 @@ const CrearCuenta: React.FC = () => {
               value={password2}
               onChangeText={(text) => {
                 setPassword2(text);
-                setErrorMatch(text !== password ? 'Las contraseñas no coinciden' : '');
+                if (password !== text) {
+                  setErrorMatch('Las contraseñas no coinciden');
+                } else {
+                  setErrorMatch('');
+                }
               }}
               placeholder="* * * * * * * *"
+              secureTextEntry
+              error={errorMatch}
             />
-            {errorMatch ? <Text style={GLOBAL_STYLES.errorText}>{errorMatch}</Text> : null}
-            {/* Checkboxes */}
-            <View style={GLOBAL_STYLES.checkboxContainer}>
-              <TouchableOpacity
-                style={GLOBAL_STYLES.checkbox}
-                onPress={() => setCheckedPolitica(!checkedPolitica)}
-              >
+
+            
+            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }] }>
+              <TouchableOpacity style={GLOBAL_STYLES.checkbox} onPress={() => setCheckedPolitica(!checkedPolitica)}>
                 {checkedPolitica && <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />}
               </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.checkboxText}>Política de privacidad</Text>
+              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Política de privacidad</Text>
             </View>
-            <View style={GLOBAL_STYLES.checkboxContainer}>
-              <TouchableOpacity
-                style={GLOBAL_STYLES.checkbox}
-                onPress={() => setCheckedCookies(!checkedCookies)}
-              >
+
+            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }] }>
+              <TouchableOpacity style={GLOBAL_STYLES.checkbox} onPress={() => setCheckedCookies(!checkedCookies)}>
                 {checkedCookies && <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />}
               </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.checkboxText}>Cookies</Text>
+              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Cookies</Text>
             </View>
-            {/* Submit Button */}
-            <PrimaryButton
+
+            <Button
+              style={[
+                GLOBAL_STYLES.buttonPrimaryGreen,
+                {
+                  backgroundColor:
+                    (isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword && !isCounting)
+                      ? COLORS.success
+                      : COLORS.disabled,
+                },
+              ]}
+              disabled={isCounting || !(isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword)}
               onPress={handleEnviarVerificacion}
               disabled={
                 !isValidEmail ||
@@ -179,8 +192,13 @@ const CrearCuenta: React.FC = () => {
                     : COLORS.disabled,
               }}
             >
-              Enviar verificación
-            </PrimaryButton>
+              {isCounting ? `Reenviando en ${contador}s` : 'Enviar verificación'}
+            </Button>
+
+            <Text style={GLOBAL_STYLES.verificacionEnviarCodigoNuevo}>¿No te ha llegado?</Text>
+
+            {isCounting && <Text style={GLOBAL_STYLES.verificacionContador}></Text>}
+
             <Popup
               visible={modalVisible}
               onClose={() => setModalVisible(false)}

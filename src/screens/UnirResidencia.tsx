@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Text,
   View,
@@ -10,13 +10,16 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import GLOBAL_STYLES from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Popup from '../components/ui/Popup';
+import { useKeyboardAware } from '../hooks';
+import Button from '../components/ui/Button';
+import TextField from '../components/ui/TextField';
 import useCodigoResidencia from '../hooks/useCodigoResidencia';
 
 const UnirResidencia: React.FC = () => {
@@ -29,6 +32,9 @@ const UnirResidencia: React.FC = () => {
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
+
+  const containerRef = useRef<any>(null);
+  useKeyboardAware({ containerRef, padding: 12 });
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupOptions, setPopupOptions] = useState<any>({});
@@ -87,59 +93,45 @@ const UnirResidencia: React.FC = () => {
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'android' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
-          keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}
-        >
-          <View style={GLOBAL_STYLES.container}>
-            <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
-            <Text style={GLOBAL_STYLES.subtitle}>
-              <Text style={{ fontWeight: 'bold' }}>
-                Obtén el código de la residencia a la que quieres unirte en el apartado{' '}
-              </Text>
-              <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
-            </Text>
+<KeyboardAvoidingView
+  behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+  style={{ flex: 1 }}
+  keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}
+>
+  <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
+    <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
-            <View style={GLOBAL_STYLES.inputGroup}>
-              <Text style={GLOBAL_STYLES.label}>Código de la residencia</Text>
-              <TextInput
-                style={[
-                  GLOBAL_STYLES.input,
-                  {
-                    borderColor:
-                      codigo.length === 0 ? '#CCC' : isValidCode ? '#28e80eff' : 'red',
-                  },
-                ]}
-                placeholder="0-0-0-0-0-0"
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="numeric"
-                value={codigo}
-                onChangeText={handleChange}
-              />
-              {!isValidCode && codigo.length > 0 && (
-                <Text style={GLOBAL_STYLES.errorText}>
-                  Formato inválido. Usa 0-0-0-0-0-0
-                </Text>
-              )}
-            </View>
+    <Text style={GLOBAL_STYLES.subtitle}>
+      <Text>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
+      <Text>Perfil - Mi residencia</Text>
+    </Text>
 
-            <TouchableOpacity
-              style={[
-                GLOBAL_STYLES.primaryButton,
-                { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' },
-              ]}
-              disabled={!isValidCode || loading}
-              onPress={handleUnirse}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#4B4741" />
-              ) : (
-                <Text style={GLOBAL_STYLES.primaryButtonText}>Unirse</Text>
-              )}
-            </TouchableOpacity>
+    {/* Campo de código */}
+    <TextField
+      label="Código de la residencia"
+      value={codigo} // hook del segundo bloque
+      onChangeText={handleChange} // lógica del segundo bloque
+      placeholder="0-0-0-0-0-0"
+      keyboardType="numeric"
+      error={!isValidCode && codigo.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined}
+    />
+
+    {/* Botón actualizado del primer bloque */}
+    <Button
+      style={[
+        GLOBAL_STYLES.buttonPrimaryGreen,
+        { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' },
+      ]}
+      disabled={!isValidCode || loading}
+      onPress={handleUnirse}
+      loading={loading}
+    >
+      Unirse
+    </Button>
+  </View>
+</KeyboardAvoidingView>
+
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>

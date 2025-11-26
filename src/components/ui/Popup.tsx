@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 80,
-    height: 80,
+    width: 250,
+    height: 250,
     marginBottom: 12,
   },
   title: {
@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginBottom: 8,
+    fontFamily: FONTS.title
   },
   description: {
     fontSize: 14,
