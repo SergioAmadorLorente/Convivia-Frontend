@@ -73,17 +73,17 @@ const NuevaResidencia: React.FC = () => {
     <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
         <View ref={containerRef} style={[styles.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-          <Text style={styles.titulo}>Crea una nueva residencia</Text>
+          <Text style={[styles.titulo, { fontSize: 45 }]}>Crea una nueva residencia</Text>
 
           <Text style={GLOBAL_STYLES.subtitle}>
-            <Text style={{ fontWeight: 'bold' }}>Obtén el código de tu residencia en el apartado </Text>
-            <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
+            <Text >Obtén el código de tu residencia en el apartado </Text>
+            <Text >Perfil - Mi residencia</Text>
           </Text>
 
           <View style={GLOBAL_STYLES.inputGroup}>
             <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Nombre de la residencia</Text>
             <TextInput
-              style={[GLOBAL_STYLES.input, { borderColor: hasText ? '#28e80eff' : 'red' }]}
+              style={GLOBAL_STYLES.input}
               placeholder="Piso Tarragona"
               autoCapitalize="words"
               autoCorrect={false}

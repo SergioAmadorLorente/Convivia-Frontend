@@ -33,7 +33,7 @@ const Bienvenida: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={GLOBAL_STYLES.container} keyboardShouldPersistTaps="handled">
-      <Text style={GLOBAL_STYLES.textoBienvenida}>Tu espacio compartido comienza aquí. {'\n'}¿Cómo quieres unirte?</Text>
+      <Text style={[GLOBAL_STYLES.textoBienvenida, { fontSize: 25 }]}>Tu espacio compartido comienza aquí. {'\n'}¿Cómo quieres unirte?</Text>
 
       <PrimaryButton style={GLOBAL_STYLES.botonStyle2} onPress={() => navigation.navigate('NuevaResidencia')}>
         <Text style={GLOBAL_STYLES.textoBoton}>Crea una residencia nueva</Text>

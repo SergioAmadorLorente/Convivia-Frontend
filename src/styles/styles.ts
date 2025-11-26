@@ -256,6 +256,10 @@ export const GLOBAL_STYLES = StyleSheet.create({
     height: 200,
   },
 
+
+
+
+
   // Contenedor para loading/spinner
   loadingContainer: {
     flex: 1,
@@ -440,6 +444,13 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
 
   // ----------- VERIFICACIÓN DE CUENTA [#8]-----------
+
+  // Contenedor de verificación de cuenta
+  verificacionContainer: {
+    ...(COMMON.PAGE_CARD as any),
+    borderRadius: moderateScale(25),
+  },
+
 
   // Botón para crear cuenta
   botonCrearCuenta: {

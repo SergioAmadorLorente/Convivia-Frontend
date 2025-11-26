@@ -81,8 +81,8 @@ const UnirResidencia: React.FC = () => {
             <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
             <Text style={GLOBAL_STYLES.subtitle}>
-              <Text style={{ fontWeight: 'bold' }}>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
-              <Text style={{ fontStyle: 'italic' }}>Perfil - Mi residencia</Text>
+              <Text >Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
+              <Text >Perfil - Mi residencia</Text>
             </Text>
 
             <View style={GLOBAL_STYLES.inputGroup}>
