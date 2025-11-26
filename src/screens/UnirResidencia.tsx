@@ -19,7 +19,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
-import { PrimaryButton } from '../components';
+import Button from '../components/ui/Button';
 
 const UnirResidencia: React.FC = () => {
   const [codigoResidencia, setCodigoResidencia] = useState<string>('');
@@ -103,9 +103,9 @@ const UnirResidencia: React.FC = () => {
               />
               {!isValidCode && codigoResidencia.length > 0 && <Text style={GLOBAL_STYLES.errorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
             </View>
-            <PrimaryButton style={[GLOBAL_STYLES.botonStyle1, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse}>
-              {loading ? <ActivityIndicator size="small" color="#4B4741" /> : <Text style={GLOBAL_STYLES.textoBoton}>Unirse</Text>}
-            </PrimaryButton>
+            <Button style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse} loading={loading}>
+              Unirse
+            </Button>
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>

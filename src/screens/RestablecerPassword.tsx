@@ -8,7 +8,7 @@ import { moderateScale } from 'react-native-size-matters';
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { COLORS } from '../styles/theme';
 import { useKeyboardAware } from '../hooks';
-import { PrimaryButton } from '../components';
+import Button from '../components/ui/Button';
 
 const RestablecerPassword: React.FC = () => {
   const [password, setPassword] = useState<string>('');
@@ -81,9 +81,7 @@ const RestablecerPassword: React.FC = () => {
         </View>
 
 
-        <PrimaryButton onPress={handleChangePassword} disabled={!isPasswordValid} style={[GLOBAL_STYLES.botonStyle1, { backgroundColor: !isPasswordValid ? COLORS.disabled : COLORS.success }]}>
-          <Text style={GLOBAL_STYLES.textoBoton}>Restablecer contraseña</Text>
-        </PrimaryButton>
+        <Button onPress={handleChangePassword} disabled={!isPasswordValid} style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: !isPasswordValid ? COLORS.disabled : COLORS.success }]}>Restablecer contraseña</Button>
       </View>
     </TouchableWithoutFeedback>
   );

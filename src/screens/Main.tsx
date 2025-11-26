@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import useLoadFonts from '../hooks/useLoadFonts';
 import Loading from '../components/ui/Loading';
 import Logo from '../components/ui/Logo';
-import AuthButtons from '../components/ui/AuthButtons';
+import Button from '../components/ui/Button';
 import GLOBAL_STYLES from '../styles/styles';
 
 const Main: React.FC = () => {
@@ -28,7 +28,8 @@ const Main: React.FC = () => {
 
       <Logo />
 
-      <AuthButtons onCreate={() => navigation.navigate('CrearCuenta')} onSignIn={() => navigation.navigate('IniciarSesion')} />
+      <Button style={GLOBAL_STYLES.buttonPrimaryGreen} onPress={() => navigation.navigate('CrearCuenta')}>Crea una cuenta</Button>
+      <Button style={GLOBAL_STYLES.buttonSecondaryGrey} onPress={() => navigation.navigate('IniciarSesion')}>Inicia sesión</Button>
     </ScrollView>
   );
 };

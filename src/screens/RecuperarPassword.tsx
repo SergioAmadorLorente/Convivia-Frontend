@@ -11,7 +11,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
-import { PrimaryButton } from '../components';
+import Button from '../components/ui/Button';
 
 const RecuperarPassword: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -68,8 +68,8 @@ const RecuperarPassword: React.FC = () => {
             {`Ingresa tu dirección de correo electrónico y te enviaremos un enlace para que puedas crear una nueva contraseña de forma segura.\n\nLa dirección ingresada debe contar con un formato estándar (por ejemplo, usuario@dominio.com).`}
           </Text>
 
-          <PrimaryButton 
-            style={[GLOBAL_STYLES.botonStyle1, { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled }]}
+          <Button 
+            style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled }]}
             disabled={!isValidEmail}
             onPress={async () => {
               try {
@@ -80,13 +80,10 @@ const RecuperarPassword: React.FC = () => {
               }
             }}
           >
-            <Text style={GLOBAL_STYLES.textoBoton}>Enviar correo</Text>
-          </PrimaryButton>
+            Enviar correo
+          </Button>
         </View>
 
-        <TouchableOpacity style={GLOBAL_STYLES.botonTemp} onPress={() => navigation.navigate('RestablecerPassword')}>
-          <Text style={GLOBAL_STYLES.botonTempText}>Boton Temporal Restablecer Contraseña</Text>
-        </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
       <Popup visible={popupVisible} onClose={handleClosePopup} title={popupOptions.title || ''} description={popupOptions.description} imageType={popupOptions.imageType} buttons={popupOptions.buttons} />

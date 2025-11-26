@@ -6,7 +6,7 @@ import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/mo
 import { useNavigation } from '@react-navigation/native';
 import GLOBAL_STYLES from '../styles/styles';
 import Popup from '../components/ui/Popup';
-import { PrimaryButton } from '../components';
+import Button from '../components/ui/Button';
 
 const Bienvenida: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -35,13 +35,9 @@ const Bienvenida: React.FC = () => {
     <ScrollView contentContainerStyle={GLOBAL_STYLES.container} keyboardShouldPersistTaps="handled">
       <Text style={[GLOBAL_STYLES.textoBienvenida, { fontSize: 25 }]}>Tu espacio compartido comienza aquí. {'\n'}¿Cómo quieres unirte?</Text>
 
-      <PrimaryButton style={GLOBAL_STYLES.botonStyle2} onPress={() => navigation.navigate('NuevaResidencia')}>
-        <Text style={GLOBAL_STYLES.textoBoton}>Crea una residencia nueva</Text>
-      </PrimaryButton>
+      <Button style={GLOBAL_STYLES.buttonPrimaryGreen} onPress={() => navigation.navigate('NuevaResidencia')}>Crea una residencia nueva</Button>
 
-      <PrimaryButton style={GLOBAL_STYLES.botonStyle3} onPress={() => navigation.navigate('UnirResidencia')}>
-        <Text style={GLOBAL_STYLES.textoBoton}>Únete a una residencia!</Text>
-      </PrimaryButton>
+      <Button style={GLOBAL_STYLES.buttonSecondaryGrey} onPress={() => navigation.navigate('UnirResidencia')}>Únete a una residencia!</Button>
 
       <Popup
         visible={modalVisible}

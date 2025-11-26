@@ -208,44 +208,21 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
   // ----------- BOTONES (TODOS LOS TIPOS) [#5]-----------
 
-  botonStyle1: {
+  // Active unified button styles
+  buttonPrimaryGreen: {
     ...(COMMON.BUTTON_BASE as any),
     ...(COMMON.SHADOW as any),
-  },
-
-  botonStyle2: {
-    backgroundColor: COLORS.inputBackground,
-    ...(COMMON.BUTTON_BASE as any),
-    ...(COMMON.SHADOW as any),
-  },
-
-  botonStyle3: {
     backgroundColor: COLORS.success,
+  },
+
+  buttonSecondaryGrey: {
     ...(COMMON.BUTTON_BASE as any),
     ...(COMMON.SHADOW as any),
+    backgroundColor: COLORS.inputBackground,
   },
-
-  // Botón temporal (pruebas o debug)
-  botonTemp: {
-    paddingVertical: hp("1.5%"),
-    borderRadius: 25,
-    width: wp("80%"),
-    alignSelf: "center",
-    marginTop: hp("20%"),
-    ...(COMMON.SHADOW as any),
-    backgroundColor: "red",
-  },
-
   // Botón para mostrar/ocultar contraseña OK
   eyeIconButton: {
     padding: wp("0.1%"),
-  },
-
-  // Botón primario reutilizable
-  primaryButton: {
-    ...(COMMON.BUTTON_BASE as any),
-    ...(COMMON.SHADOW as any),
-    backgroundColor: COLORS.success,
   },
 
   // ----------- LOGOS Y CONTENEDORES DE LOGO [#6]-----------
@@ -255,10 +232,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     width: 200,
     height: 200,
   },
-
-
-
-
 
   // Contenedor para loading/spinner
   loadingContainer: {
@@ -309,15 +282,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     color: COLORS.error,
     fontSize: SIZES.smallText,
     marginTop: hp("0.5%"),
-  },
-  // Botón para restablecer contraseña
-  restablecerBoton: {
-    paddingVertical: verticalScale(11),
-    borderRadius: 15,
-    width: wp("80%"),
-    alignSelf: "center",
-    marginTop: hp("4%"),
-    ...(COMMON.SHADOW as any),
   },
   // Texto del botón de restablecer contraseña
   restablecerTextoBoton: {
@@ -411,15 +375,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     width: wp("80%"),
     marginTop: hp("1%"),
   },
-  // Botón para recuperar contraseña
-  botonRecuperarPassword: {
-    paddingVertical: hp("1.5%"),
-    borderRadius: 15,
-    width: wp("80%"),
-    alignSelf: "center",
-    marginTop: hp("3%"),
-    ...(COMMON.SHADOW as any),
-  },
   // Texto del botón de recuperar contraseña
   textoRecuperarPassword: {
     color: COLORS.secondary,
@@ -449,15 +404,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
   verificacionContainer: {
     ...(COMMON.PAGE_CARD as any),
     borderRadius: moderateScale(25),
-  },
-
-
-  // Botón para crear cuenta
-  botonCrearCuenta: {
-    backgroundColor: COLORS.inputBackground,
-    ...(COMMON.BUTTON_BASE as any),
-    marginTop: hp("4%"),
-    ...(COMMON.SHADOW as any),
   },
 
   // Título en verificación de cuenta
@@ -532,23 +478,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     padding: 0,
     marginLeft: -2,
   },
-  // Botón para finalizar verificación
-  verificacionBotonFinalizar: {
-    backgroundColor: COLORS.success,
-    ...(COMMON.BUTTON_BASE as any),
-    marginTop: hp("5%"),
-    height: verticalScale(45),
-    ...(COMMON.SHADOW as any),
-  },
-  // Texto del botón finalizar verificación
-  verificacionTextoBotonFinalizar: {
-    color: COLORS.secondary,
-    fontSize: moderateScale(16),
-    textAlign: "center",
-    fontFamily: FONTS.regular,
-    padding: verticalScale(3),
-  },
-
   // Contenedor del contenido del scroll en verificación
   verificacionScrollContent: {
     flexGrow: 1,

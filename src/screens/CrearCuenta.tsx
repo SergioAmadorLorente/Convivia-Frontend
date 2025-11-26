@@ -25,7 +25,7 @@ import { COLORS } from '../styles/theme';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
-import { PrimaryButton } from '../components';
+import { Button } from '../components';
 
 const CrearCuenta: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -237,9 +237,9 @@ const CrearCuenta: React.FC = () => {
               <Text style={GLOBAL_STYLES.labelCheckbox as any}>Cookies</Text>
             </View>
 
-            <PrimaryButton
+            <Button
               style={[
-                GLOBAL_STYLES.botonStyle1,
+                GLOBAL_STYLES.buttonPrimaryGreen,
                 {
                   backgroundColor:
                     (isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword && !isCounting)
@@ -250,8 +250,8 @@ const CrearCuenta: React.FC = () => {
               disabled={isCounting || !(isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword)}
               onPress={handleEnviarVerificacion}
             >
-              <Text style={GLOBAL_STYLES.textoBoton}>{isCounting ? `Reenviando en ${contador}s` : 'Enviar verificación'}</Text>
-            </PrimaryButton>
+              {isCounting ? `Reenviando en ${contador}s` : 'Enviar verificación'}
+            </Button>
 
             <Text style={GLOBAL_STYLES.verificacionEnviarCodigoNuevo}>¿No te ha llegado?</Text>
 

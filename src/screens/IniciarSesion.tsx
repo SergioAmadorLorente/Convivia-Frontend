@@ -13,7 +13,7 @@ import useEmailValidation from '../hooks/useEmailValidation';
 import { useKeyboardAware } from '../hooks';
 import TextField from '../components/ui/TextField';
 import PasswordField from '../components/ui/PasswordField';
-import PrimaryButton from '../components/ui/PrimaryButton';
+import Button from '../components/ui/Button';
 import Popup from '../components/ui/Popup';
 import { COLORS } from '../styles/theme';
 
@@ -107,12 +107,12 @@ const IniciarSesion: React.FC = () => {
             <Text style={GLOBAL_STYLES.labelCheckbox}>Recordarme</Text>
           </TouchableOpacity>
 
-          <PrimaryButton
+          <Button
             onPress={() => handleLogin()}
             disabled={!isValidEmail || loading || !isValidPassword}
             loading={loading}
             style={[
-              GLOBAL_STYLES.botonStyle1,
+              GLOBAL_STYLES.buttonPrimaryGreen,
               {
                 backgroundColor:
                   (!isValidEmail || !isValidPassword)
@@ -123,8 +123,8 @@ const IniciarSesion: React.FC = () => {
               },
             ]}
           >
-            <Text style={GLOBAL_STYLES.textoBoton}>Entrar</Text>
-          </PrimaryButton>
+            Entrar
+          </Button>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback><Popup

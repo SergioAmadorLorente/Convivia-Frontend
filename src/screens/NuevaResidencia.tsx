@@ -20,7 +20,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
-import { PrimaryButton } from '../components';
+import Button from '../components/ui/Button';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -92,16 +92,14 @@ const NuevaResidencia: React.FC = () => {
             {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
           </View>
 
-          <PrimaryButton
-            style={[GLOBAL_STYLES.botonStyle1, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
+          <Button
+            style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
             disabled={!hasText || loading}
-            onPress={handleCrear}>
-            {loading ? (
-              <ActivityIndicator size="small" color="#4B4741" />
-            ) : (
-              <Text style={GLOBAL_STYLES.textoBoton}>Crear</Text>
-            )}
-          </PrimaryButton>
+            onPress={handleCrear}
+            loading={loading}
+          >
+            Crear
+          </Button>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback><Popup
