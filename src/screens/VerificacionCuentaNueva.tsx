@@ -112,8 +112,8 @@ const VerificacionCuentaNueva: React.FC = () => {
               </View>
             </View>
 
-            <TouchableOpacity style={[GLOBAL_STYLES.verificacionBotonFinalizar, (password !== password2 || password.length < 8 || codigo.length !== 6) && { opacity: 0.5 }]} disabled={password !== password2 || password.length < 8 || codigo.length !== 6} onPress={() => { setModalVisible(true); setModalTipo('exito'); }}>
-              <Text style={GLOBAL_STYLES.verificacionTextoBotonFinalizar}>Finalizar registro</Text>
+            <TouchableOpacity style={[GLOBAL_STYLES.buttonPrimaryGreen, (password !== password2 || password.length < 8 || codigo.length !== 6) && { opacity: 0.5 }]} disabled={password !== password2 || password.length < 8 || codigo.length !== 6} onPress={() => { setModalVisible(true); setModalTipo('exito'); }}>
+              <Text style={GLOBAL_STYLES.buttonPrimaryGreen}>Finalizar registro</Text>
             </TouchableOpacity>
 
             <Popup
