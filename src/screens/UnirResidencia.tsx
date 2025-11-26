@@ -20,6 +20,7 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
 import Button from '../components/ui/Button';
+import TextField from '../components/ui/TextField';
 
 const UnirResidencia: React.FC = () => {
   const [codigoResidencia, setCodigoResidencia] = useState<string>('');
@@ -85,24 +86,7 @@ const UnirResidencia: React.FC = () => {
               <Text >Perfil - Mi residencia</Text>
             </Text>
 
-            <View style={GLOBAL_STYLES.inputGroup}>
-              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Código de la residencia</Text>
-              <TextInput
-                style={[
-                  GLOBAL_STYLES.input,
-                  {
-                    borderColor: codigoResidencia.length === 0 ? '#CCC' : isValidCode ? '#28e80eff' : 'red',
-                  },
-                ]}
-                placeholder="0-0-0-0-0-0"
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="numeric"
-                value={codigoResidencia}
-                onChangeText={setCodigoResidencia}
-              />
-              {!isValidCode && codigoResidencia.length > 0 && <Text style={GLOBAL_STYLES.errorText}>Formato inválido. Usa 0-0-0-0-0-0</Text>}
-            </View>
+            <TextField label="Código de la residencia" value={codigoResidencia} onChangeText={setCodigoResidencia} placeholder="0-0-0-0-0-0" keyboardType="numeric" error={!isValidCode && codigoResidencia.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined} />
             <Button style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse} loading={loading}>
               Unirse
             </Button>

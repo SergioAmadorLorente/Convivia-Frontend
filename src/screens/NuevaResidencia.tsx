@@ -21,6 +21,7 @@ import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
 import Button from '../components/ui/Button';
+import TextField from '../components/ui/TextField';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -80,17 +81,8 @@ const NuevaResidencia: React.FC = () => {
             <Text >Perfil - Mi residencia</Text>
           </Text>
 
-          <View style={GLOBAL_STYLES.inputGroup}>
-            <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Nombre de la residencia</Text>
-            <TextInput
-              style={GLOBAL_STYLES.input}
-              placeholder="Piso Tarragona"
-              autoCapitalize="words"
-              autoCorrect={false}
-              value={nombreResidencia}
-              onChangeText={setNombreResidencia} />
-            {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
-          </View>
+          <TextField label="Nombre de la residencia" value={nombreResidencia} onChangeText={setNombreResidencia} placeholder="Piso Tarragona" />
+          {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
 
           <Button
             style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}

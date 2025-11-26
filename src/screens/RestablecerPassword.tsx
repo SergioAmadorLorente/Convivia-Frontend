@@ -9,13 +9,12 @@ import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
 import { COLORS } from '../styles/theme';
 import { useKeyboardAware } from '../hooks';
 import Button from '../components/ui/Button';
+import TextField from '../components/ui/TextField';
 
 const RestablecerPassword: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
@@ -59,27 +58,9 @@ const RestablecerPassword: React.FC = () => {
         <Text style={GLOBAL_STYLES.restablecerTitulo}>Restablecer contraseña</Text>
         <Text style={GLOBAL_STYLES.restablecerSubtitulo}>Cambia tu contraseña si no te acuerdas de ella</Text>
 
-          <View style={GLOBAL_STYLES.restablecerInputGroup}>
-          <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Contraseña</Text>
-          <View style={GLOBAL_STYLES.restablecerInputPasswordContainer}>
-            <TextInput style={GLOBAL_STYLES.restablecerInputPassword} placeholder="* * * * * * * *" secureTextEntry={!showPassword} autoCorrect={false} textContentType="newPassword" value={password} onChangeText={setPassword} />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={GLOBAL_STYLES.restablecerEyeIconButton}>
-              <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={moderateScale(22)} color={COLORS.accent} />
-            </TouchableOpacity>
-          </View>
-          <Text style={GLOBAL_STYLES.restablecerErrorText}>{passwordError}</Text>
-        </View>
+        <TextField label="Contraseña" placeholder="* * * * * * * *" secureTextEntry value={password} onChangeText={setPassword} error={passwordError} />
 
-          <View style={GLOBAL_STYLES.restablecerInputGroup}>
-          <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>Confirma la contraseña</Text>
-          <View style={GLOBAL_STYLES.restablecerInputPasswordContainer}>
-            <TextInput style={GLOBAL_STYLES.restablecerInputPassword} placeholder="* * * * * * * *" secureTextEntry={!showConfirmPassword} autoCorrect={false} textContentType="newPassword" value={confirmPassword} onChangeText={setConfirmPassword} />
-            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={GLOBAL_STYLES.restablecerEyeIconButton}>
-              <Ionicons name={showConfirmPassword ? 'eye-off' : 'eye'} size={moderateScale(22)} color={COLORS.accent} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
+        <TextField label="Confirma la contraseña" placeholder="* * * * * * * *" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
 
         <Button onPress={handleChangePassword} disabled={!isPasswordValid} style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: !isPasswordValid ? COLORS.disabled : COLORS.success }]}>Restablecer contraseña</Button>
       </View>

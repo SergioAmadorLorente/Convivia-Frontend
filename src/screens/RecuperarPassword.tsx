@@ -12,6 +12,7 @@ import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
 import Button from '../components/ui/Button';
+import TextField from '../components/ui/TextField';
 
 const RecuperarPassword: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -60,9 +61,7 @@ const RecuperarPassword: React.FC = () => {
         <Text style={GLOBAL_STYLES.recuperarSubtitulo}>¿Has olvidado tu contraseña?</Text>
 
         <View style={GLOBAL_STYLES.recuperarBloque}>
-          <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { alignSelf: 'flex-start' }]}>Correo electrónico</Text>
-          <TextInput style={GLOBAL_STYLES.recuperarInput} placeholder="usuario@dominio" keyboardType="email-address" autoCapitalize="none" autoCorrect={false} value={email} onChangeText={validateEmail} />
-          {emailError ? <Text style={GLOBAL_STYLES.recuperarErrorText}>{emailError}</Text> : null}
+          <TextField label="Correo electrónico" placeholder="usuario@dominio" keyboardType="email-address" value={email} onChangeText={validateEmail} error={emailError} />
 
           <Text style={GLOBAL_STYLES.recuperarSubTextEmail}>
             {`Ingresa tu dirección de correo electrónico y te enviaremos un enlace para que puedas crear una nueva contraseña de forma segura.\n\nLa dirección ingresada debe contar con un formato estándar (por ejemplo, usuario@dominio.com).`}

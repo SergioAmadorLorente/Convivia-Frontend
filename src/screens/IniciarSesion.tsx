@@ -12,7 +12,7 @@ import useLoadFonts from '../hooks/useLoadFonts';
 import useEmailValidation from '../hooks/useEmailValidation';
 import { useKeyboardAware } from '../hooks';
 import TextField from '../components/ui/TextField';
-import PasswordField from '../components/ui/PasswordField';
+// PasswordField has been unified into TextField (secureTextEntry prop)
 import Button from '../components/ui/Button';
 import Popup from '../components/ui/Popup';
 import { COLORS } from '../styles/theme';
@@ -93,11 +93,11 @@ const IniciarSesion: React.FC = () => {
           Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {},
         ]}>
           <Text style={styles.titulo}>Iniciar sesión</Text>
-          <Text style={[styles.subtitulo, { textAlign: 'center', color: isButtonGrey ? '#888' : '#4B4741' }]}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
+          <Text style={GLOBAL_STYLES.subtitle}>¡Ya estás a punto de poder utilizar la aplicación de Convivia!</Text>
 
           <TextField label="Correo electrónico:" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
 
-          <PasswordField label="Contraseña:" value={password} onChangeText={setPassword} placeholder="• • • • • • • •" />
+          <TextField label="Contraseña:" value={password} onChangeText={setPassword} placeholder="• • • • • • • •" secureTextEntry />
           <TouchableOpacity style={GLOBAL_STYLES.recuperarContainer} onPress={() => navigation.navigate('RecuperarPassword')}>
             <Text style={GLOBAL_STYLES.recuperarPassword}>Recuperar contraseña</Text>
           </TouchableOpacity>

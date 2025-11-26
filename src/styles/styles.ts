@@ -55,13 +55,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginTop: hp("0.5%"),
   },
 
-  // Contenedor de input de contraseña
-  inputPasswordContainer: {
-    ...(COMMON.INPUT_CONTAINER as any),
-    paddingHorizontal: wp("4%"),
-    height: verticalScale(40),
-  },
-
   // ----------- TEXTOS Y TIPOGRAFÍA [#2]-----------
 
   // Texto del botón primario
@@ -166,35 +159,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginTop: hp("1%"),
   },
 
-  // ----------- INPUTS Y CAMPOS DE FORMULARIO [#3]-----------
-  // Grupo de inputs en formularios
-  inputGroup: {
-    width: wp("80%"),
-    marginTop: hp("2%"),
-  },
-
-  inputPassword: {
-    flex: 1,
-    fontSize: SIZES.passwordInput,
-    fontFamily: FONTS.regular,
-    paddingBottom: 0,
-  },
-
-  // Input de email en crear cuenta
-  inputEmailCrearCuenta: {
-    ...(COMMON.INPUT_BASE as any),
-    marginBottom: verticalScale(5),
-    width: wp("80%"),
-  },
-
-  // Input de texto estándar
-  input: {
-    ...(COMMON.INPUT_BASE as any),
-    paddingHorizontal: wp("4%"),
-  },
-
   // ----------- CHECKBOXES [#4]-----------
-
   // Estilo del checkbox
   checkbox: {
     width: wp("5%"),
@@ -206,7 +171,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     alignItems: "center",
     marginRight: wp("2%"),
   },
-  // ----------- BOTONES (TODOS LOS TIPOS) [#5]-----------
+  // ----------- BOTONES (TODOS LOS TIPOS) -----------
 
   // Active unified button styles
   buttonPrimaryGreen: {
@@ -273,10 +238,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
   // ----------- RECUPERAR Y RESTABLECER PASSWORD [#7]-----------
 
-  // Botón para mostrar/ocultar nueva contraseña
-  restablecerEyeIconButton: {
-    padding: wp("0.1%"),
-  },
   // Texto de error en restablecer contraseña
   restablecerErrorText: {
     color: COLORS.error,
@@ -302,26 +263,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     textAlign: "center",
     marginBottom: hp("1%"),
   },
-  // Grupo de inputs en restablecer contraseña
-  restablecerInputGroup: {
-    width: wp("80%"),
-    marginTop: hp("1%"),
-  },
-  // Contenedor de input de nueva contraseña
-  restablecerInputPasswordContainer: {
-    ...(COMMON.INPUT_CONTAINER as any),
-    borderRadius: moderateScale(15),
-    paddingHorizontal: wp("4%"),
-    height: verticalScale(40),
-  },
-  // Input de nueva contraseña
-  restablecerInputPassword: {
-    flex: 1,
-    fontSize: SIZES.passwordInput,
-    fontFamily: FONTS.regular,
-    paddingBottom: 0,
-  },
-
   // Título en restablecer contraseña
   restablecerTitulo: {
     fontSize: moderateScale(45),
@@ -359,12 +300,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     color: COLORS.secondary,
     marginVertical: hp("1%"),
     fontFamily: FONTS.regular,
-  },
-  // Input de correo en recuperar contraseña
-  recuperarInput: {
-    width: "100%",
-    ...(COMMON.INPUT_BASE as any),
-    marginBottom: hp("1%"),
   },
   // Texto informativo bajo el input de correo
   recuperarSubTextEmail: {
@@ -424,13 +359,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     textAlign: "center",
     marginBottom: hp("1%"),
   },
-  // Input para código de verificación
-  verificacionInputCodigo: {
-    ...(COMMON.INPUT_BASE as any),
-    fontSize: moderateScale(15),
-    marginBottom: verticalScale(5),
-    width: wp("80%"),
-  },
   // Link para reenviar código de verificación
   verificacionEnviarCodigoNuevo: {
     fontSize: moderateScale(14),
@@ -455,24 +383,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     borderRadius: moderateScale(25),
   },
 
-  // Input de nueva contraseña tras verificación
-  verificacionInputPassword: {
-    paddingHorizontal: wp("3%"),
-    paddingVertical: verticalScale(8),
-    fontSize: moderateScale(16),
-    width: wp("70%"),
-    backgroundColor: COLORS.inputBackground,
-    fontFamily: FONTS.regular,
-    paddingBottom: 0,
-  },
-  // Contenedor del input de nueva contraseña tras verificación
-  verificacionInputPasswordContainer: {
-    ...(COMMON.INPUT_CONTAINER as any),
-    borderRadius: moderateScale(10),
-    width: wp("80%"),
-    height: verticalScale(38),
-    marginBottom: verticalScale(5),
-  },
   // Botón para mostrar/ocultar nueva contraseña tras verificación
   verificacionEyeIconButton: {
     padding: 0,
@@ -486,7 +396,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
 
   // -------------- LABELS [#9]----------------
-
   // Label genérico para formularios
   labelBase: {
     fontSize: SIZES.label,

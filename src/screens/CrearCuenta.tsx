@@ -26,6 +26,7 @@ import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
 import { Button } from '../components';
+import TextField from '../components/ui/TextField';
 
 const CrearCuenta: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -37,9 +38,7 @@ const CrearCuenta: React.FC = () => {
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const [password, setPassword] = useState<string>('');
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [password2, setPassword2] = useState<string>('');
-  const [showPassword2, setShowPassword2] = useState<boolean>(false);
   const [codigo, setCodigo] = useState<string>('');
   const [errorMatch, setErrorMatch] = useState<string>('');
   const [contador, setContador] = useState<number>(0);
@@ -162,65 +161,31 @@ const CrearCuenta: React.FC = () => {
             <Text style={GLOBAL_STYLES.subtitle}>¿Quieres empezar tu experiencia con Convivia?</Text>
 
             <View style={{ width: '100%', alignItems: 'center' }}>
-              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { fontSize: 14, marginBottom: 2 }]}>Correo electrónico</Text>
-              <TextInput
-                style={GLOBAL_STYLES.inputEmailCrearCuenta}
-                placeholder="usuario@dominio"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                value={email}
-                onChangeText={validateEmail}
-              />
-              {emailError ? <Text style={GLOBAL_STYLES.errorText}>{emailError}</Text> : null}
+              <TextField label="Correo electrónico" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
               <Text style={GLOBAL_STYLES.helperText}>
                 La dirección ingresada debe contar con un formato estándar (por ejemplo, usuario@dominio.com).
               </Text>
             </View>
 
-            <View style={[GLOBAL_STYLES.verificacionContainerPassword, { paddingTop: hp('1%') }] }>
-              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { fontSize: 14, marginBottom: 2 }]}>Contraseña</Text>
-              <View style={[GLOBAL_STYLES.verificacionInputPasswordContainer, { marginBottom: verticalScale(2) }] }>
-                <TextInput
-                  style={GLOBAL_STYLES.verificacionInputPassword}
-                  placeholder="* * * * * * * *"
-                  secureTextEntry={!showPassword}
-                  autoCorrect={false}
-                  value={password}
-                  onChangeText={setPassword}
-                />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={GLOBAL_STYLES.verificacionEyeIconButton}>
-                  <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={23} color={COLORS.accent} />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <TextField label="Contraseña" value={password} onChangeText={setPassword} placeholder="* * * * * * * *" secureTextEntry />
 
             <Text style={[GLOBAL_STYLES.labelPasswordReq, { marginVertical: verticalScale(1) }]}>La contraseña requiere al menos 8 símbolos, incluyendo como mínimo un número.</Text>
 
-            <View style={[GLOBAL_STYLES.verificacionContainerPassword, { paddingTop: hp('1%') }] }>
-              <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall, { fontSize: 14, marginBottom: 2 }]}>Confirma la Contraseña</Text>
-              <View style={[GLOBAL_STYLES.verificacionInputPasswordContainer, { marginBottom: verticalScale(2) }] }>
-                <TextInput
-                  style={GLOBAL_STYLES.verificacionInputPassword}
-                  placeholder="* * * * * * * *"
-                  secureTextEntry={!showPassword2}
-                  autoCorrect={false}
-                  value={password2}
-                  onChangeText={(text) => {
-                    setPassword2(text);
-                    if (password !== text) {
-                      setErrorMatch('Las contraseñas no coinciden');
-                    } else {
-                      setErrorMatch('');
-                    }
-                  }}
-                />
-                <TouchableOpacity onPress={() => setShowPassword2(!showPassword2)} style={GLOBAL_STYLES.verificacionEyeIconButton}>
-                  <Ionicons name={showPassword2 ? 'eye-off' : 'eye'} size={23} color={COLORS.accent} />
-                </TouchableOpacity>
-              </View>
-              {errorMatch ? <Text style={GLOBAL_STYLES.errorText}>{errorMatch}</Text> : null}
-            </View>
+            <TextField
+              label="Confirma la Contraseña"
+              value={password2}
+              onChangeText={(text) => {
+                setPassword2(text);
+                if (password !== text) {
+                  setErrorMatch('Las contraseñas no coinciden');
+                } else {
+                  setErrorMatch('');
+                }
+              }}
+              placeholder="* * * * * * * *"
+              secureTextEntry
+              error={errorMatch}
+            />
 
             
             <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }] }>

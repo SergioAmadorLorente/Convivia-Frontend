@@ -92,7 +92,6 @@ export const COMMON = {
     alignItems: 'center',
   },
   INPUT_BASE: {
-    borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: moderateScale(10),
     paddingHorizontal: wp('3%'),

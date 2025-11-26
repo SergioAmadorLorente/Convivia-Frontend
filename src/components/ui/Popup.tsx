@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginBottom: 8,
+    fontFamily: FONTS.title
   },
   description: {
     fontSize: 14,
