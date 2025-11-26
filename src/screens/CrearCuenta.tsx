@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   View,
@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TextInput,
   TouchableWithoutFeedback,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
@@ -23,6 +22,7 @@ import GLOBAL_STYLES from '../styles/styles';
 import { COLORS } from '../styles/theme';
 import { auth } from '../configs/firebaseConfig';
 import Popup from '../components/ui/Popup';
+import { useCountdown } from '../hooks/useCountdown';
 
 const CrearCuenta: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -37,12 +37,11 @@ const CrearCuenta: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [password2, setPassword2] = useState<string>('');
   const [showPassword2, setShowPassword2] = useState<boolean>(false);
-  const [codigo, setCodigo] = useState<string>('');
   const [errorMatch, setErrorMatch] = useState<string>('');
-  const [contador, setContador] = useState<number>(0);
-  const [isCounting, setIsCounting] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalTipo, setModalTipo] = useState<string>('exito');
+
+  const { seconds, isCounting, startCountdown } = useCountdown(60);
 
   const isValidPassword = password.length >= 8 && /\d/.test(password);
 
@@ -59,21 +58,6 @@ const CrearCuenta: React.FC = () => {
       </View>
     );
   }
-
-  useEffect(() => {
-    if (!isCounting) return;
-
-    if (contador === 0) {
-      setIsCounting(false);
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setContador((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [contador, isCounting]);
 
   const validateEmail = (text: string) => {
     setEmail(text);
@@ -101,8 +85,7 @@ const CrearCuenta: React.FC = () => {
       setModalTipo('exito');
       setModalVisible(true);
       // start resend timer
-      setContador(60);
-      setIsCounting(true);
+      startCountdown();
     } catch (error: any) {
       setEmailError('No se pudo crear la cuenta: ' + (error?.message ?? String(error)));
     }
@@ -135,8 +118,7 @@ const CrearCuenta: React.FC = () => {
       const user = auth.currentUser;
       if (user) {
         await sendVerificationEmail(user);
-        setContador(60);
-        setIsCounting(true);
+        startCountdown();
         setModalTipo('reenvio');
         setModalVisible(true);
       } else {
@@ -244,30 +226,21 @@ const CrearCuenta: React.FC = () => {
               disabled={isCounting || !(isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword)}
               onPress={handleEnviarVerificacion}
             >
-              <Text style={GLOBAL_STYLES.textoBotonIngresarMail}>{isCounting ? `Reenviando en ${contador}s` : 'Enviar verificación'}</Text>
+              <Text style={GLOBAL_STYLES.textoBotonIngresarMail}>{isCounting ? `Reenviando en ${seconds}s` : 'Enviar verificación'}</Text>
             </TouchableOpacity>
 
             <Text style={GLOBAL_STYLES.verificacionEnviarCodigoNuevo}>¿No te ha llegado?</Text>
 
             {isCounting && <Text style={GLOBAL_STYLES.verificacionContador}></Text>}
 
+            {/* Popup solo informativo */}
             <Popup
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
               title={modalTipo === 'exito' ? '¡Verificación enviada!' : 'Código reenviado'}
-              description={modalTipo === 'exito' ? 'Revisa tu correo' : 'Revisa tu correo y spam'}
-              imageType={'success'}
-              buttons={
-                modalTipo === 'exito'
-                  ? [
-                      { text: 'Cerrar', onPress: () => navigation.navigate('Main') },
-                      { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
-                    ]
-                  : [
-                      { text: 'Cerrar', onPress: () => {} },
-                      { text: isCounting ? `Reenviar (${contador}s)` : 'Reenviar correo', onPress: () => { if (!isCounting) handleResend(); } },
-                    ]
-              }
+              description="Revisa tu correo y carpeta de spam"
+              imageType="success"
+              buttons={[{ text: 'Cerrar', onPress: () => setModalVisible(false) }]}
             />
           </View>
         </ScrollView>
