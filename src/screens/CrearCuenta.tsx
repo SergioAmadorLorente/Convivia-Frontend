@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
@@ -25,7 +24,9 @@ import Popup from '../components/ui/Popup';
 import { useCountdown } from '../hooks/useCountdown';
 import { useEmailValidation } from '../hooks/useEmailValidation';
 import { usePasswordValidation } from '../hooks/usePasswordValidation';
-
+import TextField from '../components/ui/TextField';
+import PasswordField from '../components/ui/PasswordField';
+import PrimaryButton from '../components/ui/PrimaryButton';
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
@@ -74,106 +75,92 @@ const CrearCuenta: React.FC = () => {
   };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-
           <View style={GLOBAL_STYLES.container}>
             <Text style={GLOBAL_STYLES.title}>Crea tu cuenta</Text>
-            <Text style={GLOBAL_STYLES.subtitle}>¿Quieres empezar tu experiencia con Convivia?</Text>
-            <View style={{ width: '100%', alignItems: 'center' }}>
-              <Text style={GLOBAL_STYLES.label}>Correo electrónico</Text>
-              <TextInput
-                style={GLOBAL_STYLES.inputEmailCrearCuenta}
-                placeholder="usuario@dominio"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                value={email}
-                onChangeText={setEmail}
-              />
-              {emailError ? <Text style={GLOBAL_STYLES.errorText}>{emailError}</Text> : null}
-              <Text style={GLOBAL_STYLES.helperText}>
-                Debe seguir el formato estándar (ej: usuario@dominio.com)
-              </Text>
-            </View>
-            <View style={GLOBAL_STYLES.verificacionContainerPassword}>
-              <Text style={GLOBAL_STYLES.verificacionLabelPassword}>Contraseña</Text>
-              <View style={GLOBAL_STYLES.verificacionInputPasswordContainer}>
-                <TextInput
-                  style={GLOBAL_STYLES.verificacionInputPassword}
-                  placeholder="* * * * * * * *"
-                  secureTextEntry={true}
-                  value={password}
-                  onChangeText={setPassword}
-                />
-              </View>
-            </View>
+            <Text style={GLOBAL_STYLES.subtitle}>
+              ¿Quieres empezar tu experiencia con Convivia?
+            </Text>
+            {/* Email */}
+            <TextField
+              label="Correo electrónico"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="usuario@dominio.com"
+              keyboardType="email-address"
+              error={emailError}
+            />
+            {/* Password */}
+            <PasswordField
+              label="Contraseña"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="* * * * * * * *"
+            />
             <View style={{ marginVertical: 5 }}>
               <Text style={GLOBAL_STYLES.helperText}>Requisitos de la contraseña:</Text>
               <Text
                 style={[
                   { color: validations.length ? GLOBAL_STYLES.subtitulo.color : GLOBAL_STYLES.errorText.color },
-                  GLOBAL_STYLES.helperText
+                  GLOBAL_STYLES.helperText,
                 ]}
               >
                 {validations.length ? '✓' : '✘'} Al menos 8 caracteres
               </Text>
-
-              <Text style={[
-                  { color: validations.length ? GLOBAL_STYLES.subtitulo.color : GLOBAL_STYLES.errorText.color },
-                  GLOBAL_STYLES.helperText
-                ]}>
+              <Text
+                style={[
+                  { color: validations.uppercase ? GLOBAL_STYLES.subtitulo.color : GLOBAL_STYLES.errorText.color },
+                  GLOBAL_STYLES.helperText,
+                ]}
+              >
                 {validations.uppercase ? '✓' : '✘'} Una mayúscula
               </Text>
-              <Text style={[
-                  { color: validations.length ? GLOBAL_STYLES.subtitulo.color : GLOBAL_STYLES.errorText.color },
-                  GLOBAL_STYLES.helperText
-                ]}>
+              <Text
+                style={[
+                  { color: validations.number ? GLOBAL_STYLES.subtitulo.color : GLOBAL_STYLES.errorText.color },
+                  GLOBAL_STYLES.helperText,
+                ]}
+              >
                 {validations.number ? '✓' : '✘'} Un número
               </Text>
             </View>
-            <View style={GLOBAL_STYLES.verificacionContainerPassword}>
-              <Text style={GLOBAL_STYLES.verificacionLabelPassword}>Confirma la Contraseña</Text>
-              <View style={GLOBAL_STYLES.verificacionInputPasswordContainer}>
-                <TextInput
-                  style={GLOBAL_STYLES.verificacionInputPassword}
-                  placeholder="* * * * * * * *"
-                  secureTextEntry={true}
-                  value={password2}
-                  onChangeText={(text) => {
-                    setPassword2(text);
-                    setErrorMatch(text !== password ? 'Las contraseñas no coinciden' : '');
-                  }}
-                />
-              </View>
-              {errorMatch ? <Text style={GLOBAL_STYLES.errorText}>{errorMatch}</Text> : null}
-            </View>
+            {/* Confirm Password */}
+            <PasswordField
+              label="Confirma la Contraseña"
+              value={password2}
+              onChangeText={(text) => {
+                setPassword2(text);
+                setErrorMatch(text !== password ? 'Las contraseñas no coinciden' : '');
+              }}
+              placeholder="* * * * * * * *"
+            />
+            {errorMatch ? <Text style={GLOBAL_STYLES.errorText}>{errorMatch}</Text> : null}
+            {/* Checkboxes */}
             <View style={GLOBAL_STYLES.checkboxContainer}>
-              <TouchableOpacity style={GLOBAL_STYLES.checkbox} onPress={() => setCheckedPolitica(!checkedPolitica)}>
+              <TouchableOpacity
+                style={GLOBAL_STYLES.checkbox}
+                onPress={() => setCheckedPolitica(!checkedPolitica)}
+              >
                 {checkedPolitica && <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />}
               </TouchableOpacity>
               <Text style={GLOBAL_STYLES.checkboxText}>Política de privacidad</Text>
             </View>
             <View style={GLOBAL_STYLES.checkboxContainer}>
-              <TouchableOpacity style={GLOBAL_STYLES.checkbox} onPress={() => setCheckedCookies(!checkedCookies)}>
+              <TouchableOpacity
+                style={GLOBAL_STYLES.checkbox}
+                onPress={() => setCheckedCookies(!checkedCookies)}
+              >
                 {checkedCookies && <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />}
               </TouchableOpacity>
               <Text style={GLOBAL_STYLES.checkboxText}>Cookies</Text>
             </View>
-            <TouchableOpacity
-              style={[
-                GLOBAL_STYLES.botonIngresarMail,
-                {
-                  backgroundColor:
-                    isValidEmail &&
-                      isValidPassword &&
-                      password === password2 &&
-                      checkedPolitica &&
-                      checkedCookies
-                      ? COLORS.success
-                      : COLORS.disabled,
-                },
-              ]}
+            {/* Submit Button */}
+            <PrimaryButton
+              onPress={handleEnviarVerificacion}
               disabled={
                 !isValidEmail ||
                 !isValidPassword ||
@@ -181,10 +168,19 @@ const CrearCuenta: React.FC = () => {
                 !checkedPolitica ||
                 !checkedCookies
               }
-              onPress={handleEnviarVerificacion}
+              style={{
+                backgroundColor:
+                  isValidEmail &&
+                    isValidPassword &&
+                    password === password2 &&
+                    checkedPolitica &&
+                    checkedCookies
+                    ? COLORS.success
+                    : COLORS.disabled,
+              }}
             >
-              <Text style={GLOBAL_STYLES.textoBotonIngresarMail}>Enviar verificación</Text>
-            </TouchableOpacity>
+              Enviar verificación
+            </PrimaryButton>
             <Popup
               visible={modalVisible}
               onClose={() => setModalVisible(false)}

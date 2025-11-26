@@ -95,7 +95,7 @@ const IniciarSesion: React.FC = () => {
               label="Contraseña:"
               value={password}
               onChangeText={setPassword}
-              placeholder="• • • • • • • •"
+              placeholder="* * * * * * * *"
             />
             <TouchableOpacity
               style={GLOBAL_STYLES.recuperarContainer}
