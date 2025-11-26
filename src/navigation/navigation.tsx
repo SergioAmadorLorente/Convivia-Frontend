@@ -39,10 +39,10 @@ const headerOptions: StackNavigationOptions = {
   },
 };
 
-const defaultScreenOptions = {
+const defaultScreenOptions: StackNavigationOptions = {
   ...headerOptions,
-  title: 'Volver',
-  headerBackTitle: 'Volver',
+  title: '',
+  headerBackTitle: '',
 };
 
 const AppNavigator: React.FC = () => {
@@ -56,7 +56,7 @@ const AppNavigator: React.FC = () => {
           options={{ headerShown: false }}
         />
 
-        {/* Bienvenida con header personalizado */}
+        {/* Bienvenida con header personalizado (no usa la flecha por el header custom) */}
         <Stack.Screen
           name="Bienvenida"
           component={Bienvenida}
@@ -73,15 +73,47 @@ const AppNavigator: React.FC = () => {
           })}
         />
 
-        {/* Resto de pantallas con header común */}
-        <Stack.Screen name="CrearCuenta" component={CrearCuenta} options={defaultScreenOptions} />
-        <Stack.Screen name="IniciarSesion" component={IniciarSesion} options={defaultScreenOptions} />
-        <Stack.Screen name="RecuperarPassword" component={RecuperarPassword} options={defaultScreenOptions} />
-        <Stack.Screen name="VerificacionCuentaNueva" component={VerificacionCuentaNueva} options={defaultScreenOptions} />
-        <Stack.Screen name="RestablecerPassword" component={RestablecerPassword} options={defaultScreenOptions} />
-        <Stack.Screen name="DashBoardPersonal" component={DashBoardPersonal} options={defaultScreenOptions} />
-        <Stack.Screen name="NuevaResidencia" component={NuevaResidencia} options={defaultScreenOptions} />
-        <Stack.Screen name="UnirResidencia" component={UnirResidencia} options={defaultScreenOptions} />
+        {/* Resto de pantallas con header común y flecha sin texto */}
+        <Stack.Screen
+          name="CrearCuenta"
+          component={CrearCuenta}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="IniciarSesion"
+          component={IniciarSesion}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="RecuperarPassword"
+          component={RecuperarPassword}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="VerificacionCuentaNueva"
+          component={VerificacionCuentaNueva}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="RestablecerPassword"
+          component={RestablecerPassword}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="DashBoardPersonal"
+          component={DashBoardPersonal}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="NuevaResidencia"
+          component={NuevaResidencia}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="UnirResidencia"
+          component={UnirResidencia}
+          options={defaultScreenOptions}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

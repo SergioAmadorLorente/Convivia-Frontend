@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { auth } from '../configs/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
+import { moderateScale } from 'react-native-size-matters';
 import useLoadFonts from '../hooks/useLoadFonts';
 import useEmailValidation from '../hooks/useEmailValidation';
 import { useKeyboardAware } from '../hooks';
@@ -20,15 +20,22 @@ import { COLORS } from '../styles/theme';
 
 
 const IniciarSesion: React.FC = () => {
-  const { value: email, validate: validateEmail, error: emailError, isValid: isValidEmail } = useEmailValidation('');
+  const { email, setEmail: validateEmail, emailError, isValidEmail } = useEmailValidation();
   const [password, setPassword] = useState<string>('');
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
-  const isValidPassword = password.length >= 8 && /\d/.test(password);
 
   const fontsLoaded = useLoadFonts();
-  const containerRef = useRef<any>(null);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupOptions, setPopupOptions] = useState<any>({});
+  const showPopup = (opts: any) => {
+    setPopupOptions(opts);
+    setPopupVisible(true);
+  };
+  const handleClosePopup = () => setPopupVisible(false);
+    
+      const containerRef = useRef<any>(null);
   useKeyboardAware({ containerRef, padding: 12 });
 
   // Button enabled when both email is valid and password exists
@@ -43,48 +50,34 @@ const IniciarSesion: React.FC = () => {
       </View>
     );
   }
-
   const handleLogin = async () => {
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      // FOR FUTURE EMAIL VERIFICATION IMPLEMENTATION
       /*if (user && !user.emailVerified) {
-        Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
-        // optional: navigate to a screen that explains verification
-        navigation.navigate('Main');
-      } else {
-        Alert.alert('Éxito', 'Login exitoso');
-        navigation.navigate('Bienvenida');
-      }*/
+  Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
+  // optional: navigate to a screen that explains verification
+  navigation.navigate('Main');
+} else {
+  Alert.alert('Éxito', 'Login exitoso');
+  navigation.navigate('Bienvenida');
+}*/
       showPopup({
         title: 'Éxito',
         description: 'Login exitoso',
         imageType: 'success',
-        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('Bienvenida') }],
+        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('Bienvenida') }]
       });
     } catch (error: any) {
       showPopup({
         title: 'Error',
         description: 'Credenciales incorrectas o usuario no existe',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: 'Aceptar', onPress: () => { } }]
       });
     }
     setLoading(false);
   };
-
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupOptions, setPopupOptions] = useState<any>({});
-
-  const showPopup = (opts: any) => {
-    setPopupOptions(opts);
-    setPopupVisible(true);
-  };
-
-  const handleClosePopup = () => setPopupVisible(false);
-
   return (
     <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
@@ -133,10 +126,9 @@ const IniciarSesion: React.FC = () => {
         title={popupOptions.title || ''}
         description={popupOptions.description}
         imageType={popupOptions.imageType}
-        buttons={popupOptions.buttons} />
+        buttons={popupOptions.buttons}
+      />
     </>
   );
 };
-
-
 export default IniciarSesion;

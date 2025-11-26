@@ -16,14 +16,14 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../components/ui/Popup';
 import { useKeyboardAware } from '../hooks';
 import Button from '../components/ui/Button';
 import TextField from '../components/ui/TextField';
+import useCodigoResidencia from '../hooks/useCodigoResidencia';
 
 const UnirResidencia: React.FC = () => {
-  const [codigoResidencia, setCodigoResidencia] = useState<string>('');
+  const { codigo, handleChange } = useCodigoResidencia();
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
 
@@ -46,21 +46,37 @@ const UnirResidencia: React.FC = () => {
 
   const handleClosePopup = () => setPopupVisible(false);
 
+  // Regex para validar el formato 0-0-0-0-0-0
   const formatoValido = /^\d-\d-\d-\d-\d-\d$/;
-  const isValidCode = formatoValido.test(codigoResidencia.trim());
+  const isValidCode = formatoValido.test(codigo);
 
   const handleUnirse = async () => {
     if (!isValidCode) {
-      showPopup({ title: 'Código inválido', description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
+      showPopup({
+        title: 'Código inválido',
+        description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+      });
       return;
     }
 
     setLoading(true);
     try {
-      showPopup({ title: 'Éxito', description: 'Te has unido exitosamente a la residencia', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }] });
+      showPopup({
+        title: 'Éxito',
+        description: 'Te has unido exitosamente a la residencia',
+        imageType: 'success',
+        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }],
+      });
     } catch (error) {
       console.error('Error al unirse a la residencia:', error);
-      showPopup({ title: 'Error', description: 'No se pudo unir a la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
+      showPopup({
+        title: 'Error',
+        description: 'No se pudo unir a la residencia. Intenta de nuevo.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+      });
     } finally {
       setLoading(false);
     }
@@ -77,19 +93,45 @@ const UnirResidencia: React.FC = () => {
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'android' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}>
-          <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-            <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
-            <Text style={GLOBAL_STYLES.subtitle}>
-              <Text >Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
-              <Text >Perfil - Mi residencia</Text>
-            </Text>
+<KeyboardAvoidingView
+  behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+  style={{ flex: 1 }}
+  keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}
+>
+  <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
+    <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
-            <TextField label="Código de la residencia" value={codigoResidencia} onChangeText={setCodigoResidencia} placeholder="0-0-0-0-0-0" keyboardType="numeric" error={!isValidCode && codigoResidencia.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined} />
-            <Button style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' }]} disabled={!isValidCode || loading} onPress={handleUnirse} loading={loading}>
-              Unirse
-            </Button>
+    <Text style={GLOBAL_STYLES.subtitle}>
+      <Text>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
+      <Text>Perfil - Mi residencia</Text>
+    </Text>
+
+    {/* Campo de código */}
+    <TextField
+      label="Código de la residencia"
+      value={codigo} // hook del segundo bloque
+      onChangeText={handleChange} // lógica del segundo bloque
+      placeholder="0-0-0-0-0-0"
+      keyboardType="numeric"
+      error={!isValidCode && codigo.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined}
+    />
+
+    {/* Botón actualizado del primer bloque */}
+    <Button
+      style={[
+        GLOBAL_STYLES.buttonPrimaryGreen,
+        { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' },
+      ]}
+      disabled={!isValidCode || loading}
+      onPress={handleUnirse}
+      loading={loading}
+    >
+      Unirse
+    </Button>
+  </View>
+</KeyboardAvoidingView>
+
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -104,7 +146,5 @@ const UnirResidencia: React.FC = () => {
     </>
   );
 };
-
-
 
 export default UnirResidencia;
