@@ -21,11 +21,11 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ onLogout }) => {
         style={{
           position: 'absolute',
           top: 70,
-          left: 40,
+          left: 25,
           zIndex: 1,
         }}
       >
-        <MaterialIcons name="logout" size={28} color="#66b35fff" />
+        <MaterialIcons name="logout" size={28} color="#ACBF8A" />
       </TouchableOpacity>
 
       {/* Logo + dibujo */}
