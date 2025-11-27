@@ -24,7 +24,7 @@ const TerminosCondiciones: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
       <View style={GLOBAL_STYLES.container}>
-        <Text style={GLOBAL_STYLES.title}>Términos y Condiciones de Usuario</Text>
+        <Text style={GLOBAL_STYLES.title}>Términos y Condiciones de Uso</Text>
 
         <View style={{ width: '85%', marginTop: 20 }}>
           <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
