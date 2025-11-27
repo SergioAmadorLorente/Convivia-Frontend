@@ -71,7 +71,7 @@ export const COMMON = {
     borderRadius: moderateScale(25),
   },
   BUTTON_BASE: {
-    paddingVertical: verticalScale(8),
+    paddingVertical: verticalScale(10),
     borderRadius: 15,
     width: wp('80%'),
     alignSelf: 'center',
@@ -92,7 +92,6 @@ export const COMMON = {
     alignItems: 'center',
   },
   INPUT_BASE: {
-    borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: moderateScale(10),
     paddingHorizontal: wp('3%'),

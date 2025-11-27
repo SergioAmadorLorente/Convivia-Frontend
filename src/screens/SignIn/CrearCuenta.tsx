@@ -1,0 +1,243 @@
+// CrearCuenta.tsx
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Text,
+  View,
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  ScrollViewProps,
+} from 'react-native';
+import { useFonts } from 'expo-font';
+import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
+import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { moderateScale } from 'react-native-size-matters';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification
+} from 'firebase/auth';
+import GLOBAL_STYLES from '../../styles/styles';
+import { COLORS } from '../../styles/theme';
+import { auth } from '../../configs/firebaseConfig';
+import Popup from '../../components/ui/Popup';
+import TextField from '../../components/ui/TextField';
+import Button from '../../components/ui/Button';
+import useKeyboardAware from '../../hooks/useKeyboardAware';
+import { useCountdown } from '../../hooks/useCountdown';
+import { useEmailValidation } from '../../hooks/useEmailValidation';
+import { usePasswordValidation } from '../../hooks/usePasswordValidation';
+const CrearCuenta: React.FC = () => {
+  const navigation = useNavigation<any>();
+  const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
+  const { password, setPassword, validations, isValidPassword } = usePasswordValidation();
+  const [password2, setPassword2] = useState('');
+  const [errorMatch, setErrorMatch] = useState('');
+  const [checkedPolitica, setCheckedPolitica] = useState(false);
+  const [checkedCookies, setCheckedCookies] = useState(false);
+  const [emailUsedError, setEmailUsedError] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const { seconds, isCounting, startCountdown } = useCountdown(60);
+  // referencia al ScrollView (la pasa useKeyboardAware como container)
+  const scrollRef = useRef<any>(null);
+  // usa el hook para mantener el input visible cuando aparece el teclado
+  useKeyboardAware({ containerRef: scrollRef, padding: 12, extraScroll: 30, enabled: true });
+  const [fontsLoaded] = useFonts({
+    DMSerifDisplay_400Regular,
+    Montserrat_400Regular,
+    Montserrat_700Bold,
+  });
+  useEffect(() => {
+    // limpiar el mensaje de mismatch en cuanto coincidan
+    if (password === password2) {
+      setErrorMatch('');
+    } else if (password2.length > 0) {
+      setErrorMatch('Las contraseñas no coinciden');
+    }
+  }, [password, password2]);
+  if (!fontsLoaded) {
+    return (
+      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+  const validarBBDD = async () => {
+    try {
+      setEmailUsedError('');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(userCredential.user);
+      setModalVisible(true);
+      startCountdown();
+    } catch (error: any) {
+      console.log(error);
+      if (error.code === 'auth/email-already-in-use') {
+        setEmailUsedError('Este correo ya está registrado.');
+      } else {
+        setEmailUsedError('Error al crear la cuenta.');
+      }
+    }
+  };
+  const handleEnviarVerificacion = async () => {
+    if (!isValidEmail) return;
+    if (!isValidPassword) return;
+    if (password !== password2) {
+      setErrorMatch('Las contraseñas no coinciden');
+      return;
+    }
+    if (!checkedPolitica || !checkedCookies) return;
+    await validarBBDD();
+  };
+  const unmetPasswordRequirements: string[] = [];
+  if (!validations.length) unmetPasswordRequirements.push('Al menos 8 caracteres');
+  if (!validations.uppercase) unmetPasswordRequirements.push('Al menos una letra mayúscula');
+  if (!validations.number) unmetPasswordRequirements.push('Al menos un número');
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        {/* Pasa la referencia al ScrollView */}
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={GLOBAL_STYLES.container}>
+            <Text style={GLOBAL_STYLES.title}>Crea tu cuenta</Text>
+            <Text style={GLOBAL_STYLES.subtitle}>
+              ¿Quieres empezar tu experiencia con Convivia?
+            </Text>
+            {/* EMAIL */}
+            <TextField
+              label="Correo electrónico"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailUsedError('');
+              }}
+              placeholder="usuario@dominio.com"
+              keyboardType="email-address"
+              error={emailError || emailUsedError}
+            />
+            {/* CONTRASEÑA */}
+            <TextField
+              label="Contraseña"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="* * * * * * * *"
+              secureTextEntry
+            />
+            {/* VALIDACIONES: ahora mostramos sólo lo que falta */}
+            <View style={{ marginVertical: 5 }}>
+              <Text style={GLOBAL_STYLES.helperText}>Requisitos de la contraseña:</Text>
+              {/* Si no hay ningún requisito pendiente mostramos que está todo OK */}
+              {unmetPasswordRequirements.length === 0 ? (
+                <Text style={[GLOBAL_STYLES.helperText, { color: GLOBAL_STYLES.subtitulo.color }]}>
+                  ✓ Contraseña válida
+                </Text>
+              ) : (
+                unmetPasswordRequirements.map((msg) => (
+                  <Text
+                    key={msg}
+                    style={[
+                      GLOBAL_STYLES.helperText,
+                      { color: GLOBAL_STYLES.errorText.color, marginTop: 4 },
+                    ]}
+                  >
+                    ✘ {msg}
+                  </Text>
+                ))
+              )}
+            </View>
+            {/* CONFIRMAR */}
+            <TextField
+              label="Confirma la Contraseña"
+              value={password2}
+              onChangeText={(text) => {
+                setPassword2(text);
+                // el useEffect se encarga de limpiar el mensaje cuando coincidan
+                if (password === text) setErrorMatch('');
+                else if (text.length > 0) setErrorMatch('Las contraseñas no coinciden');
+              }}
+              placeholder="* * * * * * * *"
+              secureTextEntry
+              error={errorMatch}
+            />
+            {/* CHECKBOXES */}
+            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }]}>
+              <TouchableOpacity
+                style={GLOBAL_STYLES.checkbox}
+                onPress={() => setCheckedPolitica(!checkedPolitica)}
+              >
+                {checkedPolitica && (
+                  <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />
+                )}
+              </TouchableOpacity>
+              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Política de privacidad</Text>
+            </View>
+            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }]}>
+              <TouchableOpacity
+                style={GLOBAL_STYLES.checkbox}
+                onPress={() => setCheckedCookies(!checkedCookies)}
+              >
+                {checkedCookies && (
+                  <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />
+                )}
+              </TouchableOpacity>
+              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Cookies</Text>
+            </View>
+            {/* BOTÓN */}
+            <Button
+              style={[
+                GLOBAL_STYLES.buttonPrimaryGreen,
+                {
+                  backgroundColor:
+                    (isValidEmail &&
+                      checkedPolitica &&
+                      checkedCookies &&
+                      password === password2 &&
+                      isValidPassword &&
+                      !isCounting &&
+                      !emailUsedError)
+                      ? COLORS.success
+                      : COLORS.disabled,
+                },
+              ]}
+              disabled={
+                isCounting ||
+                !(
+                  isValidEmail &&
+                  checkedPolitica &&
+                  checkedCookies &&
+                  password === password2 &&
+                  isValidPassword
+                ) ||
+                !!emailUsedError
+              }
+              onPress={handleEnviarVerificacion}
+            >
+              {isCounting ? `Reenviando en ${seconds}s` : 'Enviar verificación'}
+            </Button>
+            <Popup
+              visible={modalVisible}
+              onClose={() => setModalVisible(false)}
+              title="¡Verificación enviada!"
+              description="Revisa tu correo y carpeta de spam"
+              imageType="success"
+              buttons={[{ text: 'Cerrar', onPress: () => setModalVisible(false) }]}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+  );
+};
+export default CrearCuenta;
