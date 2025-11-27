@@ -32,7 +32,7 @@ const RecuperarPassword: React.FC = () => {
   const handleClosePopup = () => setPopupVisible(false);
   if (!fontsLoaded) {
     return (
-      <View style={[GLOBAL_STYLES.recuperarContainerPrincipal, { justifyContent: 'center' }]}>
+      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -43,12 +43,13 @@ const RecuperarPassword: React.FC = () => {
         <View
           ref={containerRef}
           style={[
-            GLOBAL_STYLES.recuperarContainerPrincipal,
+            GLOBAL_STYLES.container,
             Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {},
           ]}
         >
-          <Text style={GLOBAL_STYLES.recuperarTitulo}>Recuperar contraseña</Text>
-          <Text style={[GLOBAL_STYLES.recuperarSubtitulo, { marginBottom: 18 }]}>
+          
+          <Text style={GLOBAL_STYLES.titulo}>Recuperar contraseña</Text>
+          <Text style={[GLOBAL_STYLES.subtitle, { marginBottom: 18 }]}>
             ¿Has olvidado tu contraseña?
           </Text>
           {/* BLOQUE PRINCIPAL */}
@@ -61,7 +62,7 @@ const RecuperarPassword: React.FC = () => {
               onChangeText={setEmail}
               error={emailError}
             />
-            <Text style={GLOBAL_STYLES.recuperarSubTextEmail}>
+            <Text style={[GLOBAL_STYLES.helperText, {marginTop: 10, }]}>
               {`Ingresa tu dirección de correo electrónico y te enviaremos un enlace para que puedas crear una nueva contraseña de forma segura.\n\nLa dirección ingresada debe contar con un formato estándar (por ejemplo, usuario@dominio.com).`}
             </Text>
             <Button

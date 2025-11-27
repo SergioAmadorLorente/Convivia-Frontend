@@ -21,7 +21,7 @@ const Bienvenida: React.FC = () => {
 
   if (!fontsLoaded) {
     return (
-      <View style={GLOBAL_STYLES.loadingContainer}>
+      <View style={GLOBAL_STYLES.container}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -33,7 +33,7 @@ const Bienvenida: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={GLOBAL_STYLES.container} keyboardShouldPersistTaps="handled">
-      <Text style={[GLOBAL_STYLES.textoBienvenida, { fontSize: 25 }]}>Tu espacio compartido comienza aquí. {'\n'}¿Cómo quieres unirte?</Text>
+      <Text style={[GLOBAL_STYLES.title, { fontSize: 28 }]}>Tu espacio compartido comienza aquí. {'\n'}¿Cómo quieres unirte?</Text>
 
       <Button style={GLOBAL_STYLES.buttonPrimaryGreen} onPress={() => navigation.navigate('NuevaResidencia')}>Crea una residencia nueva</Button>
 

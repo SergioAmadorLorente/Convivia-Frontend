@@ -20,7 +20,7 @@ const Main: React.FC = () => {
       <Text style={GLOBAL_STYLES.titulo}>¡Hola!</Text>
       <Text style={GLOBAL_STYLES.subtitulo}>Bienvenido a Convivia</Text>
 
-      <View style={GLOBAL_STYLES.bloqueTexto}>
+      <View>
         <Text style={GLOBAL_STYLES.parrafo}>
           Organiza, colabora y cumple tus metas junto a tus compañeros.{'\n'}¡Aquí la productividad es compartida y las ideas fluyen en sintonía!
         </Text>
