@@ -29,6 +29,7 @@ import { auth } from '../../configs/firebaseConfig';
 import Popup from '../../components/ui/Popup';
 import TextField from '../../components/ui/TextField';
 import Button from '../../components/ui/Button';
+import CheckboxWithLink from '../../components/ui/CheckboxWithLink';
 import useKeyboardAware from '../../hooks/useKeyboardAware';
 import { useCountdown } from '../../hooks/useCountdown';
 import { useEmailValidation } from '../../hooks/useEmailValidation';
@@ -40,7 +41,7 @@ const CrearCuenta: React.FC = () => {
   const [password2, setPassword2] = useState('');
   const [errorMatch, setErrorMatch] = useState('');
   const [checkedPolitica, setCheckedPolitica] = useState(false);
-  const [checkedCookies, setCheckedCookies] = useState(false);
+  const [checkedTerminos, setCheckedTerminos] = useState(false);
   const [emailUsedError, setEmailUsedError] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const { seconds, isCounting, startCountdown } = useCountdown(60);
@@ -91,7 +92,7 @@ const CrearCuenta: React.FC = () => {
       setErrorMatch('Las contraseñas no coinciden');
       return;
     }
-    if (!checkedPolitica || !checkedCookies) return;
+    if (!checkedPolitica || !checkedTerminos) return;
     await validarBBDD();
   };
   const unmetPasswordRequirements: string[] = [];
@@ -171,29 +172,21 @@ const CrearCuenta: React.FC = () => {
               secureTextEntry
               error={errorMatch}
             />
-            {/* CHECKBOXES */}
-            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }]}>
-              <TouchableOpacity
-                style={GLOBAL_STYLES.checkbox}
-                onPress={() => setCheckedPolitica(!checkedPolitica)}
-              >
-                {checkedPolitica && (
-                  <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />
-                )}
-              </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Política de privacidad</Text>
-            </View>
-            <View style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp('1%') }]}>
-              <TouchableOpacity
-                style={GLOBAL_STYLES.checkbox}
-                onPress={() => setCheckedCookies(!checkedCookies)}
-              >
-                {checkedCookies && (
-                  <Ionicons name="checkmark" size={moderateScale(18)} color={COLORS.accent} />
-                )}
-              </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Cookies</Text>
-            </View>
+            {/* CHECKBOXES WITH LINKS */}
+            <CheckboxWithLink
+              checked={checkedPolitica}
+              onCheckboxPress={() => setCheckedPolitica(!checkedPolitica)}
+              labelText=""
+              linkText="Política de Privacidad y Cookies"
+              linkRoute="PoliticaCookiesPrivacidad"
+            />
+            <CheckboxWithLink
+              checked={checkedTerminos}
+              onCheckboxPress={() => setCheckedTerminos(!checkedTerminos)}
+              labelText=""
+              linkText="Términos y Condiciones"
+              linkRoute="TerminosCondiciones"
+            />
             {/* BOTÓN */}
             <Button
               style={[
@@ -202,7 +195,7 @@ const CrearCuenta: React.FC = () => {
                   backgroundColor:
                     (isValidEmail &&
                       checkedPolitica &&
-                      checkedCookies &&
+                      checkedTerminos &&
                       password === password2 &&
                       isValidPassword &&
                       !isCounting &&
@@ -216,7 +209,7 @@ const CrearCuenta: React.FC = () => {
                 !(
                   isValidEmail &&
                   checkedPolitica &&
-                  checkedCookies &&
+                  checkedTerminos &&
                   password === password2 &&
                   isValidPassword
                 ) ||
