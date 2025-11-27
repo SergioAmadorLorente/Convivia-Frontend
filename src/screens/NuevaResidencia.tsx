@@ -74,7 +74,7 @@ const NuevaResidencia: React.FC = () => {
     <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
         <View ref={containerRef} style={[styles.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-          <Text style={[styles.titulo, { fontSize: 45 }]}>Crea una nueva residencia</Text>
+          <Text style={[styles.titulo, { fontSize: 40, textAlign: 'center' }]}>Crea una nueva residencia</Text>
 
           <Text style={GLOBAL_STYLES.subtitle}>
             <Text >Obtén el código de tu residencia en el apartado </Text>
