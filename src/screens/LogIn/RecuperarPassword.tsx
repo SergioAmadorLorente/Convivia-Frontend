@@ -5,14 +5,14 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useNavigation } from '@react-navigation/native';
-import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
-import { COLORS } from '../styles/theme';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../../styles/styles';
+import { COLORS } from '../../styles/theme';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '../configs/firebaseConfig';
-import Popup from '../components/ui/Popup';
-import { useKeyboardAware } from '../hooks';
-import Button from '../components/ui/Button';
-import TextField from '../components/ui/TextField';
+import { auth } from '../../configs/firebaseConfig';
+import Popup from '../../components/ui/Popup';
+import { useKeyboardAware } from '../../hooks';
+import Button from '../../components/ui/Button';
+import TextField from '../../components/ui/TextField';
 
 const RecuperarPassword: React.FC = () => {
   const [email, setEmail] = useState<string>('');

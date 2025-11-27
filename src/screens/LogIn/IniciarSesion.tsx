@@ -1,20 +1,20 @@
 import React, { useState, useRef } from 'react';
-import { GLOBAL_STYLES, WEB_FULL_VIEWPORT } from '../styles/styles';
-import styles from '../styles/styles';
+import { GLOBAL_STYLES, WEB_FULL_VIEWPORT } from '../../styles/styles';
+import styles from '../../styles/styles';
 import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { auth } from '../configs/firebaseConfig';
+import { auth } from '../../configs/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale } from 'react-native-size-matters';
-import useLoadFonts from '../hooks/useLoadFonts';
-import {useEmailValidation} from '../hooks/useEmailValidation';
-import { useKeyboardAware } from '../hooks';
-import TextField from '../components/ui/TextField';
-import Button from '../components/ui/Button';
-import Popup from '../components/ui/Popup';
-import { COLORS } from '../styles/theme';
+import useLoadFonts from '../../hooks/useLoadFonts';
+import {useEmailValidation} from '../../hooks/useEmailValidation';
+import { useKeyboardAware } from '../../hooks';
+import TextField from '../../components/ui/TextField';
+import Button from '../../components/ui/Button';
+import Popup from '../../components/ui/Popup';
+import { COLORS } from '../../styles/theme';
 
 
 

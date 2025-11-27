@@ -17,10 +17,10 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import GLOBAL_STYLES, { COLORS, WEB_FULL_VIEWPORT } from '../styles/styles';
-import Popup from '../components/ui/Popup';
-import { useKeyboardAware } from '../hooks';
-import TextField from '../components/ui/TextField';
+import GLOBAL_STYLES, { COLORS, WEB_FULL_VIEWPORT } from '../../styles/styles';
+import Popup from '../../components/ui/Popup';
+import { useKeyboardAware } from '../../hooks';
+import TextField from '../../components/ui/TextField';
 
 const VerificacionCuentaNueva: React.FC = () => {
   const navigation = useNavigation<any>();

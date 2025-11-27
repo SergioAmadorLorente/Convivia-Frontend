@@ -4,9 +4,9 @@ import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
-import GLOBAL_STYLES from '../styles/styles';
-import Popup from '../components/ui/Popup';
-import Button from '../components/ui/Button';
+import GLOBAL_STYLES from '../../styles/styles';
+import Popup from '../../components/ui/Popup';
+import Button from '../../components/ui/Button';
 
 const Bienvenida: React.FC = () => {
   const navigation = useNavigation<any>();

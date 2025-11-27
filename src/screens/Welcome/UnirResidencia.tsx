@@ -10,17 +10,17 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../../styles/styles';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import Popup from '../components/ui/Popup';
-import { useKeyboardAware } from '../hooks';
-import Button from '../components/ui/Button';
-import TextField from '../components/ui/TextField';
-import useCodigoResidencia from '../hooks/useCodigoResidencia';
+import Popup from '../../components/ui/Popup';
+import { useKeyboardAware } from '../../hooks';
+import Button from '../../components/ui/Button';
+import TextField from '../../components/ui/TextField';
+import useCodigoResidencia from '../../hooks/useCodigoResidencia';
 
 const UnirResidencia: React.FC = () => {
   const { codigo, handleChange } = useCodigoResidencia();

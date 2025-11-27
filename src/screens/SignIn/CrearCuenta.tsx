@@ -23,16 +23,16 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification
 } from 'firebase/auth';
-import GLOBAL_STYLES from '../styles/styles';
-import { COLORS } from '../styles/theme';
-import { auth } from '../configs/firebaseConfig';
-import Popup from '../components/ui/Popup';
-import TextField from '../components/ui/TextField';
-import Button from '../components/ui/Button';
-import useKeyboardAware from '../hooks/useKeyboardAware';
-import { useCountdown } from '../hooks/useCountdown';
-import { useEmailValidation } from '../hooks/useEmailValidation';
-import { usePasswordValidation } from '../hooks/usePasswordValidation';
+import GLOBAL_STYLES from '../../styles/styles';
+import { COLORS } from '../../styles/theme';
+import { auth } from '../../configs/firebaseConfig';
+import Popup from '../../components/ui/Popup';
+import TextField from '../../components/ui/TextField';
+import Button from '../../components/ui/Button';
+import useKeyboardAware from '../../hooks/useKeyboardAware';
+import { useCountdown } from '../../hooks/useCountdown';
+import { useEmailValidation } from '../../hooks/useEmailValidation';
+import { usePasswordValidation } from '../../hooks/usePasswordValidation';
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();

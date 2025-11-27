@@ -4,15 +4,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { StackNavigationOptions } from '@react-navigation/stack';
 
 import Main from '../screens/Main';
-import CrearCuenta from '../screens/CrearCuenta';
-import IniciarSesion from '../screens/IniciarSesion';
-import RecuperarPassword from '../screens/RecuperarPassword';
-import VerificacionCuentaNueva from '../screens/VerificacionCuentaNueva';
-import RestablecerPassword from '../screens/RestablecerPassword';
-import DashBoardPersonal from '../screens/DashBoardPersonal';
-import NuevaResidencia from '../screens/NuevaResidencia';
-import UnirResidencia from '../screens/UnirResidencia';
-import Bienvenida from '../screens/Bienvenida';
+import CrearCuenta from '../screens/SignIn/CrearCuenta';
+import IniciarSesion from '../screens/LogIn/IniciarSesion';
+import RecuperarPassword from '../screens/LogIn/RecuperarPassword';
+import VerificacionCuentaNueva from '../screens/SignIn/VerificacionCuentaNueva';
+import RestablecerPassword from '../screens/LogIn/RestablecerPassword';
+import DashBoardPersonal from '../screens/Dashboard/DashBoardPersonal';
+import NuevaResidencia from '../screens/Welcome/NuevaResidencia';
+import UnirResidencia from '../screens/Welcome/UnirResidencia';
+import Bienvenida from '../screens/Welcome/Bienvenida';
 
 import CustomHeader from '../components/ui/CustomHeader';
 

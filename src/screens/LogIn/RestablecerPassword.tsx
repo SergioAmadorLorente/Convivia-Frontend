@@ -5,11 +5,11 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { Ionicons } from '@expo/vector-icons';
 import { moderateScale } from 'react-native-size-matters';
-import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../styles/styles';
-import { COLORS } from '../styles/theme';
-import { useKeyboardAware } from '../hooks';
-import Button from '../components/ui/Button';
-import TextField from '../components/ui/TextField';
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../../styles/styles';
+import { COLORS } from '../../styles/theme';
+import { useKeyboardAware } from '../../hooks';
+import Button from '../../components/ui/Button';
+import TextField from '../../components/ui/TextField';
 
 const RestablecerPassword: React.FC = () => {
   const [password, setPassword] = useState<string>('');
