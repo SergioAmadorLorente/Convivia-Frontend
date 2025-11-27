@@ -12,7 +12,6 @@ import useLoadFonts from '../hooks/useLoadFonts';
 import {useEmailValidation} from '../hooks/useEmailValidation';
 import { useKeyboardAware } from '../hooks';
 import TextField from '../components/ui/TextField';
-// PasswordField has been unified into TextField (secureTextEntry prop)
 import Button from '../components/ui/Button';
 import Popup from '../components/ui/Popup';
 import { COLORS } from '../styles/theme';
@@ -102,17 +101,11 @@ const IniciarSesion: React.FC = () => {
 
           <Button
             onPress={() => handleLogin()}
-            disabled={!isValidEmail || loading}
             loading={loading}
             style={[
               GLOBAL_STYLES.buttonPrimaryGreen,
               {
-                backgroundColor:
-                  (!isValidEmail || !loading)
-                    ? COLORS.disabled
-                    : (loading
-                      ? COLORS.border
-                      : COLORS.success)
+                backgroundColor: COLORS.success
               },
             ]}
           >
