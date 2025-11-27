@@ -5,7 +5,7 @@ import { StyleSheet, Text, View, ActivityIndicator, TouchableOpacity, Keyboard, 
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../configs/firebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale } from 'react-native-size-matters';
 import useLoadFonts from '../../hooks/useLoadFonts';
@@ -15,6 +15,7 @@ import TextField from '../../components/ui/TextField';
 import Button from '../../components/ui/Button';
 import Popup from '../../components/ui/Popup';
 import { COLORS } from '../../styles/theme';
+import { Alert } from 'react-native/Libraries/Alert/Alert';
 
 
 
@@ -53,14 +54,17 @@ const IniciarSesion: React.FC = () => {
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      /*if (user && !user.emailVerified) {
-  Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
-  // optional: navigate to a screen that explains verification
-  navigation.navigate('Main');
-} else {
-  Alert.alert('Éxito', 'Login exitoso');
-  navigation.navigate('Bienvenida');
-}*/
+      if (userCredential && !userCredential.user.emailVerified) {
+    Alert.alert('Cuenta no verificada', 'Tu correo no está verificado. Por favor revisa tu email y verifica tu cuenta.');
+    // Enviar correo de verificacion
+    await sendEmailVerification(userCredential.user);
+
+    navigation.navigate('Main');
+    } else {
+    Alert.alert('Éxito', 'Login exitoso');
+    navigation.navigate('Bienvenida');
+    }
+
       showPopup({
         title: 'Éxito',
         description: 'Login exitoso',
