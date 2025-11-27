@@ -91,6 +91,23 @@ const RecuperarPassword: React.FC = () => {
             >
               Enviar correo
             </Button>
+            <Button onPress={() => navigation.navigate('RestablecerPassword')}
+              style={[
+                GLOBAL_STYLES.buttonPrimaryGreen,
+                { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled },
+              ]}
+            >
+              Boton temporal - Restablecer
+            </Button>
+            <Button onPress={() => navigation.navigate('VerificaionCuentaNueva')}
+              style={[
+                GLOBAL_STYLES.buttonPrimaryGreen,
+                { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled },
+              ]}
+            >
+              Boton temporal - Verificaion
+            </Button>
+
           </View>
         </View>
       </TouchableWithoutFeedback>
