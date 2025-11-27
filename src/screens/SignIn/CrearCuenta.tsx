@@ -140,7 +140,7 @@ const CrearCuenta: React.FC = () => {
               <Text style={GLOBAL_STYLES.helperText}>Requisitos de la contraseña:</Text>
               {/* Si no hay ningún requisito pendiente mostramos que está todo OK */}
               {unmetPasswordRequirements.length === 0 ? (
-                <Text style={[GLOBAL_STYLES.helperText, { color: GLOBAL_STYLES.subtitulo.color }]}>
+                <Text style={[GLOBAL_STYLES.helperText, { color: COLORS.accent }]}>
                   ✓ Contraseña válida
                 </Text>
               ) : (

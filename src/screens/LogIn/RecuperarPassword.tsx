@@ -99,13 +99,13 @@ const RecuperarPassword: React.FC = () => {
             >
               Boton temporal - Restablecer
             </Button>
-            <Button onPress={() => navigation.navigate('VerificaionCuentaNueva')}
+            <Button onPress={() => navigation.navigate('VerificacionCuentaNueva')}
               style={[
                 GLOBAL_STYLES.buttonPrimaryGreen,
                 { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled },
               ]}
             >
-              Boton temporal - Verificaion
+              Boton temporal - Verificaion cuenta nueva
             </Button>
 
           </View>

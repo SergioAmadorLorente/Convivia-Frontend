@@ -1,49 +1,49 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Platform ,Text, View, Keyboard, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, TextInput } from 'react-native';
+import { Platform, Text, View, Keyboard, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
-import { Ionicons } from '@expo/vector-icons';
-import { moderateScale } from 'react-native-size-matters';
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../../styles/styles';
 import { COLORS } from '../../styles/theme';
-import { useKeyboardAware } from '../../hooks';
-import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
-
+import Button from '../../components/ui/Button';
+import { usePasswordValidation } from '../../hooks/usePasswordValidation';
+import { useKeyboardAware } from '../../hooks';
 const RestablecerPassword: React.FC = () => {
-  const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [passwordError, setPasswordError] = useState<string>('');
-
-  const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
-
+  const { password, setPassword, validations, isValidPassword } = usePasswordValidation();
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [matchError, setMatchError] = useState('');
   const containerRef = useRef<any>(null);
   useKeyboardAware({ containerRef, padding: 12 });
-
-  const isPasswordValid = password.length >= 8 && password === confirmPassword;
-
+  const [fontsLoaded] = useFonts({
+    DMSerifDisplay_400Regular,
+    Montserrat_400Regular,
+    Montserrat_700Bold,
+  });
+  // VERIFICAR COINCIDENCIA
   useEffect(() => {
-    if (password.length === 0 && confirmPassword.length === 0) {
-      setPasswordError('');
+    if (confirmPassword.length === 0) {
+      setMatchError('');
       return;
     }
-
-    if (password.length < 8) {
-      setPasswordError('La contraseña debe tener al menos 8 caracteres.');
-    } else if (password !== confirmPassword) {
-      setPasswordError('Las contraseñas no coinciden.');
+    if (confirmPassword === password) {
+      setMatchError('');
     } else {
-      setPasswordError(' ');
+      setMatchError('Las contraseñas no coinciden');
     }
   }, [password, confirmPassword]);
-
+  const unmetPasswordRequirements: string[] = [];
+  if (!validations.length) unmetPasswordRequirements.push('Al menos 8 caracteres');
+  if (!validations.uppercase) unmetPasswordRequirements.push('Al menos una letra mayúscula');
+  if (!validations.number) unmetPasswordRequirements.push('Al menos un número');
+  const canSubmit =
+    isValidPassword &&
+    confirmPassword === password &&
+    matchError === '';
   const handleChangePassword = () => {
-    if (!passwordError) {
-      console.log('Contraseña válida, proceder con el cambio.');
-    }
+    if (!canSubmit) return;
+    console.log("Contraseña válida — proceder con el cambio");
   };
-
   if (!fontsLoaded) {
     return (
       <View style={[GLOBAL_STYLES.restablecerContainer, { justifyContent: 'center' }]}>
@@ -51,21 +51,67 @@ const RestablecerPassword: React.FC = () => {
       </View>
     );
   }
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View ref={containerRef} style={[GLOBAL_STYLES.restablecerContainer, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
+      <View
+        ref={containerRef}
+        style={[
+          GLOBAL_STYLES.restablecerContainer,
+          Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {},
+        ]}
+      >
         <Text style={GLOBAL_STYLES.restablecerTitulo}>Restablecer contraseña</Text>
-        <Text style={GLOBAL_STYLES.restablecerSubtitulo}>Cambia tu contraseña si no te acuerdas de ella</Text>
-
-        <TextField label="Contraseña" placeholder="* * * * * * * *" secureTextEntry value={password} onChangeText={setPassword} error={passwordError} />
-
-        <TextField label="Confirma la contraseña" placeholder="* * * * * * * *" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
-
-        <Button onPress={handleChangePassword} disabled={!isPasswordValid} style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: !isPasswordValid ? COLORS.disabled : COLORS.success }]}>Restablecer contraseña</Button>
+        <Text style={GLOBAL_STYLES.restablecerSubtitulo}>
+          Cambia tu contraseña si no te acuerdas de ella
+        </Text>
+        {/* NUEVA CONTRASEÑA */}
+        <TextField
+          label="Nueva contraseña"
+          placeholder="* * * * * * * *"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        {/* REQUISITOS DE CONTRASEÑA */}
+        <View style={{ marginVertical: 5 }}>
+          <Text style={GLOBAL_STYLES.helperText}>Requisitos de la contraseña:</Text>
+          {unmetPasswordRequirements.length === 0 ? (
+            <Text style={[GLOBAL_STYLES.helperText, { color: COLORS.accent }]}>
+              ✓ Contraseña válida
+            </Text>
+          ) : (
+            unmetPasswordRequirements.map((req) => (
+              <Text
+                key={req}
+                style={[GLOBAL_STYLES.helperText, { color: COLORS.error, marginTop: 4 }]}
+              >
+                ✘ {req}
+              </Text>
+            ))
+          )}
+        </View>
+        {/* CONFIRMAR */}
+        <TextField
+          label="Confirma la contraseña"
+          placeholder="* * * * * * * *"
+          secureTextEntry
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          error={matchError}
+        />
+        {/* BOTÓN */}
+        <Button
+          onPress={handleChangePassword}
+          disabled={!canSubmit}
+          style={[
+            GLOBAL_STYLES.buttonPrimaryGreen,
+            { backgroundColor: canSubmit ? COLORS.success : COLORS.disabled },
+          ]}
+        >
+          Restablecer contraseña
+        </Button>
       </View>
     </TouchableWithoutFeedback>
   );
 };
-
 export default RestablecerPassword;
