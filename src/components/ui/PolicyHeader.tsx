@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import GLOBAL_STYLES from '../../styles/styles';
-import { COMPONENTS } from '../../styles/theme';
+import { COMPONENTS, COLORS } from '../../styles/theme';
 
 interface PolicyHeaderProps {
   title: string;
@@ -16,7 +16,7 @@ const PolicyHeader: React.FC<PolicyHeaderProps> = ({
 }) => {
   return (
     <View style={styles.headerRow}>
-      <Text style={[GLOBAL_STYLES.labelBase, { fontSize, fontWeight }]}>
+      <Text style={[GLOBAL_STYLES.labelBase, { fontSize, fontWeight, color: COMPONENTS.POLICY_HEADER.leftColor }]}>
         {title}
       </Text>
       <View style={styles.lineFull} />
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   lineFull: {
     alignSelf: 'stretch',
     height: COMPONENTS.POLICY_HEADER.height,
-    backgroundColor: COMPONENTS.POLICY_HEADER.leftColor,
+    backgroundColor: COMPONENTS.POLICY_HEADER.rightColor,
     marginTop: COMPONENTS.POLICY_HEADER.gap,
   },
 });

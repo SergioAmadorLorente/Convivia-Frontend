@@ -58,7 +58,7 @@ export const COMPONENTS = {
     leftSegmentWidth: moderateScale(60),
     height: 2,
     leftColor: COLORS.accent,
-    rightColor: COLORS.border,
+    rightColor: COLORS.primary,
     gap: moderateScale(8),
     marginTop: verticalScale(2),
     marginBottom: verticalScale(1.5),
