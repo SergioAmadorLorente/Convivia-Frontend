@@ -131,7 +131,7 @@ const CrearCuenta: React.FC = () => {
               </Text>
             </View>
             {/* Confirm Password */}
-            <PasswordField
+            <TextField
               label="Confirma la Contraseña"
               value={password2}
               onChangeText={(text) => {
@@ -174,25 +174,9 @@ const CrearCuenta: React.FC = () => {
               ]}
               disabled={isCounting || !(isValidEmail && checkedPolitica && checkedCookies && password === password2 && isValidPassword)}
               onPress={handleEnviarVerificacion}
-              disabled={
-                !isValidEmail ||
-                !isValidPassword ||
-                password !== password2 ||
-                !checkedPolitica ||
-                !checkedCookies
-              }
-              style={{
-                backgroundColor:
-                  isValidEmail &&
-                    isValidPassword &&
-                    password === password2 &&
-                    checkedPolitica &&
-                    checkedCookies
-                    ? COLORS.success
-                    : COLORS.disabled,
-              }}
+
             >
-              {isCounting ? `Reenviando en ${contador}s` : 'Enviar verificación'}
+            {isCounting ? `Reenviando en ${seconds}s` : 'Enviar verificación'}
             </Button>
 
             <Text style={GLOBAL_STYLES.verificacionEnviarCodigoNuevo}>¿No te ha llegado?</Text>

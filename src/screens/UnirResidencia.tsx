@@ -131,9 +131,6 @@ const UnirResidencia: React.FC = () => {
     </Button>
   </View>
 </KeyboardAvoidingView>
-
-          </View>
-        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
       <Popup
         visible={popupVisible}

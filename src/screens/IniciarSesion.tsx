@@ -9,7 +9,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { moderateScale } from 'react-native-size-matters';
 import useLoadFonts from '../hooks/useLoadFonts';
-import useEmailValidation from '../hooks/useEmailValidation';
+import {useEmailValidation} from '../hooks/useEmailValidation';
 import { useKeyboardAware } from '../hooks';
 import TextField from '../components/ui/TextField';
 // PasswordField has been unified into TextField (secureTextEntry prop)
@@ -102,13 +102,13 @@ const IniciarSesion: React.FC = () => {
 
           <Button
             onPress={() => handleLogin()}
-            disabled={!isValidEmail || loading || !isValidPassword}
+            disabled={!isValidEmail || loading}
             loading={loading}
             style={[
               GLOBAL_STYLES.buttonPrimaryGreen,
               {
                 backgroundColor:
-                  (!isValidEmail || !isValidPassword)
+                  (!isValidEmail || !loading)
                     ? COLORS.disabled
                     : (loading
                       ? COLORS.border
