@@ -278,16 +278,15 @@ export const GLOBAL_STYLES = StyleSheet.create({
     borderRadius: moderateScale(15),
   },
 
-  // Bloque de contenido en recuperar contraseña
   recuperarBloque: {
-    width: wp("80%"),
+    width: wp("90%"),
     alignItems: "center",
     marginTop: hp("5%"),
   },
 
   // Título en recuperar contraseña
   recuperarTitulo: {
-    fontSize: wp("10%"),
+    fontSize: wp("13%"),
     color: COLORS.primary,
     fontFamily: FONTS.title,
     textAlign: "center",
@@ -296,7 +295,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
   // Subtítulo en recuperar contraseña
   recuperarSubtitulo: {
-    fontSize: wp("3%"),
+    fontSize: wp("4%"),
     color: COLORS.secondary,
     marginVertical: hp("1%"),
     fontFamily: FONTS.regular,
@@ -305,10 +304,11 @@ export const GLOBAL_STYLES = StyleSheet.create({
   recuperarSubTextEmail: {
     fontFamily: FONTS.regular,
     color: COLORS.secondary,
-    fontSize: wp("3%"),
-    textAlign: "justify",
+    fontSize: wp("2.9%"),
+    textAlign: "left",
     width: wp("80%"),
     marginTop: hp("1%"),
+    lineHeight: moderateScale(16),
   },
   // Texto del botón de recuperar contraseña
   /*textoRecuperarPassword: {
