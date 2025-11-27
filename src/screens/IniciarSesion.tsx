@@ -90,13 +90,13 @@ const IniciarSesion: React.FC = () => {
           <TextField label="Correo electrónico:" value={email} onChangeText={validateEmail} placeholder="usuario@dominio" keyboardType="email-address" error={emailError} />
 
           <TextField label="Contraseña:" value={password} onChangeText={setPassword} placeholder="• • • • • • • •" secureTextEntry />
-          <TouchableOpacity style={GLOBAL_STYLES.recuperarContainer} onPress={() => navigation.navigate('RecuperarPassword')}>
-            <Text style={GLOBAL_STYLES.recuperarPassword}>Recuperar contraseña</Text>
+          <TouchableOpacity style={GLOBAL_STYLES.checkboxContainer} onPress={() => navigation.navigate('RecuperarPassword')}>
+            <Text style={GLOBAL_STYLES.linkRecuperarPassword}>Recuperar contraseña</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={GLOBAL_STYLES.checkboxContainer} onPress={() => setIsChecked(!isChecked)}>
             <View style={GLOBAL_STYLES.checkbox}>{isChecked && <Ionicons name="checkmark" size={moderateScale(16)} color="#ACBF8A" />}</View>
-            <Text style={GLOBAL_STYLES.labelCheckbox}>Recordarme</Text>
+            <Text style={GLOBAL_STYLES.labelCheckbox}>Recuérdame</Text>
           </TouchableOpacity>
 
           <Button

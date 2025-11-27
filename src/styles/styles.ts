@@ -311,12 +311,12 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginTop: hp("1%"),
   },
   // Texto del botón de recuperar contraseña
-  textoRecuperarPassword: {
+  /*textoRecuperarPassword: {
     color: COLORS.secondary,
     fontSize: wp("4%"),
-    textAlign: "center",
+    //textAlign: "left",
     fontFamily: FONTS.regular,
-  },
+  }*/
   // Texto de error en recuperar contraseña
   recuperarErrorText: {
     color: COLORS.error,
@@ -326,11 +326,12 @@ export const GLOBAL_STYLES = StyleSheet.create({
   },
 
   // Link de recuperar contraseña
-  recuperarPassword: {
+  linkRecuperarPassword: {
     fontSize: SIZES.passwordInput,
     fontFamily: FONTS.regular,
     color: COLORS.accent,
     textDecorationLine: "underline",
+    //textAlign: "left",
   },
 
   // ----------- VERIFICACIÓN DE CUENTA [#8]-----------
@@ -422,9 +423,9 @@ export const GLOBAL_STYLES = StyleSheet.create({
   // Contenedor de checkbox y label
   checkboxContainer: {
     flexDirection: "row",
-    alignItems: "center",
     width: wp("80%"),
-    marginTop: hp("2%"),
+    marginTop: hp("1%"),
+    marginBottom: hp("1%"),
   },
 
   // Label para verificación (código y nueva contraseña)
