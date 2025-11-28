@@ -54,14 +54,14 @@ export const HELPERS = {
 };
 
 export const COMPONENTS = {
-  POLICY_HEADER: {
+  DESPLEGABLE: {
     leftSegmentWidth: moderateScale(60),
     height: 2,
     leftColor: COLORS.accent,
     rightColor: COLORS.primary,
     gap: moderateScale(8),
     marginTop: verticalScale(2),
-    marginBottom: verticalScale(1.5),
+    marginBottom: verticalScale(7.5),
   },
 };
 

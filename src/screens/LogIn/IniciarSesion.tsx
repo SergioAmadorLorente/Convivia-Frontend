@@ -121,7 +121,7 @@ const IniciarSesion: React.FC = () => {
               style={GLOBAL_STYLES.checkboxContainer}
               onPress={() => navigation.navigate('RecuperarPassword')}
             >
-              <Text style={GLOBAL_STYLES.linkRecuperarPassword}>
+              <Text style={GLOBAL_STYLES.link}>
                 Recuperar contraseña
               </Text>
             </TouchableOpacity>
@@ -135,7 +135,7 @@ const IniciarSesion: React.FC = () => {
                   <Ionicons
                     name="checkmark"
                     size={moderateScale(16)}
-                    color="#ACBF8A"
+                    color={COLORS.accent}
                   />
                 )}
               </View>

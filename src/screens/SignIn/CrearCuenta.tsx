@@ -22,19 +22,18 @@ import { moderateScale } from "react-native-size-matters";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
   createUserWithEmailAndPassword,
-  sendEmailVerification
-} from 'firebase/auth';
-import GLOBAL_STYLES from '../../styles/styles';
-import { COLORS } from '../../styles/theme';
-import { auth } from '../../configs/firebaseConfig';
-import Popup from '../../components/ui/Popup';
-import TextField from '../../components/ui/TextField';
-import Button from '../../components/ui/Button';
-import CheckboxWithLink from '../../components/ui/CheckboxWithLink';
-import useKeyboardAware from '../../hooks/useKeyboardAware';
-import { useCountdown } from '../../hooks/useCountdown';
-import { useEmailValidation } from '../../hooks/useEmailValidation';
-import { usePasswordValidation } from '../../hooks/usePasswordValidation';
+  sendEmailVerification,
+} from "firebase/auth";
+import GLOBAL_STYLES from "../../styles/styles";
+import { COLORS } from "../../styles/theme";
+import { auth } from "../../configs/firebaseConfig";
+import Popup from "../../components/ui/Popup";
+import TextField from "../../components/ui/TextField";
+import Button from "../../components/ui/Button";
+import useKeyboardAware from "../../hooks/useKeyboardAware";
+import { useCountdown } from "../../hooks/useCountdown";
+import { useEmailValidation } from "../../hooks/useEmailValidation";
+import { usePasswordValidation } from "../../hooks/usePasswordValidation";
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
@@ -44,7 +43,7 @@ const CrearCuenta: React.FC = () => {
   const [errorMatch, setErrorMatch] = useState("");
   const [checkedPolitica, setCheckedPolitica] = useState(false);
   const [checkedTerminos, setCheckedTerminos] = useState(false);
-  const [emailUsedError, setEmailUsedError] = useState('');
+  const [emailUsedError, setEmailUsedError] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const { seconds, isCounting, startCountdown } = useCountdown(60);
   const scrollRef = useRef<any>(null);
@@ -66,7 +65,6 @@ const CrearCuenta: React.FC = () => {
       setErrorMatch("Las contraseñas no coinciden");
     }
   }, [password, password2]);
-
 
   // REGISTRO + ENVÍO DE EMAIL DE VERIFICACIÓN
   const validarBBDD = async () => {
@@ -197,21 +195,48 @@ const CrearCuenta: React.FC = () => {
               secureTextEntry
               error={errorMatch}
             />
-            {/* CHECKBOXES WITH LINKS */}
-            <CheckboxWithLink
-              checked={checkedPolitica}
-              onCheckboxPress={() => setCheckedPolitica(!checkedPolitica)}
-              labelText=""
-              linkText="Política de Privacidad y Cookies"
-              linkRoute="PoliticaCookiesPrivacidad"
-            />
-            <CheckboxWithLink
-              checked={checkedTerminos}
-              onCheckboxPress={() => setCheckedTerminos(!checkedTerminos)}
-              labelText=""
-              linkText="Términos y Condiciones"
-              linkRoute="TerminosCondiciones"
-            />
+            {/* CHECKBOX POLÍTICA DE PRIVACIDAD */}
+            <TouchableOpacity
+              style={GLOBAL_STYLES.checkboxContainer}
+              onPress={() => setCheckedPolitica(!checkedPolitica)}
+            >
+              <View style={GLOBAL_STYLES.checkbox}>
+                {checkedPolitica && (
+                  <Ionicons
+                    name="checkmark"
+                    size={moderateScale(16)}
+                    color={COLORS.accent}
+                  />
+                )}
+              </View>
+              <Text
+                style={[GLOBAL_STYLES.labelCheckbox ]}
+                onPress={() => navigation.navigate("PoliticaCookiesPrivacidad")}
+              >
+                Política de Privacidad y Cookies
+              </Text>
+            </TouchableOpacity>
+            {/* CHECKBOX TÉRMINOS Y CONDICIONES */}
+            <TouchableOpacity
+              style={GLOBAL_STYLES.checkboxContainer}
+              onPress={() => setCheckedTerminos(!checkedTerminos)}
+            >
+              <View style={GLOBAL_STYLES.checkbox}>
+                {checkedTerminos && (
+                  <Ionicons
+                    name="checkmark"
+                    size={moderateScale(16)}
+                    color={COLORS.accent}
+                  />
+                )}
+              </View>
+              <Text
+                style={GLOBAL_STYLES.labelCheckbox}
+                onPress={() => navigation.navigate("TerminosCondiciones")}
+              >
+                Términos y Condiciones
+              </Text>
+            </TouchableOpacity>
             {/* BOTÓN */}
             <Button
               style={[

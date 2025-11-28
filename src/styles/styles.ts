@@ -190,7 +190,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginTop: hp("5%"),
   },
   // Link de recuperar contraseña
-  linkRecuperarPassword: {
+  link: {
     fontSize: SIZES.passwordInput,
     fontFamily: FONTS.regular,
     color: COLORS.accent,
