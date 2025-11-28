@@ -7,8 +7,6 @@ import Main from '../screens/Main';
 import CrearCuenta from '../screens/SignIn/CrearCuenta';
 import IniciarSesion from '../screens/LogIn/IniciarSesion';
 import RecuperarPassword from '../screens/LogIn/RecuperarPassword';
-import VerificacionCuentaNueva from '../screens/SignIn/VerificacionCuentaNueva';
-import RestablecerPassword from '../screens/LogIn/RestablecerPassword';
 import DashBoardPersonal from '../screens/Dashboard/DashBoardPersonal';
 import NuevaResidencia from '../screens/Welcome/NuevaResidencia';
 import UnirResidencia from '../screens/Welcome/UnirResidencia';
@@ -87,16 +85,6 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="RecuperarPassword"
           component={RecuperarPassword}
-          options={defaultScreenOptions}
-        />
-        <Stack.Screen
-          name="VerificacionCuentaNueva"
-          component={VerificacionCuentaNueva}
-          options={defaultScreenOptions}
-        />
-        <Stack.Screen
-          name="RestablecerPassword"
-          component={RestablecerPassword}
           options={defaultScreenOptions}
         />
         <Stack.Screen

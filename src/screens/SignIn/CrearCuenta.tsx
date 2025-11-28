@@ -35,9 +35,7 @@ import { useCountdown } from "../../hooks/useCountdown";
 import { useEmailValidation } from "../../hooks/useEmailValidation";
 import { usePasswordValidation } from "../../hooks/usePasswordValidation";
 
-// ───────────────────────────────────────────────────────────────
 // COMPONENTE
-// ───────────────────────────────────────────────────────────────
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
@@ -154,7 +152,7 @@ const CrearCuenta: React.FC = () => {
               label="Contraseña"
               value={password}
               onChangeText={setPassword}
-              placeholder="* * * * * * * *"
+              placeholder="• • • • • • • •"
               secureTextEntry
             />
             {/* VALIDACIONES */}
@@ -196,7 +194,7 @@ const CrearCuenta: React.FC = () => {
                 else if (text.length > 0)
                   setErrorMatch("Las contraseñas no coinciden");
               }}
-              placeholder="* * * * * * * *"
+              placeholder="• • • • • • • •"
               secureTextEntry
               error={errorMatch}
             />
