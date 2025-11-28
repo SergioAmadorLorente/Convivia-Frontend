@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import GLOBAL_STYLES from '../../styles/styles';
-import { COMPONENTS, COLORS } from '../../styles/theme';
+import { COMPONENTS } from '../../styles/theme';
 
 interface PolicyHeaderProps {
   title: string;
