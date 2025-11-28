@@ -198,68 +198,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     //textAlign: "left",
   },
 
-  // ----------- VERIFICACIÓN DE CUENTA [#8]-----------
-
-  // Contenedor de verificación de cuenta
-  verificacionContainer: {
-    ...(COMMON.PAGE_CARD as any),
-    borderRadius: moderateScale(25),
-  },
-
-  // Título en verificación de cuenta
-  verificacionTitulo: {
-    fontSize: moderateScale(45),
-    color: COLORS.primary,
-    fontFamily: FONTS.title,
-    textAlign: "center",
-    lineHeight: moderateScale(55),
-  },
-  // Subtítulo en verificación de cuenta
-  verificacionSubtitulo: {
-    fontSize: moderateScale(12),
-    color: COLORS.secondary,
-    marginVertical: hp("1%"),
-    fontFamily: FONTS.regular,
-    width: wp("75%"),
-    textAlign: "center",
-    marginBottom: hp("1%"),
-  },
-  // Link para reenviar código de verificación
-  verificacionEnviarCodigoNuevo: {
-    fontSize: moderateScale(14),
-    marginTop: verticalScale(8),
-    marginLeft: -wp("45%"),
-    fontFamily: FONTS.regular,
-    color: COLORS.accent,
-  },
-  // Contador de tiempo para reenviar código
-  verificacionContador: {
-    fontSize: moderateScale(14),
-    marginTop: -verticalScale(20),
-    marginLeft: wp("75%"),
-    fontFamily: FONTS.regular,
-    color: COLORS.secondary,
-  },
-  // Contenedor para crear nueva contraseña tras verificación
-  verificacionContainerPassword: {
-    backgroundColor: COLORS.background,
-    paddingTop: hp("7%"),
-    paddingHorizontal: wp("5%"),
-    borderRadius: moderateScale(25),
-  },
-
-  // Botón para mostrar/ocultar nueva contraseña tras verificación
-  verificacionEyeIconButton: {
-    padding: 0,
-    marginLeft: -2,
-  },
-  // Contenedor del contenido del scroll en verificación
-  verificacionScrollContent: {
-    flexGrow: 1,
-    justifyContent: "flex-start",
-    alignItems: "center",
-  },
-
   // -------------- LABELS [#9]----------------
   // Label genérico para formularios
   labelBase: {
@@ -274,9 +212,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginLeft: wp("1%"),
   },
   
-  /*labelMarginTop: {
-    marginTop: hp("2%"),
-  },*/
 
   // Label para checkbox y "Recordarme"
   labelCheckbox: {
@@ -293,20 +228,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginBottom: hp("1%"),
   },
 
-  // Label para verificación (código y nueva contraseña)
-  labelVerificacion: {
-    fontSize: moderateScale(15),
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-  },
-
-  // Requisitos de la nueva contraseña
-  labelPasswordReq: {
-    fontFamily: FONTS.regular,
-    color: COLORS.secondary,
-    fontSize: moderateScale(11),
-    width: wp("80%"),
-  },
 });
 
 // Exportaciones de constantes de tema para uso en otros archivos
