@@ -4,7 +4,6 @@ import {
   View,
   ActivityIndicator,
   ScrollView,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
@@ -17,9 +16,6 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
-import { moderateScale } from "react-native-size-matters";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -244,12 +240,12 @@ const CrearCuenta: React.FC = () => {
                 {
                   backgroundColor:
                     isValidEmail &&
-                    checkedPolitica &&
-                    checkedTerminos &&
-                    password === password2 &&
-                    isValidPassword &&
-                    !isCounting &&
-                    !emailUsedError
+                      checkedPolitica &&
+                      checkedTerminos &&
+                      password === password2 &&
+                      isValidPassword &&
+                      !isCounting &&
+                      !emailUsedError
                       ? COLORS.success
                       : COLORS.disabled,
                 },
