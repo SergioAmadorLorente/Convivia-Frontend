@@ -2,7 +2,6 @@ import React from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import useLoadFonts from '../hooks/useLoadFonts';
-import Loading from '../components/ui/Loading';
 import Logo from '../components/ui/Logo';
 import Button from '../components/ui/Button';
 import GLOBAL_STYLES from '../styles/styles';
@@ -10,10 +9,6 @@ import GLOBAL_STYLES from '../styles/styles';
 const Main: React.FC = () => {
   const navigation = useNavigation<any>();
   const fontsLoaded = useLoadFonts();
-
-  if (!fontsLoaded) {
-    return <Loading />;
-  }
 
   return (
     <ScrollView contentContainerStyle={GLOBAL_STYLES.scrollContainer} keyboardShouldPersistTaps="handled">
