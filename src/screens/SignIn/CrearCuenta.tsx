@@ -22,20 +22,19 @@ import { moderateScale } from "react-native-size-matters";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
   createUserWithEmailAndPassword,
-  sendEmailVerification,
-} from "firebase/auth";
-import GLOBAL_STYLES from "../../styles/styles";
-import { COLORS } from "../../styles/theme";
-import { auth } from "../../configs/firebaseConfig";
-import Popup from "../../components/ui/Popup";
-import TextField from "../../components/ui/TextField";
-import Button from "../../components/ui/Button";
-import useKeyboardAware from "../../hooks/useKeyboardAware";
-import { useCountdown } from "../../hooks/useCountdown";
-import { useEmailValidation } from "../../hooks/useEmailValidation";
-import { usePasswordValidation } from "../../hooks/usePasswordValidation";
-
-// COMPONENTE
+  sendEmailVerification
+} from 'firebase/auth';
+import GLOBAL_STYLES from '../../styles/styles';
+import { COLORS } from '../../styles/theme';
+import { auth } from '../../configs/firebaseConfig';
+import Popup from '../../components/ui/Popup';
+import TextField from '../../components/ui/TextField';
+import Button from '../../components/ui/Button';
+import CheckboxWithLink from '../../components/ui/CheckboxWithLink';
+import useKeyboardAware from '../../hooks/useKeyboardAware';
+import { useCountdown } from '../../hooks/useCountdown';
+import { useEmailValidation } from '../../hooks/useEmailValidation';
+import { usePasswordValidation } from '../../hooks/usePasswordValidation';
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
@@ -44,8 +43,8 @@ const CrearCuenta: React.FC = () => {
   const [password2, setPassword2] = useState("");
   const [errorMatch, setErrorMatch] = useState("");
   const [checkedPolitica, setCheckedPolitica] = useState(false);
-  const [checkedCookies, setCheckedCookies] = useState(false);
-  const [emailUsedError, setEmailUsedError] = useState("");
+  const [checkedTerminos, setCheckedTerminos] = useState(false);
+  const [emailUsedError, setEmailUsedError] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const { seconds, isCounting, startCountdown } = useCountdown(60);
   const scrollRef = useRef<any>(null);
@@ -97,7 +96,7 @@ const CrearCuenta: React.FC = () => {
       setErrorMatch("Las contraseñas no coinciden");
       return;
     }
-    if (!checkedPolitica || !checkedCookies) return;
+    if (!checkedPolitica || !checkedTerminos) return;
     await validarBBDD();
   };
 
@@ -198,45 +197,21 @@ const CrearCuenta: React.FC = () => {
               secureTextEntry
               error={errorMatch}
             />
-
-            {/* CHECKBOXES */}
-            <View
-              style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp("1%") }]}
-            >
-              <TouchableOpacity
-                style={GLOBAL_STYLES.checkbox}
-                onPress={() => setCheckedPolitica(!checkedPolitica)}
-              >
-                {checkedPolitica && (
-                  <Ionicons
-                    name="checkmark"
-                    size={moderateScale(18)}
-                    color={COLORS.accent}
-                  />
-                )}
-              </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.labelCheckbox as any}>
-                Política de privacidad
-              </Text>
-            </View>
-            <View
-              style={[GLOBAL_STYLES.checkboxContainer, { marginTop: hp("1%") }]}
-            >
-              <TouchableOpacity
-                style={GLOBAL_STYLES.checkbox}
-                onPress={() => setCheckedCookies(!checkedCookies)}
-              >
-                {checkedCookies && (
-                  <Ionicons
-                    name="checkmark"
-                    size={moderateScale(18)}
-                    color={COLORS.accent}
-                  />
-                )}
-              </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.labelCheckbox as any}>Cookies</Text>
-            </View>
-
+            {/* CHECKBOXES WITH LINKS */}
+            <CheckboxWithLink
+              checked={checkedPolitica}
+              onCheckboxPress={() => setCheckedPolitica(!checkedPolitica)}
+              labelText=""
+              linkText="Política de Privacidad y Cookies"
+              linkRoute="PoliticaCookiesPrivacidad"
+            />
+            <CheckboxWithLink
+              checked={checkedTerminos}
+              onCheckboxPress={() => setCheckedTerminos(!checkedTerminos)}
+              labelText=""
+              linkText="Términos y Condiciones"
+              linkRoute="TerminosCondiciones"
+            />
             {/* BOTÓN */}
             <Button
               style={[
@@ -245,7 +220,7 @@ const CrearCuenta: React.FC = () => {
                   backgroundColor:
                     isValidEmail &&
                     checkedPolitica &&
-                    checkedCookies &&
+                    checkedTerminos &&
                     password === password2 &&
                     isValidPassword &&
                     !isCounting &&
@@ -259,7 +234,7 @@ const CrearCuenta: React.FC = () => {
                 !(
                   isValidEmail &&
                   checkedPolitica &&
-                  checkedCookies &&
+                  checkedTerminos &&
                   password === password2 &&
                   isValidPassword
                 ) ||

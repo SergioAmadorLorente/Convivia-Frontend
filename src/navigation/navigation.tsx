@@ -11,6 +11,8 @@ import DashBoardPersonal from '../screens/Dashboard/DashBoardPersonal';
 import NuevaResidencia from '../screens/Welcome/NuevaResidencia';
 import UnirResidencia from '../screens/Welcome/UnirResidencia';
 import Bienvenida from '../screens/Welcome/Bienvenida';
+import PoliticaCookiesPrivacidad from '../screens/Policies/PoliticaCookiesPrivacidad';
+import TerminosCondiciones from '../screens/Policies/TerminosCondiciones';
 
 import CustomHeader from '../components/ui/CustomHeader';
 
@@ -100,6 +102,16 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="UnirResidencia"
           component={UnirResidencia}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="PoliticaCookiesPrivacidad"
+          component={PoliticaCookiesPrivacidad}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="TerminosCondiciones"
+          component={TerminosCondiciones}
           options={defaultScreenOptions}
         />
       </Stack.Navigator>

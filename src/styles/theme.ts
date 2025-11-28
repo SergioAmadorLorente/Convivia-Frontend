@@ -53,6 +53,18 @@ export const HELPERS = {
   verticalScale,
 };
 
+export const COMPONENTS = {
+  POLICY_HEADER: {
+    leftSegmentWidth: moderateScale(60),
+    height: 2,
+    leftColor: COLORS.accent,
+    rightColor: COLORS.primary,
+    gap: moderateScale(8),
+    marginTop: verticalScale(2),
+    marginBottom: verticalScale(1.5),
+  },
+};
+
 export const COMMON = {
   SHADOW: {
     shadowColor: '#000',
@@ -118,4 +130,5 @@ export default {
   SIZES,
   COMMON,
   HELPERS,
+  COMPONENTS,
 };
