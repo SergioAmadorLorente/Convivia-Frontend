@@ -61,7 +61,7 @@ const PoliticaCookiesPrivacidad: React.FC = () => {
           </Text>
           </Desplegable>
 
-          <Desplegable title="Comprendiendo Nuestra Política de Cookies">
+          <Desplegable title="Nuestra Política de Cookies">
           <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
             Las cookies son esenciales para cómo opera Convivia. Nos permiten recordar tu estado de sesión, preferencias, y mejorar tu experiencia general. Diferentes tipos de cookies sirven para diferentes propósitos en nuestra plataforma.
           </Text>
