@@ -209,7 +209,10 @@ const CrearCuenta: React.FC = () => {
                 )}
               </View>
               <Text
-                style={[GLOBAL_STYLES.labelCheckbox]}
+                style={[
+                  GLOBAL_STYLES.labelCheckbox,
+                  { color: COLORS.accent, textDecorationLine: "underline" },
+                ]}
                 onPress={() => navigation.navigate("PoliticaCookiesPrivacidad")}
               >
                 Política de Privacidad y Cookies
@@ -230,7 +233,10 @@ const CrearCuenta: React.FC = () => {
                 )}
               </View>
               <Text
-                style={GLOBAL_STYLES.labelCheckbox}
+                style={[
+                  GLOBAL_STYLES.labelCheckbox,
+                  { color: COLORS.accent, textDecorationLine: "underline" },
+                ]}
                 onPress={() => navigation.navigate("TerminosCondiciones")}
               >
                 Términos y Condiciones
