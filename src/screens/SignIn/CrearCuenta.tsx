@@ -4,6 +4,7 @@ import {
   View,
   ActivityIndicator,
   ScrollView,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
@@ -16,6 +17,8 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import { moderateScale } from "react-native-size-matters";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -206,7 +209,7 @@ const CrearCuenta: React.FC = () => {
                 )}
               </View>
               <Text
-                style={[GLOBAL_STYLES.labelCheckbox ]}
+                style={[GLOBAL_STYLES.labelCheckbox]}
                 onPress={() => navigation.navigate("PoliticaCookiesPrivacidad")}
               >
                 Política de Privacidad y Cookies

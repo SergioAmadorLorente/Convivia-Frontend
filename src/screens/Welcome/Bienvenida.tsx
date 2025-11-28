@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Image, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, Image, ActivityIndicator, ScrollView } from 'react-native';
 import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';

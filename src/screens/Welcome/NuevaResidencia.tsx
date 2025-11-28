@@ -17,7 +17,6 @@ import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { moderateScale, verticalScale } from 'react-native-size-matters';
 import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
 import Button from '../../components/ui/Button';
