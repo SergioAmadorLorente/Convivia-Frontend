@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Image, Text } from 'react-native';
-import GLOBAL_STYLES from '../../styles/styles';
+import React from "react";
+import { View, Image, Text } from "react-native";
+import GLOBAL_STYLES from "../../styles/styles";
 
 const Logo: React.FC = () => (
   <>
     <Image
-      source={require('../../assets/logoReal.png')}
+      source={require("../../assets/logoReal.png")}
       style={GLOBAL_STYLES.logo}
       resizeMode="contain"
     />

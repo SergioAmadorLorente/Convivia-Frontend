@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import React from "react";
+import { View, Image, TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface CustomHeaderProps {
   onLogout?: () => void;
@@ -11,32 +11,32 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ onLogout }) => {
     <View
       style={{
         height: 450,
-        backgroundColor: '#F5F4F2',
-        justifyContent: 'center',
+        backgroundColor: "#F5F4F2",
+        justifyContent: "center",
       }}
     >
       {/* Botón de logout */}
       <TouchableOpacity
         onPress={onLogout}
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 70,
-          left: 40,
+          left: 25,
           zIndex: 1,
         }}
       >
-        <MaterialIcons name="logout" size={28} color="#66b35fff" />
+        <MaterialIcons name="logout" size={28} color="#ACBF8A" />
       </TouchableOpacity>
 
       {/* Logo + dibujo */}
       <View
         style={{
-          alignItems: 'center',
+          alignItems: "center",
           marginTop: 50,
         }}
       >
         <Image
-          source={require('../../assets/logo_completo.png')}
+          source={require("../../assets/logo_completo.png")}
           style={{
             width: 250,
             height: 70,
@@ -44,7 +44,7 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ onLogout }) => {
           }}
         />
         <Image
-          source={require('../../assets/dibujo.png')}
+          source={require("../../assets/dibujo.png")}
           style={{
             width: 230,
             height: 200,

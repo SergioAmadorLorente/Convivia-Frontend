@@ -1,37 +1,37 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationContainer } from '@react-navigation/native';
-import { StackNavigationOptions } from '@react-navigation/stack';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { StackNavigationOptions } from "@react-navigation/stack";
 
-import Main from '../screens/Main';
-import CrearCuenta from '../screens/SignIn/CrearCuenta';
-import IniciarSesion from '../screens/LogIn/IniciarSesion';
-import RecuperarPassword from '../screens/LogIn/RecuperarPassword';
-import VerificacionCuentaNueva from '../screens/SignIn/VerificacionCuentaNueva';
-import RestablecerPassword from '../screens/LogIn/RestablecerPassword';
-import DashBoardPersonal from '../screens/Dashboard/DashBoardPersonal';
-import NuevaResidencia from '../screens/Welcome/NuevaResidencia';
-import UnirResidencia from '../screens/Welcome/UnirResidencia';
-import Bienvenida from '../screens/Welcome/Bienvenida';
+import Main from "../screens/Main";
+import CrearCuenta from "../screens/SignIn/CrearCuenta";
+import IniciarSesion from "../screens/LogIn/IniciarSesion";
+import RecuperarPassword from "../screens/LogIn/RecuperarPassword";
+import DashBoardPersonal from "../screens/Dashboard/DashBoardPersonal";
+import NuevaResidencia from "../screens/Welcome/NuevaResidencia";
+import UnirResidencia from "../screens/Welcome/UnirResidencia";
+import Bienvenida from "../screens/Welcome/Bienvenida";
+import PoliticaCookiesPrivacidad from "../screens/Policies/PoliticaCookiesPrivacidad";
+import TerminosCondiciones from "../screens/Policies/TerminosCondiciones";
 
-import CustomHeader from '../components/ui/CustomHeader';
+import CustomHeader from "../components/ui/CustomHeader";
 
 const Stack = createStackNavigator<any>();
 
 // Opciones comunes para los headers
 const headerOptions: StackNavigationOptions = {
   headerShown: true,
-  headerTintColor: '#ACBF8A',
+  headerTintColor: "#ACBF8A",
   headerTitleStyle: {
     fontSize: 20,
-    fontFamily: 'DMSerifDisplay_400Regular',
-    color: '#ACBF8A',
+    fontFamily: "DMSerifDisplay_400Regular",
+    color: "#ACBF8A",
   },
   gestureEnabled: true,
-  gestureDirection: 'horizontal',
+  gestureDirection: "horizontal",
   headerShadowVisible: false,
   headerStyle: {
-    backgroundColor: '#F5F4F2',
+    backgroundColor: "#F5F4F2",
     elevation: 0,
     height: 150,
     shadowOpacity: 0,
@@ -41,8 +41,8 @@ const headerOptions: StackNavigationOptions = {
 
 const defaultScreenOptions: StackNavigationOptions = {
   ...headerOptions,
-  title: '',
-  headerBackTitle: '',
+  title: "",
+  headerBackTitle: "",
 };
 
 const AppNavigator: React.FC = () => {
@@ -90,16 +90,6 @@ const AppNavigator: React.FC = () => {
           options={defaultScreenOptions}
         />
         <Stack.Screen
-          name="VerificacionCuentaNueva"
-          component={VerificacionCuentaNueva}
-          options={defaultScreenOptions}
-        />
-        <Stack.Screen
-          name="RestablecerPassword"
-          component={RestablecerPassword}
-          options={defaultScreenOptions}
-        />
-        <Stack.Screen
           name="DashBoardPersonal"
           component={DashBoardPersonal}
           options={defaultScreenOptions}
@@ -112,6 +102,16 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="UnirResidencia"
           component={UnirResidencia}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="PoliticaCookiesPrivacidad"
+          component={PoliticaCookiesPrivacidad}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="TerminosCondiciones"
+          component={TerminosCondiciones}
           options={defaultScreenOptions}
         />
       </Stack.Navigator>
