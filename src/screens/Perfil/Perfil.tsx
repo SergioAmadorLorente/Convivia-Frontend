@@ -18,6 +18,7 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
+import BottomBar from "../../components/ui/BottomBar";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const hp = (percentage: string) =>
@@ -61,6 +62,7 @@ const DashBoardPersonal: React.FC = () => {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          
           <View
             style={{
               flex: 1,
@@ -78,7 +80,7 @@ const DashBoardPersonal: React.FC = () => {
                 textAlign: "center",
               }}
             >
-              DashBoardPersonal
+              Perfil
             </Text>
             <Text
               style={{
@@ -118,7 +120,10 @@ const DashBoardPersonal: React.FC = () => {
                 Perfil
               </Text>
             </TouchableOpacity>
+
+
           </View>
+      <BottomBar/>
         </ScrollView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
