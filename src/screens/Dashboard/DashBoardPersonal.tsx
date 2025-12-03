@@ -1,128 +1,157 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import {
-  Text,
   View,
-  ActivityIndicator,
-  ScrollView,
+  Text,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Platform,
-  Dimensions,
+  StyleSheet,
+  Animated,
 } from "react-native";
-import { useFonts } from "expo-font";
-import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
-import {
-  Montserrat_400Regular,
-  Montserrat_700Bold,
-} from "@expo-google-fonts/montserrat";
-import { useNavigation } from "@react-navigation/native";
-
-const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
-const hp = (percentage: string) =>
-  (screenHeight * parseFloat(percentage)) / 100;
-const wp = (percentage: string) => (screenWidth * parseFloat(percentage)) / 100;
-const moderateScale = (size: number, factor = 0.5) =>
-  size + size * factor * (screenWidth / 375 - 1);
-
-const DashBoardPersonal: React.FC = () => {
-  const navigation = useNavigation<any>();
-
-  const [fontsLoaded] = useFonts({
-    DMSerifDisplay_400Regular,
-    Montserrat_400Regular,
-    Montserrat_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#fff",
-        }}
-      >
-        <ActivityIndicator size="large" color="#6B705C" />
-      </View>
-    );
-  }
-
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../../navigation/RootStackParamList";
+const BottomBar = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [open, setOpen] = useState(false);
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const toggleMenu = () => {
+    Animated.spring(scaleAnim, {
+      toValue: open ? 0 : 1,
+      useNativeDriver: true,
+      friction: 6,
+    }).start();
+    setOpen(!open);
+  };
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+    <View style={styles.container}>
+      {/* ------------------ MENÚ FLOTANTE (+) ------------------ */}
+      <Animated.View
+        style={[
+          styles.floatingMenu,
+          {
+            transform: [{ scale: scaleAnim }],
+            opacity: scaleAnim,
+          },
+        ]}
       >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#fff",
-              alignItems: "center",
-              paddingTop: hp("7%"),
-              paddingHorizontal: wp("5%"),
-            }}
-          >
-            <Text
-              style={{
-                fontSize: moderateScale(40),
-                color: "#6B705C",
-                fontFamily: "DMSerifDisplay_400Regular",
-                textAlign: "center",
-              }}
-            >
-              DashBoardPersonal
-            </Text>
-            <Text
-              style={{
-                fontSize: moderateScale(13),
-                color: "#4B4741",
-                marginVertical: hp("1%"),
-                fontFamily: "Montserrat_400Regular",
-                textAlign: "center",
-              }}
-            >
-              ¡Ya estás a punto de poder utilizar la aplicación de Convivia!
-            </Text>
-
-            <TouchableOpacity
-              style={{
-                marginTop: hp("3%"),
-                backgroundColor: "#E6ECDC",
-                paddingVertical: hp("1.5%"),
-                paddingHorizontal: wp("10%"),
-                borderRadius: 15,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 3,
-                elevation: 3,
-              }}
-              onPress={() => navigation.navigate("UnirResidencia")}
-            >
-              <Text
-                style={{
-                  color: "#4B4741",
-                  fontSize: moderateScale(15),
-                  fontFamily: "Montserrat_400Regular",
-                  textAlign: "center",
-                }}
-              >
-                Probar Unirse a Residencia
-              </Text>
-            </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem}>
+          <View style={styles.circleIcon}>
+            <Text style={styles.circleIconText}>€</Text>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+          <Text style={styles.menuText}>Crear nueva factura</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem}>
+          <View style={styles.circleIcon}>
+            <Text style={styles.circleIconText}>T</Text>
+          </View>
+          <Text style={styles.menuText}>Crear nueva tarea</Text>
+        </TouchableOpacity>
+      </Animated.View>
+      {/* ------------------ BOTTOM BAR ------------------ */}
+      <View style={styles.bottomBar}>
+        {/* HOME */}
+        <TouchableOpacity
+          style={styles.tab}
+          onPress={() => navigation.navigate("DashBoardPersonal")}
+        >
+          <Text style={styles.icon}>🏠</Text>
+          <Text style={styles.label}>Inicio</Text>
+        </TouchableOpacity>
+        {/* BOTÓN CENTRAL + */}
+        <TouchableOpacity style={styles.plusButton} onPress={toggleMenu}>
+          <Text style={styles.plus}>+</Text>
+        </TouchableOpacity>
+        {/* PERFIL */}
+        <TouchableOpacity
+          style={styles.tab}
+          onPress={() => navigation.navigate("Perfil")}
+        >
+          <Text style={styles.icon}>👤</Text>
+          <Text style={styles.label}>Perfil</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
-
-export default DashBoardPersonal;
+export default BottomBar;
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    alignItems: "center",
+  },
+  /* MENU FLOTANTE */
+  floatingMenu: {
+    position: "absolute",
+    bottom: 115,
+    left: 85,
+  },
+  menuItem: {
+    flexDirection: "row",
+    backgroundColor: "#DDE6D4",
+    padding: 12,
+    paddingHorizontal: 18,
+    borderRadius: 25,
+    alignItems: "center",
+    marginBottom: 12,
+    elevation: 3,
+  },
+  circleIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  circleIconText: {
+    fontSize: 16,
+  },
+  menuText: {
+    fontSize: 15,
+    color: "#4B4741",
+  },
+  /* BOTTOM BAR */
+  bottomBar: {
+    flexDirection: "row",
+    backgroundColor: "#ECECEB",
+    width: "100%",
+    height: 80,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    justifyContent: "space-around",
+    paddingHorizontal: 0,
+    alignItems: "center",
+    position: "relative",
+  },
+  /* BOTONES LATERALES */
+  tab: {
+    alignItems: "center",
+  },
+  icon: {
+    fontSize: 26,
+  },
+  label: {
+    fontSize: 14,
+    marginTop: 2,
+    color: "#4B4741",
+  },
+  /* BOTÓN + */
+  plusButton: {
+    position: "absolute",
+    top: -30,
+    alignSelf: "center",
+    width: 70,
+    height: 70,
+    borderRadius: 50,
+    backgroundColor: "#DDE6D4",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 6,
+  },
+  plus: {
+    fontSize: 38,
+    color: "#4B4741",
+    marginTop: -2,
+  },
+});
