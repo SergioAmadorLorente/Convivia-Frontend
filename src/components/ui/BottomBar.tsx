@@ -5,12 +5,15 @@ import {
    TouchableOpacity,
    StyleSheet,
    Animated,
+   TouchableWithoutFeedback,
+   Dimensions,
 } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../styles/theme";
-import { useTabColor } from "../../hooks/useTabColor"; // <-- import del hook
+import { useTabColor } from "../../hooks/useTabColor";
+const { height } = Dimensions.get("window");
 const BottomBar = () => {
    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
    const [open, setOpen] = useState(false);
@@ -23,12 +26,17 @@ const BottomBar = () => {
        }).start();
        setOpen(!open);
    };
-   // Usar hook para los tabs laterales
    const homeColor = useTabColor("DashBoardPersonal");
    const profileColor = useTabColor("Perfil");
    return (
-<View style={styles.container}>
-           {/* ------------------ MENÚ FLOTANTE (+) ------------------ */}
+<View style={styles.wrapper}>
+           {/* -------- OVERLAY GRIS -------- */}
+           {open && (
+<TouchableWithoutFeedback onPress={toggleMenu}>
+<View style={styles.overlay} />
+</TouchableWithoutFeedback>
+           )}
+           {/* -------- MENÚ FLOTANTE -------- */}
 <Animated.View
                style={[
                    styles.floatingMenu,
@@ -51,9 +59,8 @@ const BottomBar = () => {
 <Text style={styles.menuText}>Crear nueva tarea</Text>
 </TouchableOpacity>
 </Animated.View>
-           {/* ------------------ BOTTOM BAR ------------------ */}
+           {/* -------- BOTTOM BAR -------- */}
 <View style={styles.bottomBar}>
-               {/* HOME */}
 <TouchableOpacity
                    style={styles.tab}
                    onPress={() => navigation.navigate("DashBoardPersonal")}
@@ -61,14 +68,12 @@ const BottomBar = () => {
 <Ionicons name="home-outline" size={28} color={homeColor} />
 <Text style={styles.label}>Inicio</Text>
 </TouchableOpacity>
-               {/* BOTÓN CENTRAL + */}
 <View style={styles.plusContainer}>
 <TouchableOpacity style={styles.plusButton} onPress={toggleMenu}>
 <Ionicons name="add-outline" size={40} color={COLORS.primary} />
 </TouchableOpacity>
 <Text style={[styles.label, styles.createLabel]}>Crear</Text>
 </View>
-               {/* PERFIL */}
 <TouchableOpacity
                    style={styles.tab}
                    onPress={() => navigation.navigate("Perfil")}
@@ -82,17 +87,29 @@ const BottomBar = () => {
 };
 export default BottomBar;
 const styles = StyleSheet.create({
-   container: {
+   wrapper: {
        position: "absolute",
        bottom: 0,
        width: "100%",
+       height: height,
        alignItems: "center",
+   },
+   /* OVERLAY GRIS */
+   overlay: {
+       position: "absolute",
+       top: 0,
+       left: 0,
+       right: 0,
+       bottom: 80, // altura del bottom bar
+       backgroundColor: "rgba(0,0,0,0.2)",
+       zIndex: 1,
    },
    /* MENU FLOTANTE */
    floatingMenu: {
        position: "absolute",
        bottom: 120,
        left: 85,
+       zIndex: 2,
    },
    menuItem: {
        flexDirection: "row",
@@ -128,9 +145,10 @@ const styles = StyleSheet.create({
        height: 80,
        justifyContent: "space-around",
        alignItems: "center",
-       position: "relative",
+       position: "absolute",
+       bottom: 0,
+       zIndex: 3,
    },
-   /* BOTONES LATERALES */
    tab: {
        alignItems: "center",
    },
@@ -139,7 +157,6 @@ const styles = StyleSheet.create({
        marginTop: 2,
        color: "#4B4741",
    },
-   /* BOTÓN CENTRAL */
    plusContainer: {
        alignItems: "center",
        justifyContent: "flex-end",
@@ -154,8 +171,9 @@ const styles = StyleSheet.create({
        justifyContent: "center",
        alignItems: "center",
        elevation: 6,
+       zIndex: 4,
    },
    createLabel: {
-       marginTop: 30, // 👈 baja solo el texto "Crear" sin mover el botón
+       marginTop: 30,
    },
 });
