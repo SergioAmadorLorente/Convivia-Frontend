@@ -8,14 +8,14 @@ Convivia es una app móvil diseñada para mejorar la convivencia en pisos compar
 - Frontend: **React**
 - Backend: **.NET**
 - Diseño de interfaz: **Figma**
-- Base de datos: **CosmosDB**
+- Base de datos: **Firebase**
 
 ## ✨ Funcionalidades principales
-- Crear y gestionar **residencias compartidas**
-- Añadir y asignar **tareas domésticas**
-- Visualizar actividades en un **calendario integrado**
-- Recibir **recordatorios** automáticos
-- Sistema de **niveles “Karma”** que recompensa a quienes más contribuyen
+- Crear y gestionar **Residencias Compartidas**
+- Añadir y asignar **Tareas Domésticas**
+- Visualizar actividades en un **Calendario Integrado**
+- Recibir **Recordatorios** automáticos
+- Sistema de **Niveles “Karma”** que recompensa a quienes más contribuyen
 
 ## 👥 Usuarios objetivo
 - Personas que comparten piso

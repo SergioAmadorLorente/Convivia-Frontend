@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useFonts } from 'expo-font';
-import SplashScreen from './src/screens/SplashScreen';
-import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
-import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
-import AppNavigator from './src/navigation/navigation';
+import React, { useState, useEffect } from "react";
+import { useFonts } from "expo-font";
+import SplashScreen from "./src/screens/SplashScreen";
+import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
+import {
+  Montserrat_400Regular,
+  Montserrat_700Bold,
+} from "@expo-google-fonts/montserrat";
+import AppNavigator from "./src/navigation/navigation";
 
 const App: React.FC = () => {
   const [fontsLoaded] = useFonts({
