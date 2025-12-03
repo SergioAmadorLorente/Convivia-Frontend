@@ -249,12 +249,12 @@ const CrearCuenta: React.FC = () => {
                 {
                   backgroundColor:
                     isValidEmail &&
-                      checkedPolitica &&
-                      checkedTerminos &&
-                      password === password2 &&
-                      isValidPassword &&
-                      !isCounting &&
-                      !emailUsedError
+                    checkedPolitica &&
+                    checkedTerminos &&
+                    password === password2 &&
+                    isValidPassword &&
+                    !isCounting &&
+                    !emailUsedError
                       ? COLORS.success
                       : COLORS.disabled,
                 },

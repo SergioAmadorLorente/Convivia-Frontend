@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   Text,
   View,
@@ -6,23 +6,23 @@ import {
   ActivityIndicator,
   Platform,
   TouchableWithoutFeedback,
-} from 'react-native';
-import { useFonts } from 'expo-font';
-import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
+} from "react-native";
+import { useFonts } from "expo-font";
+import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
 import {
   Montserrat_400Regular,
   Montserrat_700Bold,
-} from '@expo-google-fonts/montserrat';
-import { useNavigation } from '@react-navigation/native';
-import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from '../../styles/styles';
-import { COLORS } from '../../styles/theme';
-import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '../../configs/firebaseConfig';
-import Popup from '../../components/ui/Popup';
-import Button from '../../components/ui/Button';
-import TextField from '../../components/ui/TextField';
-import { useKeyboardAware } from '../../hooks';
-import { useEmailValidation } from '../../hooks/useEmailValidation';
+} from "@expo-google-fonts/montserrat";
+import { useNavigation } from "@react-navigation/native";
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
+import { COLORS } from "../../styles/theme";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../../configs/firebaseConfig";
+import Popup from "../../components/ui/Popup";
+import Button from "../../components/ui/Button";
+import TextField from "../../components/ui/TextField";
+import { useKeyboardAware } from "../../hooks";
+import { useEmailValidation } from "../../hooks/useEmailValidation";
 const RecuperarPassword: React.FC = () => {
   const navigation = useNavigation<any>();
   // Hook de validación de email
@@ -45,7 +45,7 @@ const RecuperarPassword: React.FC = () => {
   const handleClosePopup = () => setPopupVisible(false);
   if (!fontsLoaded) {
     return (
-      <View style={[GLOBAL_STYLES.container, { justifyContent: 'center' }]}>
+      <View style={[GLOBAL_STYLES.container, { justifyContent: "center" }]}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -55,29 +55,29 @@ const RecuperarPassword: React.FC = () => {
     try {
       await sendPasswordResetEmail(auth, email);
       showPopup({
-        title: 'Correo enviado',
+        title: "Correo enviado",
         description:
-          'Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.',
-        imageType: 'success',
+          "Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.",
+        imageType: "success",
         buttons: [
           {
-            text: 'Aceptar',
-            onPress: () => navigation.navigate('IniciarSesion'),
+            text: "Aceptar",
+            onPress: () => navigation.navigate("IniciarSesion"),
           },
         ],
       });
     } catch (err: any) {
       console.log(err);
-      let message = 'No se pudo enviar el correo.';
-      if (err.code === 'auth/user-not-found')
-        message = 'No existe ninguna cuenta con este correo.';
-      if (err.code === 'auth/invalid-email')
-        message = 'El correo ingresado no es válido.';
+      let message = "No se pudo enviar el correo.";
+      if (err.code === "auth/user-not-found")
+        message = "No existe ninguna cuenta con este correo.";
+      if (err.code === "auth/invalid-email")
+        message = "El correo ingresado no es válido.";
       showPopup({
-        title: 'Error',
+        title: "Error",
         description: message,
-        imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        imageType: "error",
+        buttons: [{ text: "Aceptar", onPress: () => {} }],
       });
     }
   };
@@ -88,7 +88,7 @@ const RecuperarPassword: React.FC = () => {
           ref={containerRef}
           style={[
             GLOBAL_STYLES.container,
-            Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {},
+            Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
           ]}
         >
           <Text style={GLOBAL_STYLES.titulo}>Recuperar contraseña</Text>
@@ -111,7 +111,11 @@ const RecuperarPassword: React.FC = () => {
             <Button
               style={[
                 GLOBAL_STYLES.buttonPrimaryGreen,
-                { backgroundColor: isValidEmail ? COLORS.success : COLORS.disabled },
+                {
+                  backgroundColor: isValidEmail
+                    ? COLORS.success
+                    : COLORS.disabled,
+                },
               ]}
               disabled={!isValidEmail}
               onPress={handleResetPassword}
@@ -125,7 +129,7 @@ const RecuperarPassword: React.FC = () => {
       <Popup
         visible={popupVisible}
         onClose={handleClosePopup}
-        title={popupOptions.title || ''}
+        title={popupOptions.title || ""}
         description={popupOptions.description}
         imageType={popupOptions.imageType}
         buttons={popupOptions.buttons}

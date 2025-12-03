@@ -211,7 +211,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginBottom: hp("0.5%"),
     marginLeft: wp("1%"),
   },
-  
 
   // Label para checkbox y "Recordarme"
   labelCheckbox: {
@@ -227,7 +226,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     marginTop: hp("1%"),
     marginBottom: hp("1%"),
   },
-
 });
 
 // Exportaciones de constantes de tema para uso en otros archivos

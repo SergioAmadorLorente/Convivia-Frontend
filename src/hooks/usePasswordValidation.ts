@@ -7,13 +7,10 @@ export const usePasswordValidation = () => {
         length: password.length >= 8,
         uppercase: /[A-Z]/.test(password),
         number: /\d/.test(password),
-
     };
     const isValidPassword =
-        validations.length &&
-        validations.uppercase &&
-        validations.number;
-        
+        validations.length && validations.uppercase && validations.number;
+
     return {
         password,
         setPassword,

@@ -1,21 +1,21 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export const useEmailValidation = () => {
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const validateEmail = (value: string) => {
     setEmail(value);
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!pattern.test(value)) {
-      setEmailError('Correo inválido');
+      setEmailError("Correo inválido");
     } else {
-      setEmailError('');
+      setEmailError("");
     }
   };
   return {
     email,
     setEmail: validateEmail,
-    isValidEmail: emailError === '' && email.length > 0,
+    isValidEmail: emailError === "" && email.length > 0,
     emailError,
   };
 };

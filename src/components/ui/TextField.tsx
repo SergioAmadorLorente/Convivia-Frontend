@@ -1,17 +1,23 @@
-
-import React, { useState } from 'react';
-import { View, Text, TextInput, TextInputProps, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import GLOBAL_STYLES from '../../styles/styles';
-import { moderateScale } from 'react-native-size-matters';
-import { COLORS, COMMON } from '../../styles/theme';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import GLOBAL_STYLES from "../../styles/styles";
+import { moderateScale } from "react-native-size-matters";
+import { COLORS, COMMON } from "../../styles/theme";
 
 interface TextFieldProps {
   label?: string;
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
-  keyboardType?: TextInputProps['keyboardType'];
+  keyboardType?: TextInputProps["keyboardType"];
   error?: string;
   secureTextEntry?: boolean;
 }
@@ -21,7 +27,7 @@ const TextField: React.FC<TextFieldProps> = ({
   value,
   onChangeText,
   placeholder,
-  keyboardType = 'default',
+  keyboardType = "default",
   error,
   secureTextEntry = false,
 }) => {
@@ -41,7 +47,9 @@ const TextField: React.FC<TextFieldProps> = ({
           style={[COMMON.INPUT_BASE, { flex: 1 }]}
           placeholder={placeholder}
           keyboardType={keyboardType}
-          autoCapitalize={keyboardType === 'email-address' ? 'none' : 'sentences'}
+          autoCapitalize={
+            keyboardType === "email-address" ? "none" : "sentences"
+          }
           autoCorrect={false}
           secureTextEntry={isPassword && !show}
           value={value}
@@ -54,9 +62,15 @@ const TextField: React.FC<TextFieldProps> = ({
             style={styles.eyeButton}
             accessible
             accessibilityRole="button"
-            accessibilityLabel={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            accessibilityLabel={
+              show ? "Ocultar contraseña" : "Mostrar contraseña"
+            }
           >
-            <Ionicons name={show ? 'eye-off' : 'eye'} size={moderateScale(22)} color={COLORS.accent} />
+            <Ionicons
+              name={show ? "eye-off" : "eye"}
+              size={moderateScale(22)}
+              color={COLORS.accent}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -70,7 +84,7 @@ export default TextField;
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '90%',
+    width: "90%",
     marginTop: 12,
   },
   inputError: {
