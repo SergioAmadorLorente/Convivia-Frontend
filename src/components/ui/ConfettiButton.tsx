@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
     TouchableOpacity,
     Text,
@@ -8,7 +8,7 @@ import {
     View,
     Animated,
     Easing,
-    LayoutChangeEvent,
+    Dimensions,
 } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COLORS } from "../../styles/theme";
@@ -21,6 +21,7 @@ interface ConfettiButtonProps {
     style?: StyleProp<ViewStyle>;
     variant?: "primary" | "alt" | "success" | string;
 }
+const { width: screenWidth } = Dimensions.get("window");
 const ConfettiButton: React.FC<ConfettiButtonProps> = ({
     onPress,
     onClick,
@@ -31,44 +32,36 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
     variant = "primary",
 }) => {
     const resolvedOnPress = onPress ?? onClick ?? (() => { });
-
-    const [layout, setLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
-    const onLayout = (e: LayoutChangeEvent) => {
-        const { x, y, width, height } = e.nativeEvent.layout;
-        setLayout({ x, y, width, height });
-    };
-
-    const confettiCount = 24;
+    const confettiCount = 30; // más partículas para la lluvia
     const particles = Array.from({ length: confettiCount });
     const animations = useRef(
         particles.map(() => ({
-            translateX: new Animated.Value(0),
-            translateY: new Animated.Value(0),
+            translateX: new Animated.Value(Math.random() * screenWidth),
+            translateY: new Animated.Value(-20 - Math.random() * 100), // empezar arriba de la pantalla
             opacity: new Animated.Value(0),
         }))
     ).current;
     const startConfetti = () => {
         animations.forEach((p) => {
-            p.translateX.setValue(0);
-            p.translateY.setValue(0);
             p.opacity.setValue(1);
+            p.translateX.setValue(Math.random() * screenWidth); // posición inicial
+            p.translateY.setValue(-300 - Math.random() * 100); // empezar arriba
             Animated.parallel([
-                Animated.timing(p.translateX, {
-                    toValue: (Math.random() - 0.5) * 200,
-                    duration: 700 + Math.random() * 300,
-                    easing: Easing.out(Easing.quad),
+                Animated.timing(p.translateY, {
+                    toValue: 800 + Math.random() * 200,
+                    duration: 2000 + Math.random() * 1000,
+                    easing: Easing.linear,
                     useNativeDriver: true,
                 }),
-                Animated.timing(p.translateY, {
-                    toValue: -140 - Math.random() * 160,
-                    duration: 700 + Math.random() * 300,
-                    easing: Easing.out(Easing.quad),
+                Animated.timing(p.translateX, {
+                    toValue: Math.random() * screenWidth, // nueva posición X aleatoria
+                    duration: 2000 + Math.random() * 1000,
+                    easing: Easing.linear,
                     useNativeDriver: true,
                 }),
                 Animated.timing(p.opacity, {
                     toValue: 0,
-                    duration: 700 + Math.random() * 300,
-                    easing: Easing.linear,
+                    duration: 2000 + Math.random() * 1000,
                     useNativeDriver: true,
                 }),
             ]).start();
@@ -78,7 +71,6 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
         if (!disabled && !loading) startConfetti();
         resolvedOnPress();
     };
-
     let baseStyle: any = GLOBAL_STYLES.buttonPrimaryGreen;
     let textStyle: any = GLOBAL_STYLES.textoBoton;
     if (variant === "alt" || variant === "secondary") {
@@ -87,31 +79,20 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
     }
     const buttonStyle = [baseStyle, style, disabled ? { opacity: 0.6 } : null];
     // Colores del confeti
-    const confettiColors = [
-        "#ff5f6d",
-        "#ffc371",
-        "#7afcff",
-        "#9b88ff",
-        "#6eff8a",
-    ];
-    // 🔥 Cálculo del centro del botón
-    const originX = layout.width / 2;
-    const originY = layout.height / 2;
+    const confettiColors = ["#ff5f6d", "#ffc371", "#7afcff", "#9b88ff", "#6eff8a"];
     return (
-        <View
-            style={{ justifyContent: "center", alignItems: "center" }}
-        >
-            {/* Confeti superpuesto */}
+        <View style={{ justifyContent: "center", alignItems: "center", width: "100%" }}>
+            {/* Confeti desde arriba de la pantalla */}
             <View
                 style={{
                     position: "absolute",
-                    width: layout.width,
-                    height: layout.height,
-                    left: layout.x,
-                    top: layout.y,
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                     zIndex: 999,
+                    pointerEvents: "none",
                 }}
-                pointerEvents="none"
             >
                 {animations.map((p, i) => (
                     <Animated.View
@@ -121,11 +102,9 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
                             height: 10,
                             backgroundColor: confettiColors[i % confettiColors.length],
                             position: "absolute",
-                            transform: [
-                                { translateX: Animated.add(p.translateX, new Animated.Value(originX)) },
-                                { translateY: Animated.add(p.translateY, new Animated.Value(originY)) },
-                            ],
+                            transform: [{ translateX: p.translateX }, { translateY: p.translateY }],
                             opacity: p.opacity,
+                            borderRadius: 2,
                         }}
                     />
                 ))}
@@ -135,7 +114,6 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
                 onPress={onButtonPress}
                 disabled={disabled}
                 activeOpacity={0.8}
-                onLayout={onLayout} 
             >
                 {loading ? (
                     <ActivityIndicator size="small" color={COLORS.primary} />
