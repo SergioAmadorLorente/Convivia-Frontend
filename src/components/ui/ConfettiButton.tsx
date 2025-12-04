@@ -98,7 +98,7 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
                 style={{
                     position: "absolute",
                     width: "100%",
-                    height: 0,
+                    height: "100%",
                     justifyContent: "center",
                     alignItems: "center",
                     zIndex: 9999,
@@ -111,12 +111,13 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
                         style={{
                             width: 10,
                             height: 10,
-                            backgroundColor:
-                                confettiColors[i % confettiColors.length],
+                            backgroundColor: confettiColors[i % confettiColors.length],
                             position: "absolute",
+                            left: "50%",
+                            top: "50%",
                             transform: [
-                                { translateX: p.translateX },
-                                { translateY: p.translateY },
+                                { translateX: Animated.add(p.translateX, new Animated.Value(-80)) }, // compensación horizontal
+                                { translateY: Animated.add(p.translateY, new Animated.Value(-10)) }, // compensación vertical
                             ],
                             opacity: p.opacity,
                         }}
