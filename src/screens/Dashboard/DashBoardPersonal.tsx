@@ -63,7 +63,7 @@ const DashBoardPersonal: React.FC = () => {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          
+
           <View
             style={{
               flex: 1,
@@ -95,14 +95,14 @@ const DashBoardPersonal: React.FC = () => {
               Perfil
             </Text>
             <ConfettiButton
-       onPress={() => {
-         console.log("Botón con confeti presionado");
-       }}
-       variant="primary"
-       style={{ width: 200 }}
->
-       Celebrar 🎉
-</ConfettiButton>
+              onPress={() => {
+                console.log("Botón con confeti presionado");
+              }}
+              variant="primary"
+              style={{ width: 200 }}
+            >
+              Celebrar 🎉
+            </ConfettiButton>
 
             <TouchableOpacity
               style={{
@@ -133,7 +133,7 @@ const DashBoardPersonal: React.FC = () => {
 
 
           </View>
-      <BottomBar/>
+          <BottomBar />
         </ScrollView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
