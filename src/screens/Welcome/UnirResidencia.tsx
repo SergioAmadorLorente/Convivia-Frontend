@@ -21,6 +21,7 @@ import { useKeyboardAware } from '../../hooks';
 import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
 import useCodigoResidencia from '../../hooks/useCodigoResidencia';
+import ConfettiButton from '../../components/ui/ConfettiButton';
 
 const UnirResidencia: React.FC = () => {
   const { codigo, handleChange } = useCodigoResidencia();
@@ -118,7 +119,7 @@ const UnirResidencia: React.FC = () => {
     />
 
     {/* Botón actualizado del primer bloque */}
-    <Button
+    <ConfettiButton
       style={[
         GLOBAL_STYLES.buttonPrimaryGreen,
         { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' },
@@ -128,7 +129,7 @@ const UnirResidencia: React.FC = () => {
       loading={loading}
     >
       Unirse
-    </Button>
+    </ConfettiButton>
   </View>
 </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
