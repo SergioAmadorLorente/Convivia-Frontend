@@ -31,24 +31,20 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
     variant = "primary",
 }) => {
     const resolvedOnPress = onPress ?? onClick ?? (() => { });
-    // --------------------------------------------------
-    // Guardar la posición y tamaño del botón en pantalla
-    // --------------------------------------------------
+
     const [layout, setLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
     const onLayout = (e: LayoutChangeEvent) => {
         const { x, y, width, height } = e.nativeEvent.layout;
         setLayout({ x, y, width, height });
     };
-    // -----------------------------
-    // Confeti (cuadraditos animados)
-    // -----------------------------
+
     const confettiCount = 24;
     const particles = Array.from({ length: confettiCount });
     const animations = useRef(
         particles.map(() => ({
             translateX: new Animated.Value(0),
             translateY: new Animated.Value(0),
-            opacity: new Animated.Value(1),
+            opacity: new Animated.Value(0),
         }))
     ).current;
     const startConfetti = () => {
@@ -82,9 +78,7 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
         if (!disabled && !loading) startConfetti();
         resolvedOnPress();
     };
-    // -----------------------------
-    // Estilos del botón (igual que tu Button)
-    // -----------------------------
+
     let baseStyle: any = GLOBAL_STYLES.buttonPrimaryGreen;
     let textStyle: any = GLOBAL_STYLES.textoBoton;
     if (variant === "alt" || variant === "secondary") {
@@ -141,7 +135,7 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
                 onPress={onButtonPress}
                 disabled={disabled}
                 activeOpacity={0.8}
-                onLayout={onLayout} // <- mide tamaño y posición del botón
+                onLayout={onLayout} 
             >
                 {loading ? (
                     <ActivityIndicator size="small" color={COLORS.primary} />
