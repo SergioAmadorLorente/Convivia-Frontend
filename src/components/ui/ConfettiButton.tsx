@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
     TouchableOpacity,
     Text,
@@ -8,6 +8,7 @@ import {
     View,
     Animated,
     Easing,
+    LayoutChangeEvent,
 } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COLORS } from "../../styles/theme";
@@ -30,10 +31,18 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
     variant = "primary",
 }) => {
     const resolvedOnPress = onPress ?? onClick ?? (() => { });
+    // --------------------------------------------------
+    // Guardar la posición y tamaño del botón en pantalla
+    // --------------------------------------------------
+    const [layout, setLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+    const onLayout = (e: LayoutChangeEvent) => {
+        const { x, y, width, height } = e.nativeEvent.layout;
+        setLayout({ x, y, width, height });
+    };
     // -----------------------------
     // Confeti (cuadraditos animados)
     // -----------------------------
-    const confettiCount = 20;
+    const confettiCount = 24;
     const particles = Array.from({ length: confettiCount });
     const animations = useRef(
         particles.map(() => ({
@@ -50,19 +59,19 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
             Animated.parallel([
                 Animated.timing(p.translateX, {
                     toValue: (Math.random() - 0.5) * 200,
-                    duration: 800 + Math.random() * 300,
+                    duration: 700 + Math.random() * 300,
                     easing: Easing.out(Easing.quad),
                     useNativeDriver: true,
                 }),
                 Animated.timing(p.translateY, {
-                    toValue: -150 - Math.random() * 150,
-                    duration: 800 + Math.random() * 300,
+                    toValue: -140 - Math.random() * 160,
+                    duration: 700 + Math.random() * 300,
                     easing: Easing.out(Easing.quad),
                     useNativeDriver: true,
                 }),
                 Animated.timing(p.opacity, {
                     toValue: 0,
-                    duration: 800 + Math.random() * 300,
+                    duration: 700 + Math.random() * 300,
                     easing: Easing.linear,
                     useNativeDriver: true,
                 }),
@@ -91,17 +100,22 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
         "#9b88ff",
         "#6eff8a",
     ];
+    // 🔥 Cálculo del centro del botón
+    const originX = layout.width / 2;
+    const originY = layout.height / 2;
     return (
-        <View>
+        <View
+            style={{ justifyContent: "center", alignItems: "center" }}
+        >
             {/* Confeti superpuesto */}
             <View
                 style={{
                     position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: 9999,
+                    width: layout.width,
+                    height: layout.height,
+                    left: layout.x,
+                    top: layout.y,
+                    zIndex: 999,
                 }}
                 pointerEvents="none"
             >
@@ -113,11 +127,9 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
                             height: 10,
                             backgroundColor: confettiColors[i % confettiColors.length],
                             position: "absolute",
-                            left: "50%",
-                            top: "50%",
                             transform: [
-                                { translateX: Animated.add(p.translateX, new Animated.Value(-80)) }, // compensación horizontal
-                                { translateY: Animated.add(p.translateY, new Animated.Value(-10)) }, // compensación vertical
+                                { translateX: Animated.add(p.translateX, new Animated.Value(originX)) },
+                                { translateY: Animated.add(p.translateY, new Animated.Value(originY)) },
                             ],
                             opacity: p.opacity,
                         }}
@@ -129,6 +141,7 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
                 onPress={onButtonPress}
                 disabled={disabled}
                 activeOpacity={0.8}
+                onLayout={onLayout} // <- mide tamaño y posición del botón
             >
                 {loading ? (
                     <ActivityIndicator size="small" color={COLORS.primary} />
