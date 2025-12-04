@@ -19,6 +19,7 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
 import BottomBar from "../../components/ui/BottomBar";
+import ConfettiButton from "../../components/ui/ConfettiButton";
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
 const hp = (percentage: string) =>
@@ -93,6 +94,15 @@ const DashBoardPersonal: React.FC = () => {
             >
               Perfil
             </Text>
+            <ConfettiButton
+       onPress={() => {
+         console.log("Botón con confeti presionado");
+       }}
+       variant="primary"
+       style={{ width: 200 }}
+>
+       Celebrar 🎉
+</ConfettiButton>
 
             <TouchableOpacity
               style={{
