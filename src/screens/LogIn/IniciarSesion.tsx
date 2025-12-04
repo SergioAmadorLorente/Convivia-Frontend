@@ -31,6 +31,7 @@ import TextField from "../../components/ui/TextField";
 import Button from "../../components/ui/Button";
 import Popup from "../../components/ui/Popup";
 import { COLORS } from "../../styles/theme";
+import ConfettiButton from "../../components/ui/ConfettiButton";
 const IniciarSesion: React.FC = () => {
   const {
     email,
@@ -162,17 +163,17 @@ const IniciarSesion: React.FC = () => {
               </View>
               <Text style={GLOBAL_STYLES.labelCheckbox}>Recuérdame</Text>
             </TouchableOpacity>
-            <Button
+            <ConfettiButton
               onPress={handleLogin}
-              loading={loading}
               disabled={!isButtonEnabled}
               style={[
                 GLOBAL_STYLES.buttonPrimaryGreen,
                 { backgroundColor: COLORS.success },
               ]}
+              variant="success"
             >
               Entrar
-            </Button>
+            </ConfettiButton>
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>

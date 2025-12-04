@@ -21,6 +21,7 @@ import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
 import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
+import ConfettiButton from '../../components/ui/ConfettiButton';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -83,14 +84,14 @@ const NuevaResidencia: React.FC = () => {
           <TextField label="Nombre de la residencia" value={nombreResidencia} onChangeText={setNombreResidencia} placeholder="Piso Tarragona" />
           {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
 
-          <Button
+          <ConfettiButton
             style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
             disabled={!hasText || loading}
             onPress={handleCrear}
             loading={loading}
           >
             Crear
-          </Button>
+          </ConfettiButton>
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback><Popup
