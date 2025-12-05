@@ -30,18 +30,21 @@ const styles = StyleSheet.create({
         fontSize: SIZES.label,
         color: COLORS.secondary,
         fontFamily: FONTS.regular,
+        textAlign: "center",
     },
     date: {
         fontSize: SIZES.welcomeTitle,
         color: COLORS.primary,
         marginTop: 4,
         fontFamily: FONTS.title,
+        textAlign: "center",
     },
     location: {
         fontSize: SIZES.subtitle,
         color: COLORS.secondary,
         marginTop: 8,
         fontFamily: FONTS.regular,
+        textAlign: "center",
     },
 });
 
