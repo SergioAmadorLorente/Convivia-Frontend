@@ -18,7 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
-import Button from '../../components/ui/Button';
+//import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
 import useCodigoResidencia from '../../hooks/useCodigoResidencia';
 import ConfettiButton from '../../components/ui/ConfettiButton';
@@ -57,7 +57,7 @@ const UnirResidencia: React.FC = () => {
         title: 'Código inválido',
         description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
       return;
     }
@@ -76,7 +76,7 @@ const UnirResidencia: React.FC = () => {
         title: 'Error',
         description: 'No se pudo unir a la residencia. Intenta de nuevo.',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
     } finally {
       setLoading(false);
@@ -95,43 +95,43 @@ const UnirResidencia: React.FC = () => {
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 
-<KeyboardAvoidingView
-  behavior={Platform.OS === 'android' ? 'padding' : 'height'}
-  style={{ flex: 1 }}
-  keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}
->
-  <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-    <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'android' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}
+        >
+          <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
+            <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
 
-    <Text style={GLOBAL_STYLES.subtitle}>
-      <Text>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
-      <Text>Perfil - Mi residencia</Text>
-    </Text>
+            <Text style={GLOBAL_STYLES.subtitle}>
+              <Text>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
+              <Text>Perfil - Mi residencia</Text>
+            </Text>
 
-    {/* Campo de código */}
-    <TextField
-      label="Código de la residencia"
-      value={codigo} // hook del segundo bloque
-      onChangeText={handleChange} // lógica del segundo bloque
-      placeholder="0-0-0-0-0-0"
-      keyboardType="numeric"
-      error={!isValidCode && codigo.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined}
-    />
+            {/* Campo de código */}
+            <TextField
+              label="Código de la residencia"
+              value={codigo} // hook del segundo bloque
+              onChangeText={handleChange} // lógica del segundo bloque
+              placeholder="0-0-0-0-0-0"
+              keyboardType="numeric"
+              error={!isValidCode && codigo.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined}
+            />
 
-    {/* Botón actualizado del primer bloque */}
-    <ConfettiButton
-      style={[
-        GLOBAL_STYLES.buttonPrimaryGreen,
-        { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' },
-      ]}
-      disabled={!isValidCode || loading}
-      onPress={handleUnirse}
-      loading={loading}
-    >
-      Unirse
-    </ConfettiButton>
-  </View>
-</KeyboardAvoidingView>
+            {/* Botón actualizado del primer bloque */}
+            <ConfettiButton
+              style={[
+                GLOBAL_STYLES.buttonPrimaryGreen,
+                { backgroundColor: isValidCode ? '#E6ECDC' : '#ccc' },
+              ]}
+              disabled={!isValidCode || loading}
+              onPress={handleUnirse}
+              loading={loading}
+            >
+              Unirse
+            </ConfettiButton>
+          </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
       <Popup
         visible={popupVisible}

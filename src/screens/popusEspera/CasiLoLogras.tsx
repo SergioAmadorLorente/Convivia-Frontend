@@ -26,7 +26,7 @@ const CasiLoLogras: React.FC<CasiLoLograsProps> = ({ visible = true, onClose }) 
             descriptionStyle={GLOBAL_STYLES.subtitle}
             buttons={[
                 {
-                    text: 'Cerrar',
+                    text: 'Aceptar',
                     onPress: handleClose,
                     textStyle: GLOBAL_STYLES.textoBoton,
                 },
