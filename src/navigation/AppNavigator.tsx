@@ -14,6 +14,7 @@ import PoliticaCookiesPrivacidad from "../screens/Policies/PoliticaCookiesPrivac
 import TerminosCondiciones from "../screens/Policies/TerminosCondiciones";
 import Perfil from "../screens/Perfil/Perfil";
 import CustomHeader from "../components/ui/CustomHeader";
+import TestScreen from "../screens/test";
 import { RootStackParamList } from "./RootStackParamList";
 const Stack = createStackNavigator<RootStackParamList>();
 const headerOptions: StackNavigationOptions = {
@@ -73,6 +74,7 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="PoliticaCookiesPrivacidad" component={PoliticaCookiesPrivacidad} options={defaultScreenOptions} />
                 <Stack.Screen name="TerminosCondiciones" component={TerminosCondiciones} options={defaultScreenOptions} />
                 <Stack.Screen name="Perfil" component={Perfil} options={defaultScreenOptions} />
+                <Stack.Screen name="test" component={TestScreen} options={defaultScreenOptions} />
             </Stack.Navigator>
         </NavigationContainer>
     );

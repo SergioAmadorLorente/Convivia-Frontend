@@ -20,6 +20,8 @@ interface ConfettiButtonProps {
     children?: React.ReactNode;
     style?: StyleProp<ViewStyle>;
     variant?: "primary" | "alt" | "success" | string;
+    trigger?: boolean;
+    disableAutoConfetti?: boolean;
 }
 const { width: screenWidth } = Dimensions.get("window");
 const ConfettiButton: React.FC<ConfettiButtonProps> = ({
@@ -30,6 +32,8 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
     children,
     style,
     variant = "primary",
+    trigger = false,
+    disableAutoConfetti = false,
 }) => {
     const resolvedOnPress = onPress ?? onClick ?? (() => { });
     const confettiCount = 30; // más partículas para la lluvia
@@ -41,6 +45,7 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
             opacity: new Animated.Value(0),
         }))
     ).current;
+
     const startConfetti = () => {
         animations.forEach((p) => {
             p.opacity.setValue(1);
@@ -67,19 +72,31 @@ const ConfettiButton: React.FC<ConfettiButtonProps> = ({
             ]).start();
         });
     };
+
     const onButtonPress = () => {
-        if (!disabled && !loading) startConfetti();
+        if (!disabled && !loading && !disableAutoConfetti) startConfetti();
         resolvedOnPress();
     };
+
+    useEffect(() => {
+        if (trigger) {
+            startConfetti();
+        }
+    }, [trigger]);
+
     let baseStyle: any = GLOBAL_STYLES.buttonPrimaryGreen;
     let textStyle: any = GLOBAL_STYLES.textoBoton;
+
     if (variant === "alt" || variant === "secondary") {
         baseStyle = GLOBAL_STYLES.buttonSecondaryGrey;
         textStyle = GLOBAL_STYLES.textoBoton;
     }
+
     const buttonStyle = [baseStyle, style, disabled ? { opacity: 0.6 } : null];
+
     // Colores del confeti
     const confettiColors = ["#ff5f6d", "#ffc371", "#7afcff", "#9b88ff", "#6eff8a"];
+
     return (
         <View style={{ justifyContent: "center", alignItems: "center", width: "100%" }}>
             {/* Confeti desde arriba de la pantalla */}
