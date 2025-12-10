@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import {COLORS, FONTS, SIZES, HELPERS, COMMON} from "../../styles/theme";
+import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 import GLOBAL_STYLES from "../../styles/styles";
 interface TabSwitcherProps {
     activeTab: "tareas" | "facturas";
@@ -55,9 +55,16 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         paddingHorizontal: 20,
-        backgroundColor: COLORS.disabled,
+        backgroundColor: COLORS.inputBackground,
         borderRadius: 8,
         alignItems: "center",
+        // ⭐ Sombra idéntica a tu screenshot: suave, amplia, poco opaca
+        shadowColor: "#000",
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 3 },
+        // Android
+        elevation: 4,
     },
     tabActive: {
         backgroundColor: COLORS.success,
