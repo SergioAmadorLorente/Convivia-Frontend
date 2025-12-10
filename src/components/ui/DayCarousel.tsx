@@ -17,7 +17,7 @@ const DayCarousel: React.FC<DayCarouselProps> = ({ onDaySelected }) => {
     const days = useMemo(() => {
         const arr = [];
         const weekdayOpts: Intl.DateTimeFormatOptions = { weekday: "long" };
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < 7; i++) {
             const date = new Date();
             date.setDate(date.getDate() + i);
             const weekday = date
