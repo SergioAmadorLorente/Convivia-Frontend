@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import {COLORS, FONTS, SIZES, HELPERS, COMMON} from "../../styles/theme";
+import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 import GLOBAL_STYLES from "../../styles/styles";
 interface TaskItemProps {
     time: string;
@@ -35,7 +35,9 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 style={[styles.checkbox, isCompleted && styles.checkboxChecked]}
                 onPress={onToggle}
             >
-                {isCompleted && <View style={styles.checkmark} />}
+                {isCompleted && (
+                    <Text style={styles.tick}>✔</Text>
+                )}
             </TouchableOpacity>
         </View>
     );
@@ -90,14 +92,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     checkboxChecked: {
-        backgroundColor: COLORS.primary,
-        borderColor: COLORS.primary,
+        backgroundColor: COLORS.success,
+        borderColor: COLORS.success,
     },
-    checkmark: {
-        width: 12,
-        height: 12,
-        backgroundColor: COLORS.background,
-        borderRadius: 2,
+    tick: {
+        color: COLORS.background,
+        fontSize: 16,
+        fontWeight: "bold",
     },
 });
 export default TaskItem;
