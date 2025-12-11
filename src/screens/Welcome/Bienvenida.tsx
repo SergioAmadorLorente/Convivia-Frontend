@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import GLOBAL_STYLES from '../../styles/styles';
 import Popup from '../../components/ui/Popup';
 import Button from '../../components/ui/Button';
+import CustomHeader from '../../components/ui/CustomHeader';
 
 const Bienvenida: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -27,8 +28,14 @@ const Bienvenida: React.FC = () => {
     );
   }
 
-  useEffect(() => {
-    navigation.setParams({ showLogoutModal: () => setModalVisible(true) });
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      header: () => (
+        <CustomHeader
+          onLogout={() => setModalVisible(true)}
+        />
+      ),
+    });
   }, [navigation]);
 
   return (

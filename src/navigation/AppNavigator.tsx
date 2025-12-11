@@ -53,17 +53,7 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen
                     name="Bienvenida"
                     component={Bienvenida}
-                    options={({ route }) => ({
-                        header: () => (
-                            <CustomHeader
-                                onLogout={() => {
-                                    if ((route as any).params?.showLogoutModal) {
-                                        (route as any).params.showLogoutModal();
-                                    }
-                                }}
-                            />
-                        ),
-                    })}
+                    options={defaultScreenOptions}
                 />
                 <Stack.Screen name="CrearCuenta" component={CrearCuenta} options={defaultScreenOptions} />
                 <Stack.Screen name="IniciarSesion" component={IniciarSesion} options={defaultScreenOptions} />
