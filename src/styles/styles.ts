@@ -56,13 +56,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontWeight: "normal",
   },
 
-
-
-
-
-
-
-
   // Texto de ayuda o aclaración
   helperText: {
     fontFamily: FONTS.regular,
