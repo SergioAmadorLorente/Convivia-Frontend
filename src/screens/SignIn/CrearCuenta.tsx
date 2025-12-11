@@ -17,7 +17,7 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons"; // 👈 NUEVO: Usamos Feather
+import { Feather } from "@expo/vector-icons";
 import { moderateScale } from "react-native-size-matters";
 import {
   createUserWithEmailAndPassword,

@@ -29,7 +29,7 @@ import { useKeyboardAware } from "../../hooks";
 import TextField from "../../components/ui/TextField";
 import Button from "../../components/ui/Button";
 import Popup from "../../components/ui/Popup";
-import { COLORS, CHECKBOX } from "../../styles/theme"; // 👈 IMPORTAMOS CHECKBOX
+import { COLORS, CHECKBOX } from "../../styles/theme";
 import ConfettiButton from "../../components/ui/ConfettiButton";
 const IniciarSesion: React.FC = () => {
   const {

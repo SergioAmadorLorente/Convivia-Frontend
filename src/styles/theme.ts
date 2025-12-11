@@ -144,7 +144,6 @@ export const CHECKBOX = {
   },
 };
 
-
 export default {
   COLORS,
   FONTS,
