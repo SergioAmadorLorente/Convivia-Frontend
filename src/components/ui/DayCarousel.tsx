@@ -13,7 +13,6 @@ interface DayCarouselProps {
 }
 const DayCarousel: React.FC<DayCarouselProps> = ({ onDaySelected }) => {
     const [selected, setSelected] = useState(0);
-    // 👉 30 días consecutivos
     const days = useMemo(() => {
         const arr = [];
         const weekdayOpts: Intl.DateTimeFormatOptions = { weekday: "long" };
@@ -96,13 +95,13 @@ const styles = StyleSheet.create({
     },
     num: {
         fontSize: 18,
-        fontFamily: FONTS.bold,
+        fontFamily: FONTS.title,
         color: COLORS.secondary,
     },
     name: {
         marginTop: 4,
         fontSize: 14,
-        fontFamily: FONTS.regular,
+        fontFamily: FONTS.title,
         color: COLORS.secondary,
         maxWidth: 70,
         textAlign: "center",
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
 
     textActive: {
         color: COLORS.primary,
-        fontFamily: FONTS.bold,
+        fontFamily: FONTS.title,
     },
 });
 export default DayCarousel;
