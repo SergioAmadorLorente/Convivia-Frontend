@@ -27,7 +27,7 @@ type PopupProps = {
   onClose: () => void;
   title: string;
   description?: string;
-  imageType?: "error" | "logout" | "success" | "happy" | "convivia";
+  imageType?: "error" | "logout" | "success" | "happy" | "convivia" | "delete";
   buttons?: ButtonDef[];
   containerStyle?: ViewStyle;
   popupStyle?: ViewStyle;
@@ -52,6 +52,7 @@ const imageMap: Record<string, any> = {
   success: require("../../assets/pngsuccessful.png"),
   happy: require("../../assets/pngCaraFeliz.png"),
   convivia: require("../../assets/pngconvivia.png"),
+  delete: require("../../assets/pngdelete.png"),
 };
 
 const Popup: React.FC<PopupProps> = ({
