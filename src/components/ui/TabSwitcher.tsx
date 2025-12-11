@@ -47,7 +47,6 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange }) => 
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        backgroundColor: COLORS.inputBackground,
         padding: 16,
         gap: 12,
     },
@@ -55,7 +54,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         paddingHorizontal: 20,
-        backgroundColor: COLORS.inputBackground,
+        backgroundColor: COLORS.background,
         borderRadius: 8,
         alignItems: "center",
         // ⭐ Sombra idéntica a tu screenshot: suave, amplia, poco opaca
