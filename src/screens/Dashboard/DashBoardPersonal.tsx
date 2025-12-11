@@ -19,8 +19,9 @@ import BottomBar from "../../components/ui/BottomBar";
 import Header from "../../components/ui/Header";
 import TabSwitcher from "../../components/ui/TabSwitcher";
 import TaskItem from "../../components/ui/TaskItem";
-import DayCarousel from "../../components/ui/DayCarousel"; 
+import DayCarousel from "../../components/ui/DayCarousel";
 import KarmaSelector from "../../components/ui/KarmaSelector";
+import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 interface Task {
   id: string;
   time: string;
@@ -127,7 +128,6 @@ const DashBoardPersonal: React.FC = () => {
         />
         <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
         <DayCarousel onDaySelected={setSelectedDate} />
-        <KarmaSelector onSelect={(value) => console.log("Karma elegido:", value)} />
         <View style={styles.contentContainer}>
           {pendingItems.map((item) => (
             <TaskItem

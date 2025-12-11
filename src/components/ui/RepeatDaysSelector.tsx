@@ -6,32 +6,40 @@ import {
     StyleSheet,
 } from "react-native";
 import { COLORS, FONTS } from "../../styles/theme";
-interface KarmaSelectorProps {
-    onSelect: (value: number) => void;
+interface RepeatDaysSelectorProps {
+    onChange: (days: string[]) => void;
 }
-const KarmaSelector: React.FC<KarmaSelectorProps> = ({ onSelect }) => {
-    const KARMA_POINTS = [5, 15, 25, 50];
-    const [selected, setSelected] = useState<number | null>(null);
-    const handleSelect = (v: number) => {
-        setSelected(v);
-        onSelect(v);
+const DAYS = [
+    { label: "L", name: "Lunes" },
+    { label: "M", name: "Martes" },
+    { label: "X", name: "Miércoles" },
+    { label: "J", name: "Jueves" },
+    { label: "V", name: "Viernes" },
+    { label: "S", name: "Sábado" },
+    { label: "D", name: "Domingo" },
+];
+const RepeatDaysSelector: React.FC<RepeatDaysSelectorProps> = ({ onChange }) => {
+    const [selected, setSelected] = useState<string[]>([]);
+    const toggleDay = (day: string) => {
+        let updated = selected.includes(day)
+            ? selected.filter(d => d !== day)
+            : [...selected, day];
+        setSelected(updated);
+        onChange(updated);
     };
     return (
         <View style={styles.wrapper}>
             <View style={styles.row}>
-                {KARMA_POINTS.map((p, i) => {
-                    const active = p === selected;
+                {DAYS.map((d, i) => {
+                    const active = selected.includes(d.name);
                     return (
                         <TouchableOpacity
                             key={i}
-                            onPress={() => handleSelect(p)}
+                            onPress={() => toggleDay(d.name)}
                             style={[styles.box, active && styles.boxActive]}
                         >
-                            <Text style={[styles.points, active && styles.textActive]}>
-                                {p}
-                            </Text>
                             <Text style={[styles.label, active && styles.textActive]}>
-                                Puntos
+                                {d.label}
                             </Text>
                         </TouchableOpacity>
                     );
@@ -51,8 +59,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     box: {
-        width: 75,
-        height: 60,
+        width: 45,
+        height: 45,
         backgroundColor: COLORS.inputBackground,
         borderRadius: 14,
         alignItems: "center",
@@ -66,14 +74,8 @@ const styles = StyleSheet.create({
     boxActive: {
         backgroundColor: COLORS.success,
     },
-    points: {
-        fontSize: 20,
-        fontFamily: FONTS.title,
-        color: COLORS.secondary,
-    },
     label: {
-        marginTop: 4,
-        fontSize: 14,
+        fontSize: 18,
         fontFamily: FONTS.title,
         color: COLORS.secondary,
     },
@@ -82,4 +84,4 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.title,
     },
 });
-export default KarmaSelector;
+export default RepeatDaysSelector;
