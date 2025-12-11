@@ -9,13 +9,19 @@ import {
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
-import { Montserrat_400Regular, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
+import {
+  Montserrat_400Regular,
+  Montserrat_700Bold,
+} from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
 import GLOBAL_STYLES from "../../styles/styles";
 import BottomBar from "../../components/ui/BottomBar";
 import Header from "../../components/ui/Header";
 import TabSwitcher from "../../components/ui/TabSwitcher";
 import TaskItem from "../../components/ui/TaskItem";
+import DayCarousel from "../../components/ui/DayCarousel";
+import KarmaSelector from "../../components/ui/KarmaSelector";
+import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 interface Task {
   id: string;
   time: string;
@@ -26,6 +32,7 @@ interface Task {
 const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
+  const [selectedDate, setSelectedDate] = useState(new Date()); // ✅ Día actual
   const [tareas, setTareas] = useState<Task[]>([
     {
       id: "1",
@@ -86,13 +93,17 @@ const DashBoardPersonal: React.FC = () => {
     if (activeTab === "tareas") {
       setTareas((prev) =>
         prev.map((task) =>
-          task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
+          task.id === id
+            ? { ...task, isCompleted: !task.isCompleted }
+            : task
         )
       );
     } else {
       setFacturas((prev) =>
         prev.map((factura) =>
-          factura.id === id ? { ...factura, isCompleted: !factura.isCompleted } : factura
+          factura.id === id
+            ? { ...factura, isCompleted: !factura.isCompleted }
+            : factura
         )
       );
     }
@@ -108,7 +119,6 @@ const DashBoardPersonal: React.FC = () => {
     >
       <ScrollView
         contentContainerStyle={[styles.scrollContainer, { paddingBottom: 120 }]}
-        keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
       >
         <Header
@@ -117,6 +127,7 @@ const DashBoardPersonal: React.FC = () => {
           location="Piso Tarragona"
         />
         <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+        <DayCarousel onDaySelected={setSelectedDate} />
         <View style={styles.contentContainer}>
           {pendingItems.map((item) => (
             <TaskItem
