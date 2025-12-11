@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import Button from '../components/ui/Button';
@@ -16,19 +17,22 @@ const TestScreen = () => {
   const [showAssignUsers, setShowAssignUsers] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState<BackendUser[]>([]);
 
-  // Usuarios simulados (sustituye por los del backend)
+  // Usuarios simulados (cámbialos por los del backend cuando quieras)
   const [users, setUsers] = useState<BackendUser[]>([
     { id: 'u1', name: 'Pepito228 DESTROYER' },
     { id: 'u2', name: 'PupuGugu' },
     { id: 'u3', name: 'Clara DSAWTTTT' },
+    { id: 'u4', name: 'Otro Usuario con nombre largo para probar scroll' },
+    { id: 'u5', name: 'Usuario Cinco' },
+    { id: 'u6', name: 'Usuario Seis' },
   ]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
   const openAssignUsers = async () => {
-    // Si quieres simular carga desde backend, descomenta:
+    // Simulación de carga desde backend (opcional)
     // setLoadingUsers(true);
     // await new Promise(r => setTimeout(r, 600));
-    // setUsers(....) // set con lo que traigas del back
+    // setUsers(res.data); // cuando tengas API real
     // setLoadingUsers(false);
     setShowAssignUsers(true);
   };
@@ -54,7 +58,7 @@ const TestScreen = () => {
         Mostrar Casi Lo Logras
       </Button>
 
-      {/* --- Demo: selección de usuarios (para tareas o facturas) --- */}
+      {/* --- Demo: selección de usuarios (para tareas/facturas) --- */}
       <View style={{ height: 30 }} />
       <Text style={GLOBAL_STYLES.subtitle}>
         {assignedUsers.length
@@ -84,20 +88,17 @@ const TestScreen = () => {
         />
       )}
 
-      {/* --- Popup de asignación de usuarios --- */}
+      {/* --- Popup de asignación de usuarios (convivia fijo) --- */}
       <AssignUsersPopup
         visible={showAssignUsers}
         onClose={() => setShowAssignUsers(false)}
-        title="Asignación de usuarios"  // Para facturas solo cambia este título
-        imageType="convivia"
-        showImage
+        title="Asignación de usuarios"   // cámbialo por “Asignación para factura” si quieres
         users={users}
-        multiSelect={true} // si quieres selección única, pon false
+        multiSelect={true}               // pon false si la asignación debe ser única
         initialSelectedIds={assignedUsers.map(u => u.id)}
         confirmLabel="¡Asigna!"
         onConfirm={(selected) => setAssignedUsers(selected)}
         loadingUsers={loadingUsers}
-        // requireSelection={false} // si quieres permitir confirmar sin selección
       />
     </View>
   );

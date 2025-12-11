@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Modal,
@@ -9,79 +8,38 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
-  ViewStyle,
-  TextStyle,
-  ImageStyle,
 } from "react-native";
-import { COLORS, FONTS } from "../../styles/styles"; // si tu proyecto usa styles.ts para tokens, puedes importar desde ahí
-// Si prefieres importar desde theme.ts (donde añadiste CHECKBOX), usa esta línea:
-import theme, { CHECKBOX } from "../../styles/theme"; // <-- aquí traemos el estilo global del checkbox
+import { FONTS, COLORS } from "../../styles/styles";
+import { CHECKBOX } from "../../styles/theme"; // estilo global del checkbox
 import { Feather } from "@expo/vector-icons";
 
 type UserItem = {
   id: string;
   name: string;
-  subtitle?: string;
 };
 
 type AssignUsersPopupProps = {
   visible: boolean;
   onClose: () => void;
   title?: string;
-  imageType?: "error" | "logout" | "success" | "happy" | "convivia";
-  showImage?: boolean;
-
   users: UserItem[];
   multiSelect?: boolean;
   initialSelectedIds?: string[];
   confirmLabel?: string;
   onConfirm: (selected: UserItem[]) => void | Promise<void>;
   loadingUsers?: boolean;
-
-  // Estilos opcionales (por si alguna pantalla necesita ajustar algo)
-  containerStyle?: ViewStyle;
-  popupStyle?: ViewStyle;
-  imageStyle?: ImageStyle;
-  titleStyle?: TextStyle;
-  itemStyle?: ViewStyle;
-  itemTextStyle?: TextStyle;
-  confirmButtonStyle?: ViewStyle;
-  confirmTextStyle?: TextStyle;
-
-  requireSelection?: boolean;
-  listMaxHeight?: number; // altura máxima del listado antes de scroll
-};
-
-const imageMap: Record<string, any> = {
-  error: require("../../assets/pngerror.png"),
-  logout: require("../../assets/pnglogout.png"),
-  success: require("../../assets/pngsuccessful.png"),
-  happy: require("../../assets/pngCaraFeliz.png"),
-  convivia: require("../../assets/pngconvivia.png"),
 };
 
 const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
   visible,
   onClose,
   title = "Asignación de usuarios",
-  imageType = "convivia",
-  showImage = true,
   users,
   multiSelect = true,
   initialSelectedIds = [],
   confirmLabel = "¡Asigna!",
   onConfirm,
   loadingUsers = false,
-  containerStyle,
-  popupStyle,
-  imageStyle,
-  titleStyle,
-  itemStyle,
-  itemTextStyle,
-  confirmButtonStyle,
-  confirmTextStyle,
-  requireSelection = true,
-  listMaxHeight = 320,
 }) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirming, setConfirming] = useState(false);
@@ -110,21 +68,15 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
     [users, selectedIds]
   );
 
-  const canConfirm = !requireSelection || selectedIds.size > 0;
-
   const handleConfirm = async () => {
     try {
       setConfirming(true);
       await Promise.resolve(onConfirm(selectedList));
       onClose();
-    } catch {
-      // opcional: mostrar un toast si falla y NO cerrar
     } finally {
       setConfirming(false);
     }
   };
-
-  const imgSource = imageType ? imageMap[imageType] : undefined;
 
   const renderItem = ({ item }: { item: UserItem }) => {
     const checked = selectedIds.has(item.id);
@@ -132,46 +84,38 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
       <TouchableOpacity
         onPress={() => toggleSelect(item.id)}
         activeOpacity={0.8}
-        style={[styles.item, itemStyle]}
+        style={styles.item}
       >
-        <Text style={[styles.itemText, itemTextStyle]} numberOfLines={1}>
-          {item.name}
-        </Text>
-
+        <Text style={styles.itemText}>{item.name}</Text>
         <TouchableOpacity
           onPress={() => toggleSelect(item.id)}
           activeOpacity={0.8}
-          style={CHECKBOX.touchArea} // estilo global del checkbox
+          style={CHECKBOX.touchArea}
         >
-          {/* Opción A: Feather square/check-square con estilo global */}
           <Feather
             name={checked ? "check-square" : "square"}
             size={CHECKBOX.iconSize}
-            color={checked ? CHECKBOX.colors.checked : CHECKBOX.colors.unchecked}
+            color={
+              checked ? CHECKBOX.colors.checked : CHECKBOX.colors.unchecked
+            }
           />
-          {/* Si prefieres el checkbox custom (Opción B), reemplaza por:
-            <View style={[CHECKBOX.box, checked && CHECKBOX.boxChecked]}>
-              {checked && (
-                <Feather name="check" size={CHECKBOX.tickSize} color={CHECKBOX.colors.tick} />
-              )}
-            </View>
-          */}
         </TouchableOpacity>
       </TouchableOpacity>
     );
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={() => {}}>
-      <View style={[styles.overlay, containerStyle]}>
-        <View style={[styles.popup, popupStyle]}>
-          {showImage && imgSource && (
-            <Image source={imgSource} resizeMode="contain" style={[styles.image, imageStyle]} />
-          )}
+    <Modal visible={visible} transparent animationType="fade">
+      <View style={styles.overlay}>
+        <View style={styles.popup}>
+          <Image
+            source={require("../../assets/pngconvivia.png")}
+            style={styles.image}
+            resizeMode="contain"
+          />
+          <Text style={styles.title}>{title}</Text>
 
-          <Text style={[styles.title, titleStyle]}>{title}</Text>
-
-          <View style={{ maxHeight: listMaxHeight, width: "100%" }}>
+          <View style={{ maxHeight: 320, width: "100%" }}>
             {loadingUsers ? (
               <View style={styles.loadingBox}>
                 <ActivityIndicator size="small" color={COLORS.secondary} />
@@ -187,25 +131,17 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
             )}
           </View>
 
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              disabled={!canConfirm || confirming}
-              onPress={handleConfirm}
-              style={[
-                styles.confirmButton,
-                (!canConfirm || confirming) && { opacity: 0.6 },
-                confirmButtonStyle,
-              ]}
-            >
-              {confirming ? (
-                <ActivityIndicator size="small" color={COLORS.secondary} />
-              ) : (
-                <Text style={[styles.confirmButtonText, confirmTextStyle]}>
-                  {confirmLabel}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            disabled={confirming}
+            onPress={handleConfirm}
+            style={styles.confirmButton}
+          >
+            {confirming ? (
+              <ActivityIndicator size="small" color={COLORS.secondary} />
+            ) : (
+              <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -279,14 +215,18 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 10,
   },
+
   confirmButton: {
     backgroundColor: "#E6ECDC",
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
+    width: "100%",
+    alignSelf: "stretch",
+    marginTop: 16,
   },
   confirmButtonText: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontFamily: FONTS.bold,
   },
 });
