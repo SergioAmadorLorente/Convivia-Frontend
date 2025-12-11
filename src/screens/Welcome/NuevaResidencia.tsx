@@ -23,8 +23,11 @@ import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
 import ConfettiButton from '../../components/ui/ConfettiButton';
 
+import { crearEspacio } from '../../api/espacio';
+
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
+  const [direccion, setDireccion] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
 
@@ -38,7 +41,7 @@ const NuevaResidencia: React.FC = () => {
 
   const handleClosePopup = () => setPopupVisible(false);
 
-  const hasText = nombreResidencia.trim().length > 0;
+  const hasText = nombreResidencia.trim().length > 0 && direccion.trim().length > 0;
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
@@ -55,12 +58,17 @@ const NuevaResidencia: React.FC = () => {
 
   const handleCrear = async () => {
     if (!hasText) {
-      showPopup({ title: 'Campo requerido', description: 'Por favor, ingresa un nombre para la residencia.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
+      showPopup({ title: 'Campos requeridos', description: 'Por favor, completa todos los campos.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
       return;
     }
 
     setLoading(true);
     try {
+      const data = await crearEspacio({
+        nombre: nombreResidencia,
+        direccion: direccion
+      });
+      console.log('Residencia creada:', data);
       showPopup({ title: 'Éxito', description: 'Residencia creada exitosamente', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }] });
     } catch (error) {
       console.error('Error al crear residencia:', error);
@@ -82,7 +90,8 @@ const NuevaResidencia: React.FC = () => {
           </Text>
 
           <TextField label="Nombre de la residencia" value={nombreResidencia} onChangeText={setNombreResidencia} placeholder="Piso Tarragona" />
-          {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
+          <TextField label="Dirección" value={direccion} onChangeText={setDireccion} placeholder="Calle Ejemplo 123" />
+          {!hasText && (nombreResidencia.length > 0 || direccion.length > 0) && <Text style={styles.errorText}>Completa todos los campos</Text>}
 
           <ConfettiButton
             style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
