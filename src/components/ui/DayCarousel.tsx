@@ -67,13 +67,13 @@ const DayCarousel: React.FC<DayCarouselProps> = ({ onDaySelected }) => {
 };
 const styles = StyleSheet.create({
     wrapper: {
-        paddingVertical: 10,
-        marginTop: 10,
+        paddingVertical: 5,
+        marginTop: 1,
 
     },
     scrollContent: {
         paddingHorizontal: 16,
-        paddingBottom: 10,
+        paddingBottom: 5,
     },
     box: {
         width: 80,

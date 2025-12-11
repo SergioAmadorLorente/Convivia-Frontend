@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: COLORS.inputBackground,
-        padding: 16,
+        padding: 12,
         borderRadius: 12,
         marginBottom: 12,
         shadowColor: "#000",
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     timeContainer: {
-        marginRight: 16,
+        marginRight: 14,
     },
     timeText: {
         fontSize: 14,

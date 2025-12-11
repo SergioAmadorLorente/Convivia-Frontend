@@ -27,6 +27,28 @@ export const GLOBAL_STYLES = StyleSheet.create({
     paddingTop: hp("8%"),
     paddingHorizontal: wp("5%"),
   },
+  scrollContainer2: {
+    flexGrow: 1,
+    backgroundColor: COLORS.background,
+    alignItems: "stretch",
+    paddingTop: hp("2%"),
+    paddingHorizontal: SIZES.paddingHorizontal,
+    borderRadius: moderateScale(25),
+  },
+  fullWidth: {
+    width: "100%",
+  },
+  
+  /** Wrapper blanco para el contenido de dashboard (tareas + carrusel) */
+  dashboardWhiteSection: {
+    backgroundColor: COLORS.background,
+    alignItems: "stretch",                 // 🔑 ancho completo para hijos
+    paddingHorizontal: SIZES.paddingHorizontal,
+    paddingBottom: HELPERS.hp("2%"),
+    // si quieres esquinas redondeadas aquí, podemos usar COMMON.PAGE_CARD;
+    // por ahora lo dejamos plano como en tu working version.
+  },
+
 
   //contenedor principal de pantallas
   container: {

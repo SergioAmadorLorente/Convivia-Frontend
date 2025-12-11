@@ -48,11 +48,14 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         padding: 16,
-        gap: 12,
+        gap: 17,
+        width: "90%",
+        alignSelf: "center",
+        marginBottom: 5,
     },
     tab: {
         flex: 1,
-        paddingVertical: 12,
+        paddingVertical: 8,
         paddingHorizontal: 20,
         backgroundColor: COLORS.background,
         borderRadius: 8,

@@ -63,7 +63,7 @@ export const COMPONENTS = {
     leftColor: COLORS.accent,
     rightColor: COLORS.primary,
     gap: moderateScale(8),
-    marginTop: verticalScale(2),
+    marginTop: moderateScale(1),
     marginBottom: verticalScale(7.5),
   },
 };

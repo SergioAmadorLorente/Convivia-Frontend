@@ -58,7 +58,12 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="CrearCuenta" component={CrearCuenta} options={defaultScreenOptions} />
                 <Stack.Screen name="IniciarSesion" component={IniciarSesion} options={defaultScreenOptions} />
                 <Stack.Screen name="RecuperarPassword" component={RecuperarPassword} options={defaultScreenOptions} />
-                <Stack.Screen name="DashBoardPersonal" component={DashBoardPersonal} options={defaultScreenOptions} />
+
+                <Stack.Screen
+                    name="DashBoardPersonal"
+                    component={DashBoardPersonal}
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen name="NuevaResidencia" component={NuevaResidencia} options={defaultScreenOptions} />
                 <Stack.Screen name="UnirResidencia" component={UnirResidencia} options={defaultScreenOptions} />
                 <Stack.Screen name="PoliticaCookiesPrivacidad" component={PoliticaCookiesPrivacidad} options={defaultScreenOptions} />
