@@ -1,12 +1,11 @@
+// src/screens/NuevaResidencia.tsx
 import React, { useState, useRef } from 'react';
 import {
   Text,
   View,
   ActivityIndicator,
-  TouchableOpacity,
-  TextInput,
-  Keyboard,
   TouchableWithoutFeedback,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -19,9 +18,9 @@ import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
-import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
 import ConfettiButton from '../../components/ui/ConfettiButton';
+import { FONTS, COLORS } from '../../styles/styles';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -55,56 +54,96 @@ const NuevaResidencia: React.FC = () => {
 
   const handleCrear = async () => {
     if (!hasText) {
-      showPopup({ title: 'Campo requerido', description: 'Por favor, ingresa un nombre para la residencia.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
+      showPopup({
+        title: 'Campo requerido',
+        description: 'Por favor, ingresa un nombre para la residencia.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+      });
       return;
     }
 
     setLoading(true);
     try {
-      showPopup({ title: 'Éxito', description: 'Residencia creada exitosamente', imageType: 'success', buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }] });
+      // TODO: Cuando tengas backend, sustituye '966069' por el código real devuelto.
+      const codigoBackend = '966069';
+
+      showPopup({
+        title: 'Residencia creada',
+        description: 'Puedes encontrarlo de nuevo en Perfil > Mi residencia',
+        imageType: 'convivia',
+        code: codigoBackend,              // <-- nuevo
+        buttons: [
+          { text: '¡Empieza!', onPress: () => navigation.navigate('DashBoardPersonal') },
+        ],
+      });
     } catch (error) {
       console.error('Error al crear residencia:', error);
-      showPopup({ title: 'Error', description: 'Error al crear la residencia. Intenta de nuevo.', imageType: 'error', buttons: [{ text: 'Aceptar', onPress: () => { } }] });
+      showPopup({
+        title: 'Error',
+        description: 'Error al crear la residencia. Intenta de nuevo.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <><TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}>
-        <View ref={containerRef} style={[styles.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-          <Text style={[styles.titulo, { fontSize: 40, textAlign: 'center' }]}>Crea una nueva residencia</Text>
+    <>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}
+        >
+          <View ref={containerRef} style={[styles.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
+            <Text style={[styles.titulo, { fontSize: 40, textAlign: 'center' }]}>Crea una nueva residencia</Text>
 
-          <Text style={GLOBAL_STYLES.subtitle}>
-            <Text >Obtén el código de tu residencia en el apartado </Text>
-            <Text >Perfil - Mi residencia</Text>
-          </Text>
+            <Text style={GLOBAL_STYLES.subtitle}>
+              <Text>Obtén el código de tu residencia en el apartado </Text>
+              <Text>Perfil - Mi residencia</Text>
+            </Text>
 
-          <TextField label="Nombre de la residencia" value={nombreResidencia} onChangeText={setNombreResidencia} placeholder="Piso Tarragona" />
-          {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
+            <TextField
+              label="Nombre de la residencia"
+              value={nombreResidencia}
+              onChangeText={setNombreResidencia}
+              placeholder="Piso Tarragona"
+            />
+            {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
 
-          <ConfettiButton
-            style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
-            disabled={!hasText || loading}
-            onPress={handleCrear}
-            loading={loading}
-          >
-            Crear
-          </ConfettiButton>
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback><Popup
+            <ConfettiButton
+              style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
+              disabled={!hasText || loading}
+              onPress={handleCrear}
+              loading={loading}
+            >
+              Crear
+            </ConfettiButton>
+          </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+
+      <Popup
         visible={popupVisible}
         onClose={handleClosePopup}
         title={popupOptions.title || ''}
         description={popupOptions.description}
         imageType={popupOptions.imageType}
-        buttons={popupOptions.buttons} />
+        buttons={popupOptions.buttons}
+        code={popupOptions.code} 
+        imageStyle={{
+          width: 130,
+          height: 130,
+          marginTop: 8,
+          marginBottom: 8,
+        }}
+        buttonsContainerStyle={{ marginTop: 8 }}
+      />
     </>
   );
 };
-
-
 
 export default NuevaResidencia;
