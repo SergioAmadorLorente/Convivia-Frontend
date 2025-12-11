@@ -134,12 +134,6 @@ const NuevaResidencia: React.FC = () => {
         imageType={popupOptions.imageType}
         buttons={popupOptions.buttons}
         code={popupOptions.code} 
-        imageStyle={{
-          width: 130,
-          height: 130,
-          marginTop: 8,
-          marginBottom: 8,
-        }}
         buttonsContainerStyle={{ marginTop: 8 }}
       />
     </>

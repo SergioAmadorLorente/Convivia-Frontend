@@ -3,10 +3,8 @@ import {
   Text,
   View,
   ActivityIndicator,
-  TouchableOpacity,
-  TextInput,
-  Keyboard,
   TouchableWithoutFeedback,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -15,10 +13,9 @@ import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
-//import Button from '../../components/ui/Button';
 import TextField from '../../components/ui/TextField';
 import useCodigoResidencia from '../../hooks/useCodigoResidencia';
 import ConfettiButton from '../../components/ui/ConfettiButton';
@@ -57,7 +54,7 @@ const UnirResidencia: React.FC = () => {
         title: 'Código inválido',
         description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
       });
       return;
     }
@@ -66,8 +63,9 @@ const UnirResidencia: React.FC = () => {
     try {
       showPopup({
         title: 'Éxito',
-        description: 'Te has unido exitosamente a la residencia',
-        imageType: 'success',
+        description: 'Te has unido exitosamente a @nombreResidencia',
+        imageType: 'convivia',
+        showCode: false,
         buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }],
       });
     } catch (error) {
@@ -76,7 +74,7 @@ const UnirResidencia: React.FC = () => {
         title: 'Error',
         description: 'No se pudo unir a la residencia. Intenta de nuevo.',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: 'Aceptar', onPress: () => {} }],
       });
     } finally {
       setLoading(false);
@@ -94,7 +92,6 @@ const UnirResidencia: React.FC = () => {
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-
         <KeyboardAvoidingView
           behavior={Platform.OS === 'android' ? 'padding' : 'height'}
           style={{ flex: 1 }}
@@ -108,17 +105,15 @@ const UnirResidencia: React.FC = () => {
               <Text>Perfil - Mi residencia</Text>
             </Text>
 
-            {/* Campo de código */}
             <TextField
               label="Código de la residencia"
-              value={codigo} // hook del segundo bloque
-              onChangeText={handleChange} // lógica del segundo bloque
+              value={codigo}
+              onChangeText={handleChange}
               placeholder="0-0-0-0-0-0"
               keyboardType="numeric"
               error={!isValidCode && codigo.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined}
             />
 
-            {/* Botón actualizado del primer bloque */}
             <ConfettiButton
               style={[
                 GLOBAL_STYLES.buttonPrimaryGreen,
@@ -133,6 +128,7 @@ const UnirResidencia: React.FC = () => {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+
       <Popup
         visible={popupVisible}
         onClose={handleClosePopup}
@@ -140,6 +136,7 @@ const UnirResidencia: React.FC = () => {
         description={popupOptions.description}
         imageType={popupOptions.imageType}
         buttons={popupOptions.buttons}
+        showCode={popupOptions.showCode}
       />
     </>
   );

@@ -36,11 +36,13 @@ type PopupProps = {
   descriptionStyle?: TextStyle;
   buttonsContainerStyle?: ViewStyle;
 
-  /** NUEVO: código de 6 dígitos (string o number). Si no llega, se usa placeholder. */
+  /** Código de 6 dígitos (string o number). Si no lo pasas, no se muestra el bloque de código. */
   code?: string | number;
-  /** NUEVO: mostrar icono copiar (por defecto true si hay código). */
+  /** Control explícito para mostrar el bloque de código (por defecto true). */
+  showCode?: boolean;
+  /** Mostrar el icono de copiar (por defecto true si hay código y showCode es true). */
   showCopyIcon?: boolean;
-  /** NUEVO: callback tras copiar. */
+  /** Callback opcional tras copiar el código. */
   onCopyCode?: (code: string) => void | Promise<void>;
 };
 
@@ -51,8 +53,6 @@ const imageMap: Record<string, any> = {
   happy: require("../../assets/pngCaraFeliz.png"),
   convivia: require("../../assets/pngconvivia.png"),
 };
-
-const PLACEHOLDER_CODE = "966069";
 
 const Popup: React.FC<PopupProps> = ({
   visible,
@@ -68,6 +68,7 @@ const Popup: React.FC<PopupProps> = ({
   descriptionStyle,
   buttonsContainerStyle,
   code,
+  showCode = true,
   showCopyIcon,
   onCopyCode,
 }) => {
@@ -83,25 +84,25 @@ const Popup: React.FC<PopupProps> = ({
 
   const imgSource = imageType ? imageMap[imageType] : undefined;
 
-  // Normaliza el código a 6 dígitos (si no llega, placeholder)
+  // ¿Tenemos code y queremos mostrarlo?
+  const hasCode = showCode && code !== undefined && code !== null && String(code).length > 0;
+
+  // Normaliza el código a 6 dígitos SOLO si hay code
   const codeDigits = useMemo(() => {
+    if (!hasCode) return [];
     const raw =
-      code === undefined || code === null
-        ? PLACEHOLDER_CODE
-        : typeof code === "number"
+      typeof code === "number"
         ? String(code).padStart(6, "0")
         : String(code).replace(/\D/g, "");
     const six = raw.slice(0, 6);
-    const filled =
-      six.length < 6
-        ? six + PLACEHOLDER_CODE.slice(six.length, 6)
-        : six;
+    const filled = six.padEnd(6, "0"); // completa si faltan dígitos
     return filled.split("");
-  }, [code]);
+  }, [code, hasCode]);
 
   const sixDigitCode = useMemo(() => codeDigits.join(""), [codeDigits]);
   const [copied, setCopied] = useState(false);
-  const canShowCopyIcon = showCopyIcon ?? Boolean(code ?? PLACEHOLDER_CODE);
+
+  const canShowCopyIcon = (showCopyIcon ?? true) && hasCode;
 
   const handleCopy = async () => {
     try {
@@ -113,8 +114,6 @@ const Popup: React.FC<PopupProps> = ({
       setCopied(false);
     }
   };
-
-  const isConvivia = imageType === "convivia";
 
   return (
     <Modal
@@ -133,13 +132,13 @@ const Popup: React.FC<PopupProps> = ({
             />
           )}
 
-          {/* Título estandarizado (fontFamily ya en styles.title) */}
+          {/* Título con estilo base (fontFamily ya en styles.title) */}
           <Text style={[styles.title, titleStyle]}>
             {title}
           </Text>
 
-          {/* Si es convivia y tenemos código, renderizamos bloque de código */}
-          {isConvivia && (
+          {/* Bloque de código: SOLO si imageType='convivia' y hasCode=true */}
+          {imageType === "convivia" && hasCode && (
             <>
               <Text style={[styles.description, descriptionStyle]}>
                 Tu código es:
@@ -173,14 +172,14 @@ const Popup: React.FC<PopupProps> = ({
             </>
           )}
 
-          {/* Descripción estandarizada; si es convivia y quieres texto auxiliar, pásalo en description */}
+          {/* Descripción estándar */}
           {description ? (
             <Text style={[styles.description, descriptionStyle]}>
               {description}
             </Text>
           ) : null}
 
-          {/* Botones (estándar) */}
+          {/* Botones */}
           <View style={[styles.buttonsContainer, buttonsContainerStyle as any]}>
             {buttons.length === 1 ? (
               <TouchableOpacity
@@ -236,9 +235,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 
-  // TITULO y DESCRIPCIÓN
+  // Título y descripción estandarizados
   title: {
-    fontSize: 24,
+    fontSize: 26,
     color: COLORS.primary,
     textAlign: "center",
     marginBottom: 8,
@@ -252,7 +251,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 
-  // Bloque genérico para el código ( “convivia”)
+  // Bloque genérico para el código
   codeRowWithCopy: {
     flexDirection: "row",
     alignItems: "center",
@@ -265,7 +264,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   codeBox: {
-    width: 38,
+    width: 36,
     height: 48,
     borderRadius: 12,
     backgroundColor: "#E6ECDC",
@@ -281,7 +280,6 @@ const styles = StyleSheet.create({
   codeDigit: {
     fontSize: 20,
     color: "#3E5639",
-    fontWeight: "700",
     fontFamily: FONTS.title,
   },
   copyIconButton: {
@@ -314,8 +312,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    color: COLORS.secondary,
-    fontWeight: "400",
+    color: COLORS.primary,
+    fontFamily: FONTS.bold,
   },
 });
 
