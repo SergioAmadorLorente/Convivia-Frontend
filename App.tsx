@@ -6,7 +6,7 @@ import {
   Montserrat_400Regular,
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
-import AppNavigator from "./src/navigation/navigation";
+import AppNavigator from "./src/navigation/AppNavigator";
 
 const App: React.FC = () => {
   const [fontsLoaded] = useFonts({

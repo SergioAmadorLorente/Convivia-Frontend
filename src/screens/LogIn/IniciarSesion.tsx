@@ -31,6 +31,7 @@ import TextField from "../../components/ui/TextField";
 import Button from "../../components/ui/Button";
 import Popup from "../../components/ui/Popup";
 import { COLORS } from "../../styles/theme";
+import ConfettiButton from "../../components/ui/ConfettiButton";
 const IniciarSesion: React.FC = () => {
   const {
     email,
@@ -43,6 +44,7 @@ const IniciarSesion: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
   const fontsLoaded = useLoadFonts();
+  const [showConfetti, setShowConfetti] = useState(false);
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupOptions, setPopupOptions] = useState<any>({});
   const showPopup = (opts: any) => {
@@ -61,6 +63,7 @@ const IniciarSesion: React.FC = () => {
     );
   }
   const handleLogin = async () => {
+    setShowConfetti(false);
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -87,6 +90,7 @@ const IniciarSesion: React.FC = () => {
         return;
       }
       // OK login
+      setShowConfetti(true);
       showPopup({
         title: "Éxito",
         description: "Login exitoso",
@@ -162,17 +166,19 @@ const IniciarSesion: React.FC = () => {
               </View>
               <Text style={GLOBAL_STYLES.labelCheckbox}>Recuérdame</Text>
             </TouchableOpacity>
-            <Button
+            <ConfettiButton
               onPress={handleLogin}
-              loading={loading}
               disabled={!isButtonEnabled}
               style={[
                 GLOBAL_STYLES.buttonPrimaryGreen,
-                { backgroundColor: COLORS.success },
+                { backgroundColor: COLORS.success }, // success color
               ]}
+              variant="success"
+              disableAutoConfetti={true}
+              trigger={showConfetti}
             >
               Entrar
-            </Button>
+            </ConfettiButton>
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>

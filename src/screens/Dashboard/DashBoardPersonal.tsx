@@ -1,128 +1,156 @@
-import React from "react";
+import React, { useState } from "react";
 import {
-  Text,
   View,
-  ActivityIndicator,
   ScrollView,
-  TouchableOpacity,
+  ActivityIndicator,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
   Platform,
-  Dimensions,
+  StyleSheet,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
-import {
-  Montserrat_400Regular,
-  Montserrat_700Bold,
-} from "@expo-google-fonts/montserrat";
+import { Montserrat_400Regular, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
-
-const { height: screenHeight, width: screenWidth } = Dimensions.get("window");
-const hp = (percentage: string) =>
-  (screenHeight * parseFloat(percentage)) / 100;
-const wp = (percentage: string) => (screenWidth * parseFloat(percentage)) / 100;
-const moderateScale = (size: number, factor = 0.5) =>
-  size + size * factor * (screenWidth / 375 - 1);
-
+import GLOBAL_STYLES from "../../styles/styles";
+import BottomBar from "../../components/ui/BottomBar";
+import Header from "../../components/ui/Header";
+import TabSwitcher from "../../components/ui/TabSwitcher";
+import TaskItem from "../../components/ui/TaskItem";
+interface Task {
+  id: string;
+  time: string;
+  title: string;
+  subtitle?: string;
+  isCompleted: boolean;
+}
 const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
-
+  const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
+  const [tareas, setTareas] = useState<Task[]>([
+    {
+      id: "1",
+      time: "12:00",
+      title: "Bajar la basura",
+      subtitle: "Orgánica y envases",
+      isCompleted: false,
+    },
+    {
+      id: "2",
+      time: "15:30",
+      title: "Barrer",
+      subtitle: "Zonas comunes",
+      isCompleted: false,
+    },
+    {
+      id: "3",
+      time: "09:30",
+      title: "Limpiar el baño",
+      isCompleted: false,
+    },
+    {
+      id: "4",
+      time: "09:30",
+      title: "Fregar los platos",
+      isCompleted: true,
+    },
+  ]);
+  const [facturas, setFacturas] = useState<Task[]>([
+    {
+      id: "1",
+      time: "15/12",
+      title: "Electricidad",
+      subtitle: "€85.50",
+      isCompleted: false,
+    },
+    {
+      id: "2",
+      time: "20/12",
+      title: "Internet",
+      subtitle: "€45.00",
+      isCompleted: true,
+    },
+  ]);
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
-
   if (!fontsLoaded) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#fff",
-        }}
-      >
-        <ActivityIndicator size="large" color="#6B705C" />
+      <View style={GLOBAL_STYLES.container}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
-
+  const handleToggleTask = (id: string) => {
+    if (activeTab === "tareas") {
+      setTareas((prev) =>
+        prev.map((task) =>
+          task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
+        )
+      );
+    } else {
+      setFacturas((prev) =>
+        prev.map((factura) =>
+          factura.id === id ? { ...factura, isCompleted: !factura.isCompleted } : factura
+        )
+      );
+    }
+  };
+  const currentItems = activeTab === "tareas" ? tareas : facturas;
+  const pendingItems = currentItems.filter((item) => !item.isCompleted);
+  const completedItems = currentItems.filter((item) => item.isCompleted);
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={[styles.scrollContainer, { paddingBottom: 120 }]}
+        keyboardShouldPersistTaps="always"
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "#fff",
-              alignItems: "center",
-              paddingTop: hp("7%"),
-              paddingHorizontal: wp("5%"),
-            }}
-          >
-            <Text
-              style={{
-                fontSize: moderateScale(40),
-                color: "#6B705C",
-                fontFamily: "DMSerifDisplay_400Regular",
-                textAlign: "center",
-              }}
-            >
-              DashBoardPersonal
-            </Text>
-            <Text
-              style={{
-                fontSize: moderateScale(13),
-                color: "#4B4741",
-                marginVertical: hp("1%"),
-                fontFamily: "Montserrat_400Regular",
-                textAlign: "center",
-              }}
-            >
-              ¡Ya estás a punto de poder utilizar la aplicación de Convivia!
-            </Text>
-
-            <TouchableOpacity
-              style={{
-                marginTop: hp("3%"),
-                backgroundColor: "#E6ECDC",
-                paddingVertical: hp("1.5%"),
-                paddingHorizontal: wp("10%"),
-                borderRadius: 15,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 3,
-                elevation: 3,
-              }}
-              onPress={() => navigation.navigate("UnirResidencia")}
-            >
-              <Text
-                style={{
-                  color: "#4B4741",
-                  fontSize: moderateScale(15),
-                  fontFamily: "Montserrat_400Regular",
-                  textAlign: "center",
-                }}
-              >
-                Probar Unirse a Residencia
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        <Header
+          username="@usuario"
+          date="Miércoles, 15 de Septiembre"
+          location="Piso Tarragona"
+        />
+        <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+        <View style={styles.contentContainer}>
+          {pendingItems.map((item) => (
+            <TaskItem
+              key={item.id}
+              time={item.time}
+              title={item.title}
+              subtitle={item.subtitle}
+              isCompleted={item.isCompleted}
+              onToggle={() => handleToggleTask(item.id)}
+            />
+          ))}
+          {completedItems.map((item) => (
+            <TaskItem
+              key={item.id}
+              time={item.time}
+              title={item.title}
+              subtitle={item.subtitle}
+              isCompleted={item.isCompleted}
+              onToggle={() => handleToggleTask(item.id)}
+            />
+          ))}
+        </View>
+      </ScrollView>
+      <BottomBar />
+    </KeyboardAvoidingView>
   );
 };
-
+const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  contentContainer: {
+    padding: 16,
+  },
+});
 export default DashBoardPersonal;

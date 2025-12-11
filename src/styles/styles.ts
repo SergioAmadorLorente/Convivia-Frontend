@@ -47,6 +47,22 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
   },
 
+  // Texto titulo popup
+  popupTitle: {
+    fontFamily: FONTS.title,
+    fontSize: moderateScale(28),
+    color: COLORS.primary,
+    textAlign: "center",
+    fontWeight: "normal",
+  },
+
+
+
+
+
+
+
+
   // Texto de ayuda o aclaración
   helperText: {
     fontFamily: FONTS.regular,

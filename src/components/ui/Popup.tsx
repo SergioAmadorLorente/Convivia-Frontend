@@ -16,6 +16,7 @@ type ButtonDef = {
   text: string;
   onPress: () => void | Promise<void>;
   style?: ViewStyle;
+  textStyle?: TextStyle;
 };
 
 type PopupProps = {
@@ -23,7 +24,7 @@ type PopupProps = {
   onClose: () => void;
   title: string;
   description?: string;
-  imageType?: "error" | "logout" | "success";
+  imageType?: "error" | "logout" | "success" | "happy";
   buttons?: ButtonDef[];
   containerStyle?: ViewStyle;
   popupStyle?: ViewStyle;
@@ -37,6 +38,7 @@ const imageMap: Record<string, any> = {
   error: require("../../assets/pngerror.png"),
   logout: require("../../assets/pnglogout.png"),
   success: require("../../assets/pngsuccessful.png"),
+  happy: require("../../assets/pngCaraFeliz.png"),
 };
 
 const Popup: React.FC<PopupProps> = ({
@@ -45,7 +47,7 @@ const Popup: React.FC<PopupProps> = ({
   title,
   description,
   imageType = "success",
-  buttons = [{ text: "Aceptar", onPress: () => {} }],
+  buttons = [{ text: "Aceptar", onPress: () => { } }],
   containerStyle,
   popupStyle,
   imageStyle,
@@ -70,7 +72,7 @@ const Popup: React.FC<PopupProps> = ({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={() => {}}
+      onRequestClose={() => { }}
     >
       <View style={[styles.overlay, containerStyle]}>
         <View style={[styles.popup, popupStyle]}>
@@ -102,7 +104,7 @@ const Popup: React.FC<PopupProps> = ({
                 style={[styles.singleButton, buttons[0].style]}
                 onPress={handleButtonPress(buttons[0])}
               >
-                <Text style={styles.buttonText}>{buttons[0].text}</Text>
+                <Text style={[styles.buttonText, buttons[0].textStyle]}>{buttons[0].text}</Text>
               </TouchableOpacity>
             ) : (
               <View style={styles.twoButtonsRow}>
@@ -116,7 +118,7 @@ const Popup: React.FC<PopupProps> = ({
                     ]}
                     onPress={handleButtonPress(btn)}
                   >
-                    <Text style={styles.buttonText}>{btn.text}</Text>
+                    <Text style={[styles.buttonText, btn.textStyle]}>{btn.text}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -145,9 +147,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   image: {
-    width: 250,
-    height: 250,
+    width: 200,
+    height: 200,
     marginBottom: 12,
+    marginTop: 20,
   },
   title: {
     fontSize: 18,
