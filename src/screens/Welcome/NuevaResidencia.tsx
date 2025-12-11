@@ -22,8 +22,11 @@ import TextField from '../../components/ui/TextField';
 import ConfettiButton from '../../components/ui/ConfettiButton';
 import { FONTS, COLORS } from '../../styles/styles';
 
+import { crearEspacio } from '../../api/espacio';
+
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
+  const [direccion, setDireccion] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
 
@@ -37,7 +40,7 @@ const NuevaResidencia: React.FC = () => {
 
   const handleClosePopup = () => setPopupVisible(false);
 
-  const hasText = nombreResidencia.trim().length > 0;
+  const hasText = nombreResidencia.trim().length > 0 && direccion.trim().length > 0;
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
