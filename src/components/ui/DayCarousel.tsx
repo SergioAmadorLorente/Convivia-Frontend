@@ -69,19 +69,21 @@ const styles = StyleSheet.create({
     wrapper: {
         paddingVertical: 10,
         marginTop: 10,
+
     },
     scrollContent: {
         paddingHorizontal: 16,
+        paddingBottom: 10,
     },
     box: {
         width: 80,
-        height: 70,
+        height: 60,
         backgroundColor: COLORS.inputBackground,
         borderRadius: 14,
         marginRight: 14,
         alignItems: "center",
         justifyContent: "center",
- 
+
         shadowColor: "#000",
         shadowOpacity: 0.08,
         shadowRadius: 4,
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
     },
     name: {
-        marginTop: 4,
+        marginTop: -2,
         fontSize: 14,
         fontFamily: FONTS.title,
         color: COLORS.secondary,

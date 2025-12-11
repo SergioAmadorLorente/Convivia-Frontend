@@ -143,11 +143,7 @@ const DashBoardPersonal: React.FC = () => {
       >
         {/* 🟪 Bloque gris que envuelve Header + TabSwitcher */}
         <View style={styles.headerArea}>
-          <Header
-            username="@usuario"
-            date={selectedDate}  // Puedes seguir pasando string si lo prefieres
-            location="Piso Tarragona"
-          />
+
 
           <View style={styles.tabsContainer}>
             <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
