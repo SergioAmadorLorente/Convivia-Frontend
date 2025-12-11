@@ -4,8 +4,8 @@ import {
   View,
   ActivityIndicator,
   ScrollView,
-  TouchableOpacity,
   TouchableWithoutFeedback,
+  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
@@ -17,14 +17,14 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons"; // 👈 NUEVO: Usamos Feather
 import { moderateScale } from "react-native-size-matters";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
 import GLOBAL_STYLES from "../../styles/styles";
-import { COLORS } from "../../styles/theme";
+import { COLORS, CHECKBOX } from "../../styles/theme";
 import { auth } from "../../configs/firebaseConfig";
 import Popup from "../../components/ui/Popup";
 import TextField from "../../components/ui/TextField";
@@ -58,14 +58,10 @@ const CrearCuenta: React.FC = () => {
     Montserrat_700Bold,
   });
   useEffect(() => {
-    if (password === password2) {
-      setErrorMatch("");
-    } else if (password2.length > 0) {
+    if (password === password2) setErrorMatch("");
+    else if (password2.length > 0)
       setErrorMatch("Las contraseñas no coinciden");
-    }
   }, [password, password2]);
-
-  // REGISTRO + ENVÍO DE EMAIL DE VERIFICACIÓN
   const validarBBDD = async () => {
     try {
       setEmailUsedError("");
@@ -85,10 +81,8 @@ const CrearCuenta: React.FC = () => {
       }
     }
   };
-
   const handleEnviarVerificacion = async () => {
-    if (!isValidEmail) return;
-    if (!isValidPassword) return;
+    if (!isValidEmail || !isValidPassword) return;
     if (password !== password2) {
       setErrorMatch("Las contraseñas no coinciden");
       return;
@@ -96,16 +90,13 @@ const CrearCuenta: React.FC = () => {
     if (!checkedPolitica || !checkedTerminos) return;
     await validarBBDD();
   };
-
-  // Lista de requisitos incumplidos (para la UI)
+  // Validaciones password
   const unmetPasswordRequirements: string[] = [];
-  if (!validations.length)
-    unmetPasswordRequirements.push("Al menos 8 caracteres");
+  if (!validations.length) unmetPasswordRequirements.push("Al menos 8 caracteres");
   if (!validations.uppercase)
     unmetPasswordRequirements.push("Al menos una letra mayúscula");
-  if (!validations.number) unmetPasswordRequirements.push("Al menos un número");
-
-  // UI PRINCIPAL
+  if (!validations.number)
+    unmetPasswordRequirements.push("Al menos un número");
   if (!fontsLoaded) {
     return (
       <View style={[GLOBAL_STYLES.container, { justifyContent: "center" }]}>
@@ -113,7 +104,6 @@ const CrearCuenta: React.FC = () => {
       </View>
     );
   }
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -142,7 +132,6 @@ const CrearCuenta: React.FC = () => {
               keyboardType="email-address"
               error={emailError || emailUsedError}
             />
-
             {/* CONTRASEÑA */}
             <TextField
               label="Contraseña"
@@ -179,7 +168,6 @@ const CrearCuenta: React.FC = () => {
                 ))
               )}
             </View>
-
             {/* CONFIRMAR CONTRASEÑA */}
             <TextField
               label="Confirma la Contraseña"
@@ -194,44 +182,50 @@ const CrearCuenta: React.FC = () => {
               secureTextEntry
               error={errorMatch}
             />
-            {/* CHECKBOX POLÍTICA DE PRIVACIDAD */}
-            <TouchableOpacity
-              style={GLOBAL_STYLES.checkboxContainer}
-              onPress={() => setCheckedPolitica(!checkedPolitica)}
-            >
-              <View style={GLOBAL_STYLES.checkbox}>
-                {checkedPolitica && (
-                  <Ionicons
-                    name="checkmark"
-                    size={moderateScale(16)}
-                    color={COLORS.accent}
-                  />
-                )}
-              </View>
+            {/* CHECKBOX POLÍTICA PRIVACIDAD */}
+            <View style={GLOBAL_STYLES.checkboxContainer}>
+              <TouchableOpacity
+                style={CHECKBOX.touchArea}
+                onPress={() => setCheckedPolitica(!checkedPolitica)}
+              >
+                <Feather
+                  name={checkedPolitica ? "check-square" : "square"}
+                  size={CHECKBOX.iconSize}
+                  color={
+                    checkedPolitica
+                      ? CHECKBOX.colors.checked
+                      : CHECKBOX.colors.unchecked
+                  }
+                />
+              </TouchableOpacity>
               <Text
                 style={[
                   GLOBAL_STYLES.labelCheckbox,
                   { color: COLORS.accent, textDecorationLine: "underline" },
                 ]}
-                onPress={() => navigation.navigate("PoliticaCookiesPrivacidad")}
+                onPress={() =>
+                  navigation.navigate("PoliticaCookiesPrivacidad")
+                }
               >
                 Política de Privacidad y Cookies
               </Text>
-            </TouchableOpacity>
+            </View>
             {/* CHECKBOX TÉRMINOS Y CONDICIONES */}
-            <TouchableOpacity
-              style={GLOBAL_STYLES.checkboxContainer}
-              onPress={() => setCheckedTerminos(!checkedTerminos)}
-            >
-              <View style={GLOBAL_STYLES.checkbox}>
-                {checkedTerminos && (
-                  <Ionicons
-                    name="checkmark"
-                    size={moderateScale(16)}
-                    color={COLORS.accent}
-                  />
-                )}
-              </View>
+            <View style={GLOBAL_STYLES.checkboxContainer}>
+              <TouchableOpacity
+                style={CHECKBOX.touchArea}
+                onPress={() => setCheckedTerminos(!checkedTerminos)}
+              >
+                <Feather
+                  name={checkedTerminos ? "check-square" : "square"}
+                  size={CHECKBOX.iconSize}
+                  color={
+                    checkedTerminos
+                      ? CHECKBOX.colors.checked
+                      : CHECKBOX.colors.unchecked
+                  }
+                />
+              </TouchableOpacity>
               <Text
                 style={[
                   GLOBAL_STYLES.labelCheckbox,
@@ -241,7 +235,7 @@ const CrearCuenta: React.FC = () => {
               >
                 Términos y Condiciones
               </Text>
-            </TouchableOpacity>
+            </View>
             {/* BOTÓN */}
             <Button
               style={[
@@ -249,12 +243,12 @@ const CrearCuenta: React.FC = () => {
                 {
                   backgroundColor:
                     isValidEmail &&
-                    checkedPolitica &&
-                    checkedTerminos &&
-                    password === password2 &&
-                    isValidPassword &&
-                    !isCounting &&
-                    !emailUsedError
+                      checkedPolitica &&
+                      checkedTerminos &&
+                      password === password2 &&
+                      isValidPassword &&
+                      !isCounting &&
+                      !emailUsedError
                       ? COLORS.success
                       : COLORS.disabled,
                 },
@@ -274,7 +268,6 @@ const CrearCuenta: React.FC = () => {
             >
               {isCounting ? `Reenviando en ${seconds}s` : "Enviar verificación"}
             </Button>
-
             {/* POPUP */}
             <Popup
               visible={modalVisible}

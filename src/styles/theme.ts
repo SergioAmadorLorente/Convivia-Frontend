@@ -132,9 +132,8 @@ export const COMMON = {
 export const CHECKBOX = {
   /** Área táctil para que sea fácil pulsar el checkbox */
   touchArea: {
-    padding: 6,
+    padding: 1,
     borderRadius: 999,
-    backgroundColor: "#F3F6EF",
   },
   /** Tamaño del icono (Feather: 'square' / 'check-square') */
   iconSize: 22,

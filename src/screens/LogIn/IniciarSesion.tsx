@@ -10,9 +10,8 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons"; // 👈 NUEVO: Feather para checkbox
 import { useNavigation } from "@react-navigation/native";
 import { auth } from "../../configs/firebaseConfig";
 import {
@@ -30,7 +29,7 @@ import { useKeyboardAware } from "../../hooks";
 import TextField from "../../components/ui/TextField";
 import Button from "../../components/ui/Button";
 import Popup from "../../components/ui/Popup";
-import { COLORS } from "../../styles/theme";
+import { COLORS, CHECKBOX } from "../../styles/theme"; // 👈 IMPORTAMOS CHECKBOX
 import ConfettiButton from "../../components/ui/ConfettiButton";
 const IniciarSesion: React.FC = () => {
   const {
@@ -40,7 +39,7 @@ const IniciarSesion: React.FC = () => {
     isValidEmail,
   } = useEmailValidation();
   const [password, setPassword] = useState<string>("");
-  const [isChecked, setIsChecked] = useState<boolean>(false); // visual, Firebase ya recuerda sesión siempre
+  const [isChecked, setIsChecked] = useState<boolean>(false); // visual
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
   const fontsLoaded = useLoadFonts();
@@ -71,7 +70,6 @@ const IniciarSesion: React.FC = () => {
         email,
         password
       );
-      // Si NO está verificado
       if (!userCredential.user.emailVerified) {
         showPopup({
           title: "Error",
@@ -128,6 +126,7 @@ const IniciarSesion: React.FC = () => {
             <Text style={GLOBAL_STYLES.subtitle}>
               ¡Ya estás a punto de poder utilizar la aplicación de Convivia!
             </Text>
+            {/* EMAIL */}
             <TextField
               label="Correo electrónico"
               value={email}
@@ -136,6 +135,7 @@ const IniciarSesion: React.FC = () => {
               keyboardType="email-address"
               error={emailError}
             />
+            {/* PASSWORD */}
             <TextField
               label="Contraseña"
               value={password}
@@ -143,35 +143,38 @@ const IniciarSesion: React.FC = () => {
               placeholder="• • • • • • • •"
               secureTextEntry
             />
-            {/* Recuperar contraseña */}
+            {/* RECUPERAR CONTRASEÑA */}
             <TouchableOpacity
               style={GLOBAL_STYLES.checkboxContainer}
               onPress={() => navigation.navigate("RecuperarPassword")}
             >
               <Text style={GLOBAL_STYLES.link}>Recuperar contraseña</Text>
             </TouchableOpacity>
-            {/* Checkbox de recuérdame (visual) */}
-            <TouchableOpacity
-              style={GLOBAL_STYLES.checkboxContainer}
-              onPress={() => setIsChecked(!isChecked)}
-            >
-              <View style={GLOBAL_STYLES.checkbox}>
-                {isChecked && (
-                  <Ionicons
-                    name="checkmark"
-                    size={moderateScale(16)}
-                    color={COLORS.accent}
-                  />
-                )}
-              </View>
+            {/* CHECKBOX RECUÉRDAME */}
+            <View style={GLOBAL_STYLES.checkboxContainer}>
+              <TouchableOpacity
+                style={CHECKBOX.touchArea}
+                onPress={() => setIsChecked(!isChecked)}
+              >
+                <Feather
+                  name={isChecked ? "check-square" : "square"}
+                  size={CHECKBOX.iconSize}
+                  color={
+                    isChecked
+                      ? CHECKBOX.colors.checked
+                      : CHECKBOX.colors.unchecked
+                  }
+                />
+              </TouchableOpacity>
               <Text style={GLOBAL_STYLES.labelCheckbox}>Recuérdame</Text>
-            </TouchableOpacity>
+            </View>
+            {/* BOTÓN LOGIN */}
             <ConfettiButton
               onPress={handleLogin}
               disabled={!isButtonEnabled}
               style={[
                 GLOBAL_STYLES.buttonPrimaryGreen,
-                { backgroundColor: COLORS.success }, // success color
+                { backgroundColor: COLORS.success },
               ]}
               variant="success"
               disableAutoConfetti={true}

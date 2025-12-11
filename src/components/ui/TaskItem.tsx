@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
-import GLOBAL_STYLES from "../../styles/styles";
+import { COLORS, FONTS } from "../../styles/theme";
+import { CHECKBOX } from "../../styles/theme";
+import { Feather } from "@expo/vector-icons";
 interface TaskItemProps {
     time: string;
     title: string;
@@ -31,13 +32,21 @@ const TaskItem: React.FC<TaskItemProps> = ({
                     </Text>
                 )}
             </View>
+            {/* Nuevo checkbox usando CHECKBOX */}
             <TouchableOpacity
-                style={[styles.checkbox, isCompleted && styles.checkboxChecked]}
                 onPress={onToggle}
+                activeOpacity={0.8}
+                style={CHECKBOX.touchArea}
             >
-                {isCompleted && (
-                    <Text style={styles.tick}>✔</Text>
-                )}
+                <Feather
+                    name={isCompleted ? "check-square" : "square"}
+                    size={CHECKBOX.iconSize}
+                    color={
+                        isCompleted
+                            ? CHECKBOX.colors.checked
+                            : CHECKBOX.colors.unchecked
+                    }
+                />
             </TouchableOpacity>
         </View>
     );
@@ -81,24 +90,6 @@ const styles = StyleSheet.create({
     completedText: {
         textDecorationLine: "line-through",
         color: COLORS.border,
-    },
-    checkbox: {
-        width: 24,
-        height: 24,
-        borderRadius: 6,
-        borderWidth: 2,
-        borderColor: COLORS.border,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    checkboxChecked: {
-        backgroundColor: COLORS.success,
-        borderColor: COLORS.success,
-    },
-    tick: {
-        color: COLORS.background,
-        fontSize: 16,
-        fontWeight: "bold",
     },
 });
 export default TaskItem;
