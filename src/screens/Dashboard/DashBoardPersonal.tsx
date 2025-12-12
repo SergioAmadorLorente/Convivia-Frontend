@@ -49,9 +49,15 @@ const DashBoardPersonal: React.FC = () => {
     { id: "2", time: "15:30", title: "Barrer", subtitle: "Zonas comunes", isCompleted: false },
     { id: "3", time: "09:30", title: "Limpiar el baño", isCompleted: false },
     { id: "4", time: "09:30", title: "Fregar los platos", isCompleted: true },
+    { id: "1", time: "12:00", title: "Bajar la basura", subtitle: "Orgánica y envases", isCompleted: false },
+    { id: "2", time: "15:30", title: "Barrer", subtitle: "Zonas comunes", isCompleted: false },
+    { id: "3", time: "09:30", title: "Limpiar el baño", isCompleted: false },
+    { id: "4", time: "09:30", title: "Fregar los platos", isCompleted: true },
   ]);
  
   const [facturas, setFacturas] = useState<Task[]>([
+    { id: "1", time: "15/12", title: "Electricidad", subtitle: "€85.50", isCompleted: false },
+    { id: "2", time: "20/12", title: "Internet", subtitle: "€45.00", isCompleted: true },
     { id: "1", time: "15/12", title: "Electricidad", subtitle: "€85.50", isCompleted: false },
     { id: "2", time: "20/12", title: "Internet", subtitle: "€45.00", isCompleted: true },
   ]);
