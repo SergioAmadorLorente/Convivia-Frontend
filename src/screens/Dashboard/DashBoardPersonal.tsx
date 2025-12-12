@@ -13,16 +13,15 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
-// ✅ Globales y tokens
+// Global
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
 import { COLORS, HELPERS, SIZES } from "../../styles/theme";
-// ✅ Componentes existentes
+// Componentes
 import BottomBar from "../../components/ui/BottomBar";
 import Header from "../../components/ui/Header";
 import TabSwitcher from "../../components/ui/TabSwitcher";
 import TaskItem from "../../components/ui/TaskItem";
 import Desplegable from "../../components/ui/Desplegable";
-// ⬇️ Nuevo componente
 import TasksFilter from "../../components/ui/TasksFilter";
 const { hp } = HELPERS;
 interface Task {
@@ -35,7 +34,8 @@ interface Task {
 const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
-  const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
+  const [selectedFilter, setSelectedFilter] =
+    useState<"today" | "week" | "all">("today");
   const [tareas, setTareas] = useState<Task[]>([
     { id: "1", time: "12:00", title: "Bajar la basura", subtitle: "Orgánica y envases", isCompleted: false },
     { id: "2", time: "15:30", title: "Barrer", subtitle: "Zonas comunes", isCompleted: false },
@@ -67,28 +67,26 @@ const DashBoardPersonal: React.FC = () => {
       );
     } else {
       setFacturas(prev =>
-        prev.map(factura =>
-          factura.id === id ? { ...factura, isCompleted: !factura.isCompleted } : factura
+        prev.map(f =>
+          f.id === id ? { ...f, isCompleted: !f.isCompleted } : f
         )
       );
     }
   };
   const currentItems = activeTab === "tareas" ? tareas : facturas;
-  const pendingItems = currentItems.filter(item => !item.isCompleted);
-  const completedItems = currentItems.filter(item => item.isCompleted);
+  const pendingItems = currentItems.filter(i => !i.isCompleted);
+  const completedItems = currentItems.filter(i => i.isCompleted);
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
-      {/* Header */}
       <Header
         username="@usuario"
         date="Miércoles, 15 de Septiembre"
         location="Piso Tarragona"
       />
-      {/* Tabs */}
       <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
       <ScrollView
         contentContainerStyle={[
@@ -100,13 +98,18 @@ const DashBoardPersonal: React.FC = () => {
         nestedScrollEnabled
         keyboardShouldPersistTaps="handled"
       >
-        {/* ⬇️ Nuevo Filtro (reemplaza al DayCarousel) */}
-        <View style={[GLOBAL_STYLES.fullWidth, { marginTop: 10, marginBottom: 15 }]}>
-          <TasksFilter onFilterChange={setSelectedFilter} />
-        </View>
-        {/* Contenido */}
+        {/* ⬅️ SOLO aparece cuando estás en "tareas" */}
+        {activeTab === "tareas" && (
+          <View
+            style={[
+              GLOBAL_STYLES.fullWidth,
+              { marginTop: 10, marginBottom: 15 }
+            ]}
+          >
+            <TasksFilter onFilterChange={setSelectedFilter} />
+          </View>
+        )}
         <View style={GLOBAL_STYLES.container}>
-          {/* PENDIENTES */}
           <Desplegable
             title="Pendientes"
             fontSize={SIZES.text16}
@@ -125,7 +128,6 @@ const DashBoardPersonal: React.FC = () => {
               />
             ))}
           </Desplegable>
-          {/* COMPLETADAS */}
           <Desplegable
             title="Completadas"
             fontSize={SIZES.text16}
