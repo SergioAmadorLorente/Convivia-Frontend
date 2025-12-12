@@ -11,6 +11,9 @@ import {
   ImageStyle,
 } from "react-native";
 import { FONTS, COLORS } from "../../styles/styles";
+import ErrorSvg from "../../assets/pngerror.svg";
+import LogoutSvg from "../../assets/pnglogout.svg";
+import SuccessSvg from "../../assets/pngsuccessful.svg";
 
 type ButtonDef = {
   text: string;
@@ -34,11 +37,19 @@ type PopupProps = {
   buttonsContainerStyle?: ViewStyle;
 };
 
-const imageMap: Record<string, any> = {
-  error: require("../../assets/pngerror.png"),
-  logout: require("../../assets/pnglogout.png"),
-  success: require("../../assets/pngsuccessful.png"),
-  happy: require("../../assets/pngCaraFeliz.png"),
+const HappyImage = (props: any) => (
+  <Image
+    source={require("../../assets/pngCaraFeliz.png")}
+    resizeMode="contain"
+    {...props}
+  />
+);
+
+const imageMap: Record<string, React.ElementType> = {
+  error: ErrorSvg,
+  logout: LogoutSvg,
+  success: SuccessSvg,
+  happy: HappyImage,
 };
 
 const Popup: React.FC<PopupProps> = ({
@@ -65,7 +76,7 @@ const Popup: React.FC<PopupProps> = ({
     }
   };
 
-  const imgSource = imageType ? imageMap[imageType] : undefined;
+  const ImgComponent = imageType ? imageMap[imageType] : undefined;
 
   return (
     <Modal
@@ -76,11 +87,11 @@ const Popup: React.FC<PopupProps> = ({
     >
       <View style={[styles.overlay, containerStyle]}>
         <View style={[styles.popup, popupStyle]}>
-          {imgSource && (
-            <Image
-              source={imgSource}
+          {ImgComponent && (
+            <ImgComponent
               style={[styles.image, imageStyle]}
-              resizeMode="contain"
+              width={200}
+              height={200}
             />
           )}
           <Text style={[styles.title, titleStyle, { fontFamily: FONTS.title }]}>
