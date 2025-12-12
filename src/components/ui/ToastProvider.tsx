@@ -7,6 +7,7 @@ import React, {
   useEffect,
 } from "react";
 import { View, Text, Pressable, Animated } from "react-native";
+import Svg, { Circle, Path } from "react-native-svg";
 import { COLORS, FONTS, HELPERS, COMMON } from "../../styles/theme";
 
 const { verticalScale, moderateScale, wp, hp } = HELPERS;
@@ -47,14 +48,17 @@ export function ToastProvider({
 }: ToastProviderProps) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const show = useCallback((opts: ShowOptions) => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setToasts((prev) => {
-      const next: ToastItem[] = [{ id, open: true, ...opts }, ...prev];
-      return next.slice(0, maxToasts);
-    });
-    return id;
-  }, [maxToasts]);
+  const show = useCallback(
+    (opts: ShowOptions) => {
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      setToasts((prev) => {
+        const next: ToastItem[] = [{ id, open: true, ...opts }, ...prev];
+        return next.slice(0, maxToasts);
+      });
+      return id;
+    },
+    [maxToasts]
+  );
 
   const dismiss = useCallback((id?: string) => {
     setToasts((prev) => {
@@ -84,7 +88,10 @@ export function ToastProvider({
             ...(position === "top" ? { top: hp("2%") } : { bottom: hp("2%") }),
           }}
         >
-          <View pointerEvents="box-none" style={{ maxWidth: wp("96%"), zIndex: 999, gap }}>
+          <View
+            pointerEvents="box-none"
+            style={{ maxWidth: wp("96%"), zIndex: 999, gap }}
+          >
             {toasts.map((t) => (
               <ToastItemComponent
                 key={t.id}
@@ -100,6 +107,43 @@ export function ToastProvider({
     </ToastContext.Provider>
   );
 }
+
+/* ========= SVG TIC ✔️ =========
+   Estilo coincidente con el screenshot:
+   - Círculo con borde y check gris verdoso
+   - Extremos redondeados
+*/
+const TickIcon: React.FC<{
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+}> = ({ size = 20, color = "#5B6159", strokeWidth = 2 }) => {
+  const r = size / 2 - strokeWidth / 2;
+  return (
+    <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <Circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        stroke={color}
+        strokeWidth={strokeWidth}
+        fill="none"
+      />
+      <Path
+        d={`
+          M ${size * 0.30} ${size * 0.52}
+          L ${size * 0.45} ${size * 0.68}
+          L ${size * 0.72} ${size * 0.40}
+        `}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+};
 
 // Componente interno del Toast
 function ToastItemComponent({
@@ -145,7 +189,7 @@ function ToastItemComponent({
   return (
     <Animated.View
       style={{
-        width: wp("90%"), // ✅ ancho suficiente para texto
+        width: wp("90%"),
         flexDirection: "row",
         alignItems: "center",
         borderRadius: moderateScale(12),
@@ -158,7 +202,7 @@ function ToastItemComponent({
         ...COMMON.SHADOW,
       }}
     >
-      {/* Icono */}
+      {/* Icono estilo screenshot: fondo blanco, borde suave, SVG gris verdoso */}
       <View
         style={{
           width: moderateScale(34),
@@ -172,18 +216,7 @@ function ToastItemComponent({
           marginRight: moderateScale(8),
         }}
       >
-        <View
-          style={{
-            width: moderateScale(20),
-            height: moderateScale(20),
-            borderRadius: moderateScale(10),
-            backgroundColor: COLORS.accent,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text style={{ color: "#fff", fontSize: moderateScale(14), fontFamily: FONTS.bold }}>✓</Text>
-        </View>
+        <TickIcon size={moderateScale(20)} color={"#5B6159"} strokeWidth={2} />
       </View>
 
       {/* Texto */}
@@ -201,7 +234,7 @@ function ToastItemComponent({
         <Text
           style={{
             fontFamily: FONTS.regular,
-                       fontSize: moderateScale(12),
+            fontSize: moderateScale(12),
             color: toneColors.muted,
           }}
         >
@@ -210,11 +243,13 @@ function ToastItemComponent({
       </View>
 
       {/* Botón cerrar */}
-      <Pressable onPress={onClose} style={{ marginLeft: moderateScale(4), paddingHorizontal: moderateScale(6) }}>
+      <Pressable
+        onPress={onClose}
+        style={{ marginLeft: moderateScale(4), paddingHorizontal: moderateScale(6) }}
+      >
         <Text style={{ color: "#5b5f61", fontSize: moderateScale(18) }}>×</Text>
       </Pressable>
-    </Animated.View>
+       </Animated.View>
   );
 }
 
-export default ToastProvider;
