@@ -19,16 +19,6 @@ export const crearTarea = async (data: TareaPayload) => {
     }
 };
 
-export const obtenerTareas = async () => {
-    try {
-        const response = await api.get("/Tarea");
-        return response.data;
-    } catch (error) {
-        console.error("Error al obtener tareas:", error);
-        throw error;
-    }
-};
-
 export const editarTarea = async (id: number, data: TareaPayload) => {
     try {
         const response = await api.put(`/Tarea/${id}`, data);
@@ -45,6 +35,16 @@ export const eliminarTarea = async (id: number) => {
         return response.data;
     } catch (error) {
         console.error("Error al eliminar tarea:", error);
+        throw error;
+    }
+};
+
+export const obtenerTareas = async () => {
+    try {
+        const response = await api.get("/Tarea");
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener tareas:", error);
         throw error;
     }
 };

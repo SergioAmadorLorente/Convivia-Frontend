@@ -36,3 +36,13 @@ export const eliminarFactura = async (id: number) => {
         throw error;
     }
 };
+
+export const obtenerFacturas = async () => {
+    try {
+        const response = await api.get("/Factura");
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener facturas:", error);
+        throw error;
+    }
+};
