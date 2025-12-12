@@ -249,13 +249,14 @@ export const GLOBAL_STYLES = StyleSheet.create({
     color: COLORS.primary,
     fontFamily: FONTS.regular,
   },
-
   // Contenedor de checkbox y label
   checkboxContainer: {
     flexDirection: "row",
+    alignItems: "center", 
     width: wp("80%"),
     marginTop: hp("1%"),
     marginBottom: hp("1%"),
+    gap: 8, // espaciado entre checkbox y label (opcional)
   },
 });
 
