@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import {COLORS, FONTS, SIZES, HELPERS, COMMON} from "../../styles/theme";
-import GLOBAL_STYLES from "../../styles/styles";
+import { COLORS, FONTS } from "../../styles/theme";
+import { CHECKBOX } from "../../styles/theme";
+import { Feather } from "@expo/vector-icons";
 interface TaskItemProps {
     time: string;
     title: string;
@@ -31,11 +32,21 @@ const TaskItem: React.FC<TaskItemProps> = ({
                     </Text>
                 )}
             </View>
+            {/* Nuevo checkbox usando CHECKBOX */}
             <TouchableOpacity
-                style={[styles.checkbox, isCompleted && styles.checkboxChecked]}
                 onPress={onToggle}
+                activeOpacity={0.8}
+                style={CHECKBOX.touchArea}
             >
-                {isCompleted && <View style={styles.checkmark} />}
+                <Feather
+                    name={isCompleted ? "check-square" : "square"}
+                    size={CHECKBOX.iconSize}
+                    color={
+                        isCompleted
+                            ? CHECKBOX.colors.checked
+                            : CHECKBOX.colors.unchecked
+                    }
+                />
             </TouchableOpacity>
         </View>
     );
@@ -44,8 +55,8 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: COLORS.background,
-        padding: 16,
+        backgroundColor: COLORS.inputBackground,
+        padding: 12,
         borderRadius: 12,
         marginBottom: 12,
         shadowColor: "#000",
@@ -55,7 +66,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     timeContainer: {
-        marginRight: 16,
+        marginRight: 14,
     },
     timeText: {
         fontSize: 14,
@@ -79,25 +90,6 @@ const styles = StyleSheet.create({
     completedText: {
         textDecorationLine: "line-through",
         color: COLORS.border,
-    },
-    checkbox: {
-        width: 24,
-        height: 24,
-        borderRadius: 6,
-        borderWidth: 2,
-        borderColor: COLORS.border,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    checkboxChecked: {
-        backgroundColor: COLORS.primary,
-        borderColor: COLORS.primary,
-    },
-    checkmark: {
-        width: 12,
-        height: 12,
-        backgroundColor: COLORS.background,
-        borderRadius: 2,
     },
 });
 export default TaskItem;
