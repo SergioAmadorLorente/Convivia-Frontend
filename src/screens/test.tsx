@@ -6,6 +6,7 @@ import GLOBAL_STYLES from '../styles/styles';
 import Felicidades from './popusEspera/Felicidades';
 import CasiLoLogras from './popusEspera/CasiLoLogras';
 import AssignUsersPopup from '../components/ui/AssignUsersPopup';
+import MoneyInput from '../components/ui/MoneyInput';
 
 type BackendUser = { id: string; name: string };
 
@@ -40,7 +41,6 @@ const TestScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={[GLOBAL_STYLES.title, { marginBottom: 20 }]}>Pantalla de Prueba</Text>
-
       {/* --- Botones de los popups existentes --- */}
       <Button
         style={GLOBAL_STYLES.buttonPrimaryGreen}
@@ -72,6 +72,8 @@ const TestScreen = () => {
       >
         Abrir selector (Usuarios)
       </Button>
+
+ 
 
       {/* --- Popups existentes --- */}
       {showFelicidades && (
