@@ -14,6 +14,9 @@ import {
 import { FONTS, COLORS } from "../../styles/styles";
 import * as Clipboard from "expo-clipboard";
 import { Feather } from "@expo/vector-icons";
+import ErrorSvg from "../../assets/pngerror.svg";
+import LogoutSvg from "../../assets/pnglogout.svg";
+import SuccessSvg from "../../assets/pngsuccessful.svg";
 
 type ButtonDef = {
   text: string;
@@ -46,13 +49,19 @@ type PopupProps = {
   onCopyCode?: (code: string) => void | Promise<void>;
 };
 
-const imageMap: Record<string, any> = {
-  error: require("../../assets/pngerror.png"),
-  logout: require("../../assets/pnglogout.png"),
-  success: require("../../assets/pngsuccessful.png"),
-  happy: require("../../assets/pngCaraFeliz.png"),
-  convivia: require("../../assets/pngconvivia.png"),
-  delete: require("../../assets/pngdelete.png"),
+const HappyImage = (props: any) => (
+  <Image
+    source={require("../../assets/pngCaraFeliz.png")}
+    resizeMode="contain"
+    {...props}
+  />
+);
+
+const imageMap: Record<string, React.ElementType> = {
+  error: ErrorSvg,
+  logout: LogoutSvg,
+  success: SuccessSvg,
+  happy: HappyImage,
 };
 
 const Popup: React.FC<PopupProps> = ({
@@ -83,7 +92,7 @@ const Popup: React.FC<PopupProps> = ({
     }
   };
 
-  const imgSource = imageType ? imageMap[imageType] : undefined;
+  const ImgComponent = imageType ? imageMap[imageType] : undefined;
 
   // ¿Tenemos code y queremos mostrarlo?
   const hasCode = showCode && code !== undefined && code !== null && String(code).length > 0;
@@ -125,11 +134,11 @@ const Popup: React.FC<PopupProps> = ({
     >
       <View style={[styles.overlay, containerStyle]}>
         <View style={[styles.popup, popupStyle]}>
-          {imgSource && (
-            <Image
-              source={imgSource}
+          {ImgComponent && (
+            <ImgComponent
               style={[styles.image, imageStyle]}
-              resizeMode="contain"
+              width={200}
+              height={200}
             />
           )}
 
