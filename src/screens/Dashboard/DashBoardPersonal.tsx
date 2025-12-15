@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -16,6 +16,8 @@ import BottomBar from "../../components/ui/BottomBar";
 import Header from "../../components/ui/Header";
 import TabSwitcher from "../../components/ui/TabSwitcher";
 import TaskItem from "../../components/ui/TaskItem";
+import { auth } from "../../configs/firebaseConfig";
+import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 interface Task {
   id: string;
   time: string;
@@ -26,6 +28,10 @@ interface Task {
 const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
+  const [nombreEspacio, setNombreEspacio] = useState<string>("Cargando...");
+  const [nombreUsuario, setNombreUsuario] = useState<string>("@usuario");
+  const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
+
   const [tareas, setTareas] = useState<Task[]>([
     {
       id: "1",
@@ -70,12 +76,52 @@ const DashBoardPersonal: React.FC = () => {
       isCompleted: true,
     },
   ]);
+
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
-  if (!fontsLoaded) {
+
+  // Cargar el espacio del usuario
+  useEffect(() => {
+    const cargarEspacioUsuario = async () => {
+      try {
+        const user = auth.currentUser;
+
+        if (!user) {
+          console.log("No hay usuario autenticado");
+          setNombreEspacio("Sin espacio");
+          setLoadingEspacio(false);
+          return;
+        }
+
+        // Obtener el nombre de usuario (email sin dominio)
+        const username = user.email?.split('@')[0] || "usuario";
+        setNombreUsuario(`@${username}`);
+
+        // Obtener el espacio del usuario
+        const espacioData = await obtenerEspacioPorUsuarioId(user.uid);
+
+        if (espacioData && espacioData.espacio) {
+          setNombreEspacio(espacioData.espacio.nombre);
+          console.log("Espacio cargado:", espacioData.espacio);
+        } else {
+          setNombreEspacio("Sin espacio asignado");
+          console.log("Usuario no tiene espacio asignado");
+        }
+      } catch (error) {
+        console.error("Error al cargar espacio del usuario:", error);
+        setNombreEspacio("Error al cargar");
+      } finally {
+        setLoadingEspacio(false);
+      }
+    };
+
+    cargarEspacioUsuario();
+  }, []);
+
+  if (!fontsLoaded || loadingEspacio) {
     return (
       <View style={GLOBAL_STYLES.container}>
         <ActivityIndicator size="large" />
@@ -112,9 +158,13 @@ const DashBoardPersonal: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <Header
-          username="@usuario"
-          date="Miércoles, 15 de Septiembre"
-          location="Piso Tarragona"
+          username={nombreUsuario}
+          date={new Date().toLocaleDateString('es-ES', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long'
+          })}
+          location={nombreEspacio}
         />
         <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
         <View style={styles.contentContainer}>
