@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { FONTS, COLORS, COMMON, SIZES } from "../styles/theme";
+import { FONTS, COLORS, COMMON, SIZES } from "../../styles/theme";
 
 interface CalendarProps {
     onDateSelect?: (date: Date) => void;
