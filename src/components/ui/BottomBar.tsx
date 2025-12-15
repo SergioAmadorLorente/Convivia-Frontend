@@ -44,7 +44,7 @@ const BottomBar = () => {
           </View>
           <Text style={styles.menuText}>Crear nueva factura</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("CreateTask")}>
           <View style={styles.circleIcon}>
             <Text style={styles.circleIconText}>T</Text>
           </View>
@@ -106,13 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
-    // ⭐ Sombra idéntica a tu screenshot: suave, amplia, poco opaca
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 3 },
-    // Android
-    elevation: 4,
   },
   circleIconText: { fontSize: 16 },
   menuText: { fontSize: 15, color: "#4B4741" },
@@ -126,8 +119,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#ECECEB",
     zIndex: 3,
-
-
   },
   tab: { alignItems: "center" },
   label: { fontSize: 14, marginTop: 2, color: "#4B4741" },

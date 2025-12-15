@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { FONTS, COLORS, COMMON, SIZES } from "../styles/theme";
 
 interface CalendarProps {
@@ -13,8 +14,8 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
     const [minuto, setMinuto] = useState<string>("00");
     const [horaScrolling, setHoraScrolling] = useState<boolean>(false);
     const [minScrolling, setMinScrolling] = useState<boolean>(false);
-    const scrollRefHora = useRef<ScrollView | null>(null);
-    const scrollRefMin = useRef<ScrollView | null>(null);
+    const scrollRefHora = useRef<any>(null);
+    const scrollRefMin = useRef<any>(null);
     const itemHeight = 40;
     const containerHeight = 60; // visible area for scroll (3 items)
     const hours = Array.from({ length: 24 }, (_, i) => i);
@@ -169,6 +170,7 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
                     <View style={[styles.scrollWrap, { height: containerHeight }]}>
                         <ScrollView
                             ref={scrollRefHora}
+                            nestedScrollEnabled={true}
                             showsVerticalScrollIndicator={false}
                             snapToInterval={itemHeight}
                             decelerationRate="fast"
@@ -200,6 +202,7 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
                     <View style={[styles.scrollWrap, { height: containerHeight }]}>
                         <ScrollView
                             ref={scrollRefMin}
+                            nestedScrollEnabled={true}
                             showsVerticalScrollIndicator={false}
                             snapToInterval={itemHeight}
                             decelerationRate="fast"
@@ -229,19 +232,19 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
 
 
 const styles = StyleSheet.create({
-    contenedor: { padding: 20, maxWidth: 400 },
+    contenedor: { maxWidth: 400 },
     encabezado: {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 20,
+        marginBottom: 1,
     },
     titulo: {
-        marginHorizontal: 15,
+        marginHorizontal: 40,
         fontSize: 20,
         textAlign: "center",
         color: "#000000ff",
-        fontFamily: FONTS.regular,
+        fontFamily: FONTS.title,
         fontWeight: "400",
         fontStyle: "normal",
         lineHeight: 20,
@@ -268,7 +271,7 @@ const styles = StyleSheet.create({
     diaVacio: { width: "14.2857%" },
     dia: {
         width: "14.2857%",
-        padding: 10,
+        paddingVertical: 5,
         borderRadius: 10,
 
         alignItems: "center",
@@ -301,8 +304,8 @@ const styles = StyleSheet.create({
     },
     scrollItem: { height: 40, justifyContent: "center", alignItems: "center" },
     scrollItemSelected: {},
-    scrollItemText: { fontFamily: FONTS.regular, fontSize: 16, color: "#333" },
-    selectedText: { color: COLORS.primary, fontWeight: "700" },
+    scrollItemText: { fontFamily: FONTS.title, fontSize: 20, color: "#333" },
+    selectedText: { color: COLORS.primary, fontFamily: FONTS.title, fontSize: 24 },
     hiddenText: { opacity: 0 },
     centerIndicator: { position: "absolute", left: 0, right: 0, top: 10, height: 40, borderTopWidth: 1, borderBottomWidth: 1, borderColor: "#ddd" },
     timeContainer: {

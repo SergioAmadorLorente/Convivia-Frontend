@@ -127,8 +127,6 @@ export const COMMON = {
   },
 };
 
-
-
 export const CHECKBOX = {
   /** Área táctil para que sea fácil pulsar el checkbox */
   touchArea: {
@@ -151,5 +149,5 @@ export default {
   COMMON,
   HELPERS,
   COMPONENTS,
-  CHECKBOX
+  CHECKBOX,
 };

@@ -1,0 +1,198 @@
+import {
+    View,
+    Text,
+    Platform,
+    KeyboardAvoidingView,
+    TouchableOpacity,
+    StyleSheet,
+} from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
+import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
+import { Desplegable, TextField } from "../../components";
+import BottomBar from "../../components/ui/BottomBar";
+import { Calendar } from "../../components/calendar";
+import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
+import KarmaSelector from "../../components/ui/KarmaSelector";
+import LargeTextField from "../../components/ui/LargeTextField";
+import Button from "../../components/ui/Button";
+import { Feather } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
+
+const { hp } = HELPERS;
+
+
+
+const CreateTask: React.FC = () => {
+    const navigation = useNavigation<any>();
+
+    React.useLayoutEffect(() => {
+        navigation.setOptions({ title: "Crear Tarea" });
+    }, [navigation]);
+    const [checkedAutoasign, setcheckedAutoasign] = useState(false);
+    const [assignPopupVisible, setAssignPopupVisible] = useState(false);
+
+    const [availableUsers] = useState([
+        { id: "1", name: "Juan Pérez" },
+        { id: "2", name: "María García" },
+        { id: "3", name: "Lucía Fernández" },
+    ]);
+
+    function handleToggleTask(id: any) {
+        // abrir popup de asignación
+        setAssignPopupVisible(true);
+    }
+
+    return (
+
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+        >
+            <ScrollView
+                contentContainerStyle={[
+                    GLOBAL_STYLES.scrollContainer2, // ✅ ancho completo, fondo blanco
+                    { paddingBottom: hp("15%") }, // puedes mover esto a un global si prefieres
+                    Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
+                    { alignItems: "center" }, // centrar todos los elementos horizontalmente
+                ]}
+                showsVerticalScrollIndicator={false}
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled"
+            >
+                <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
+                    <TextField
+                        value={""}
+                        onChangeText={function (text: string): void {
+                            null;
+                        }}
+                        placeholder="Nombre"
+                    />
+                    <LargeTextField
+                        value={""}
+                        onChangeText={function (text: string): void {
+                            null;
+                        }}
+                        placeholder="Descripcion"
+                    ></LargeTextField>
+                </View>
+                <View style={{ width: "90%", gap: 20 }}>
+                    <Desplegable
+                        title="Fecha y hora límite"
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+                        <Calendar />
+                    </Desplegable>
+                    <Desplegable
+                        title="Repetición de la tarea"
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+                        <RepeatDaysSelector
+                            onChange={(days: string[]) => {
+                                /* noop for now */
+                            }}
+                        />
+                    </Desplegable>
+
+                    <Desplegable
+                        title="Puntos de karma"
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+                        <KarmaSelector
+                            onSelect={(points: number) => {
+                                /* noop for now */
+                            }}
+                        />
+                    </Desplegable>
+                    <Desplegable
+                        title="Asigna a compañeros"
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+                        <Button
+                            style={GLOBAL_STYLES.buttonSecondaryGrey}
+                            onPress={() => handleToggleTask(1)}
+                        >
+                            <Text style={GLOBAL_STYLES.textoBoton}>
+                                Asignar usuario a la tarea
+                            </Text>
+                        </Button>
+
+                        <View
+                            style={[
+                                GLOBAL_STYLES.checkboxContainer,
+                                { marginLeft: "40%", marginTop: 20 },
+                            ]}
+                        >
+                            <Text
+                                style={[GLOBAL_STYLES.labelCheckbox, { color: COLORS.accent }]}
+                            >
+                                Autoasignar a la tarea
+                            </Text>
+                            <TouchableOpacity
+                                style={CHECKBOX.touchArea}
+                                onPress={() => setcheckedAutoasign(!checkedAutoasign)}
+                            >
+                                <Feather
+                                    name={checkedAutoasign ? "check-square" : "square"}
+                                    size={CHECKBOX.iconSize}
+                                    color={
+                                        checkedAutoasign
+                                            ? CHECKBOX.colors.checked
+                                            : CHECKBOX.colors.unchecked
+                                    }
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </Desplegable>
+                </View>
+                <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
+                    <LargeTextField
+                        value={""}
+                        onChangeText={function (text: string): void {
+                            null;
+                        }}
+                        placeholder="Usuarios asignados"
+
+                    ></LargeTextField>
+
+                    <Button
+                        style={GLOBAL_STYLES.buttonPrimaryGreen}
+                        onPress={() => {
+                            /* noop for now */
+                        }}
+                    >
+                        <Text style={GLOBAL_STYLES.textoBoton}>Crear tarea</Text>
+                    </Button>
+                </View>
+            </ScrollView>
+
+            <AssignUsersPopup
+                visible={assignPopupVisible}
+                onClose={() => setAssignPopupVisible(false)}
+                users={availableUsers}
+                multiSelect={true}
+                onConfirm={(selected) => {
+                    console.log("Usuarios asignados:", selected);
+                }}
+            />
+            <BottomBar />
+        </KeyboardAvoidingView>
+    );
+};
+
+export default CreateTask;
