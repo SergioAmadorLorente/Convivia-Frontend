@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
@@ -21,8 +21,6 @@ import BottomBar from "../../components/ui/BottomBar";
 import Header from "../../components/ui/Header";
 import TabSwitcher from "../../components/ui/TabSwitcher";
 import TaskItem from "../../components/ui/TaskItem";
-import { auth } from "../../configs/firebaseConfig";
-import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 import Desplegable from "../../components/ui/Desplegable";
 import TasksFilter from "../../components/ui/TasksFilter";
 const { hp } = HELPERS;
@@ -36,10 +34,6 @@ interface Task {
 const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
-  const [nombreEspacio, setNombreEspacio] = useState<string>("Cargando...");
-  const [nombreUsuario, setNombreUsuario] = useState<string>("@usuario");
-  const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
-
   const [selectedFilter, setSelectedFilter] =
     useState<"today" | "week" | "all">("today");
   const [tareas, setTareas] = useState<Task[]>([
@@ -52,52 +46,12 @@ const DashBoardPersonal: React.FC = () => {
     { id: "1", time: "15/12", title: "Electricidad", subtitle: "€85.50", isCompleted: false },
     { id: "2", time: "20/12", title: "Internet", subtitle: "€45.00", isCompleted: true },
   ]);
-
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
-
-  // Cargar el espacio del usuario
-  useEffect(() => {
-    const cargarEspacioUsuario = async () => {
-      try {
-        const user = auth.currentUser;
-
-        if (!user) {
-          console.log("No hay usuario autenticado");
-          setNombreEspacio("Sin espacio");
-          setLoadingEspacio(false);
-          return;
-        }
-
-        // Obtener el nombre de usuario (email sin dominio)
-        const username = user.email?.split('@')[0] || "usuario";
-        setNombreUsuario(`@${username}`);
-
-        // Obtener el espacio del usuario
-        const espacioData = await obtenerEspacioPorUsuarioId(user.uid);
-
-        if (espacioData && espacioData.espacio) {
-          setNombreEspacio(espacioData.espacio.nombre);
-          console.log("Espacio cargado:", espacioData.espacio);
-        } else {
-          setNombreEspacio("Sin espacio asignado");
-          console.log("Usuario no tiene espacio asignado");
-        }
-      } catch (error) {
-        console.error("Error al cargar espacio del usuario:", error);
-        setNombreEspacio("Error al cargar");
-      } finally {
-        setLoadingEspacio(false);
-      }
-    };
-
-    cargarEspacioUsuario();
-  }, []);
-
-  if (!fontsLoaded || loadingEspacio) {
+  if (!fontsLoaded) {
     return (
       <View style={[GLOBAL_STYLES.container, { justifyContent: "center" }]}>
         <ActivityIndicator size="large" />
@@ -144,37 +98,54 @@ const DashBoardPersonal: React.FC = () => {
         nestedScrollEnabled
         keyboardShouldPersistTaps="handled"
       >
-        <Header
-          username={nombreUsuario}
-          date={new Date().toLocaleDateString('es-ES', {
-            weekday: 'long',
-            day: 'numeric',
-            month: 'long'
-          })}
-          location={nombreEspacio}
-        />
-        <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
-        <View style={styles.contentContainer}>
-          {pendingItems.map((item) => (
-            <TaskItem
-              key={item.id}
-              time={item.time}
-              title={item.title}
-              subtitle={item.subtitle}
-              isCompleted={item.isCompleted}
-              onToggle={() => handleToggleTask(item.id)}
-            />
-          ))}
-          {completedItems.map((item) => (
-            <TaskItem
-              key={item.id}
-              time={item.time}
-              title={item.title}
-              subtitle={item.subtitle}
-              isCompleted={item.isCompleted}
-              onToggle={() => handleToggleTask(item.id)}
-            />
-          ))}
+        {/* ⬅️ SOLO aparece cuando estás en "tareas" */}
+        {activeTab === "tareas" && (
+          <View
+            style={[
+              GLOBAL_STYLES.fullWidth,
+              { marginTop: 10, marginBottom: 15 }
+            ]}
+          >
+            <TasksFilter onFilterChange={setSelectedFilter} />
+          </View>
+        )}
+        <View style={GLOBAL_STYLES.container}>
+          <Desplegable
+            title="Pendientes"
+            fontSize={SIZES.text16}
+            fontWeight="bold"
+            collapsible={false}
+            showIcon={false}
+          >
+            {pendingItems.map(item => (
+              <TaskItem
+                key={item.id}
+                time={item.time}
+                title={item.title}
+                subtitle={item.subtitle}
+                isCompleted={item.isCompleted}
+                onToggle={() => handleToggleTask(item.id)}
+              />
+            ))}
+          </Desplegable>
+          <Desplegable
+            title="Completadas"
+            fontSize={SIZES.text16}
+            fontWeight="bold"
+            collapsible={false}
+            showIcon={false}
+          >
+            {completedItems.map(item => (
+              <TaskItem
+                key={item.id}
+                time={item.time}
+                title={item.title}
+                subtitle={item.subtitle}
+                isCompleted={item.isCompleted}
+                onToggle={() => handleToggleTask(item.id)}
+              />
+            ))}
+          </Desplegable>
         </View>
       </ScrollView>
       <BottomBar />

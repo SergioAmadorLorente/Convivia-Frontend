@@ -48,11 +48,11 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingHorizontal: 16,
+        paddingHorizontal: 0,
     },
     box: {
-        width: 75,
-        height: 60,
+        width: 70,
+        height: 55,
         backgroundColor: COLORS.inputBackground,
         borderRadius: 14,
         alignItems: "center",
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
     },
     label: {
-        marginTop: 4,
+        marginTop: -2,
         fontSize: 14,
         fontFamily: FONTS.title,
         color: COLORS.secondary,
