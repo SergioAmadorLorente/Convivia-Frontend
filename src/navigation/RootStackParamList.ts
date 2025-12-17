@@ -12,4 +12,5 @@ export type RootStackParamList = {
   Perfil: undefined;
   test: undefined;
   CreateTask: undefined;
+  CreateFactura: undefined;
 };
