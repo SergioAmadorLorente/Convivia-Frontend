@@ -11,7 +11,7 @@ import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
 import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
-import { Calendar } from "../../components/ui/calendar";
+import { Calendar } from "../../components/ui/Calendar";
 import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
@@ -20,6 +20,7 @@ import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
+import TimePickerPopup from "../../components/ui/TimePickerPopup";
 
 const { hp } = HELPERS;
 
@@ -34,6 +35,10 @@ const CreateTask: React.FC = () => {
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
     const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
+
+    // Time Picker State
+    const [timePopupVisible, setTimePopupVisible] = useState(false);
+    const [selectedTime, setSelectedTime] = useState("12:00");
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -87,7 +92,10 @@ const CreateTask: React.FC = () => {
                         collapsible={false}
                         showIcon={false}
                     >
-                        <Calendar />
+                        <Calendar
+                            time={selectedTime}
+                            onTimeClick={() => setTimePopupVisible(true)}
+                        />
                     </Desplegable>
                     <Desplegable
                         title="Repetición de la tarea"
@@ -206,6 +214,16 @@ const CreateTask: React.FC = () => {
                     const isCurrentUserSelected = selected.some(u => u.id === CURRENT_USER.id);
                     setcheckedAutoasign(isCurrentUserSelected);
                 }}
+            />
+
+            <TimePickerPopup
+                visible={timePopupVisible}
+                onClose={() => setTimePopupVisible(false)}
+                onConfirm={(hour, minute) => {
+                    setSelectedTime(`${hour}:${minute}`);
+                }}
+                initialHour={selectedTime.split(":")[0]}
+                initialMinute={selectedTime.split(":")[1]}
             />
             <BottomBar />
         </KeyboardAvoidingView>
