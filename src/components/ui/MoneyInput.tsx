@@ -21,7 +21,7 @@ const MoneyInput: React.FC<MoneyInputProps> = ({ value = "", onChange }) => {
     return (
         <View style={styles.container}>
             <TextInput
-                value={text}
+                value={text ? text + "€" : ""}
                 onChangeText={formatMoney}
                 style={styles.input}
                 keyboardType="decimal-pad"
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.inputBackground,
         borderRadius: 20,
         paddingHorizontal: 20,
-        paddingVertical: 16,
+        paddingVertical: 5,
         marginTop: 10,
         shadowColor: "#000",
         shadowOpacity: 0.08,

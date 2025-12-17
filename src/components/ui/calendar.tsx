@@ -1,58 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
-import { FONTS, COLORS, COMMON, SIZES } from "../styles/theme";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+
+import { FONTS, COLORS, COMMON, SIZES } from "../../styles/theme";
 
 interface CalendarProps {
     onDateSelect?: (date: Date) => void;
+    time?: string;
+    onTimeClick?: () => void;
 }
 
-export const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
+export const Calendar: React.FC<CalendarProps> = ({ onDateSelect, time, onTimeClick }) => {
     const [fechaActual, setFechaActual] = useState(new Date());
     const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
     const [hora, setHora] = useState<string>("00");
     const [minuto, setMinuto] = useState<string>("00");
-    const [horaScrolling, setHoraScrolling] = useState<boolean>(false);
-    const [minScrolling, setMinScrolling] = useState<boolean>(false);
-    const scrollRefHora = useRef<ScrollView | null>(null);
-    const scrollRefMin = useRef<ScrollView | null>(null);
-    const itemHeight = 40;
-    const containerHeight = 60; // visible area for scroll (3 items)
-    const hours = Array.from({ length: 24 }, (_, i) => i);
-    const minutes = Array.from({ length: 60 }, (_, i) => i);
 
+    // Sync with external time prop
     useEffect(() => {
-        // scroll to initial values on mount
-        const h = parseInt(hora || "0", 10);
-        const m = parseInt(minuto || "0", 10);
-        setTimeout(() => {
-            scrollRefHora.current?.scrollTo({ y: h * itemHeight, animated: false });
-            scrollRefMin.current?.scrollTo({ y: m * itemHeight, animated: false });
-        }, 0);
-    }, []);
-
-    const onHoraMomentum = (e: any) => {
-        const y = e.nativeEvent.contentOffset.y;
-        const index = Math.max(
-            0,
-            Math.min(hours.length - 1, Math.round(y / itemHeight))
-        );
-        const value = String(index).padStart(2, "0");
-        setHora(value);
-        scrollRefHora.current?.scrollTo({ y: index * itemHeight, animated: true });
-        setHoraScrolling(false);
-    };
-
-    const onMinutoMomentum = (e: any) => {
-        const y = e.nativeEvent.contentOffset.y;
-        const index = Math.max(
-            0,
-            Math.min(minutes.length - 1, Math.round(y / itemHeight))
-        );
-        const value = String(index).padStart(2, "0");
-        setMinuto(value);
-        scrollRefMin.current?.scrollTo({ y: index * itemHeight, animated: true });
-        setMinScrolling(false);
-    };
+        if (time) {
+            const [h, m] = time.split(":");
+            if (h !== undefined && m !== undefined) {
+                setHora(h);
+                setMinuto(m);
+            }
+        }
+    }, [time]);
 
     const obtenerDiasDelMes = (fecha: Date) => {
         return new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
@@ -164,84 +136,42 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect }) => {
                 })}
             </View>
 
-            <View style={styles.timeContainer}>
+            <Pressable style={styles.timeContainer} onPress={onTimeClick}>
                 <View style={styles.timeBox}>
-                    <View style={[styles.scrollWrap, { height: containerHeight }]}>
-                        <ScrollView
-                            ref={scrollRefHora}
-                            showsVerticalScrollIndicator={false}
-                            snapToInterval={itemHeight}
-                            decelerationRate="fast"
-                            onMomentumScrollBegin={() => setHoraScrolling(true)}
-                            onMomentumScrollEnd={onHoraMomentum}
-                            onScrollBeginDrag={() => setHoraScrolling(true)}
-                            contentContainerStyle={{ paddingTop: (containerHeight - itemHeight) / 2, paddingBottom: (containerHeight - itemHeight) / 2 }}
-                        >
-                            {hours.map((h) => {
-                                const text = String(h).padStart(2, "0");
-                                const selected = hora === text;
-                                const hidden = !horaScrolling && !selected;
-                                return (
-                                    <View key={h} style={[styles.scrollItem, hidden && styles.hiddenText, selected && styles.scrollItemSelected]}>
-                                        <Text style={[styles.scrollItemText, hidden && styles.hiddenText, selected && styles.selectedText]}>{text}</Text>
-                                    </View>
-                                );
-                            })}
-                        </ScrollView>
-                        <View />
+                    <View style={styles.staticTimeDisplay}>
+                        <Text style={styles.staticTimeText}>{hora}</Text>
                     </View>
                 </View>
 
-                <Text style={{ fontSize: SIZES.popupTitle, color: COLORS.primary, textAlignVertical: "center", height: "90%", fontFamily: FONTS.title }}>
+                <Text style={{ fontSize: SIZES.popupTitle, color: COLORS.primary, textAlignVertical: "center", fontFamily: FONTS.title }}>
                     :
                 </Text>
 
                 <View style={styles.timeBox}>
-                    <View style={[styles.scrollWrap, { height: containerHeight }]}>
-                        <ScrollView
-                            ref={scrollRefMin}
-                            showsVerticalScrollIndicator={false}
-                            snapToInterval={itemHeight}
-                            decelerationRate="fast"
-                            onMomentumScrollBegin={() => setMinScrolling(true)}
-                            onMomentumScrollEnd={onMinutoMomentum}
-                            onScrollBeginDrag={() => setMinScrolling(true)}
-                            contentContainerStyle={{ paddingTop: (containerHeight - itemHeight) / 2, paddingBottom: (containerHeight - itemHeight) / 2 }}
-                        >
-                            {minutes.map((m) => {
-                                const text = String(m).padStart(2, "0");
-                                const selected = minuto === text;
-                                const hidden = !minScrolling && !selected;
-                                return (
-                                    <View key={m} style={[styles.scrollItem, hidden && styles.hiddenText, selected && styles.scrollItemSelected]}>
-                                        <Text style={[styles.scrollItemText, hidden && styles.hiddenText, selected && styles.selectedText]}>{text}</Text>
-                                    </View>
-                                );
-                            })}
-                        </ScrollView>
-                        <View />
+                    <View style={styles.staticTimeDisplay}>
+                        <Text style={styles.staticTimeText}>{minuto}</Text>
                     </View>
                 </View>
-            </View>
+            </Pressable>
         </View>
     );
 };
 
 
 const styles = StyleSheet.create({
-    contenedor: { padding: 20, maxWidth: 400 },
+    contenedor: { maxWidth: 400 },
     encabezado: {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 20,
+        marginBottom: 1,
     },
     titulo: {
-        marginHorizontal: 15,
+        marginHorizontal: 40,
         fontSize: 20,
         textAlign: "center",
         color: "#000000ff",
-        fontFamily: FONTS.regular,
+        fontFamily: FONTS.title,
         fontWeight: "400",
         fontStyle: "normal",
         lineHeight: 20,
@@ -268,7 +198,7 @@ const styles = StyleSheet.create({
     diaVacio: { width: "14.2857%" },
     dia: {
         width: "14.2857%",
-        padding: 10,
+        paddingVertical: 5,
         borderRadius: 10,
 
         alignItems: "center",
@@ -286,23 +216,28 @@ const styles = StyleSheet.create({
         elevation: 6,
     },
     findesText: { color: "#ff0000ff" },
-    scrollWrap: {
+    staticTimeDisplay: {
         width: "70%",
-        maxHeight: "100%",
-        overflow: "hidden",
+        paddingVertical: 10,
         backgroundColor: COLORS.success,
         borderRadius: 8,
-
+        alignItems: "center",
+        justifyContent: "center",
         shadowColor: COMMON.SHADOW.shadowColor,
         shadowOffset: COMMON.SHADOW.shadowOffset,
         shadowOpacity: COMMON.SHADOW.shadowOpacity,
         shadowRadius: COMMON.SHADOW.shadowRadius,
         elevation: COMMON.SHADOW.elevation,
     },
+    staticTimeText: {
+        color: COLORS.primary,
+        fontFamily: FONTS.title,
+        fontSize: 24,
+    },
     scrollItem: { height: 40, justifyContent: "center", alignItems: "center" },
     scrollItemSelected: {},
-    scrollItemText: { fontFamily: FONTS.regular, fontSize: 16, color: "#333" },
-    selectedText: { color: COLORS.primary, fontWeight: "700" },
+    scrollItemText: { fontFamily: FONTS.title, fontSize: 20, color: "#333" },
+    selectedText: { color: COLORS.primary, fontFamily: FONTS.title, fontSize: 24 },
     hiddenText: { opacity: 0 },
     centerIndicator: { position: "absolute", left: 0, right: 0, top: 10, height: 40, borderTopWidth: 1, borderBottomWidth: 1, borderColor: "#ddd" },
     timeContainer: {
