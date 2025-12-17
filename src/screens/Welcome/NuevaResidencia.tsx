@@ -22,7 +22,8 @@ import TextField from '../../components/ui/TextField';
 import ConfettiButton from '../../components/ui/ConfettiButton';
 import { FONTS, COLORS } from '../../styles/styles';
 
-import { crearEspacio } from '../../api/espacio';
+import { crearEspacioConUsuario } from '../../api/espacio';
+import { auth } from '../../configs/firebaseConfig';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -66,19 +67,38 @@ const NuevaResidencia: React.FC = () => {
       return;
     }
 
+    // Verificar que el usuario esté autenticado
+    const user = auth.currentUser;
+    if (!user) {
+      showPopup({
+        title: 'Error de autenticación',
+        description: 'No se pudo identificar al usuario. Por favor, inicia sesión nuevamente.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('IniciarSesion') }]
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // TODO: Cuando tengas backend, sustituye '966069' por el código real devuelto.
-      const codigoBackend = '966069';
+      // Crear espacio y relación con el usuario automáticamente
+      const resultado = await crearEspacioConUsuario(
+        {
+          nombre: nombreResidencia,
+          direccion: direccion
+        },
+        user.uid,  // ID del usuario autenticado de Firebase
+        'admin'    // Rol del usuario (creador es admin)
+      );
+
+      console.log('Residencia creada:', resultado.espacio);
+      console.log('Relación usuario-espacio creada:', resultado.usuarioEspacio);
 
       showPopup({
-        title: 'Residencia creada',
-        description: 'Puedes encontrarlo de nuevo en Perfil > Mi residencia',
-        imageType: 'convivia',
-        code: codigoBackend,              // <-- nuevo
-        buttons: [
-          { text: '¡Empieza!', onPress: () => navigation.navigate('DashBoardPersonal') },
-        ],
+        title: 'Éxito',
+        description: 'Residencia creada exitosamente',
+        imageType: 'success',
+        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }]
       });
     } catch (error) {
       console.error('Error al crear residencia:', error);
