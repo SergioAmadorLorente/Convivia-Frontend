@@ -31,7 +31,6 @@ import Button from "../../components/ui/Button";
 import Popup from "../../components/ui/Popup";
 import { COLORS, CHECKBOX } from "../../styles/theme";
 import ConfettiButton from "../../components/ui/ConfettiButton";
-import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 const IniciarSesion: React.FC = () => {
   const {
     email,
@@ -90,24 +89,12 @@ const IniciarSesion: React.FC = () => {
       }
       // OK login
       setShowConfetti(true);
-
-      // Verificar si el usuario tiene espacio asignado
-      let destination = "Bienvenida";
-      try {
-        const usuarioEspacio = await obtenerEspacioPorUsuarioId(userCredential.user.uid);
-        if (usuarioEspacio) {
-          destination = "DashBoardPersonal";
-        }
-      } catch (error) {
-        console.log("Error al verificar espacio en login, redirigiendo a Bienvenida por defecto:", error);
-      }
-
       showPopup({
         title: "Éxito",
         description: "Login exitoso",
         imageType: "success",
         buttons: [
-          { text: "Aceptar", onPress: () => navigation.navigate(destination) },
+          { text: "Aceptar", onPress: () => navigation.navigate("Bienvenida") },
         ],
       });
     } catch (error) {
