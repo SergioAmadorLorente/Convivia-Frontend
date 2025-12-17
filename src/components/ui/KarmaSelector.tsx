@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
     },
     label: {
-        marginTop: 4,
+        marginTop: -2,
         fontSize: 14,
         fontFamily: FONTS.title,
         color: COLORS.secondary,

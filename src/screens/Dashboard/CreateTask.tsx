@@ -11,7 +11,7 @@ import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
 import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
-import { Calendar } from "../../components/ui/Calendar";
+import { Calendar } from "../../components/ui/calendar";
 import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
@@ -79,7 +79,7 @@ const CreateTask: React.FC = () => {
                         placeholder="Descripcion"
                     ></LargeTextField>
                 </View>
-                <View style={{ width: "90%", gap: 20 }}>
+                <View style={{ width: "100%", gap: 20 }}>
                     <Desplegable
                         title="Fecha y hora límite"
                         fontSize={SIZES.text16}
@@ -102,6 +102,7 @@ const CreateTask: React.FC = () => {
                             }}
                         />
                     </Desplegable>
+
 
                     <Desplegable
                         title="Puntos de karma"
