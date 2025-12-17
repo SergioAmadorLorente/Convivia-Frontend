@@ -5,19 +5,27 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
-import { Montserrat_400Regular, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
+import {
+  Montserrat_400Regular,
+  Montserrat_700Bold,
+} from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
-import GLOBAL_STYLES from "../../styles/styles";
+// Global
+import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
+import { COLORS, HELPERS, SIZES } from "../../styles/theme";
+// Componentes
 import BottomBar from "../../components/ui/BottomBar";
 import Header from "../../components/ui/Header";
 import TabSwitcher from "../../components/ui/TabSwitcher";
 import TaskItem from "../../components/ui/TaskItem";
 import { auth } from "../../configs/firebaseConfig";
 import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
+import Desplegable from "../../components/ui/Desplegable";
+import TasksFilter from "../../components/ui/TasksFilter";
+const { hp } = HELPERS;
 interface Task {
   id: string;
   time: string;
@@ -32,49 +40,17 @@ const DashBoardPersonal: React.FC = () => {
   const [nombreUsuario, setNombreUsuario] = useState<string>("@usuario");
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
 
+  const [selectedFilter, setSelectedFilter] =
+    useState<"today" | "week" | "all">("today");
   const [tareas, setTareas] = useState<Task[]>([
-    {
-      id: "1",
-      time: "12:00",
-      title: "Bajar la basura",
-      subtitle: "Orgánica y envases",
-      isCompleted: false,
-    },
-    {
-      id: "2",
-      time: "15:30",
-      title: "Barrer",
-      subtitle: "Zonas comunes",
-      isCompleted: false,
-    },
-    {
-      id: "3",
-      time: "09:30",
-      title: "Limpiar el baño",
-      isCompleted: false,
-    },
-    {
-      id: "4",
-      time: "09:30",
-      title: "Fregar los platos",
-      isCompleted: true,
-    },
+    { id: "1", time: "12:00", title: "Bajar la basura", subtitle: "Orgánica y envases", isCompleted: false },
+    { id: "2", time: "15:30", title: "Barrer", subtitle: "Zonas comunes", isCompleted: false },
+    { id: "3", time: "09:30", title: "Limpiar el baño", isCompleted: false },
+    { id: "4", time: "09:30", title: "Fregar los platos", isCompleted: true },
   ]);
   const [facturas, setFacturas] = useState<Task[]>([
-    {
-      id: "1",
-      time: "15/12",
-      title: "Electricidad",
-      subtitle: "€85.50",
-      isCompleted: false,
-    },
-    {
-      id: "2",
-      time: "20/12",
-      title: "Internet",
-      subtitle: "€45.00",
-      isCompleted: true,
-    },
+    { id: "1", time: "15/12", title: "Electricidad", subtitle: "€85.50", isCompleted: false },
+    { id: "2", time: "20/12", title: "Internet", subtitle: "€45.00", isCompleted: true },
   ]);
 
   const [fontsLoaded] = useFonts({
@@ -123,39 +99,50 @@ const DashBoardPersonal: React.FC = () => {
 
   if (!fontsLoaded || loadingEspacio) {
     return (
-      <View style={GLOBAL_STYLES.container}>
+      <View style={[GLOBAL_STYLES.container, { justifyContent: "center" }]}>
         <ActivityIndicator size="large" />
       </View>
     );
   }
   const handleToggleTask = (id: string) => {
     if (activeTab === "tareas") {
-      setTareas((prev) =>
-        prev.map((task) =>
+      setTareas(prev =>
+        prev.map(task =>
           task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
         )
       );
     } else {
-      setFacturas((prev) =>
-        prev.map((factura) =>
-          factura.id === id ? { ...factura, isCompleted: !factura.isCompleted } : factura
+      setFacturas(prev =>
+        prev.map(f =>
+          f.id === id ? { ...f, isCompleted: !f.isCompleted } : f
         )
       );
     }
   };
   const currentItems = activeTab === "tareas" ? tareas : facturas;
-  const pendingItems = currentItems.filter((item) => !item.isCompleted);
-  const completedItems = currentItems.filter((item) => item.isCompleted);
+  const pendingItems = currentItems.filter(i => !i.isCompleted);
+  const completedItems = currentItems.filter(i => i.isCompleted);
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
+      <Header
+        username="@usuario"
+        date="Miércoles, 15 de Septiembre"
+        location="Piso Tarragona"
+      />
+      <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
       <ScrollView
-        contentContainerStyle={[styles.scrollContainer, { paddingBottom: 120 }]}
-        keyboardShouldPersistTaps="always"
+        contentContainerStyle={[
+          GLOBAL_STYLES.scrollContainer2,
+          { paddingBottom: hp("15%") },
+          Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
+        ]}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+        keyboardShouldPersistTaps="handled"
       >
         <Header
           username={nombreUsuario}
@@ -194,13 +181,4 @@ const DashBoardPersonal: React.FC = () => {
     </KeyboardAvoidingView>
   );
 };
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  contentContainer: {
-    padding: 16,
-  },
-});
 export default DashBoardPersonal;

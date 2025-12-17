@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import LogoCompleto from "../../assets/logo_completo.svg";
 
 interface CustomHeaderProps {
   onLogout?: () => void;
@@ -35,11 +36,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ onLogout }) => {
           marginTop: 50,
         }}
       >
-        <Image
-          source={require("../../assets/logo_completo.png")}
+        <LogoCompleto
+          width={250}
+          height={70}
           style={{
-            width: 250,
-            height: 70,
             marginTop: 20,
           }}
         />

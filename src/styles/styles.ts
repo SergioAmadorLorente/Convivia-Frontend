@@ -27,6 +27,28 @@ export const GLOBAL_STYLES = StyleSheet.create({
     paddingTop: hp("8%"),
     paddingHorizontal: wp("5%"),
   },
+  scrollContainer2: {
+    flexGrow: 1,
+    backgroundColor: COLORS.background,
+    alignItems: "stretch",
+    paddingTop: hp("2%"),
+    paddingHorizontal: SIZES.paddingHorizontal,
+    borderRadius: moderateScale(25),
+  },
+  fullWidth: {
+    width: "100%",
+  },
+  
+  /** Wrapper blanco para el contenido de dashboard (tareas + carrusel) */
+  dashboardWhiteSection: {
+    backgroundColor: COLORS.background,
+    alignItems: "stretch",                 // 🔑 ancho completo para hijos
+    paddingHorizontal: SIZES.paddingHorizontal,
+    paddingBottom: HELPERS.hp("2%"),
+    // si quieres esquinas redondeadas aquí, podemos usar COMMON.PAGE_CARD;
+    // por ahora lo dejamos plano como en tu working version.
+  },
+
 
   //contenedor principal de pantallas
   container: {
@@ -55,13 +77,6 @@ export const GLOBAL_STYLES = StyleSheet.create({
     textAlign: "center",
     fontWeight: "normal",
   },
-
-
-
-
-
-
-
 
   // Texto de ayuda o aclaración
   helperText: {
@@ -234,13 +249,14 @@ export const GLOBAL_STYLES = StyleSheet.create({
     color: COLORS.primary,
     fontFamily: FONTS.regular,
   },
-
   // Contenedor de checkbox y label
   checkboxContainer: {
     flexDirection: "row",
+    alignItems: "center", 
     width: wp("80%"),
     marginTop: hp("1%"),
     marginBottom: hp("1%"),
+    gap: 8, // espaciado entre checkbox y label (opcional)
   },
 });
 

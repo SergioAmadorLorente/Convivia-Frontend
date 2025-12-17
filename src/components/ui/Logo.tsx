@@ -1,14 +1,11 @@
 import React from "react";
-import { View, Image, Text } from "react-native";
+import { View, Text } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
+import LogoReal from "../../assets/logoReal.svg";
 
 const Logo: React.FC = () => (
   <>
-    <Image
-      source={require("../../assets/logoReal.png")}
-      style={GLOBAL_STYLES.logo}
-      resizeMode="contain"
-    />
+    <LogoReal style={GLOBAL_STYLES.logo} />
 
     <View style={GLOBAL_STYLES.logoContainer}>
       <Text style={GLOBAL_STYLES.tituloLogo}>Convivia</Text>
