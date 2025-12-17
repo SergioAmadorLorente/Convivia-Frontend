@@ -11,7 +11,7 @@ import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
 import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
-import { Calendar } from "../../components/ui/calendar";
+import { Calendar } from "../../components/ui/Calendar";
 import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
@@ -23,7 +23,7 @@ import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
 
 const { hp } = HELPERS;
 
-
+const CURRENT_USER = { id: "0", name: "Yo" };
 
 const CreateTask: React.FC = () => {
     const navigation = useNavigation<any>();
@@ -33,6 +33,7 @@ const CreateTask: React.FC = () => {
     }, [navigation]);
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
+    const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -41,7 +42,6 @@ const CreateTask: React.FC = () => {
     ]);
 
     function handleToggleTask(id: any) {
-        // abrir popup de asignación
         setAssignPopupVisible(true);
     }
 
@@ -54,10 +54,10 @@ const CreateTask: React.FC = () => {
         >
             <ScrollView
                 contentContainerStyle={[
-                    GLOBAL_STYLES.scrollContainer2, // ✅ ancho completo, fondo blanco
-                    { paddingBottom: hp("15%") }, // puedes mover esto a un global si prefieres
+                    GLOBAL_STYLES.scrollContainer2,
+                    { paddingBottom: hp("15%") },
                     Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
-                    { alignItems: "center" }, // centrar todos los elementos horizontalmente
+                    { alignItems: "center" },
                 ]}
                 showsVerticalScrollIndicator={false}
                 nestedScrollEnabled
@@ -124,7 +124,7 @@ const CreateTask: React.FC = () => {
                         showIcon={false}
                     >
                         <Button
-                            style={GLOBAL_STYLES.buttonSecondaryGrey}
+                            style={[GLOBAL_STYLES.buttonSecondaryGrey]}
                             onPress={() => handleToggleTask(1)}
                         >
                             <Text style={GLOBAL_STYLES.textoBoton}>
@@ -145,7 +145,17 @@ const CreateTask: React.FC = () => {
                             </Text>
                             <TouchableOpacity
                                 style={CHECKBOX.touchArea}
-                                onPress={() => setcheckedAutoasign(!checkedAutoasign)}
+                                onPress={() => {
+                                    const newValue = !checkedAutoasign;
+                                    setcheckedAutoasign(newValue);
+                                    if (newValue) {
+                                        if (!assignedUsers.find(u => u.id === CURRENT_USER.id)) {
+                                            setAssignedUsers(prev => [...prev, CURRENT_USER]);
+                                        }
+                                    } else {
+                                        setAssignedUsers(prev => prev.filter(u => u.id !== CURRENT_USER.id));
+                                    }
+                                }}
                             >
                                 <Feather
                                     name={checkedAutoasign ? "check-square" : "square"}
@@ -161,14 +171,16 @@ const CreateTask: React.FC = () => {
                     </Desplegable>
                 </View>
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
-                    <LargeTextField
-                        value={""}
-                        onChangeText={function (text: string): void {
-                            null;
-                        }}
-                        placeholder="Usuarios asignados"
-
-                    ></LargeTextField>
+                    {assignedUsers.length > 0 && (
+                        <LargeTextField
+                            value={assignedUsers.map((u) => u.name).join("\n")}
+                            editable={false}
+                            onChangeText={() => {
+                                null;
+                            }}
+                            placeholder="Usuarios asignados"
+                        />
+                    )}
 
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
@@ -186,8 +198,12 @@ const CreateTask: React.FC = () => {
                 onClose={() => setAssignPopupVisible(false)}
                 users={availableUsers}
                 multiSelect={true}
+                initialSelectedIds={assignedUsers.map(u => u.id)}
                 onConfirm={(selected) => {
                     console.log("Usuarios asignados:", selected);
+                    setAssignedUsers(selected);
+                    const isCurrentUserSelected = selected.some(u => u.id === CURRENT_USER.id);
+                    setcheckedAutoasign(isCurrentUserSelected);
                 }}
             />
             <BottomBar />

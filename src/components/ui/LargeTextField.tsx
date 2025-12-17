@@ -20,6 +20,7 @@ interface LargeTextFieldProps {
     keyboardType?: TextInputProps["keyboardType"];
     error?: string;
     secureTextEntry?: boolean;
+    editable?: boolean;
 }
 
 const LargeTextField: React.FC<LargeTextFieldProps> = ({
@@ -30,6 +31,7 @@ const LargeTextField: React.FC<LargeTextFieldProps> = ({
     keyboardType = "default",
     error,
     secureTextEntry = false,
+    editable = true,
 }) => {
     const [show, setShow] = useState<boolean>(false);
     const isPassword = !!secureTextEntry;
@@ -54,6 +56,8 @@ const LargeTextField: React.FC<LargeTextFieldProps> = ({
                     secureTextEntry={isPassword && !show}
                     value={value}
                     onChangeText={onChangeText}
+                    editable={editable}
+                    multiline={true}
                 />
 
                 {isPassword && (
