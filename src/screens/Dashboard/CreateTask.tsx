@@ -11,7 +11,7 @@ import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
 import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
-import { Calendar } from "../../components/ui/calendar";
+import { Calendar } from "../../components/ui/Calendar";
 import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
@@ -150,7 +150,7 @@ const CreateTask: React.FC = () => {
                             <Text
                                 style={[GLOBAL_STYLES.labelCheckbox, { color: COLORS.accent }]}
                             >
-                                Autoasignar a la tarea
+                                Autoasignarse a la tarea
                             </Text>
                             <TouchableOpacity
                                 style={CHECKBOX.touchArea}

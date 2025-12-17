@@ -11,16 +11,15 @@ import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
 import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
-import { Calendar } from "../../components/ui/calendar";
-import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
-import KarmaSelector from "../../components/ui/KarmaSelector";
+import UploadImage from "../../components/ui/UploadImage";
+import MoneyInput from "../../components/ui/MoneyInput";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
-import TimePickerPopup from "../../components/ui/TimePickerPopup";
+
 
 const { hp } = HELPERS;
 
@@ -35,10 +34,6 @@ const CreateFactura: React.FC = () => {
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
     const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
-
-    // Time Picker State
-    const [timePopupVisible, setTimePopupVisible] = useState(false);
-    const [selectedTime, setSelectedTime] = useState("12:00");
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -85,45 +80,15 @@ const CreateFactura: React.FC = () => {
                     ></LargeTextField>
                 </View>
                 <View style={{ width: "100%", gap: 20 }}>
-                    <Desplegable
-                        title="Fecha y hora límite"
-                        fontSize={SIZES.text16}
-                        fontWeight="bold"
-                        collapsible={false}
-                        showIcon={false}
-                    >
-                        <Calendar
-                            time={selectedTime}
-                            onTimeClick={() => setTimePopupVisible(true)}
-                        />
-                    </Desplegable>
-                    <Desplegable
-                        title="Repetición de la tarea"
-                        fontSize={SIZES.text16}
-                        fontWeight="bold"
-                        collapsible={false}
-                        showIcon={false}
-                    >
-                        <RepeatDaysSelector
-                            onChange={(days: string[]) => {
-                                /* noop for now */
-                            }}
-                        />
-                    </Desplegable>
-
 
                     <Desplegable
-                        title="Puntos de karma"
+                        title="Precio"
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
                         showIcon={false}
                     >
-                        <KarmaSelector
-                            onSelect={(points: number) => {
-                                /* noop for now */
-                            }}
-                        />
+                        <MoneyInput onChange={(val) => console.log("Dinero:", val)} />
                     </Desplegable>
                     <Desplegable
                         title="Asigna a compañeros"
@@ -137,7 +102,7 @@ const CreateFactura: React.FC = () => {
                             onPress={() => handleToggleTask(1)}
                         >
                             <Text style={GLOBAL_STYLES.textoBoton}>
-                                Asignar usuario a la tarea
+                                Asignar usuario a la factura
                             </Text>
                         </Button>
 
@@ -150,7 +115,7 @@ const CreateFactura: React.FC = () => {
                             <Text
                                 style={[GLOBAL_STYLES.labelCheckbox, { color: COLORS.accent }]}
                             >
-                                Autoasignar a la tarea
+                                Autoasignarse a la factura
                             </Text>
                             <TouchableOpacity
                                 style={CHECKBOX.touchArea}
@@ -178,6 +143,7 @@ const CreateFactura: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                     </Desplegable>
+
                 </View>
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
                     {assignedUsers.length > 0 && (
@@ -190,14 +156,27 @@ const CreateFactura: React.FC = () => {
                             placeholder="Usuarios asignados"
                         />
                     )}
-
+                    <Desplegable
+                        title="Foto (opcional)"
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+                        <UploadImage
+                            label="Subir imagen"
+                            onImageSelected={(uri) => {
+                                console.log("Imagen seleccionada:", uri);
+                            }}
+                        />
+                    </Desplegable>
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
                         onPress={() => {
                             /* noop for now */
                         }}
                     >
-                        <Text style={GLOBAL_STYLES.textoBoton}>Crear tarea</Text>
+                        <Text style={GLOBAL_STYLES.textoBoton}>Crear factura</Text>
                     </Button>
                 </View>
             </ScrollView>
@@ -216,15 +195,6 @@ const CreateFactura: React.FC = () => {
                 }}
             />
 
-            <TimePickerPopup
-                visible={timePopupVisible}
-                onClose={() => setTimePopupVisible(false)}
-                onConfirm={(hour, minute) => {
-                    setSelectedTime(`${hour}:${minute}`);
-                }}
-                initialHour={selectedTime.split(":")[0]}
-                initialMinute={selectedTime.split(":")[1]}
-            />
             <BottomBar />
         </KeyboardAvoidingView>
     );
