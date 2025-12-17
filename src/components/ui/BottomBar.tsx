@@ -38,7 +38,7 @@ const BottomBar = () => {
           },
         ]}
       >
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("CreateFactura")}>
           <View style={styles.circleIcon}>
             <Text style={styles.circleIconText}>€</Text>
           </View>
@@ -48,7 +48,7 @@ const BottomBar = () => {
           <View style={styles.circleIcon}>
             <Text style={styles.circleIconText}>T</Text>
           </View>
-          <Text style={styles.menuText}>Crear nueva tarea</Text>
+          <Text style={styles.menuText} >Crear nueva tarea</Text>
         </TouchableOpacity>
       </Animated.View>
       {/* BOTTOM BAR */}

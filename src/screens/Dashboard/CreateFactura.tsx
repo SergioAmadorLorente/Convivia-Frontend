@@ -26,11 +26,11 @@ const { hp } = HELPERS;
 
 const CURRENT_USER = { id: "0", name: "Yo" };
 
-const CreateTask: React.FC = () => {
+const CreateFactura: React.FC = () => {
     const navigation = useNavigation<any>();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions({ title: "Crear Tarea" });
+        navigation.setOptions({ title: "Crear Factura" });
     }, [navigation]);
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
@@ -230,4 +230,4 @@ const CreateTask: React.FC = () => {
     );
 };
 
-export default CreateTask;
+export default CreateFactura;
