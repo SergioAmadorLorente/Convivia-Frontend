@@ -22,10 +22,10 @@ const api = axios.create({
   baseURL: getBaseUrl(),
   headers: {
     "Content-Type": "application/json",
-    "Accept": "*/*",
+    "Accept": "application/json",
   },
   timeout: 10000,
-  validateStatus: () => true,
+  // Removed validateStatus to properly handle HTTP errors
 });
 
 api.interceptors.request.use(request => {
