@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     // ⬇️ Bajamos ligeramente el contenido del header
-    paddingTop: SIZES.paddingVertical * 10,   // antes: 4
-    paddingBottom: SIZES.paddingVertical,
+    paddingTop: SIZES.paddingVertical * 7.5,   // antes: 4
+    paddingBottom: SIZES.paddingVertical * 0.6,
     paddingHorizontal: SIZES.paddingHorizontal,
     backgroundColor: COLORS.inputBackground,
     width: "100%",

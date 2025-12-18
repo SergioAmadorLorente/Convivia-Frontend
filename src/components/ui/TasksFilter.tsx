@@ -43,13 +43,12 @@ const TasksFilter: React.FC<TasksFilterProps> = ({ onFilterChange }) => {
 };
 const styles = StyleSheet.create({
     wrapper: {
-        paddingVertical: 5,
-        marginTop: 5,
+        paddingVertical: 0,
     },
     row: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingHorizontal: 12,
+        paddingHorizontal: 15,
     },
     box: {
         width: 100,
@@ -69,12 +68,13 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        fontFamily: FONTS.title,
+        fontFamily: FONTS.regular,
         color: COLORS.secondary,
+        textAlign: "center",
     },
     textActive: {
         color: COLORS.primary,
-        fontFamily: FONTS.title,
+        fontFamily: FONTS.bold,
     },
 });
 export default TasksFilter;
