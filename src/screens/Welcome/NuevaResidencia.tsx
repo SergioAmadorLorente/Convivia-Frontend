@@ -115,7 +115,7 @@ const NuevaResidencia: React.FC = () => {
               onChangeText={setNombreResidencia}
               placeholder="Piso Tarragona"
             />
-            {!hasText && nombreResidencia.length > 0 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
+            {!hasText && nombreResidencia.length > 20 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
 
             <ConfettiButton
               style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
