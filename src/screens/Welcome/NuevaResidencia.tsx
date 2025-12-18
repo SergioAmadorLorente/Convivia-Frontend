@@ -40,7 +40,17 @@ const NuevaResidencia: React.FC = () => {
 
   const handleClosePopup = () => setPopupVisible(false);
 
-  const hasText = nombreResidencia.trim().length > 0 && direccion.trim().length > 0;
+  // Validaciones independientes
+  const nombreValido =
+    nombreResidencia.trim().length > 0 &&
+    nombreResidencia.trim().length <= 20;
+
+  const direccionValida =
+    direccion.trim().length > 0 &&
+    direccion.trim().length <= 100;
+
+  // El botón solo se habilita si ambos son válidos
+  const hasText = nombreValido && direccionValida;
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
@@ -59,9 +69,9 @@ const NuevaResidencia: React.FC = () => {
     if (!hasText) {
       showPopup({
         title: 'Campo requerido',
-        description: 'Por favor, ingresa un nombre para la residencia.',
+        description: 'Por favor, ingresa un nombre y dirección válidos para la residencia.',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
       return;
     }
@@ -75,7 +85,7 @@ const NuevaResidencia: React.FC = () => {
         title: 'Residencia creada',
         description: 'Puedes encontrarlo de nuevo en Perfil > Mi residencia',
         imageType: 'convivia',
-        code: codigoBackend,              // <-- nuevo
+        code: codigoBackend,
         buttons: [
           { text: '¡Empieza!', onPress: () => navigation.navigate('DashBoardPersonal') },
         ],
@@ -86,7 +96,7 @@ const NuevaResidencia: React.FC = () => {
         title: 'Error',
         description: 'Error al crear la residencia. Intenta de nuevo.',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
     } finally {
       setLoading(false);
@@ -109,14 +119,35 @@ const NuevaResidencia: React.FC = () => {
               <Text>Perfil - Mi residencia</Text>
             </Text>
 
+            {/* Nombre */}
             <TextField
               label="Nombre de la residencia"
               value={nombreResidencia}
               onChangeText={setNombreResidencia}
               placeholder="Piso Tarragona"
             />
-            {!hasText && nombreResidencia.length > 20 && <Text style={styles.errorText}>Ingresa un nombre válido</Text>}
+            {nombreResidencia.trim().length === 0 && (
+              <Text style={styles.errorText}>Ingresa un nombre válido</Text>
+            )}
+            {nombreResidencia.trim().length > 20 && (
+              <Text style={styles.errorText}>El nombre no puede superar 20 caracteres</Text>
+            )}
 
+            {/* Dirección */}
+            <TextField
+              label="Dirección de la residencia"
+              value={direccion}
+              onChangeText={setDireccion}
+              placeholder="Calle Mayor 123, Madrid"
+            />
+            {direccion.trim().length === 0 && (
+              <Text style={styles.errorText}>Ingresa una dirección válida</Text>
+            )}
+            {direccion.trim().length > 100 && (
+              <Text style={styles.errorText}>La dirección no puede superar 100 caracteres</Text>
+            )}
+
+            {/* Botón */}
             <ConfettiButton
               style={[GLOBAL_STYLES.buttonPrimaryGreen, { backgroundColor: hasText ? '#E6ECDC' : '#ccc' }]}
               disabled={!hasText || loading}
@@ -136,7 +167,7 @@ const NuevaResidencia: React.FC = () => {
         description={popupOptions.description}
         imageType={popupOptions.imageType}
         buttons={popupOptions.buttons}
-        code={popupOptions.code} 
+        code={popupOptions.code}
         buttonsContainerStyle={{ marginTop: 8 }}
       />
     </>
