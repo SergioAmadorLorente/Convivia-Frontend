@@ -4,11 +4,10 @@ import {
     Platform,
     KeyboardAvoidingView,
     TouchableOpacity,
-    StyleSheet,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
-import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
+import { CHECKBOX, COLORS, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
 import UploadImage from "../../components/ui/UploadImage";
@@ -20,7 +19,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
 import { useEditFactura } from "../../hooks/useEditFactura";
-
 
 const { hp } = HELPERS;
 
@@ -74,7 +72,6 @@ const CreateFactura: React.FC = () => {
     }
 
     return (
-
         <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -93,18 +90,18 @@ const CreateFactura: React.FC = () => {
             >
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
-                        value={name}
-                        onChangeText={setName}
+                        value={facturaName}
+                        onChangeText={(text: string) => setFacturaName(text)}
                         placeholder="Nombre"
                     />
                     <LargeTextField
-                        value={description}
-                        onChangeText={setDescription}
+                        value={facturaDescription}
+                        onChangeText={(text: string) => setFacturaDescription(text)}
                         placeholder="Descripcion"
-                    ></LargeTextField>
+                    />
                 </View>
-                <View style={{ width: "100%", gap: 20 }}>
 
+                <View style={{ width: "100%", gap: 20 }}>
                     <Desplegable
                         title="Precio"
                         fontSize={SIZES.text16}
@@ -114,6 +111,7 @@ const CreateFactura: React.FC = () => {
                     >
                         <MoneyInput value={amount} onChange={(val) => setAmount(val)} />
                     </Desplegable>
+
                     <Desplegable
                         title="Asigna a compañeros"
                         fontSize={SIZES.text16}
@@ -167,19 +165,18 @@ const CreateFactura: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                     </Desplegable>
-
                 </View>
+
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
                     {assignedUsers.length > 0 && (
                         <LargeTextField
                             value={assignedUsers.map((u) => u.name).join("\n")}
                             editable={false}
-                            onChangeText={() => {
-                                null;
-                            }}
+                            onChangeText={() => { }}
                             placeholder="Usuarios asignados"
                         />
                     )}
+
                     <Desplegable
                         title="Foto (opcional)"
                         fontSize={SIZES.text16}
@@ -194,10 +191,15 @@ const CreateFactura: React.FC = () => {
                             }}
                         />
                     </Desplegable>
+
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
                         onPress={() => {
-                            /* noop for now */
+                            console.log("Factura creada:", {
+                                nombre: facturaName,
+                                descripcion: facturaDescription,
+                                usuarios: assignedUsers,
+                            });
                         }}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
