@@ -18,9 +18,10 @@ import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
+import { useEditTask } from "../../hooks/useEditTask";
 
 const { hp } = HELPERS;
 
@@ -28,22 +29,43 @@ const CURRENT_USER = { id: "0", name: "Yo" };
 
 const CreateTask: React.FC = () => {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions({ title: "Crear Tarea" });
-    }, [navigation]);
+        navigation.setOptions({ title: route.params?.taskToEdit ? "Editar Tarea" : "Crear Tarea" });
+    }, [navigation, route.params]);
+    const {
+        name, setName,
+        description, setDescription,
+        selectedTime, setSelectedTime,
+        repeatDays, setRepeatDays,
+        karma, setKarma,
+        assignedUsers, setAssignedUsers,
+        loadTask,
+        isEditing,
+    } = useEditTask();
 
-    // Estados para los campos de texto
-    const [taskName, setTaskName] = useState("");
-    const [taskDescription, setTaskDescription] = useState("");
+    useEffect(() => {
+        if (route.params?.taskToEdit) {
+            const t = route.params.taskToEdit;
+            // Map the simple task object to the form state
+            loadTask({
+                id: t.id,
+                name: t.title,
+                description: t.subtitle || "",
+                time: t.time,
+                repeatDays: [],
+                karma: 0,
+                assignedUsers: [],
+            });
+        }
+    }, [route.params]);
 
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
-    const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
 
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
-    const [selectedTime, setSelectedTime] = useState("12:00");
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -108,7 +130,7 @@ const CreateTask: React.FC = () => {
                     >
                         <RepeatDaysSelector
                             onChange={(days: string[]) => {
-                                /* noop for now */
+                                setRepeatDays(days);
                             }}
                         />
                     </Desplegable>
@@ -122,7 +144,7 @@ const CreateTask: React.FC = () => {
                     >
                         <KarmaSelector
                             onSelect={(points: number) => {
-                                /* noop for now */
+                                setKarma(points);
                             }}
                         />
                     </Desplegable>
@@ -203,7 +225,9 @@ const CreateTask: React.FC = () => {
                             });
                         }}
                     >
-                        <Text style={GLOBAL_STYLES.textoBoton}>Crear tarea</Text>
+                        <Text style={GLOBAL_STYLES.textoBoton}>
+                            {isEditing ? "Guardar cambios" : "Crear tarea"}
+                        </Text>
                     </Button>
                 </View>
             </ScrollView>

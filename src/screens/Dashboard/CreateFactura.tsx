@@ -15,9 +15,10 @@ import MoneyInput from "../../components/ui/MoneyInput";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
+import { useEditFactura } from "../../hooks/useEditFactura";
 
 const { hp } = HELPERS;
 
@@ -25,18 +26,40 @@ const CURRENT_USER = { id: "0", name: "Yo" };
 
 const CreateFactura: React.FC = () => {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
+
+    const {
+        name, setName,
+        description, setDescription,
+        amount, setAmount,
+        assignedUsers, setAssignedUsers,
+        imageUri, setImageUri,
+        isEditing,
+        loadFactura,
+    } = useEditFactura();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions({ title: "Crear Factura" });
-    }, [navigation]);
+        navigation.setOptions({ title: isEditing ? "Editar Factura" : "Crear Factura" });
+    }, [navigation, isEditing]);
 
-    // Estados para los campos de texto
-    const [facturaName, setFacturaName] = useState("");
-    const [facturaDescription, setFacturaDescription] = useState("");
+    useEffect(() => {
+        console.log("CreateFactura mounted. Params:", route.params);
+        if (route.params?.facturaToEdit) {
+            console.log("Editing factura:", route.params.facturaToEdit);
+            const f = route.params.facturaToEdit;
+            loadFactura({
+                id: f.id,
+                name: f.title,
+                description: f.subtitle || "",
+                amount: f.subtitle ? f.subtitle.replace("€", "") : "", // Simple parsing assumption
+                assignedUsers: [],
+                imageUri: undefined,
+            });
+        }
+    }, [route.params]);
 
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
-    const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -86,7 +109,7 @@ const CreateFactura: React.FC = () => {
                         collapsible={false}
                         showIcon={false}
                     >
-                        <MoneyInput onChange={(val) => console.log("Dinero:", val)} />
+                        <MoneyInput value={amount} onChange={(val) => setAmount(val)} />
                     </Desplegable>
 
                     <Desplegable
@@ -164,7 +187,7 @@ const CreateFactura: React.FC = () => {
                         <UploadImage
                             label="Subir imagen"
                             onImageSelected={(uri) => {
-                                console.log("Imagen seleccionada:", uri);
+                                setImageUri(uri || undefined);
                             }}
                         />
                     </Desplegable>
@@ -179,7 +202,9 @@ const CreateFactura: React.FC = () => {
                             });
                         }}
                     >
-                        <Text style={GLOBAL_STYLES.textoBoton}>Crear factura</Text>
+                        <Text style={GLOBAL_STYLES.textoBoton}>
+                            {isEditing ? "Guardar cambios" : "Crear factura"}
+                        </Text>
                     </Button>
                 </View>
             </ScrollView>

@@ -10,6 +10,9 @@ interface MoneyInputProps {
 const MoneyInput: React.FC<MoneyInputProps> = ({ value = "", onChange }) => {
     const [text, setText] = useState(value);
 
+    React.useEffect(() => {
+        setText(value);
+    }, [value]);
     const formatMoney = (val: string) => {
         // Quitamos todo lo que no sea número o coma
         let cleaned = val.replace(/[^0-9,]/g, "");
