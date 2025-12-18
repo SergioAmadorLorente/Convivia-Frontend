@@ -32,6 +32,11 @@ const CreateTask: React.FC = () => {
     React.useLayoutEffect(() => {
         navigation.setOptions({ title: "Crear Tarea" });
     }, [navigation]);
+
+    // Estados para los campos de texto
+    const [taskName, setTaskName] = useState("");
+    const [taskDescription, setTaskDescription] = useState("");
+
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
     const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
@@ -51,7 +56,6 @@ const CreateTask: React.FC = () => {
     }
 
     return (
-
         <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -70,20 +74,17 @@ const CreateTask: React.FC = () => {
             >
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
-                        value={""}
-                        onChangeText={function (text: string): void {
-                            null;
-                        }}
+                        value={taskName}
+                        onChangeText={(text: string) => setTaskName(text)}
                         placeholder="Nombre"
                     />
                     <LargeTextField
-                        value={""}
-                        onChangeText={function (text: string): void {
-                            null;
-                        }}
+                        value={taskDescription}
+                        onChangeText={(text: string) => setTaskDescription(text)}
                         placeholder="Descripcion"
-                    ></LargeTextField>
+                    />
                 </View>
+
                 <View style={{ width: "100%", gap: 20 }}>
                     <Desplegable
                         title="Fecha y hora límite"
@@ -97,6 +98,7 @@ const CreateTask: React.FC = () => {
                             onTimeClick={() => setTimePopupVisible(true)}
                         />
                     </Desplegable>
+
                     <Desplegable
                         title="Repetición de la tarea"
                         fontSize={SIZES.text16}
@@ -111,7 +113,6 @@ const CreateTask: React.FC = () => {
                         />
                     </Desplegable>
 
-
                     <Desplegable
                         title="Puntos de karma"
                         fontSize={SIZES.text16}
@@ -125,6 +126,7 @@ const CreateTask: React.FC = () => {
                             }}
                         />
                     </Desplegable>
+
                     <Desplegable
                         title="Asigna a compañeros"
                         fontSize={SIZES.text16}
@@ -179,14 +181,13 @@ const CreateTask: React.FC = () => {
                         </View>
                     </Desplegable>
                 </View>
+
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
                     {assignedUsers.length > 0 && (
                         <LargeTextField
                             value={assignedUsers.map((u) => u.name).join("\n")}
                             editable={false}
-                            onChangeText={() => {
-                                null;
-                            }}
+                            onChangeText={() => { }}
                             placeholder="Usuarios asignados"
                         />
                     )}
@@ -194,7 +195,12 @@ const CreateTask: React.FC = () => {
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
                         onPress={() => {
-                            /* noop for now */
+                            console.log("Crear tarea:", {
+                                nombre: taskName,
+                                descripcion: taskDescription,
+                                usuarios: assignedUsers,
+                                hora: selectedTime,
+                            });
                         }}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>Crear tarea</Text>
@@ -225,6 +231,7 @@ const CreateTask: React.FC = () => {
                 initialHour={selectedTime.split(":")[0]}
                 initialMinute={selectedTime.split(":")[1]}
             />
+
             <BottomBar />
         </KeyboardAvoidingView>
     );
