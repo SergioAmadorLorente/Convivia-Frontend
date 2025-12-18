@@ -74,9 +74,13 @@ const DashBoardPersonal: React.FC = () => {
     }
   };
   const handleEditTask = (task: Task) => {
+    console.log("handleEditTask called", { task, activeTab });
     // Only allow editing if it is a task, not a bill (factura)
     if (activeTab === "tareas") {
       navigation.navigate("CreateTask", { taskToEdit: task });
+    } else {
+      console.log("Navigating to CreateFactura");
+      navigation.navigate("CreateFactura", { facturaToEdit: task });
     }
   };
 
