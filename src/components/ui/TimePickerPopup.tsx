@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Modal,
     View,
@@ -23,6 +23,11 @@ const HOURS = Array.from({ length: 24 }, (_, i) =>
 const MINUTES = Array.from({ length: 60 }, (_, i) =>
     i.toString().padStart(2, "0")
 );
+// 🔁 INFINITE LOOP
+const HOURS_LOOP = [...HOURS, ...HOURS, ...HOURS];
+const MINUTES_LOOP = [...MINUTES, ...MINUTES, ...MINUTES];
+const HOURS_MIDDLE_OFFSET = HOURS.length;
+const MINUTES_MIDDLE_OFFSET = MINUTES.length;
 const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
     visible,
     onClose,
@@ -32,10 +37,22 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
 }) => {
     const [selectedHour, setSelectedHour] = useState(initialHour);
     const [selectedMinute, setSelectedMinute] = useState(initialMinute);
+    const hourRef = useRef<FlatList>(null);
+    const minuteRef = useRef<FlatList>(null);
     useEffect(() => {
         if (visible) {
             setSelectedHour(initialHour);
             setSelectedMinute(initialMinute);
+            setTimeout(() => {
+                hourRef.current?.scrollToIndex({
+                    index: HOURS_MIDDLE_OFFSET + HOURS.indexOf(initialHour),
+                    animated: false,
+                });
+                minuteRef.current?.scrollToIndex({
+                    index: MINUTES_MIDDLE_OFFSET + MINUTES.indexOf(initialMinute),
+                    animated: false,
+                });
+            }, 0);
         }
     }, [visible, initialHour, initialMinute]);
     const handleScroll = (
@@ -44,10 +61,23 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
         setFn: (val: string) => void
     ) => {
         const y = event.nativeEvent.contentOffset.y;
-        // 🔥 CORRECCIÓN: detecta el item centrado siempre
         const index = Math.round((y + ITEM_HEIGHT / 2) / ITEM_HEIGHT);
         const clampedIndex = Math.max(0, Math.min(data.length - 1, index));
         setFn(data[clampedIndex]);
+    };
+    const keepHourLoop = (index: number) => {
+        const realIndex = index % HOURS.length;
+        hourRef.current?.scrollToIndex({
+            index: HOURS_MIDDLE_OFFSET + realIndex,
+            animated: false,
+        });
+    };
+    const keepMinuteLoop = (index: number) => {
+        const realIndex = index % MINUTES.length;
+        minuteRef.current?.scrollToIndex({
+            index: MINUTES_MIDDLE_OFFSET + realIndex,
+            animated: false,
+        });
     };
     const renderItem = (
         { item }: { item: string },
@@ -89,78 +119,77 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
                         Selecciona la hora
                     </Text>
                     <View style={styles.listsContainer}>
-                        {/* Hours */}
+                        {/* HOURS LOOP */}
                         <View style={styles.listWrapper}>
                             <Text style={styles.columnHeader}>Hora</Text>
                             <View style={styles.headerDivider} />
                             <FlatList
-                                data={HOURS}
-                                keyExtractor={(item) => item}
+                                ref={hourRef}
+                                data={HOURS_LOOP}
+                                keyExtractor={(_, i) => "H" + i}
                                 renderItem={(props) =>
                                     renderItem(props, selectedHour)
                                 }
+                                initialScrollIndex={
+                                    HOURS_MIDDLE_OFFSET +
+                                    HOURS.indexOf(selectedHour)
+                                }
                                 showsVerticalScrollIndicator={false}
-                                initialScrollIndex={HOURS.indexOf(
-                                    selectedHour
-                                )}
-                                onMomentumScrollEnd={(e) =>
-                                    handleScroll(
-                                        e,
-                                        HOURS,
-                                        setSelectedHour
-                                    )
-                                }
-                                onScrollEndDrag={(e) =>
-                                    handleScroll(
-                                        e,
-                                        HOURS,
-                                        setSelectedHour
-                                    )
-                                }
                                 snapToInterval={ITEM_HEIGHT}
                                 decelerationRate="fast"
-                                getItemLayout={(data, index) => ({
+                                onMomentumScrollEnd={(e) => {
+                                    handleScroll(
+                                        e,
+                                        HOURS_LOOP,
+                                        setSelectedHour
+                                    );
+                                    const rawIndex = Math.round(
+                                        e.nativeEvent.contentOffset.y /
+                                        ITEM_HEIGHT
+                                    );
+                                    keepHourLoop(rawIndex);
+                                }}
+                                getItemLayout={(_, index) => ({
                                     length: ITEM_HEIGHT,
                                     offset: ITEM_HEIGHT * index,
                                     index,
                                 })}
                             />
                         </View>
-                        {/* Center separator */}
                         <View style={styles.centerSeparatorContainer}>
                             <Text style={styles.separator}>:</Text>
                         </View>
-                        {/* Minutes */}
+                        {/* MINUTES LOOP */}
                         <View style={styles.listWrapper}>
                             <Text style={styles.columnHeader}>Minutos</Text>
                             <View style={styles.headerDivider} />
                             <FlatList
-                                data={MINUTES}
-                                keyExtractor={(item) => item}
+                                ref={minuteRef}
+                                data={MINUTES_LOOP}
+                                keyExtractor={(_, i) => "M" + i}
                                 renderItem={(props) =>
                                     renderItem(props, selectedMinute)
                                 }
+                                initialScrollIndex={
+                                    MINUTES_MIDDLE_OFFSET +
+                                    MINUTES.indexOf(selectedMinute)
+                                }
                                 showsVerticalScrollIndicator={false}
-                                initialScrollIndex={MINUTES.indexOf(
-                                    selectedMinute
-                                )}
-                                onMomentumScrollEnd={(e) =>
-                                    handleScroll(
-                                        e,
-                                        MINUTES,
-                                        setSelectedMinute
-                                    )
-                                }
-                                onScrollEndDrag={(e) =>
-                                    handleScroll(
-                                        e,
-                                        MINUTES,
-                                        setSelectedMinute
-                                    )
-                                }
                                 snapToInterval={ITEM_HEIGHT}
                                 decelerationRate="fast"
-                                getItemLayout={(data, index) => ({
+                                onMomentumScrollEnd={(e) => {
+                                    handleScroll(
+                                        e,
+                                        MINUTES_LOOP,
+                                        setSelectedMinute
+                                    );
+                                    const rawIndex = Math.round(
+                                        e.nativeEvent.contentOffset.y /
+                                        ITEM_HEIGHT
+                                    );
+                                    keepMinuteLoop(rawIndex);
+                                }}
+                                getItemLayout={(_, index) => ({
                                     length: ITEM_HEIGHT,
                                     offset: ITEM_HEIGHT * index,
                                     index,
@@ -219,10 +248,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 20,
         alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
         elevation: 5,
     },
     listsContainer: {

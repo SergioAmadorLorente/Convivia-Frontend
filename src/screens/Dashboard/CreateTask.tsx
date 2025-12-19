@@ -14,10 +14,12 @@ import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { Feather } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
+import { useEditTask } from "../../hooks/useEditTask";
 
 const { hp } = HELPERS;
 
@@ -30,10 +32,38 @@ type UserItem = {
 
 const CreateTask: React.FC = () => {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions({ title: "Crear Tarea" });
-    }, [navigation]);
+        navigation.setOptions({ title: route.params?.taskToEdit ? "Editar Tarea" : "Crear Tarea" });
+    }, [navigation, route.params]);
+    const {
+        name, setName,
+        description, setDescription,
+        selectedTime, setSelectedTime,
+        repeatDays, setRepeatDays,
+        karma, setKarma,
+        assignedUsers, setAssignedUsers,
+        loadTask,
+        isEditing,
+    } = useEditTask();
+
+    useEffect(() => {
+        if (route.params?.taskToEdit) {
+            const t = route.params.taskToEdit;
+            // Map the simple task object to the form state
+            loadTask({
+                id: t.id,
+                name: t.title,
+                description: t.subtitle || "",
+                time: t.time,
+                repeatDays: [],
+                karma: 0,
+                assignedUsers: [],
+            });
+        }
+    }, [route.params]);
+
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
 
@@ -45,7 +75,6 @@ const CreateTask: React.FC = () => {
 
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
-    const [selectedTime, setSelectedTime] = useState("12:00");
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -69,7 +98,6 @@ const CreateTask: React.FC = () => {
     };
 
     return (
-
         <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -88,20 +116,17 @@ const CreateTask: React.FC = () => {
             >
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
-                        value={""}
-                        onChangeText={function (text: string): void {
-                            null;
-                        }}
+                        value={taskName}
+                        onChangeText={(text: string) => setTaskName(text)}
                         placeholder="Nombre"
                     />
                     <LargeTextField
-                        value={""}
-                        onChangeText={function (text: string): void {
-                            null;
-                        }}
+                        value={taskDescription}
+                        onChangeText={(text: string) => setTaskDescription(text)}
                         placeholder="Descripcion"
-                    ></LargeTextField>
+                    />
                 </View>
+
                 <View style={{ width: "100%", gap: 20 }}>
                     <Desplegable
                         title="Fecha y hora límite"
@@ -115,6 +140,7 @@ const CreateTask: React.FC = () => {
                             onTimeClick={() => setTimePopupVisible(true)}
                         />
                     </Desplegable>
+
                     <Desplegable
                         title="Repetición de la tarea"
                         fontSize={SIZES.text16}
@@ -136,7 +162,6 @@ const CreateTask: React.FC = () => {
                         />
                     </Desplegable>
 
-
                     <Desplegable
                         title="Puntos de karma"
                         fontSize={SIZES.text16}
@@ -146,12 +171,66 @@ const CreateTask: React.FC = () => {
                     >
                         <KarmaSelector
                             onSelect={(points: number) => {
-                                /* noop for now */
+                                setKarma(points);
                             }}
                         />
                     </Desplegable>
 
+                    <Desplegable
+                        title="Asigna a compañeros"
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+                        <Button
+                            style={[GLOBAL_STYLES.buttonSecondaryGrey]}
+                            onPress={() => handleToggleTask(1)}
+                        >
+                            <Text style={GLOBAL_STYLES.textoBoton}>
+                                Asignar usuario a la tarea
+                            </Text>
+                        </Button>
+
+                        <View
+                            style={[
+                                GLOBAL_STYLES.checkboxContainer,
+                                { marginLeft: "40%", marginTop: 20 },
+                            ]}
+                        >
+                            <Text
+                                style={[GLOBAL_STYLES.labelCheckbox, { color: COLORS.accent }]}
+                            >
+                                Autoasignarse a la tarea
+                            </Text>
+                            <TouchableOpacity
+                                style={CHECKBOX.touchArea}
+                                onPress={() => {
+                                    const newValue = !checkedAutoasign;
+                                    setcheckedAutoasign(newValue);
+                                    if (newValue) {
+                                        if (!assignedUsers.find(u => u.id === CURRENT_USER.id)) {
+                                            setAssignedUsers(prev => [...prev, CURRENT_USER]);
+                                        }
+                                    } else {
+                                        setAssignedUsers(prev => prev.filter(u => u.id !== CURRENT_USER.id));
+                                    }
+                                }}
+                            >
+                                <Feather
+                                    name={checkedAutoasign ? "check-square" : "square"}
+                                    size={CHECKBOX.iconSize}
+                                    color={
+                                        checkedAutoasign
+                                            ? CHECKBOX.colors.checked
+                                            : CHECKBOX.colors.unchecked
+                                    }
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </Desplegable>
                 </View>
+
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
 
 
@@ -159,7 +238,9 @@ const CreateTask: React.FC = () => {
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
                         onPress={() => handleToggleTask(1)}
                     >
-                        <Text style={GLOBAL_STYLES.textoBoton}>Crear tarea</Text>
+                        <Text style={GLOBAL_STYLES.textoBoton}>
+                            {isEditing ? "Guardar cambios" : "Crear tarea"}
+                        </Text>
                     </Button>
                 </View>
             </ScrollView>
@@ -190,6 +271,7 @@ const CreateTask: React.FC = () => {
                 initialHour={selectedTime.split(":")[0]}
                 initialMinute={selectedTime.split(":")[1]}
             />
+
             <BottomBar />
         </KeyboardAvoidingView>
     );
