@@ -36,7 +36,7 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
   const [headerHeight, setHeaderHeight] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
 
-  const [showUnassigned, setShowUnassigned] = useState(false);
+  const [showUnassigned, setShowUnassigned] = useState(true);
   const [showOverdue, setShowOverdue] = useState(true);
   const [showCompleted, setShowCompleted] = useState(true);
 

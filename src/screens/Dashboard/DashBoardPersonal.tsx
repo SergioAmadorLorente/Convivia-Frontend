@@ -34,7 +34,7 @@ const DashBoardPersonal: React.FC = () => {
   const [selectedFilter, setSelectedFilter] =
     useState<"today" | "week" | "all">("today");
   const [visibility, setVisibility] = useState({
-    showUnassigned: false,
+    showUnassigned: true,
     showOverdue: true,
     showCompleted: true,
   });
@@ -237,7 +237,7 @@ const DashBoardPersonal: React.FC = () => {
           </View>
         )}
         <View style={GLOBAL_STYLES.container}>
-          <Desplegable title="Pendientes" fontSize={SIZES.text16} fontWeight="bold">
+          <Desplegable title="Pendientes" fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
             {pendingItems.map(item => (
               <TaskItem
                 key={item.id ?? item.IdFactura}
@@ -252,7 +252,7 @@ const DashBoardPersonal: React.FC = () => {
           </Desplegable>
 
           {visibility.showOverdue && overdueItems.length > 0 && (
-            <Desplegable title="Fuera de plazo" fontSize={SIZES.text16} fontWeight="bold">
+            <Desplegable title="Fuera de plazo" fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
               {overdueItems.map(item => (
                 <TaskItem
                   key={item.id ?? item.IdFactura}
@@ -268,7 +268,7 @@ const DashBoardPersonal: React.FC = () => {
           )}
 
           {visibility.showCompleted && (
-            <Desplegable title="Completadas" fontSize={SIZES.text16} fontWeight="bold">
+            <Desplegable title="Completadas" fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
               {completedItems.map(item => (
                 <TaskItem
                   key={item.id ?? item.IdFactura}
