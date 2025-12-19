@@ -9,6 +9,7 @@ interface TaskItemProps {
     subtitle?: string;
     isCompleted: boolean;
     onToggle: () => void;
+    onPress?: () => void;
 }
 const TaskItem: React.FC<TaskItemProps> = ({
     time,
@@ -16,9 +17,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
     subtitle,
     isCompleted,
     onToggle,
+    onPress,
 }) => {
     return (
-        <View style={styles.container}>
+        <TouchableOpacity
+            style={styles.container}
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
             <View style={styles.timeContainer}>
                 <Text style={styles.timeText}>{time}</Text>
             </View>
@@ -48,7 +54,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                     }
                 />
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
 };
 const styles = StyleSheet.create({

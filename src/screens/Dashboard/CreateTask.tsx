@@ -3,12 +3,10 @@ import {
     Text,
     Platform,
     KeyboardAvoidingView,
-    TouchableOpacity,
-    StyleSheet,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
-import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
+import { HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
 import { Calendar } from "../../components/ui/Calendar";
@@ -18,27 +16,65 @@ import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
+import { useEditTask } from "../../hooks/useEditTask";
 
 const { hp } = HELPERS;
 
 const CURRENT_USER = { id: "0", name: "Yo" };
 
+type UserItem = {
+    id: string;
+    name: string;
+};
+
 const CreateTask: React.FC = () => {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions({ title: "Crear Tarea" });
-    }, [navigation]);
+        navigation.setOptions({ title: route.params?.taskToEdit ? "Editar Tarea" : "Crear Tarea" });
+    }, [navigation, route.params]);
+    const {
+        name, setName,
+        description, setDescription,
+        selectedTime, setSelectedTime,
+        repeatDays, setRepeatDays,
+        karma, setKarma,
+        assignedUsers, setAssignedUsers,
+        loadTask,
+        isEditing,
+    } = useEditTask();
+
+    useEffect(() => {
+        if (route.params?.taskToEdit) {
+            const t = route.params.taskToEdit;
+            // Map the simple task object to the form state
+            loadTask({
+                id: t.id,
+                name: t.title,
+                description: t.subtitle || "",
+                time: t.time,
+                repeatDays: [],
+                karma: 0,
+                assignedUsers: [],
+            });
+        }
+    }, [route.params]);
+
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
-    const [assignedUsers, setAssignedUsers] = useState<any[]>([]);
+
+    // User assignments per day: { "Lunes": UserItem, "Martes": UserItem, ... }
+    const [dayUserAssignments, setDayUserAssignments] = useState<Record<string, UserItem | null>>({});
+
+    // Single user assignment (when no repeat days are selected)
+    const [singleUserAssignment, setSingleUserAssignment] = useState<UserItem | null>(null);
 
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
-    const [selectedTime, setSelectedTime] = useState("12:00");
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -50,8 +86,18 @@ const CreateTask: React.FC = () => {
         setAssignPopupVisible(true);
     }
 
-    return (
+    // Get initial assignments as userId mapping for the popup
+    const getInitialAssignments = (): Record<string, string> => {
+        const result: Record<string, string> = {};
+        Object.entries(dayUserAssignments).forEach(([day, user]) => {
+            if (user) {
+                result[day] = user.id;
+            }
+        });
+        return result;
+    };
 
+    return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -70,20 +116,17 @@ const CreateTask: React.FC = () => {
             >
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
-                        value={""}
-                        onChangeText={function (text: string): void {
-                            null;
-                        }}
+                        value={name}
+                        onChangeText={(text: string) => setName(text)}
                         placeholder="Nombre"
                     />
                     <LargeTextField
-                        value={""}
-                        onChangeText={function (text: string): void {
-                            null;
-                        }}
+                        value={description}
+                        onChangeText={(text: string) => setDescription(text)}
                         placeholder="Descripcion"
-                    ></LargeTextField>
+                    />
                 </View>
+
                 <View style={{ width: "100%", gap: 20 }}>
                     <Desplegable
                         title="Fecha y hora límite"
@@ -97,6 +140,7 @@ const CreateTask: React.FC = () => {
                             onTimeClick={() => setTimePopupVisible(true)}
                         />
                     </Desplegable>
+
                     <Desplegable
                         title="Repetición de la tarea"
                         fontSize={SIZES.text16}
@@ -106,11 +150,17 @@ const CreateTask: React.FC = () => {
                     >
                         <RepeatDaysSelector
                             onChange={(days: string[]) => {
-                                /* noop for now */
+                                setRepeatDays(days);
+                                setDayUserAssignments((prev) => {
+                                    const updated: Record<string, UserItem | null> = {};
+                                    days.forEach((day) => {
+                                        updated[day] = prev[day] || null;
+                                    });
+                                    return updated;
+                                });
                             }}
                         />
                     </Desplegable>
-
 
                     <Desplegable
                         title="Puntos de karma"
@@ -121,98 +171,46 @@ const CreateTask: React.FC = () => {
                     >
                         <KarmaSelector
                             onSelect={(points: number) => {
-                                /* noop for now */
+                                setKarma(points);
                             }}
                         />
-                    </Desplegable>
-                    <Desplegable
-                        title="Asigna a compañeros"
-                        fontSize={SIZES.text16}
-                        fontWeight="bold"
-                        collapsible={false}
-                        showIcon={false}
-                    >
-                        <Button
-                            style={[GLOBAL_STYLES.buttonSecondaryGrey]}
-                            onPress={() => handleToggleTask(1)}
-                        >
-                            <Text style={GLOBAL_STYLES.textoBoton}>
-                                Asignar usuario a la tarea
-                            </Text>
-                        </Button>
-
-                        <View
-                            style={[
-                                GLOBAL_STYLES.checkboxContainer,
-                                { marginLeft: "40%", marginTop: 20 },
-                            ]}
-                        >
-                            <Text
-                                style={[GLOBAL_STYLES.labelCheckbox, { color: COLORS.accent }]}
-                            >
-                                Autoasignarse a la tarea
-                            </Text>
-                            <TouchableOpacity
-                                style={CHECKBOX.touchArea}
-                                onPress={() => {
-                                    const newValue = !checkedAutoasign;
-                                    setcheckedAutoasign(newValue);
-                                    if (newValue) {
-                                        if (!assignedUsers.find(u => u.id === CURRENT_USER.id)) {
-                                            setAssignedUsers(prev => [...prev, CURRENT_USER]);
-                                        }
-                                    } else {
-                                        setAssignedUsers(prev => prev.filter(u => u.id !== CURRENT_USER.id));
-                                    }
-                                }}
-                            >
-                                <Feather
-                                    name={checkedAutoasign ? "check-square" : "square"}
-                                    size={CHECKBOX.iconSize}
-                                    color={
-                                        checkedAutoasign
-                                            ? CHECKBOX.colors.checked
-                                            : CHECKBOX.colors.unchecked
-                                    }
-                                />
-                            </TouchableOpacity>
-                        </View>
                     </Desplegable>
                 </View>
+
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
-                    {assignedUsers.length > 0 && (
-                        <LargeTextField
-                            value={assignedUsers.map((u) => u.name).join("\n")}
-                            editable={false}
-                            onChangeText={() => {
-                                null;
-                            }}
-                            placeholder="Usuarios asignados"
-                        />
-                    )}
+
 
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
-                        onPress={() => {
-                            /* noop for now */
-                        }}
+                        onPress={() => handleToggleTask(1)}
                     >
-                        <Text style={GLOBAL_STYLES.textoBoton}>Crear tarea</Text>
+                        <Text style={GLOBAL_STYLES.textoBoton}>
+                            {isEditing ? "Guardar cambios" : "Crear tarea"}
+                        </Text>
                     </Button>
                 </View>
             </ScrollView>
 
-            <AssignUsersPopup
+            <AssignUsersByDayPopup
                 visible={assignPopupVisible}
                 onClose={() => setAssignPopupVisible(false)}
                 users={availableUsers}
-                multiSelect={true}
-                initialSelectedIds={assignedUsers.map(u => u.id)}
-                onConfirm={(selected) => {
-                    console.log("Usuarios asignados:", selected);
-                    setAssignedUsers(selected);
-                    const isCurrentUserSelected = selected.some(u => u.id === CURRENT_USER.id);
+                days={repeatDays}
+                initialAssignments={getInitialAssignments()}
+                initialSingleUserId={singleUserAssignment?.id || null}
+                onConfirm={(assignments) => {
+                    console.log("Asignaciones por día:", assignments);
+                    setDayUserAssignments(assignments);
+                    // Check if current user is assigned to any day
+                    const isCurrentUserSelected = Object.values(assignments).some(
+                        (user) => user?.id === CURRENT_USER.id
+                    );
                     setcheckedAutoasign(isCurrentUserSelected);
+                }}
+                onConfirmSingleUser={(user) => {
+                    console.log("Usuario asignado:", user);
+                    setSingleUserAssignment(user);
+                    setcheckedAutoasign(user?.id === CURRENT_USER.id);
                 }}
             />
 
@@ -225,6 +223,7 @@ const CreateTask: React.FC = () => {
                 initialHour={selectedTime.split(":")[0]}
                 initialMinute={selectedTime.split(":")[1]}
             />
+
             <BottomBar />
         </KeyboardAvoidingView>
     );
