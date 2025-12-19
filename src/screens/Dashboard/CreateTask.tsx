@@ -3,12 +3,10 @@ import {
     Text,
     Platform,
     KeyboardAvoidingView,
-    TouchableOpacity,
-    StyleSheet,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
-import { CHECKBOX, COLORS, COMMON, HELPERS, SIZES } from "../../styles/theme";
+import { HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
 import { Calendar } from "../../components/ui/Calendar";
@@ -19,13 +17,18 @@ import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
+import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
 import { useEditTask } from "../../hooks/useEditTask";
 
 const { hp } = HELPERS;
 
 const CURRENT_USER = { id: "0", name: "Yo" };
+
+type UserItem = {
+    id: string;
+    name: string;
+};
 
 const CreateTask: React.FC = () => {
     const navigation = useNavigation<any>();
@@ -64,6 +67,12 @@ const CreateTask: React.FC = () => {
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
 
+    // Days selected in RepeatDaysSelector
+    const [repeatDays, setRepeatDays] = useState<string[]>([]);
+
+    // User assignments per day: { "Lunes": UserItem, "Martes": UserItem, ... }
+    const [dayUserAssignments, setDayUserAssignments] = useState<Record<string, UserItem | null>>({});
+
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
 
@@ -76,6 +85,17 @@ const CreateTask: React.FC = () => {
     function handleToggleTask(id: any) {
         setAssignPopupVisible(true);
     }
+
+    // Get initial assignments as userId mapping for the popup
+    const getInitialAssignments = (): Record<string, string> => {
+        const result: Record<string, string> = {};
+        Object.entries(dayUserAssignments).forEach(([day, user]) => {
+            if (user) {
+                result[day] = user.id;
+            }
+        });
+        return result;
+    };
 
     return (
         <KeyboardAvoidingView
@@ -131,6 +151,13 @@ const CreateTask: React.FC = () => {
                         <RepeatDaysSelector
                             onChange={(days: string[]) => {
                                 setRepeatDays(days);
+                                setDayUserAssignments((prev) => {
+                                    const updated: Record<string, UserItem | null> = {};
+                                    days.forEach((day) => {
+                                        updated[day] = prev[day] || null;
+                                    });
+                                    return updated;
+                                });
                             }}
                         />
                     </Desplegable>
@@ -205,25 +232,11 @@ const CreateTask: React.FC = () => {
                 </View>
 
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
-                    {assignedUsers.length > 0 && (
-                        <LargeTextField
-                            value={assignedUsers.map((u) => u.name).join("\n")}
-                            editable={false}
-                            onChangeText={() => { }}
-                            placeholder="Usuarios asignados"
-                        />
-                    )}
+
 
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
-                        onPress={() => {
-                            console.log("Crear tarea:", {
-                                nombre: taskName,
-                                descripcion: taskDescription,
-                                usuarios: assignedUsers,
-                                hora: selectedTime,
-                            });
-                        }}
+                        onPress={() => handleToggleTask(1)}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
                             {isEditing ? "Guardar cambios" : "Crear tarea"}
@@ -232,16 +245,19 @@ const CreateTask: React.FC = () => {
                 </View>
             </ScrollView>
 
-            <AssignUsersPopup
+            <AssignUsersByDayPopup
                 visible={assignPopupVisible}
                 onClose={() => setAssignPopupVisible(false)}
                 users={availableUsers}
-                multiSelect={true}
-                initialSelectedIds={assignedUsers.map(u => u.id)}
-                onConfirm={(selected) => {
-                    console.log("Usuarios asignados:", selected);
-                    setAssignedUsers(selected);
-                    const isCurrentUserSelected = selected.some(u => u.id === CURRENT_USER.id);
+                days={repeatDays}
+                initialAssignments={getInitialAssignments()}
+                onConfirm={(assignments) => {
+                    console.log("Asignaciones por día:", assignments);
+                    setDayUserAssignments(assignments);
+                    // Check if current user is assigned to any day
+                    const isCurrentUserSelected = Object.values(assignments).some(
+                        (user) => user?.id === CURRENT_USER.id
+                    );
                     setcheckedAutoasign(isCurrentUserSelected);
                 }}
             />
