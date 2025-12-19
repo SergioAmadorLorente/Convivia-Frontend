@@ -63,7 +63,7 @@ export const COMPONENTS = {
     leftColor: COLORS.accent,
     rightColor: COLORS.primary,
     gap: moderateScale(8),
-    marginTop: verticalScale(2),
+    marginTop: moderateScale(1),
     marginBottom: verticalScale(7.5),
   },
 };
@@ -127,6 +127,21 @@ export const COMMON = {
   },
 };
 
+export const CHECKBOX = {
+  /** Área táctil para que sea fácil pulsar el checkbox */
+  touchArea: {
+    padding: 1,
+    borderRadius: 999,
+  },
+  /** Tamaño del icono (Feather: 'square' / 'check-square') */
+  iconSize: 22,
+  /** Colores del icono*/
+  colors: {
+    checked: COLORS.secondary,
+    unchecked: COLORS.secondary,
+  },
+};
+
 export default {
   COLORS,
   FONTS,
@@ -134,4 +149,5 @@ export default {
   COMMON,
   HELPERS,
   COMPONENTS,
+  CHECKBOX,
 };

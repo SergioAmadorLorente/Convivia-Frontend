@@ -13,8 +13,9 @@ import Bienvenida from "../screens/Welcome/Bienvenida";
 import PoliticaCookiesPrivacidad from "../screens/Policies/PoliticaCookiesPrivacidad";
 import TerminosCondiciones from "../screens/Policies/TerminosCondiciones";
 import Perfil from "../screens/Perfil/Perfil";
-import CustomHeader from "../components/ui/CustomHeader";
 import TestScreen from "../screens/test";
+import CreateTask from "../screens/Dashboard/CreateTask";
+import CreateFactura from "../screens/Dashboard/CreateFactura";
 import { RootStackParamList } from "./RootStackParamList";
 const Stack = createStackNavigator<RootStackParamList>();
 const headerOptions: StackNavigationOptions = {
@@ -53,28 +54,25 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen
                     name="Bienvenida"
                     component={Bienvenida}
-                    options={({ route }) => ({
-                        header: () => (
-                            <CustomHeader
-                                onLogout={() => {
-                                    if ((route as any).params?.showLogoutModal) {
-                                        (route as any).params.showLogoutModal();
-                                    }
-                                }}
-                            />
-                        ),
-                    })}
+                    options={defaultScreenOptions}
                 />
                 <Stack.Screen name="CrearCuenta" component={CrearCuenta} options={defaultScreenOptions} />
                 <Stack.Screen name="IniciarSesion" component={IniciarSesion} options={defaultScreenOptions} />
                 <Stack.Screen name="RecuperarPassword" component={RecuperarPassword} options={defaultScreenOptions} />
-                <Stack.Screen name="DashBoardPersonal" component={DashBoardPersonal} options={defaultScreenOptions} />
+
+                <Stack.Screen
+                    name="DashBoardPersonal"
+                    component={DashBoardPersonal}
+                    options={{ headerShown: false }}
+                />
                 <Stack.Screen name="NuevaResidencia" component={NuevaResidencia} options={defaultScreenOptions} />
                 <Stack.Screen name="UnirResidencia" component={UnirResidencia} options={defaultScreenOptions} />
                 <Stack.Screen name="PoliticaCookiesPrivacidad" component={PoliticaCookiesPrivacidad} options={defaultScreenOptions} />
                 <Stack.Screen name="TerminosCondiciones" component={TerminosCondiciones} options={defaultScreenOptions} />
                 <Stack.Screen name="Perfil" component={Perfil} options={defaultScreenOptions} />
                 <Stack.Screen name="test" component={TestScreen} options={defaultScreenOptions} />
+                <Stack.Screen name="CreateTask" component={CreateTask} options={defaultScreenOptions} />
+                <Stack.Screen name="CreateFactura" component={CreateFactura} options={defaultScreenOptions} />
             </Stack.Navigator>
         </NavigationContainer>
     );

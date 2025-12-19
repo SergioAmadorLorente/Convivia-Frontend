@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { useFonts } from "expo-font";
 import SplashScreen from "./src/screens/SplashScreen";
+import { ToastProvider } from "./src/components/ui/ToastProvider"; // ✅ Importa el Provider
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
 import {
   Montserrat_400Regular,
@@ -30,7 +32,11 @@ const App: React.FC = () => {
     return <SplashScreen />;
   }
 
-  return <AppNavigator />;
+  return (
+    <ToastProvider position="top" maxToasts={3}>
+      <AppNavigator />
+    </ToastProvider>
+  );
 };
 
 export default App;

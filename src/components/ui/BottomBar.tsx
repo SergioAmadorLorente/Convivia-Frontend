@@ -5,53 +5,73 @@ import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../styles/theme";
 import { useTabColor } from "../../hooks/useTabColor";
-const { height } = Dimensions.get("window");
 const BottomBar = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [open, setOpen] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const toggleMenu = () => {
-    Animated.spring(scaleAnim, {
-      toValue: open ? 0 : 1,
-      useNativeDriver: true,
-      friction: 6,
-    }).start();
-    setOpen(!open);
+    if (open) {
+      Animated.timing(scaleAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(() => setOpen(false));
+    } else {
+      setOpen(true);
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        friction: 6,
+      }).start();
+    }
   };
   const homeColor = useTabColor("DashBoardPersonal");
   const profileColor = useTabColor("Perfil");
   return (
     <>
-      {/* OVERLAY solo cuando el menú está abierto */}
       {open && (
         <TouchableWithoutFeedback onPress={toggleMenu}>
           <View style={styles.overlayFullScreen} />
         </TouchableWithoutFeedback>
       )}
-      {/* MENÚ FLOTANTE */}
+      {/** MENÚ FLOTANTE */}
       <Animated.View
+        pointerEvents={open ? "auto" : "none"}
         style={[
           styles.floatingMenu,
           {
+            bottom: open ? 120 : -300,
             transform: [{ scale: scaleAnim }],
             opacity: scaleAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 1] }),
-          },
+          }
         ]}
       >
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => {
+            toggleMenu();
+            navigation.navigate("CreateFactura");
+          }}
+        >
           <View style={styles.circleIcon}>
             <Text style={styles.circleIconText}>€</Text>
           </View>
           <Text style={styles.menuText}>Crear nueva factura</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => {
+            toggleMenu();
+            navigation.navigate("CreateTask");
+          }}
+        >
           <View style={styles.circleIcon}>
             <Text style={styles.circleIconText}>T</Text>
           </View>
           <Text style={styles.menuText}>Crear nueva tarea</Text>
         </TouchableOpacity>
       </Animated.View>
-      {/* BOTTOM BAR */}
+      {/** BOTTOM BAR */}
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate("DashBoardPersonal")}>
           <Ionicons name="home-outline" size={28} color={homeColor} />
@@ -84,7 +104,6 @@ const styles = StyleSheet.create({
   },
   floatingMenu: {
     position: "absolute",
-    bottom: 120,
     left: 85,
     zIndex: 2,
   },
