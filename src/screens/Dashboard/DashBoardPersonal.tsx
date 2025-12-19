@@ -111,6 +111,17 @@ const DashBoardPersonal: React.FC = () => {
       setFacturas(prev => prev.map(f => (f.IdFactura === id ? f.togglePaid() : f)));
     }
   };
+  const handleEditTask = (task: Task) => {
+    console.log("handleEditTask called", { task, activeTab });
+    // Only allow editing if it is a task, not a bill (factura)
+    if (activeTab === "tareas") {
+      navigation.navigate("CreateTask", { taskToEdit: task });
+    } else {
+      console.log("Navigating to CreateFactura");
+      navigation.navigate("CreateFactura", { facturaToEdit: task });
+    }
+  };
+
   const currentItems = activeTab === "tareas" ? tareas : facturas;
 
   const isDone = (i: any) => {

@@ -81,7 +81,16 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect, time, onTimeCl
     };
 
     const handleSeleccionarDia = (dia: number) => {
-        setDiaSeleccionado(dia);
+        if (diaSeleccionado === dia) {
+            // Si el día ya está seleccionado, lo deseleccionamos
+            setDiaSeleccionado(null);
+            onDateSelect?.(null as unknown as Date);
+        } else {
+            // Si es un día diferente, lo seleccionamos
+            setDiaSeleccionado(dia);
+            const selectedDate = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), dia);
+            onDateSelect?.(selectedDate);
+        }
     };
 
     const diasEnMes = obtenerDiasDelMes(fechaActual);

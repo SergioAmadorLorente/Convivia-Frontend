@@ -34,7 +34,7 @@ type AssignUsersPopupProps = {
 const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
   visible,
   onClose,
-  title = "Asignación de usuarios",
+  title = "Asignación de usuarios (Opcional)",
   users,
   multiSelect = true,
   initialSelectedIds = [],
@@ -136,7 +136,9 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
             {confirming ? (
               <ActivityIndicator size="small" color={COLORS.secondary} />
             ) : (
-              <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
+              <Text style={styles.confirmButtonText}>
+                {selectedIds.size > 0 ? confirmLabel : "Mas tarde..."}
+              </Text>
             )}
           </TouchableOpacity>
         </View>
