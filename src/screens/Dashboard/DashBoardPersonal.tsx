@@ -73,6 +73,17 @@ const DashBoardPersonal: React.FC = () => {
       );
     }
   };
+  const handleEditTask = (task: Task) => {
+    console.log("handleEditTask called", { task, activeTab });
+    // Only allow editing if it is a task, not a bill (factura)
+    if (activeTab === "tareas") {
+      navigation.navigate("CreateTask", { taskToEdit: task });
+    } else {
+      console.log("Navigating to CreateFactura");
+      navigation.navigate("CreateFactura", { facturaToEdit: task });
+    }
+  };
+
   const currentItems = activeTab === "tareas" ? tareas : facturas;
   const pendingItems = currentItems.filter(i => !i.isCompleted);
   const completedItems = currentItems.filter(i => i.isCompleted);
@@ -125,6 +136,7 @@ const DashBoardPersonal: React.FC = () => {
                 subtitle={item.subtitle}
                 isCompleted={item.isCompleted}
                 onToggle={() => handleToggleTask(item.id)}
+                onPress={() => handleEditTask(item)}
               />
             ))}
           </Desplegable>
@@ -143,6 +155,7 @@ const DashBoardPersonal: React.FC = () => {
                 subtitle={item.subtitle}
                 isCompleted={item.isCompleted}
                 onToggle={() => handleToggleTask(item.id)}
+                onPress={() => handleEditTask(item)}
               />
             ))}
           </Desplegable>
