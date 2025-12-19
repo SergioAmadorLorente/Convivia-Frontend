@@ -32,20 +32,24 @@ type AssignUsersByDayPopupProps = {
     users: UserItem[];
     days: string[];
     initialAssignments?: Record<string, string>; // day -> userId
+    initialSingleUserId?: string | null; // for single user mode
     confirmLabel?: string;
     onConfirm: (assignments: Record<string, UserItem | null>) => void | Promise<void>;
+    onConfirmSingleUser?: (user: UserItem | null) => void | Promise<void>;
     loadingUsers?: boolean;
 };
 
 const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
     visible,
     onClose,
-    title = "Asignación de usuarios",
+    title = "Asignación de usuarios (Opcional)",
     users,
     days,
     initialAssignments = {},
+    initialSingleUserId = null,
     confirmLabel = "¡Asigna!",
     onConfirm,
+    onConfirmSingleUser,
     loadingUsers = false,
 }) => {
     // Track selected user for each day
@@ -53,6 +57,8 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
     const [confirming, setConfirming] = useState(false);
     // Track which day's dropdown is expanded
     const [expandedDay, setExpandedDay] = useState<string | null>(null);
+    // Track single user selection (when no days)
+    const [selectedSingleUserId, setSelectedSingleUserId] = useState<string | null>(null);
 
     useEffect(() => {
         if (visible) {
@@ -63,13 +69,15 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
             });
             setAssignments(initial);
             setExpandedDay(null);
+            // Initialize single user selection
+            setSelectedSingleUserId(initialSingleUserId || null);
         }
-    }, [visible, days.join("|"), JSON.stringify(initialAssignments)]);
+    }, [visible, days.join("|"), JSON.stringify(initialAssignments), initialSingleUserId]);
 
     const selectUserForDay = (day: string, userId: string) => {
         setAssignments((prev) => ({
             ...prev,
-            [day]: userId,
+            [day]: prev[day] === userId ? null : userId, // Toggle: deselect if already selected
         }));
         setExpandedDay(null);
     };
@@ -81,17 +89,29 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
     };
 
     const allDaysAssigned = days.every((day) => assignments[day] !== null);
+    const isSingleUserMode = days.length === 0;
+    const hasSelection = isSingleUserMode ? selectedSingleUserId !== null : allDaysAssigned;
 
     const handleConfirm = async () => {
         try {
             setConfirming(true);
-            // Convert assignments to include full user objects
-            const result: Record<string, UserItem | null> = {};
-            days.forEach((day) => {
-                const userId = assignments[day];
-                result[day] = userId ? users.find((u) => u.id === userId) || null : null;
-            });
-            await Promise.resolve(onConfirm(result));
+            if (isSingleUserMode) {
+                // Single user mode
+                const selectedUser = selectedSingleUserId
+                    ? users.find((u) => u.id === selectedSingleUserId) || null
+                    : null;
+                if (onConfirmSingleUser) {
+                    await Promise.resolve(onConfirmSingleUser(selectedUser));
+                }
+            } else {
+                // Multi-day mode
+                const result: Record<string, UserItem | null> = {};
+                days.forEach((day) => {
+                    const userId = assignments[day];
+                    result[day] = userId ? users.find((u) => u.id === userId) || null : null;
+                });
+                await Promise.resolve(onConfirm(result));
+            }
             onClose();
         } finally {
             setConfirming(false);
@@ -189,11 +209,45 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                     )}
 
                     {days.length === 0 ? (
-                        <View style={styles.emptyBox}>
-                            <Text style={styles.emptyText}>
-                                No hay días seleccionados. Selecciona días en el selector de repetición.
-                            </Text>
-                        </View>
+                        // Single user selection mode
+                        loadingUsers ? (
+                            <View style={styles.loadingBox}>
+                                <ActivityIndicator size="small" color={COLORS.secondary} />
+                                <Text style={styles.loadingText}>Cargando usuarios…</Text>
+                            </View>
+                        ) : (
+                            <ScrollView
+                                style={styles.scrollView}
+                                contentContainerStyle={styles.scrollContent}
+                                showsVerticalScrollIndicator={false}
+                            >
+                                {users.map((user) => (
+                                    <TouchableOpacity
+                                        key={user.id}
+                                        style={[
+                                            styles.singleUserItem,
+                                            selectedSingleUserId === user.id && styles.userItemSelected,
+                                        ]}
+                                        onPress={() => setSelectedSingleUserId(
+                                            selectedSingleUserId === user.id ? null : user.id
+                                        )}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.userItemText,
+                                                selectedSingleUserId === user.id && styles.userItemTextSelected,
+                                            ]}
+                                        >
+                                            {user.name}
+                                        </Text>
+                                        {selectedSingleUserId === user.id && (
+                                            <Feather name="check" size={18} color={COLORS.primary} />
+                                        )}
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        )
                     ) : loadingUsers ? (
                         <View style={styles.loadingBox}>
                             <ActivityIndicator size="small" color={COLORS.secondary} />
@@ -218,17 +272,16 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            disabled={confirming || !allDaysAssigned || days.length === 0}
+                            disabled={confirming}
                             onPress={handleConfirm}
-                            style={[
-                                styles.confirmButton,
-                                (!allDaysAssigned || days.length === 0) && styles.confirmButtonDisabled,
-                            ]}
+                            style={styles.confirmButton}
                         >
                             {confirming ? (
                                 <ActivityIndicator size="small" color={COLORS.secondary} />
                             ) : (
-                                <Text style={styles.confirmButtonText}>{confirmLabel}</Text>
+                                <Text style={styles.confirmButtonText}>
+                                    {hasSelection ? confirmLabel : "Mas tarde..."}
+                                </Text>
                             )}
                         </TouchableOpacity>
                     </View>
@@ -334,6 +387,16 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         borderBottomWidth: 1,
         borderBottomColor: "#F0F0F0",
+    },
+    singleUserItem: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        backgroundColor: "#F5F4F2",
+        borderRadius: 10,
+        marginBottom: 8,
     },
     userItemSelected: {
         backgroundColor: "#E6ECDC",

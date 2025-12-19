@@ -70,6 +70,9 @@ const CreateTask: React.FC = () => {
     // User assignments per day: { "Lunes": UserItem, "Martes": UserItem, ... }
     const [dayUserAssignments, setDayUserAssignments] = useState<Record<string, UserItem | null>>({});
 
+    // Single user assignment (when no repeat days are selected)
+    const [singleUserAssignment, setSingleUserAssignment] = useState<UserItem | null>(null);
+
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
 
@@ -194,6 +197,7 @@ const CreateTask: React.FC = () => {
                 users={availableUsers}
                 days={repeatDays}
                 initialAssignments={getInitialAssignments()}
+                initialSingleUserId={singleUserAssignment?.id || null}
                 onConfirm={(assignments) => {
                     console.log("Asignaciones por día:", assignments);
                     setDayUserAssignments(assignments);
@@ -202,6 +206,11 @@ const CreateTask: React.FC = () => {
                         (user) => user?.id === CURRENT_USER.id
                     );
                     setcheckedAutoasign(isCurrentUserSelected);
+                }}
+                onConfirmSingleUser={(user) => {
+                    console.log("Usuario asignado:", user);
+                    setSingleUserAssignment(user);
+                    setcheckedAutoasign(user?.id === CURRENT_USER.id);
                 }}
             />
 

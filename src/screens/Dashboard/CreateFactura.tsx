@@ -90,13 +90,13 @@ const CreateFactura: React.FC = () => {
             >
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
-                        value={facturaName}
-                        onChangeText={(text: string) => setFacturaName(text)}
+                        value={name}
+                        onChangeText={(text: string) => setName(text)}
                         placeholder="Nombre"
                     />
                     <LargeTextField
-                        value={facturaDescription}
-                        onChangeText={(text: string) => setFacturaDescription(text)}
+                        value={description}
+                        onChangeText={(text: string) => setDescription(text)}
                         placeholder="Descripcion"
                     />
                 </View>
@@ -196,8 +196,8 @@ const CreateFactura: React.FC = () => {
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
                         onPress={() => {
                             console.log("Factura creada:", {
-                                nombre: facturaName,
-                                descripcion: facturaDescription,
+                                nombre: name,
+                                descripcion: description,
                                 usuarios: assignedUsers,
                             });
                         }}
