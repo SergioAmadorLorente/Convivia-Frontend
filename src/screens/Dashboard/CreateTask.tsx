@@ -67,9 +67,6 @@ const CreateTask: React.FC = () => {
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
 
-    // Days selected in RepeatDaysSelector
-    const [repeatDays, setRepeatDays] = useState<string[]>([]);
-
     // User assignments per day: { "Lunes": UserItem, "Martes": UserItem, ... }
     const [dayUserAssignments, setDayUserAssignments] = useState<Record<string, UserItem | null>>({});
 
@@ -116,13 +113,13 @@ const CreateTask: React.FC = () => {
             >
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
-                        value={taskName}
-                        onChangeText={(text: string) => setTaskName(text)}
+                        value={name}
+                        onChangeText={(text: string) => setName(text)}
                         placeholder="Nombre"
                     />
                     <LargeTextField
-                        value={taskDescription}
-                        onChangeText={(text: string) => setTaskDescription(text)}
+                        value={description}
+                        onChangeText={(text: string) => setDescription(text)}
                         placeholder="Descripcion"
                     />
                 </View>
@@ -174,60 +171,6 @@ const CreateTask: React.FC = () => {
                                 setKarma(points);
                             }}
                         />
-                    </Desplegable>
-
-                    <Desplegable
-                        title="Asigna a compañeros"
-                        fontSize={SIZES.text16}
-                        fontWeight="bold"
-                        collapsible={false}
-                        showIcon={false}
-                    >
-                        <Button
-                            style={[GLOBAL_STYLES.buttonSecondaryGrey]}
-                            onPress={() => handleToggleTask(1)}
-                        >
-                            <Text style={GLOBAL_STYLES.textoBoton}>
-                                Asignar usuario a la tarea
-                            </Text>
-                        </Button>
-
-                        <View
-                            style={[
-                                GLOBAL_STYLES.checkboxContainer,
-                                { marginLeft: "40%", marginTop: 20 },
-                            ]}
-                        >
-                            <Text
-                                style={[GLOBAL_STYLES.labelCheckbox, { color: COLORS.accent }]}
-                            >
-                                Autoasignarse a la tarea
-                            </Text>
-                            <TouchableOpacity
-                                style={CHECKBOX.touchArea}
-                                onPress={() => {
-                                    const newValue = !checkedAutoasign;
-                                    setcheckedAutoasign(newValue);
-                                    if (newValue) {
-                                        if (!assignedUsers.find(u => u.id === CURRENT_USER.id)) {
-                                            setAssignedUsers(prev => [...prev, CURRENT_USER]);
-                                        }
-                                    } else {
-                                        setAssignedUsers(prev => prev.filter(u => u.id !== CURRENT_USER.id));
-                                    }
-                                }}
-                            >
-                                <Feather
-                                    name={checkedAutoasign ? "check-square" : "square"}
-                                    size={CHECKBOX.iconSize}
-                                    color={
-                                        checkedAutoasign
-                                            ? CHECKBOX.colors.checked
-                                            : CHECKBOX.colors.unchecked
-                                    }
-                                />
-                            </TouchableOpacity>
-                        </View>
                     </Desplegable>
                 </View>
 
