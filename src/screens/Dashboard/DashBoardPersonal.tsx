@@ -33,6 +33,11 @@ const DashBoardPersonal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
   const [selectedFilter, setSelectedFilter] =
     useState<"today" | "week" | "all">("today");
+  const [visibility, setVisibility] = useState({
+    showUnassigned: false,
+    showOverdue: true,
+    showCompleted: true,
+  });
   const [tareas, setTareas] = useState<TaskModel[]>([
     // Pendientes - dentro de plazo (hoy) - con usuario
     new TaskModel({ id: "1", Nombre: "Bajar la basura", Descripcion: "Orgánica y envases", karma: 5, DiasRepeticion: [], FechaLimite: new Date(), HoraLimite: "12:00", isCompleted: false, usuarioAsignado: "Juan" }),
@@ -133,7 +138,8 @@ const DashBoardPersonal: React.FC = () => {
   let pendingItems: any[] = [];
   let completedItems: any[] = [];
   let overdueItems: any[] = [];
-  let unassignedItems: any[] = [];
+  let unassignedPendingItems: any[] = [];
+  let unassignedOverdueItems: any[] = [];
 
   if (activeTab === "tareas") {
     // Get today's start date for comparison
@@ -152,7 +158,7 @@ const DashBoardPersonal: React.FC = () => {
 
     // 2. Separate into assigned and unassigned
     const assignedPending = allPending.filter(i => i.usuarioAsignado);
-    unassignedItems = allPending.filter(i => !i.usuarioAsignado);
+    const allUnassignedPending = allPending.filter(i => !i.usuarioAsignado);
 
     // 3. Separate assigned into overdue and on-time pending
     overdueItems = assignedPending.filter(isOverdue);
@@ -166,7 +172,26 @@ const DashBoardPersonal: React.FC = () => {
       return true;
     });
 
-    // 5. Get completed tasks shown only if completed within 7 days
+    // 5. If showUnassigned is true, also filter unassigned tasks by the same criteria
+    if (visibility.showUnassigned) {
+      const unassignedOnTime = allUnassignedPending.filter(i => !isOverdue(i));
+      const unassignedOverdue = allUnassignedPending.filter(isOverdue);
+
+      unassignedPendingItems = unassignedOnTime.filter(item => {
+        if (selectedFilter === "all") return true;
+        if (selectedFilter === "today") return item.isDueToday();
+        if (selectedFilter === "week") return item.isDueWithinDays(7);
+        return true;
+      });
+
+      unassignedOverdueItems = unassignedOverdue;
+
+      // Add unassigned tasks to their respective arrays
+      pendingItems = [...pendingItems, ...unassignedPendingItems];
+      overdueItems = [...overdueItems, ...unassignedOverdueItems];
+    }
+
+    // 6. Get completed tasks shown only if completed within 7 days
     completedItems = (currentItems as TaskModel[]).filter(
       i => isDone(i) && (typeof i.isCompletedWithinDays === "function" ? i.isCompletedWithinDays(7) : true)
     );
@@ -205,7 +230,10 @@ const DashBoardPersonal: React.FC = () => {
               { marginTop: 10, marginBottom: 15 }
             ]}
           >
-            <TasksFilter onFilterChange={setSelectedFilter} />
+            <TasksFilter 
+              onFilterChange={setSelectedFilter}
+              onVisibilityChange={setVisibility}
+            />
           </View>
         )}
         <View style={GLOBAL_STYLES.container}>
@@ -218,11 +246,12 @@ const DashBoardPersonal: React.FC = () => {
                 isCompleted={item.isCompleted ?? item.Pagado}
                 onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
                 fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
+                unassigned={!item.usuarioAsignado}
               />
             ))}
           </Desplegable>
 
-          {overdueItems.length > 0 && (
+          {visibility.showOverdue && overdueItems.length > 0 && (
             <Desplegable title="Fuera de plazo" fontSize={SIZES.text16} fontWeight="bold">
               {overdueItems.map(item => (
                 <TaskItem
@@ -232,14 +261,15 @@ const DashBoardPersonal: React.FC = () => {
                   isCompleted={item.isCompleted ?? item.Pagado}
                   onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
                   fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
+                  unassigned={!item.usuarioAsignado}
                 />
               ))}
             </Desplegable>
           )}
 
-          {unassignedItems.length > 0 && (
-            <Desplegable title="Sin asignar" fontSize={SIZES.text16} fontWeight="bold">
-              {unassignedItems.map(item => (
+          {visibility.showCompleted && (
+            <Desplegable title="Completadas" fontSize={SIZES.text16} fontWeight="bold">
+              {completedItems.map(item => (
                 <TaskItem
                   key={item.id ?? item.IdFactura}
                   time={item.formattedTime ? item.formattedTime() : item.formattedDate()}
@@ -247,23 +277,11 @@ const DashBoardPersonal: React.FC = () => {
                   isCompleted={item.isCompleted ?? item.Pagado}
                   onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
                   fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
+                  unassigned={!item.usuarioAsignado}
                 />
               ))}
             </Desplegable>
           )}
-
-          <Desplegable title="Completadas" fontSize={SIZES.text16} fontWeight="bold">
-            {completedItems.map(item => (
-              <TaskItem
-                key={item.id ?? item.IdFactura}
-                time={item.formattedTime ? item.formattedTime() : item.formattedDate()}
-                title={item.Nombre}
-                isCompleted={item.isCompleted ?? item.Pagado}
-                onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
-                fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
-              />
-            ))}
-          </Desplegable>
         </View>
       </ScrollView>
       <Popup
