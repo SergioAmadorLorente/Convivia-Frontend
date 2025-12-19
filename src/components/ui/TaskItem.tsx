@@ -83,13 +83,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     title: {
-        fontSize: 16,
+        fontSize: 15,
         color: COLORS.secondary,
         fontFamily: FONTS.bold,
         marginBottom: 2,
     },
     subtitle: {
-        fontSize: 14,
+        fontSize: 13,
         color: COLORS.secondary,
         fontFamily: FONTS.regular,
     },

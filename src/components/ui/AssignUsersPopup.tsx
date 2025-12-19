@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { FONTS, COLORS } from "../../styles/styles";
+import ConviviaSvg from "../../assets/Convivia.svg";
 import { CHECKBOX } from "../../styles/theme"; // estilo global del checkbox
 import { Feather } from "@expo/vector-icons";
 
@@ -108,11 +109,7 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.popup}>
-          <Image
-            source={require("../../assets/pngconvivia.png")}
-            style={styles.image}
-            resizeMode="contain"
-          />
+          <ConviviaSvg style={styles.image} width={150} height={150} />
           <Text style={styles.title}>{title}</Text>
 
           <View style={{ maxHeight: 320, width: "100%" }}>

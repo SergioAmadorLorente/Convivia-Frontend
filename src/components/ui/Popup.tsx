@@ -17,6 +17,10 @@ import { Feather } from "@expo/vector-icons";
 import ErrorSvg from "../../assets/pngerror.svg";
 import LogoutSvg from "../../assets/pnglogout.svg";
 import SuccessSvg from "../../assets/pngsuccessful.svg";
+import HappySvg from "../../assets/happy.svg";
+import ConviviaSvg from "../../assets/Convivia.svg";
+import DeleteSvg from "../../assets/pngdelete.svg";
+import GobackSvg from "../../assets/pnggoback.svg";
 
 type ButtonDef = {
   text: string;
@@ -49,19 +53,15 @@ type PopupProps = {
   onCopyCode?: (code: string) => void | Promise<void>;
 };
 
-const HappyImage = (props: any) => (
-  <Image
-    source={require("../../assets/pngCaraFeliz.png")}
-    resizeMode="contain"
-    {...props}
-  />
-);
 
 const imageMap: Record<string, React.ElementType> = {
   error: ErrorSvg,
   logout: LogoutSvg,
   success: SuccessSvg,
-  happy: HappyImage,
+  happy: HappySvg,
+  convivia: ConviviaSvg,
+  delete: DeleteSvg,
+  goback: GobackSvg,
 };
 
 const Popup: React.FC<PopupProps> = ({
