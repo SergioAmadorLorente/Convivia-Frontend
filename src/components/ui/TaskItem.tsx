@@ -9,6 +9,7 @@ interface TaskItemProps {
     subtitle?: string;
     isCompleted: boolean;
     onToggle: () => void;
+    fechaLimite?: string; // formato dd/mm
 }
 const TaskItem: React.FC<TaskItemProps> = ({
     time,
@@ -16,21 +17,20 @@ const TaskItem: React.FC<TaskItemProps> = ({
     subtitle,
     isCompleted,
     onToggle,
+    fechaLimite,
 }) => {
     return (
         <View style={styles.container}>
             <View style={styles.timeContainer}>
                 <Text style={styles.timeText}>{time}</Text>
+                {fechaLimite && (
+                    <Text style={styles.dateText}>{fechaLimite}</Text>
+                )}
             </View>
             <View style={styles.contentContainer}>
                 <Text style={[styles.title, isCompleted && styles.completedText]}>
                     {title}
                 </Text>
-                {subtitle && (
-                    <Text style={[styles.subtitle, isCompleted && styles.completedText]}>
-                        {subtitle}
-                    </Text>
-                )}
             </View>
             {/* Nuevo checkbox usando CHECKBOX */}
             <TouchableOpacity
@@ -67,8 +67,16 @@ const styles = StyleSheet.create({
     },
     timeContainer: {
         marginRight: 14,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
     },
     timeText: {
+        fontSize: 14,
+        color: COLORS.secondary,
+        fontFamily: FONTS.regular,
+    },
+    dateText: {
         fontSize: 14,
         color: COLORS.secondary,
         fontFamily: FONTS.regular,

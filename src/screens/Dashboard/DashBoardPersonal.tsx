@@ -34,22 +34,22 @@ const DashBoardPersonal: React.FC = () => {
   const [selectedFilter, setSelectedFilter] =
     useState<"today" | "week" | "all">("today");
   const [tareas, setTareas] = useState<TaskModel[]>([
-    // Pendientes - dentro de plazo (hoy)
-    new TaskModel({ id: "1", Nombre: "Bajar la basura", Descripcion: "Orgánica y envases", karma: 5, DiasRepeticion: [], FechaLimite: new Date(), HoraLimite: "12:00", isCompleted: false }),
-    // Pendientes - dentro de plazo (mañana)
-    new TaskModel({ id: "2", Nombre: "Barrer", Descripcion: "Zonas comunes", karma: 3, DiasRepeticion: [], FechaLimite: new Date(Date.now() + 24 * 60 * 60 * 1000), HoraLimite: "15:30", isCompleted: false }),
-    // Pendientes - dentro de plazo (en 2 días)
-    new TaskModel({ id: "3", Nombre: "Limpiar el baño", Descripcion: null, karma: 7, DiasRepeticion: [], FechaLimite: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), HoraLimite: "09:30", isCompleted: false }),
-    // Fuera de plazo - ayer sin completar
-    new TaskModel({ id: "4", Nombre: "Hacer la compra", Descripcion: "Supermercado", karma: 4, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 24 * 60 * 60 * 1000), HoraLimite: "18:00", isCompleted: false }),
-    // Fuera de plazo - hace 3 días sin completar
-    new TaskModel({ id: "5", Nombre: "Pagar la factura", Descripcion: null, karma: 2, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), HoraLimite: "10:00", isCompleted: false }),
-    // Completada - hace 2 días
-    new TaskModel({ id: "6", Nombre: "Fregar los platos", Descripcion: null, karma: 1, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 24 * 60 * 60 * 1000), HoraLimite: "09:30", isCompleted: true, FechaCompletada: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) }),
-    // Completada - hace 5 días
-    new TaskModel({ id: "7", Nombre: "Lavar la ropa", Descripcion: null, karma: 3, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), HoraLimite: "14:00", isCompleted: true, FechaCompletada: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) }),
-    // Completada - hace 8 días (debería ocultarse porque supera 7 días)
-    new TaskModel({ id: "8", Nombre: "Limpiar ventanas", Descripcion: null, karma: 6, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), HoraLimite: "11:00", isCompleted: true, FechaCompletada: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000) }),
+    // Pendientes - dentro de plazo (hoy) - con usuario
+    new TaskModel({ id: "1", Nombre: "Bajar la basura", Descripcion: "Orgánica y envases", karma: 5, DiasRepeticion: [], FechaLimite: new Date(), HoraLimite: "12:00", isCompleted: false, usuarioAsignado: "Juan" }),
+    // Pendientes - dentro de plazo (mañana) - con usuario
+    new TaskModel({ id: "2", Nombre: "Barrer", Descripcion: "Zonas comunes", karma: 3, DiasRepeticion: [], FechaLimite: new Date(Date.now() + 24 * 60 * 60 * 1000), HoraLimite: "15:30", isCompleted: false, usuarioAsignado: "María" }),
+    // Pendientes - dentro de plazo (en 2 días) - SIN usuario
+    new TaskModel({ id: "3", Nombre: "Limpiar el baño", Descripcion: null, karma: 7, DiasRepeticion: [], FechaLimite: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), HoraLimite: "09:30", isCompleted: false, usuarioAsignado: null }),
+    // Fuera de plazo - ayer sin completar - con usuario
+    new TaskModel({ id: "4", Nombre: "Hacer la compra", Descripcion: "Supermercado", karma: 4, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 24 * 60 * 60 * 1000), HoraLimite: "18:00", isCompleted: false, usuarioAsignado: "Pedro" }),
+    // Fuera de plazo - hace 3 días sin completar - SIN usuario
+    new TaskModel({ id: "5", Nombre: "Pagar la factura", Descripcion: null, karma: 2, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), HoraLimite: "10:00", isCompleted: false, usuarioAsignado: null }),
+    // Completada - hace 2 días - con usuario
+    new TaskModel({ id: "6", Nombre: "Fregar los platos", Descripcion: null, karma: 1, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 24 * 60 * 60 * 1000), HoraLimite: "09:30", isCompleted: true, FechaCompletada: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), usuarioAsignado: "Ana" }),
+    // Completada - hace 5 días - SIN usuario
+    new TaskModel({ id: "7", Nombre: "Lavar la ropa", Descripcion: null, karma: 3, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), HoraLimite: "14:00", isCompleted: true, FechaCompletada: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), usuarioAsignado: null }),
+    // Completada - hace 8 días (debería ocultarse porque supera 7 días) - con usuario
+    new TaskModel({ id: "8", Nombre: "Limpiar ventanas", Descripcion: null, karma: 6, DiasRepeticion: [], FechaLimite: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), HoraLimite: "11:00", isCompleted: true, FechaCompletada: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), usuarioAsignado: "Carlos" }),
   ]);
   const [facturas, setFacturas] = useState<FacturaModel[]>([
     new FacturaModel({ IdFactura: "f1", Nombre: "Electricidad", Precio: 85.5, Reparto: {}, Pagado: false, FechaCreacion: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) }),
@@ -122,6 +122,7 @@ const DashBoardPersonal: React.FC = () => {
   let pendingItems: any[] = [];
   let completedItems: any[] = [];
   let overdueItems: any[] = [];
+  let unassignedItems: any[] = [];
 
   if (activeTab === "tareas") {
     // Get today's start date for comparison
@@ -138,11 +139,15 @@ const DashBoardPersonal: React.FC = () => {
     // 1. Get ALL pending (not completed) tasks
     const allPending = (currentItems as TaskModel[]).filter(i => !isDone(i));
 
-    // 2. Separate into overdue and on-time pending
-    overdueItems = allPending.filter(isOverdue);
-    const onTimePending = allPending.filter(i => !isOverdue(i));
+    // 2. Separate into assigned and unassigned
+    const assignedPending = allPending.filter(i => i.usuarioAsignado);
+    unassignedItems = allPending.filter(i => !i.usuarioAsignado);
 
-    // 3. Apply filter (today/week/all) ONLY to on-time pending tasks
+    // 3. Separate assigned into overdue and on-time pending
+    overdueItems = assignedPending.filter(isOverdue);
+    const onTimePending = assignedPending.filter(i => !isOverdue(i));
+
+    // 4. Apply filter (today/week/all) ONLY to on-time pending tasks
     pendingItems = onTimePending.filter(item => {
       if (selectedFilter === "all") return true;
       if (selectedFilter === "today") return item.isDueToday();
@@ -150,7 +155,7 @@ const DashBoardPersonal: React.FC = () => {
       return true;
     });
 
-    // 4. Get completed tasks shown only if completed within 7 days
+    // 5. Get completed tasks shown only if completed within 7 days
     completedItems = (currentItems as TaskModel[]).filter(
       i => isDone(i) && (typeof i.isCompletedWithinDays === "function" ? i.isCompletedWithinDays(7) : true)
     );
@@ -199,9 +204,9 @@ const DashBoardPersonal: React.FC = () => {
                 key={item.id ?? item.IdFactura}
                 time={item.formattedTime ? item.formattedTime() : item.formattedDate()}
                 title={item.Nombre}
-                subtitle={item.Descripcion ?? (item.Precio !== undefined ? `€${item.Precio.toFixed(2)}` : undefined)}
                 isCompleted={item.isCompleted ?? item.Pagado}
                 onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
+                fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
               />
             ))}
           </Desplegable>
@@ -213,22 +218,38 @@ const DashBoardPersonal: React.FC = () => {
                   key={item.id ?? item.IdFactura}
                   time={item.formattedTime ? item.formattedTime() : item.formattedDate()}
                   title={item.Nombre}
-                  subtitle={item.Descripcion ?? (item.Precio !== undefined ? `€${item.Precio.toFixed(2)}` : undefined)}
                   isCompleted={item.isCompleted ?? item.Pagado}
                   onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
+                  fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
                 />
               ))}
             </Desplegable>
           )}
+
+          {unassignedItems.length > 0 && (
+            <Desplegable title="Sin asignar" fontSize={SIZES.text16} fontWeight="bold">
+              {unassignedItems.map(item => (
+                <TaskItem
+                  key={item.id ?? item.IdFactura}
+                  time={item.formattedTime ? item.formattedTime() : item.formattedDate()}
+                  title={item.Nombre}
+                  isCompleted={item.isCompleted ?? item.Pagado}
+                  onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
+                  fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
+                />
+              ))}
+            </Desplegable>
+          )}
+
           <Desplegable title="Completadas" fontSize={SIZES.text16} fontWeight="bold">
             {completedItems.map(item => (
               <TaskItem
                 key={item.id ?? item.IdFactura}
                 time={item.formattedTime ? item.formattedTime() : item.formattedDate()}
                 title={item.Nombre}
-                subtitle={item.Descripcion ?? (item.Precio !== undefined ? `€${item.Precio.toFixed(2)}` : undefined)}
                 isCompleted={item.isCompleted ?? item.Pagado}
                 onToggle={() => handleToggleTask(item.id ?? item.IdFactura)}
+                fechaLimite={item.FechaLimite ? new Date(item.FechaLimite).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }) : undefined}
               />
             ))}
           </Desplegable>
