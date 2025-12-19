@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { FONTS, COLORS } from "../../styles/styles";
 import { Feather } from "@expo/vector-icons";
+import LogoReal from "../../assets/logoReal.svg";
 
 type UserItem = {
     id: string;
@@ -191,11 +192,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
         <Modal visible={visible} transparent animationType="fade">
             <View style={styles.overlay}>
                 <View style={styles.popup}>
-                    <Image
-                        source={require("../../assets/pngconvivia.png")}
-                        style={styles.image}
-                        resizeMode="contain"
-                    />
+                    <LogoReal style={styles.image} width={120} height={120} />
                     <Text style={styles.title}>{title}</Text>
 
                     {days.length > 0 && !loadingUsers && (

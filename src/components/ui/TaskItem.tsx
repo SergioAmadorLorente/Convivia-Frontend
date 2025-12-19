@@ -20,11 +20,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
     fechaLimite,
 }) => {
     return (
-        <TouchableOpacity
-            style={styles.container}
-            onPress={onPress}
-            activeOpacity={0.7}
-        >
+        <View style={styles.container}>
             <View style={styles.timeContainer}>
                 <Text style={styles.timeText}>{time}</Text>
                 {fechaLimite && (
@@ -52,7 +48,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                     }
                 />
             </TouchableOpacity>
-        </TouchableOpacity>
+        </View>
     );
 };
 const styles = StyleSheet.create({

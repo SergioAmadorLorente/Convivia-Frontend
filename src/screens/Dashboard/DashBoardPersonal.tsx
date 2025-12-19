@@ -111,7 +111,7 @@ const DashBoardPersonal: React.FC = () => {
       setFacturas(prev => prev.map(f => (f.IdFactura === id ? f.togglePaid() : f)));
     }
   };
-  const handleEditTask = (task: Task) => {
+  const handleEditTask = (task: TaskModel) => {
     console.log("handleEditTask called", { task, activeTab });
     // Only allow editing if it is a task, not a bill (factura)
     if (activeTab === "tareas") {
