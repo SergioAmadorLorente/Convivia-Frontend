@@ -34,7 +34,7 @@ type PopupProps = {
   onClose: () => void;
   title: string;
   description?: string;
-  imageType?: "error" | "logout" | "success" | "happy" | "convivia" | "delete";
+  imageType?: "error" | "logout" | "success" | "happy" | "convivia" | "delete" | "goback";
   buttons?: ButtonDef[];
   containerStyle?: ViewStyle;
   popupStyle?: ViewStyle;
