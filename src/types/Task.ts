@@ -85,3 +85,5 @@ export class TaskModel implements ITask {
     });
   }
 }
+
+export default TaskModel;

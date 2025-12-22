@@ -4,31 +4,63 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { COLORS, FONTS, CHECKBOX } from "../../styles/theme";
 import { Feather } from "@expo/vector-icons";
 
+type Variant = "tarea" | "factura";
+
 interface TaskItemProps {
-  time: string;
+  /** 'tarea' por defecto; 'factura' para facturas */
+  variant?: Variant;
+
+  /** Tarea: hora (HH:MM) y opcional fecha (dd/mm); Factura: usar dateLabel */
+  time?: string;
+  fechaLimite?: string; // dd/mm en tareas
+  /** Factura: fecha en dd/mm */
+  dateLabel?: string;
+  /** Factura: precio por persona, ya formateado (ej: "32,50 €") */
+  perPersonPrice?: string;
+
   title: string;
   subtitle?: string;
+
+  /** Estado: completado/pagado */
   isCompleted: boolean;
+
+  /** Toggle checkbox */
   onToggle: () => void;
-  fechaLimite?: string; // formato dd/mm
-  unassigned?: boolean; // indica si la tarea está sin asignar
-  /** Abrir detalles al pulsar la fila (solo tareas) */
+
+  /** Tarea: si está sin asignar, muestra icono + tooltip */
+  unassigned?: boolean;
+
+  /** Abrir detalle al pulsar fila */
   onPressRow?: () => void;
+
+  /** Factura: contador "pagados/total" para el lado derecho (ej: 3/4) */
+  paidCount?: number;
+  totalAssigned?: number;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({
+  variant = "tarea",
   time,
+  fechaLimite,
+  dateLabel,
+  perPersonPrice,
   title,
   subtitle,
   isCompleted,
   onToggle,
-  fechaLimite,
   unassigned = false,
   onPressRow,
+  paidCount,
+  totalAssigned,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-
   const toggleTooltip = () => setShowTooltip(prev => !prev);
+
+  const isFactura = variant === "factura";
+  const counterText =
+    typeof paidCount === "number" && typeof totalAssigned === "number"
+      ? `${paidCount}/${totalAssigned}`
+      : undefined;
 
   return (
     <TouchableOpacity
@@ -36,22 +68,44 @@ const TaskItem: React.FC<TaskItemProps> = ({
       activeOpacity={0.9}
       onPress={onPressRow}
     >
-      {/* Hora y fecha */}
-      <View style={styles.timeContainer}>
-        <Text style={styles.timeText}>{time}</Text>
-        {fechaLimite && <Text style={styles.dateText}>{fechaLimite}</Text>}
-      </View>
+      {/* IZQUIERDA */}
+      {!isFactura ? (
+        // ---- TAREA: Hora + (opcional) Fecha ----
+        <View style={styles.leftTaskCol}>
+          {/* {time ? <Text style={styles.timeText}>{time}</Text> : null} */}
+          {fechaLimite ? <Text style={styles.dateText}>{fechaLimite}</Text> : null}
+        </View>
+      ) : (
+        // ---- FACTURA: Fecha (dd/mm) + Precio por persona debajo ----
+        <View style={styles.leftInvoiceCol}>
+          {dateLabel ? <Text style={styles.dateText}>{dateLabel}</Text> : null}
+          {perPersonPrice ? (
+            <Text style={styles.perPersonText}>{perPersonPrice}</Text>
+          ) : null}
+        </View>
+      )}
 
-      {/* Título + (opcional) subtítulo */}
+      {/* CENTRO: Título + subtítulo */}
       <View style={styles.contentContainer}>
-        <Text style={[styles.title, isCompleted && styles.completedText]}>
+        <Text style={[styles.title, isCompleted && styles.completedText]} numberOfLines={1}>
           {title}
         </Text>
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        {subtitle ? (
+          <Text style={styles.subtitle} numberOfLines={1}>
+            {subtitle}
+          </Text>
+        ) : null}
       </View>
 
-      {/* Icono de exclamación si está sin asignar (no se usa en facturas) */}
-      {unassigned && (
+      {/* DERECHA: (Factura) contador + checkbox */}
+      {isFactura && counterText && (
+        <View style={styles.counterBox}>
+          <Text style={styles.counterText}>{counterText}</Text>
+        </View>
+      )}
+
+      {/* Icono de exclamación SOLO en tareas sin asignar */}
+      {!isFactura && unassigned && (
         <View style={styles.unassignedIconContainer}>
           <TouchableOpacity
             onPress={toggleTooltip}
@@ -65,7 +119,6 @@ const TaskItem: React.FC<TaskItemProps> = ({
             />
           </TouchableOpacity>
 
-          {/* Tooltip estilo anterior: sin flecha y un poco arriba */}
           {showTooltip && (
             <View style={styles.tooltip}>
               <Text
@@ -80,7 +133,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
         </View>
       )}
 
-      {/* Checkbox */}
+      {/* Checkbox (tarea o factura) */}
       <TouchableOpacity
         onPress={onToggle}
         activeOpacity={0.8}
@@ -114,7 +167,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  timeContainer: {
+
+  // --- IZQUIERDA TAREA ---
+  leftTaskCol: {
     marginRight: 14,
     flexDirection: "row",
     alignItems: "center",
@@ -123,13 +178,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.secondary,
     fontFamily: FONTS.regular,
-    marginRight: 8, // evitamos 'gap'
+    marginRight: 8,
   },
   dateText: {
     fontSize: 14,
     color: COLORS.secondary,
     fontFamily: FONTS.regular,
   },
+
+  // --- IZQUIERDA FACTURA ---
+  leftInvoiceCol: {
+    marginRight: 14,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    minWidth: 72,
+  },
+  perPersonText: {
+    marginTop: 4,
+    fontSize: 13,
+    color: COLORS.accent,
+    fontFamily: FONTS.bold,
+  },
+
+  // --- CENTRO ---
   contentContainer: {
     flex: 1,
   },
@@ -149,7 +220,21 @@ const styles = StyleSheet.create({
     color: COLORS.border,
   },
 
-  // Tooltip relativo al icono (sin flecha, arriba)
+  // --- DERECHA FACTURA: contador ---
+  counterBox: {
+    marginRight: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: "#E5ECE1",
+  },
+  counterText: {
+    fontSize: 12,
+    color: COLORS.secondary,
+    fontFamily: FONTS.bold,
+  },
+
+  // --- Tooltip tarea sin asignar ---
   unassignedIconContainer: {
     marginRight: 8,
     position: "relative",
@@ -162,7 +247,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
-    bottom: 28,     // un poco arriba del icono (como te gustaba)
+    bottom: 28,
     right: 0,
     zIndex: 10,
     shadowColor: "#000",
@@ -170,8 +255,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 3,
     elevation: 5,
-
-    // Ajustes para evitar “texto vertical”
     minWidth: 88,
     maxWidth: 220,
     alignItems: "center",
@@ -189,4 +272,3 @@ const styles = StyleSheet.create({
 });
 
 export default TaskItem;
-``
