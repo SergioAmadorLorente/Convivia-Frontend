@@ -313,7 +313,7 @@ const DashBoardPersonal: React.FC = () => {
           imageType: "goback",
           title: "¿Estás seguro de que quieres marcar la tarea como pendiente?",
           description:
-            "Perderás los puntos de Karma obtenidos con esta tarea y no podrás recuperarlos.",
+            "Perderás los puntos de Karma obtenidos con esta tarea. Podrás recuperarlos al completarla de nuevo.",
           buttons: [
             { text: "Cancelar", onPress: () => {} },
             {
