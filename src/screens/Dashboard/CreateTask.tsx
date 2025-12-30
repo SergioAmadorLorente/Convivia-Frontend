@@ -3,6 +3,7 @@ import {
     Text,
     Platform,
     KeyboardAvoidingView,
+    TouchableOpacity,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
@@ -20,6 +21,10 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
 import { useEditTask } from "../../hooks/useEditTask";
+import { useAuthListener } from "../../hooks/useAuthListener";
+import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio } from "../../api/usuarioEspacio";
+import { crearTarea } from "../../api/tarea";
+import Popup from "../../components/ui/Popup";
 
 const { hp } = HELPERS;
 
@@ -33,10 +38,12 @@ type UserItem = {
 const CreateTask: React.FC = () => {
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
+    const user = useAuthListener();
 
     React.useLayoutEffect(() => {
         navigation.setOptions({ title: route.params?.taskToEdit ? "Editar Tarea" : "Crear Tarea" });
     }, [navigation, route.params]);
+
     const {
         name, setName,
         description, setDescription,
@@ -51,7 +58,6 @@ const CreateTask: React.FC = () => {
     useEffect(() => {
         if (route.params?.taskToEdit) {
             const t = route.params.taskToEdit;
-            // Map the simple task object to the form state
             loadTask({
                 id: t.id,
                 name: t.title,
@@ -66,6 +72,16 @@ const CreateTask: React.FC = () => {
 
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    // Popup state
+    const [popupVisible, setPopupVisible] = useState(false);
+    const [popupOptions, setPopupOptions] = useState<any>({});
+
+    const showPopup = (opts: any) => {
+        setPopupOptions(opts);
+        setPopupVisible(true);
+    };
 
     // User assignments per day: { "Lunes": UserItem, "Martes": UserItem, ... }
     const [dayUserAssignments, setDayUserAssignments] = useState<Record<string, UserItem | null>>({});
@@ -75,6 +91,7 @@ const CreateTask: React.FC = () => {
 
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
     const [availableUsers] = useState([
         { id: "1", name: "Juan Pérez" },
@@ -82,9 +99,161 @@ const CreateTask: React.FC = () => {
         { id: "3", name: "Lucía Fernández" },
     ]);
 
-    function handleToggleTask(id: any) {
+
+    const handleCrearTareaPress = () => {
+        // Validaciones iniciales (nombre y autenticación)
+        if (!name.trim()) {
+            showPopup({
+                title: 'Campo requerido',
+                description: 'Por favor, ingresa un nombre para la tarea.',
+                imageType: 'error',
+                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+            });
+            return;
+        }
+
+        if (!selectedDate && repeatDays.length === 0) {
+            // Si es tarea puntual (sin repetición), requerir fecha
+            showPopup({
+                title: 'Fecha requerida',
+                description: 'Por favor, selecciona una fecha límite o días de repetición.',
+                imageType: 'error',
+                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+            });
+            return;
+        }
+
+        if (!user) {
+            showPopup({
+                title: 'Error de autenticación',
+                description: 'Debes estar autenticado para crear una tarea.',
+                imageType: 'error',
+                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+            });
+            return;
+        }
+
+        // Abrir popup de asignación antes de crear
         setAssignPopupVisible(true);
-    }
+    };
+
+    const handleConfirmAssignmentAndCreate = async (
+        assignments: Record<string, UserItem | null>,
+        singleUser: UserItem | null
+    ) => {
+        // Actualizar estados locales de asignación
+        setDayUserAssignments(assignments);
+        setSingleUserAssignment(singleUser);
+
+        // Proceder con la creación de la tarea
+        await executeCreateTask(assignments, singleUser);
+    };
+
+    const executeCreateTask = async (
+        currentAssignments: Record<string, UserItem | null>,
+        currentSingleUser: UserItem | null
+    ) => {
+        setLoading(true);
+        try {
+            // Obtener el espacio del usuario
+            const usuarioEspacio = await obtenerEspacioPorUsuarioId(user!.uid);
+
+            if (!usuarioEspacio?.espacioId) {
+                throw new Error("No se encontró un espacio asignado al usuario");
+            }
+
+            // Determinar usuario asignado basado en LO QUE SE ACABA DE CONFIRMAR en el popup
+            let usuarioAsignado: string | undefined = undefined;
+
+            if (repeatDays.length > 0) {
+                // Si hay días repetidos, usar las asignaciones por día
+                const firstAssignment = Object.values(currentAssignments).find(u => u !== null);
+                usuarioAsignado = firstAssignment?.id;
+            } else {
+                // Si no hay repetición, usar la asignación single
+                usuarioAsignado = currentSingleUser?.id;
+            }
+
+            // Convertir días de string a números
+            const diasNumeros = repeatDays.map(day => {
+                const daysMap: Record<string, number> = {
+                    'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4,
+                    'Viernes': 5, 'Sábado': 6, 'Domingo': 0
+                };
+                return daysMap[day];
+            });
+
+            // Formatear hora
+            const horaFormateada = selectedTime.length === 5 ? `${selectedTime}:00` : selectedTime;
+
+            const tareaData: any = {
+                nombre: name.trim(),
+                descripcion: description.trim() || undefined,
+                fechaCreacion: new Date().toISOString(),
+                // Backend usa DateOnly, así que enviamos solo la parte de la fecha YYYY-MM-DD
+                FechaLimite: selectedDate ? selectedDate.toISOString().split('T')[0] : undefined,
+                horaLimite: horaFormateada,
+                diasRepeticion: diasNumeros.length > 0 ? diasNumeros : [],
+                karma: karma,
+                usuariosAsignacion: usuarioAsignado ? [usuarioAsignado] : [],
+                espacioId: usuarioEspacio.espacioId,
+                estado: true,
+                completada: false,
+                tareasId: [],
+            };
+
+            console.log("📤 Datos a enviar:", JSON.stringify(tareaData, null, 2));
+            console.log("📅 Fecha Límite a enviar (Mayúscula):", tareaData.FechaLimite); // LOG IMPORTANTE
+            console.log("⏰ Hora Límite a enviar:", tareaData.horaLimite);
+            const tareaCreada = await crearTarea(tareaData);
+            console.log("✅ Tarea creada con ID:", tareaCreada);
+
+            // Actualizar UsuarioEspacio si corresponde
+            if (usuarioAsignado && tareaCreada) {
+                try {
+                    const usuarioEspacioAsignado = await obtenerEspacioPorUsuarioId(usuarioAsignado);
+                    if (usuarioEspacioAsignado?.id_UsuarioEspacio) {
+                        const tareasActualizadas = [
+                            ...(usuarioEspacioAsignado.tareasId || []),
+                            tareaCreada
+                        ];
+                        await actualizarUsuarioEspacio(usuarioEspacioAsignado.id_UsuarioEspacio, {
+                            tareasId: tareasActualizadas
+                        });
+                    }
+                } catch (updateError) {
+                    console.warn("⚠️ No se pudo actualizar UsuarioEspacio con la tarea:", updateError);
+                }
+            }
+
+            // Cerrar popup de asignación si seguía abierto (aunque el flujo normal lo cierra antes)
+            setAssignPopupVisible(false);
+
+            showPopup({
+                title: 'Tarea creada',
+                description: 'La tarea se ha creado exitosamente.',
+                imageType: 'convivia',
+                buttons: [{
+                    text: 'Aceptar',
+                    onPress: () => {
+                        setPopupVisible(false);
+                        navigation.goBack();
+                    }
+                }],
+            });
+
+        } catch (error: any) {
+            console.error('Error al crear tarea:', error);
+            showPopup({
+                title: 'Error',
+                description: error?.response?.data?.message || 'Error al crear la tarea. Intenta de nuevo.',
+                imageType: 'error',
+                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Get initial assignments as userId mapping for the popup
     const getInitialAssignments = (): Record<string, string> => {
@@ -138,6 +307,7 @@ const CreateTask: React.FC = () => {
                         <Calendar
                             time={selectedTime}
                             onTimeClick={() => setTimePopupVisible(true)}
+                            onDateSelect={(date) => setSelectedDate(date)}
                         />
                     </Desplegable>
 
@@ -162,6 +332,8 @@ const CreateTask: React.FC = () => {
                         />
                     </Desplegable>
 
+                    {/* Se eliminó el desplegable de Asignación ya que ahora es parte del flujo de clic en 'Crear tarea' */}
+
                     <Desplegable
                         title="Puntos de karma"
                         fontSize={SIZES.text16}
@@ -179,13 +351,13 @@ const CreateTask: React.FC = () => {
 
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
 
-
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
-                        onPress={() => handleToggleTask(1)}
+                        onPress={handleCrearTareaPress}
+                        disabled={loading}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
-                            {isEditing ? "Guardar cambios" : "Crear tarea"}
+                            {loading ? "Guardando..." : (isEditing ? "Guardar cambios" : "Crear tarea")}
                         </Text>
                     </Button>
                 </View>
@@ -198,19 +370,13 @@ const CreateTask: React.FC = () => {
                 days={repeatDays}
                 initialAssignments={getInitialAssignments()}
                 initialSingleUserId={singleUserAssignment?.id || null}
+                confirmLabel="Crear"
                 onConfirm={(assignments) => {
-                    console.log("Asignaciones por día:", assignments);
-                    setDayUserAssignments(assignments);
-                    // Check if current user is assigned to any day
-                    const isCurrentUserSelected = Object.values(assignments).some(
-                        (user) => user?.id === CURRENT_USER.id
-                    );
-                    setcheckedAutoasign(isCurrentUserSelected);
+                    handleConfirmAssignmentAndCreate(assignments, singleUserAssignment);
                 }}
                 onConfirmSingleUser={(user) => {
-                    console.log("Usuario asignado:", user);
-                    setSingleUserAssignment(user);
-                    setcheckedAutoasign(user?.id === CURRENT_USER.id);
+                    // Pasar las asignaciones actuales de repetición (que estarán vacías si es single mode)
+                    handleConfirmAssignmentAndCreate(dayUserAssignments, user);
                 }}
             />
 
@@ -222,6 +388,15 @@ const CreateTask: React.FC = () => {
                 }}
                 initialHour={selectedTime.split(":")[0]}
                 initialMinute={selectedTime.split(":")[1]}
+            />
+
+            <Popup
+                visible={popupVisible}
+                onClose={() => setPopupVisible(false)}
+                title={popupOptions.title || ''}
+                description={popupOptions.description}
+                imageType={popupOptions.imageType}
+                buttons={popupOptions.buttons}
             />
 
             <BottomBar />
