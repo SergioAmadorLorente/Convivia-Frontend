@@ -18,7 +18,7 @@ import ErrorSvg from "../../assets/pngerror.svg";
 import LogoutSvg from "../../assets/pnglogout.svg";
 import SuccessSvg from "../../assets/pngsuccessful.svg";
 import HappySvg from "../../assets/happy.svg";
-import ConviviaSvg from "../../assets/Convivia.svg";
+import ConviviaSvg from "../../assets/logoReal.svg";
 import DeleteSvg from "../../assets/pngdelete.svg";
 import GobackSvg from "../../assets/pnggoback.svg";
 
@@ -34,7 +34,7 @@ type PopupProps = {
   onClose: () => void;
   title: string;
   description?: string;
-  imageType?: "error" | "logout" | "success" | "happy" | "convivia" | "delete";
+  imageType?: "error" | "logout" | "success" | "happy" | "convivia" | "delete" | "goback";
   buttons?: ButtonDef[];
   containerStyle?: ViewStyle;
   popupStyle?: ViewStyle;

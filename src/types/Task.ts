@@ -8,6 +8,7 @@ export interface ITask {
   HoraLimite: string; // "HH:MM"
   isCompleted: boolean;
   FechaCompletada?: Date | null;
+  usuarioAsignado?: string | null;
 }
 
 function startOfDay(d: Date) {
@@ -24,6 +25,7 @@ export class TaskModel implements ITask {
   HoraLimite: string;
   isCompleted: boolean;
   FechaCompletada?: Date | null;
+  usuarioAsignado?: string | null;
 
   constructor(props: ITask) {
     this.id = props.id;
@@ -35,6 +37,7 @@ export class TaskModel implements ITask {
     this.HoraLimite = props.HoraLimite;
     this.isCompleted = !!props.isCompleted;
     this.FechaCompletada = props.FechaCompletada ? new Date(props.FechaCompletada) : null;
+    this.usuarioAsignado = props.usuarioAsignado ?? null;
   }
 
   formattedTime() {
@@ -78,6 +81,9 @@ export class TaskModel implements ITask {
       HoraLimite: this.HoraLimite,
       isCompleted: !this.isCompleted,
       FechaCompletada: !this.isCompleted ? now : null,
+      usuarioAsignado: this.usuarioAsignado,
     });
   }
 }
+
+export default TaskModel;

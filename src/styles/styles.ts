@@ -55,7 +55,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     alignItems: "center",
-    paddingTop: hp("4%"),
+    paddingTop: hp("2%"),
     paddingHorizontal: SIZES.paddingHorizontal,
     borderRadius: moderateScale(25),
   },
