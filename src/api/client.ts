@@ -1,12 +1,6 @@
 import axios from "axios";
 import { Platform } from "react-native";
 
-// Configuration for API URL
-// NOTE: For Android Emulator, use '10.0.2.2' instead of 'localhost'.
-// NOTE: For physical devices, use your computer's local LAN IP (e.g., 192.168.1.X).
-// WARNING: Self-signed HTTPS certificates often fail on Android/iOS without extra config.
-// If you get Network Error, try using HTTP on port 5273 (if available) or configure your device to trust the certificate.
-
 const ANDROID_URL = "https://pbbtmgfm-5082.uks1.devtunnels.ms/api";
 const IOS_WEB_URL = "https://pbbtmgfm-5082.uks1.devtunnels.ms/api";
 
@@ -25,7 +19,6 @@ const api = axios.create({
     Accept: "application/json",
   },
   timeout: 10000,
-  // Removed validateStatus to properly handle HTTP errors
 });
 
 api.interceptors.request.use((request) => {

@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -136,19 +137,40 @@ const DashBoardPersonal: React.FC = () => {
           const tareasRaw = await obtenerTareasPorEspacio(espacioId);
 
           if (Array.isArray(tareasRaw)) {
-            const mappedTasks = tareasRaw.map((t: any) => new TaskModel({
-              id: t.id,
-              Nombre: t.nombre, // Mapeo de backend (minúscula) a modelo (PascalCase si aplica o como definas)
-              Descripcion: t.descripcion,
-              karma: t.karma,
-              DiasRepeticion: [], // TODO: mapear días si vienen del backend
-              // Asegurar formato fecha
-              FechaLimite: t.fechaLimite ? new Date(t.fechaLimite) : new Date(),
-              // Asegurar formato hora HH:mm
-              HoraLimite: t.horaLimite ? t.horaLimite.substring(0, 5) : "12:00",
-              isCompleted: t.completada || false,
-              usuarioAsignado: t.usuariosAsignacion?.[0] || null // Asumimos 1 por ahora
-            }));
+            // Log para depuración
+            if (tareasRaw.length > 0) {
+              // debug log removed
+            }
+
+            const mappedTasks = tareasRaw.map((t: any) => {
+              // BACKEND devuelve 'startDate' en lugar de 'fechaLimite'
+              // y NO devuelve hora explícita.
+              // Usaremos startDate como fecha límite.
+
+              const fechaFuente = t.startDate || t.fechaLimite || t.FechaLimite;
+              const fechaObj = fechaFuente ? new Date(fechaFuente) : new Date();
+
+              // Hora: no viene en el JSON actual. Intentamos buscarla por si acaso, si no '12:00'
+              const rawTime = t.horaLimite || t.HoraLimite;
+              let cleanTime = "12:00";
+              if (rawTime && typeof rawTime === 'string' && rawTime.length >= 5) {
+                cleanTime = rawTime.substring(0, 5);
+              }
+
+              return new TaskModel({
+                id: t.id,
+                Nombre: t.nombre || t.Nombre,
+                Descripcion: t.descripcion || t.Descripcion,
+                karma: t.karma,
+                DiasRepeticion: t.diasRepeticion || [],
+
+                FechaLimite: fechaObj,
+                HoraLimite: cleanTime,
+
+                isCompleted: t.completada || t.Completada || false,
+                usuarioAsignado: t.usuariosAsignacion?.[0] || null
+              });
+            });
             setTareas(mappedTasks);
             console.log("✅ Tareas cargadas:", mappedTasks.length);
           }
@@ -608,7 +630,7 @@ const DashBoardPersonal: React.FC = () => {
     >
       <Header
         username={`@${userName.split(" ")[0].toLowerCase()}`}
-        date="Miércoles, 15 de Septiembre"
+        date={new Date()}
         location={espacioNombre}
       />
 
