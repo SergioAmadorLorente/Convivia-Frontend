@@ -20,15 +20,16 @@ import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
 import TextField from '../../components/ui/TextField';
 import ConfettiButton from '../../components/ui/ConfettiButton';
-import { FONTS, COLORS } from '../../styles/styles';
 
-import { crearEspacio } from '../../api/espacio';
+import { crearEspacio, crearEspacioConUsuario } from '../../api/espacio';
+import { useAuthListener } from '../../hooks/useAuthListener';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
   const [direccion, setDireccion] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
+  const user = useAuthListener();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupOptions, setPopupOptions] = useState<any>({});
@@ -76,20 +77,62 @@ const NuevaResidencia: React.FC = () => {
       return;
     }
 
+    if (!user) {
+      showPopup({
+        title: 'Error de autenticación',
+        description: 'Debes estar autenticado para crear una residencia.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      // TODO: Cuando tengas backend, sustituye '966069' por el código real devuelto.
-      const codigoBackend = '966069';
+      const result = await crearEspacioConUsuario(
+        {
+          nombre: nombreResidencia.trim(),
+          direccion: direccion.trim(),
+        },
+        user.uid
+      );
 
-      showPopup({
-        title: 'Residencia creada',
-        description: 'Puedes encontrarlo de nuevo en Perfil > Mi residencia',
-        imageType: 'convivia',
-        code: codigoBackend,
-        buttons: [
-          { text: '¡Empieza!', onPress: () => navigation.navigate('DashBoardPersonal') },
-        ],
-      });
+      const espacioCreado = result.espacio;
+      const codigoResidencia = espacioCreado.id;
+      // @ts-ignore
+      const joinError = result.joinError;
+
+      if (joinError) {
+        showPopup({
+          title: 'Residencia creada con aviso',
+          description: `La residencia se creó, pero hubo un problema al unirte automáticamente. Error: ${JSON.stringify(joinError.response?.data || joinError.message)}`,
+          imageType: 'error',
+          code: codigoResidencia,
+          buttons: [
+            {
+              text: 'Entendido',
+              onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
+            },
+          ],
+        });
+      } else {
+        showPopup({
+          title: 'Residencia creada',
+          description: 'Puedes encontrarlo de nuevo en Perfil > Mi residencia',
+          imageType: 'convivia',
+          code: codigoResidencia,
+          buttons: [
+            {
+              text: '¡Empieza!',
+              onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
+            },
+          ],
+        });
+      }
+
+      // Limpiar campos después de crear
+      setNombreResidencia('');
+      setDireccion('');
     } catch (error) {
       console.error('Error al crear residencia:', error);
       showPopup({

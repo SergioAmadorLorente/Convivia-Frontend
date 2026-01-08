@@ -17,28 +17,29 @@ import FacturaModel, { IFacturaUser } from "../../types/Factura";
 
 type Props =
   | {
-      visible: boolean;
-      kind: "tarea";
-      task: TaskModel;
-      onClose: () => void;
-      onComplete: () => void; // misma lógica que en dashboard
-      onEdit: () => void;
-    }
+    visible: boolean;
+    kind: "tarea";
+    task: TaskModel;
+    onClose: () => void;
+    onComplete: () => void; // misma lógica que en dashboard
+    onEdit: () => void;
+  }
   | {
-      visible: boolean;
-      kind: "factura";
-      factura: FacturaModel;
-      onClose: () => void;
-      onComplete: () => void; // marcar como pagada (dashboard valida)
-      onEdit: () => void;
-      onDownloadImage?: () => void;
-    };
+    visible: boolean;
+    kind: "factura";
+    factura: FacturaModel;
+    onClose: () => void;
+    onComplete: () => void; // marcar como pagada (dashboard valida)
+    onEdit: () => void;
+    onDownloadImage?: () => void;
+  };
 
 const Detalle: React.FC<Props> = (props) => {
   const { visible, onClose, onComplete, onEdit } = props;
 
   if (props.kind === "tarea") {
     const { task } = props;
+    console.log("🔍 Detalle recibiendo tarea:", JSON.stringify(task, null, 2));
 
     const fechaStr = useMemo(() => {
       if (!task.FechaLimite) return "-";
@@ -261,7 +262,7 @@ const Detalle: React.FC<Props> = (props) => {
             <TouchableOpacity
               style={styles.downloadRow}
               activeOpacity={0.85}
-              onPress={onDownloadImage ?? (() => {})}
+              onPress={onDownloadImage ?? (() => { })}
             >
               <Text style={styles.downloadText}>Descargar imagen</Text>
               <View style={styles.downloadBtn}>

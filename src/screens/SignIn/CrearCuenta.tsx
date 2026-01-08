@@ -33,6 +33,8 @@ import useKeyboardAware from "../../hooks/useKeyboardAware";
 import { useCountdown } from "../../hooks/useCountdown";
 import { useEmailValidation } from "../../hooks/useEmailValidation";
 import { usePasswordValidation } from "../../hooks/usePasswordValidation";
+import { crearUsuario, crearUsuarioConId } from "../../api/usuario";
+
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
@@ -70,6 +72,18 @@ const CrearCuenta: React.FC = () => {
         email,
         password
       );
+
+      // Crear usuario en el backend para mantener consistencia
+      // Usamos crearUsuarioConId para forzar el mismo ID que Firebase
+      const nameFromEmail = email.split("@")[0];
+      await crearUsuarioConId(userCredential.user.uid, {
+        id: userCredential.user.uid,
+        nombre: nameFromEmail,
+        email: email,
+        password: password,
+        premium: false,
+      });
+
       await sendEmailVerification(userCredential.user);
       setModalVisible(true);
       startCountdown();
@@ -77,6 +91,7 @@ const CrearCuenta: React.FC = () => {
       if (error.code === "auth/email-already-in-use") {
         setEmailUsedError("Este correo ya está registrado.");
       } else {
+        console.error("Error creating account:", error);
         setEmailUsedError("Error al crear la cuenta.");
       }
     }

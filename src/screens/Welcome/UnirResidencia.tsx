@@ -19,6 +19,9 @@ import { useKeyboardAware } from '../../hooks';
 import TextField from '../../components/ui/TextField';
 import useCodigoResidencia from '../../hooks/useCodigoResidencia';
 import ConfettiButton from '../../components/ui/ConfettiButton';
+import { useAuthListener } from '../../hooks/useAuthListener';
+import { crearUsuarioEspacio, obtenerUsuarioEspacios } from '../../api/usuarioEspacio';
+import { obtenerEspacioPorId } from '../../api/espacio';
 
 const UnirResidencia: React.FC = () => {
   const { codigo, handleChange } = useCodigoResidencia();
@@ -44,38 +47,109 @@ const UnirResidencia: React.FC = () => {
 
   const handleClosePopup = () => setPopupVisible(false);
 
-  // Regex para validar el formato 0-0-0-0-0-0
-  const formatoValido = /^\d-\d-\d-\d-\d-\d$/;
-  const isValidCode = formatoValido.test(codigo);
+  // Simplificado para aceptar cualquier ID por ahora
+  const formatoValido = codigo.length > 0;
+  const isValidCode = formatoValido;
+  const user = useAuthListener();
 
   const handleUnirse = async () => {
     if (!isValidCode) {
       showPopup({
         title: 'Código inválido',
-        description: 'Por favor, ingresa un código válido con el formato 0-0-0-0-0-0.',
+        description: 'Por favor, ingresa un código válido.',
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => {} }],
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+      });
+      return;
+    }
+
+    if (!user) {
+      showPopup({
+        title: 'Error de sesión',
+        description: 'No se detectó un usuario autenticado.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
       return;
     }
 
     setLoading(true);
     try {
+      // 1. Verificar si el espacio existe
+      const espacioData = await obtenerEspacioPorId(codigo);
+
+      if (!espacioData) {
+        throw new Error("Espacio no encontrado");
+      }
+
+      console.log("✅ Espacio encontrado:", espacioData.nombre);
+
+      // 1.5 Verificar si ya es miembro
+      try {
+        const relaciones = await obtenerUsuarioEspacios();
+        const yaEsMiembro = Array.isArray(relaciones) && relaciones.some((r: any) =>
+          r.usuarioId === user.uid && r.espacioId === codigo
+        );
+
+        if (yaEsMiembro) {
+          console.log("⚠️ El usuario ya es miembro de este espacio.");
+          showPopup({
+            title: '¡Ya estás dentro!',
+            description: `Ya eres miembro de ${espacioData.nombre}`,
+            imageType: 'convivia',
+            showCode: false,
+            buttons: [{
+              text: 'Ir al inicio',
+              onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioData.nombre })
+            }],
+          });
+          return;
+        }
+      } catch (checkError) {
+        console.warn("No se pudo verificar membresía previa, intentando unir de todos modos...", checkError);
+      }
+
+      // 2. Crear la relación UsuarioEspacio
+      await crearUsuarioEspacio({
+        usuarioId: user.uid,
+        espacioId: codigo,
+        rol: 'miembro',
+        ausente: false,
+        karma: 0
+      });
+
+      console.log("✅ Usuario unido al espacio exitosamente");
+
       showPopup({
         title: 'Éxito',
-        description: 'Te has unido exitosamente a @nombreResidencia',
+        description: `Te has unido exitosamente a ${espacioData.nombre}`,
         imageType: 'convivia',
         showCode: false,
-        buttons: [{ text: 'Aceptar', onPress: () => navigation.navigate('DashBoardPersonal') }],
+        buttons: [{
+          text: 'Aceptar',
+          onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioData.nombre })
+        }],
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al unirse a la residencia:', error);
-      showPopup({
-        title: 'Error',
-        description: 'No se pudo unir a la residencia. Intenta de nuevo.',
-        imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => {} }],
-      });
+
+      const is404 = error.message?.includes('404') || error.response?.status === 404;
+
+      if (is404) {
+        showPopup({
+          title: 'Residencia no encontrada',
+          description: 'El código ingresado no corresponde a ninguna residencia existente. Verifícalo e intenta de nuevo.',
+          imageType: 'error',
+          buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        });
+      } else {
+        showPopup({
+          title: 'Error',
+          description: 'No se pudo unir a la residencia. Intenta de nuevo más tarde.',
+          imageType: 'error',
+          buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -109,9 +183,8 @@ const UnirResidencia: React.FC = () => {
               label="Código de la residencia"
               value={codigo}
               onChangeText={handleChange}
-              placeholder="0-0-0-0-0-0"
-              keyboardType="numeric"
-              error={!isValidCode && codigo.length > 0 ? 'Formato inválido. Usa 0-0-0-0-0-0' : undefined}
+              placeholder="Pegar código aquí..."
+              error={undefined}
             />
 
             <ConfettiButton
