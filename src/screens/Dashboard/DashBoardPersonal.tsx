@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   ScrollView,
@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -32,7 +33,7 @@ import Detalle from "../../components/ui/Detalle";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerEspacioPorId, obtenerEspacios } from "../../api/espacio";
 import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
-import { obtenerTareasPorEspacio } from "../../api/tarea";
+import { obtenerTareasPorEspacio, obtenerDetallePlantilla, obtenerDetalleTareaInstancia } from "../../api/tarea";
 
 const { hp } = HELPERS;
 
@@ -124,66 +125,209 @@ const DashBoardPersonal: React.FC = () => {
   // -------------------------
   const [tareas, setTareas] = useState<TaskModel[]>([]);
   const [loadingTareas, setLoadingTareas] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Cargar tareas al enfocar la pantalla o cuando cambie el espacioId
+  // Ref para el intervalo de polling
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Función reutilizable para cargar tareas
+  const cargarTareas = async (showLoading = true) => {
+    if (!espacioId) return;
+
+    if (showLoading) {
+      setLoadingTareas(true);
+    }
+
+    try {
+      console.log("🔄 Cargando tareas para espacio:", espacioId);
+      const tareasRaw = await obtenerTareasPorEspacio(espacioId);
+
+      if (Array.isArray(tareasRaw)) {
+        console.log("✅ Tareas (plantillas) recibidas:", tareasRaw.length);
+
+        const mappedTasks = tareasRaw.map((t: any) => {
+          // BACKEND devuelve 'startDate' en lugar de 'fechaLimite'
+          // y NO devuelve hora explícita en la plantilla.
+          // Usaremos startDate como fecha límite.
+
+          const fechaFuente = t.startDate || t.fechaLimite || t.FechaLimite;
+          const fechaObj = fechaFuente ? new Date(fechaFuente) : new Date();
+
+          // La hora real suele estar en la instancia (tarea hija), no en la plantilla.
+          // Intentamos leer de la plantilla por si acaso, o default "12:00".
+          // Luego enriqueceremos esto con otra llamada.
+          const rawTime = t.HoraLimite ?? t.horaLimite ??
+            t.time ?? t.Time ??
+            t.hora ?? t.Hora;
+
+          let cleanTime = "12:00";
+          if (rawTime && typeof rawTime === 'string' && rawTime.length >= 5) {
+            cleanTime = rawTime.substring(0, 5);
+          }
+
+          return new TaskModel({
+            id: t.id,
+            Nombre: t.nombre || t.Nombre,
+            Descripcion: t.descripcion || t.Descripcion,
+            karma: t.karma,
+            DiasRepeticion: t.diasRepeticion || [],
+
+            FechaLimite: fechaObj,
+            HoraLimite: cleanTime,
+
+            isCompleted: t.completada || t.Completada || false,
+            usuarioAsignado: t.usuariosAsignacion?.[0] || null,
+            tareasId: t.tareasId || [] // Guardamos los IDs de instancias
+          });
+        });
+
+        // 🚀 OPTIMIZACIÓN: Fusión Inteligente (Smart Merge)
+        // En lugar de reemplazar todo ciegamente, comparamos con lo que ya tenemos.
+        // Si la tarea ya existe y tiene la misma instancia, preservamos los datos enriquecidos (Hora/Fecha)
+        // para evitar un fetch innecesario y parpadeos en la UI.
+
+        setTareas(prevTareas => {
+          const mergedTasks = mappedTasks.map(newTask => {
+            const existing = prevTareas.find(t => t.id === newTask.id);
+
+            if (existing) {
+              // Verificar si es la misma instancia de tarea (mismo ID de tarea hija)
+              const prevLastInstance = existing.tareasId?.[existing.tareasId.length - 1];
+              const newLastInstance = newTask.tareasId?.[newTask.tareasId.length - 1];
+
+              // Si es la misma instancia y ya tenemos datos enriquecidos (no es 12:00 por defecto), 
+              // conservamos los datos locales.
+              const hasValidLocalTime = existing.HoraLimite !== "12:00";
+              const sameInstance = prevLastInstance === newLastInstance;
+
+              if (sameInstance && hasValidLocalTime) {
+                return new TaskModel({
+                  ...newTask as any, // Propiedades base actualizadas (Nombre, Karma, etc)
+                  FechaLimite: existing.FechaLimite, // MANTENER fecha real recuperada
+                  HoraLimite: existing.HoraLimite,   // MANTENER hora real recuperada
+                });
+              }
+            }
+            return newTask;
+          });
+
+          // Identificar qué tareas NECESITAN ser enriquecidas (son nuevas o cambió su instancia)
+          // Lo hacemos en un timeout para no bloquear el renderizado del setTareas
+          setTimeout(() => {
+            const tasksToEnrich = mergedTasks.filter(t => {
+              // Necesita update si:
+              // 1. Tiene instancias (tareasId > 0)
+              // 2. Y (Su hora es la default "12:00" O acabamos de detectar que cambió su instancia)
+              // Simplificación: Si su hora es "12:00" y tiene instancias, intentamos enriquecer.
+              return t.tareasId && t.tareasId.length > 0 && t.HoraLimite === "12:00";
+            });
+
+            if (tasksToEnrich.length > 0) {
+              fetchRealTaskTimes(tasksToEnrich, espacioId);
+            }
+          }, 100);
+
+          return mergedTasks;
+        });
+      }
+    } catch (error) {
+      console.error("Error cargando tareas:", error);
+    } finally {
+      if (showLoading) {
+        setLoadingTareas(false);
+      }
+      setRefreshing(false);
+    }
+  };
+
+  // Handler para pull-to-refresh
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    cargarTareas(false);
+  }, [espacioId]);
+
+  // Cargar tareas al enfocar la pantalla
   useFocusEffect(
     React.useCallback(() => {
-      const cargarTareas = async () => {
-        if (!espacioId) return;
-
-        setLoadingTareas(true);
-        try {
-          console.log("🔄 Cargando tareas para espacio:", espacioId);
-          const tareasRaw = await obtenerTareasPorEspacio(espacioId);
-
-          if (Array.isArray(tareasRaw)) {
-            // Log para depuración
-            if (tareasRaw.length > 0) {
-              // debug log removed
-            }
-
-            const mappedTasks = tareasRaw.map((t: any) => {
-              // BACKEND devuelve 'startDate' en lugar de 'fechaLimite'
-              // y NO devuelve hora explícita.
-              // Usaremos startDate como fecha límite.
-
-              const fechaFuente = t.startDate || t.fechaLimite || t.FechaLimite;
-              const fechaObj = fechaFuente ? new Date(fechaFuente) : new Date();
-
-              // Hora: no viene en el JSON actual. Intentamos buscarla por si acaso, si no '12:00'
-              const rawTime = t.horaLimite || t.HoraLimite;
-              let cleanTime = "12:00";
-              if (rawTime && typeof rawTime === 'string' && rawTime.length >= 5) {
-                cleanTime = rawTime.substring(0, 5);
-              }
-
-              return new TaskModel({
-                id: t.id,
-                Nombre: t.nombre || t.Nombre,
-                Descripcion: t.descripcion || t.Descripcion,
-                karma: t.karma,
-                DiasRepeticion: t.diasRepeticion || [],
-
-                FechaLimite: fechaObj,
-                HoraLimite: cleanTime,
-
-                isCompleted: t.completada || t.Completada || false,
-                usuarioAsignado: t.usuariosAsignacion?.[0] || null
-              });
-            });
-            setTareas(mappedTasks);
-            console.log("✅ Tareas cargadas:", mappedTasks.length);
-          }
-        } catch (error) {
-          console.error("Error cargando tareas:", error);
-        } finally {
-          setLoadingTareas(false);
-        }
-      };
-
+      // Cargar tareas una vez al entrar o volver a la pantalla
       cargarTareas();
+
+      return () => {
+        // Cleanup si fuera necesario
+      };
     }, [espacioId])
   );
+
+  // Función para enriquecer tareas con detalles de instancias (Horas reales)
+  const fetchRealTaskTimes = async (currentTasks: TaskModel[], eId: string) => {
+    // Solo procesamos tareas que tienen instancias
+    const candidates = currentTasks.filter(t => t.tareasId && t.tareasId.length > 0);
+
+    if (candidates.length === 0) return;
+
+    console.log(`🕒 Buscando horas reales para ${candidates.length} tareas...`);
+
+    // Hacemos las peticiones en paralelo
+    const updates = await Promise.all(candidates.map(async (task) => {
+      try {
+        // Tomamos la última instancia (asumiendo que es la más relevante/reciente)
+        const lastInstanceId = task.tareasId[task.tareasId.length - 1];
+        const detail = await obtenerDetalleTareaInstancia(eId, task.id, lastInstanceId);
+
+        const result: any = { id: task.id };
+        let hasUpdate = false;
+
+        // 1. Buscamos HORA
+        const timeFound = detail?.horaLimite || detail?.HoraLimite || detail?.hora;
+        if (timeFound && typeof timeFound === 'string' && timeFound.length >= 5) {
+          result.realTime = timeFound.substring(0, 5);
+          hasUpdate = true;
+        }
+
+        // 2. Buscamos FECHA LIMITE
+        const dateFound = detail?.fechaLimite || detail?.FechaLimite;
+        if (dateFound) {
+          result.realDate = new Date(dateFound);
+          hasUpdate = true;
+        }
+
+        if (hasUpdate) return result;
+
+      } catch (e) {
+        console.warn(`Falló al obtener detalles para tarea ${task.Nombre}`, e);
+      }
+      return null;
+    }));
+
+    // Filtramos actualizaciones válidas
+    const validUpdates = updates.filter(u => u !== null) as { id: string, realTime?: string, realDate?: Date }[];
+
+    if (validUpdates.length > 0) {
+      console.log(`✅ Actualizando detalles (hora/fecha) de ${validUpdates.length} tareas.`);
+      setTareas(prevTareas => prevTareas.map(t => {
+        const update = validUpdates.find(u => u.id === t.id);
+        if (update) {
+          // Return new updated instance
+          return new TaskModel({
+            id: t.id,
+            Nombre: t.Nombre,
+            Descripcion: t.Descripcion,
+            karma: t.karma,
+            DiasRepeticion: t.DiasRepeticion,
+            // Usamos la fecha real de la instancia si existe, si no la que ya tenía
+            FechaLimite: update.realDate || t.FechaLimite,
+            // Usamos la hora real de la instancia si existe, si no la que ya tenía
+            HoraLimite: update.realTime || t.HoraLimite,
+            isCompleted: t.isCompleted,
+            FechaCompletada: t.FechaCompletada,
+            usuarioAsignado: t.usuarioAsignado,
+            tareasId: t.tareasId
+          });
+        }
+        return t;
+      }));
+    }
+  };
 
   const [facturas, setFacturas] = useState<FacturaModel[]>([
     new FacturaModel({
@@ -645,6 +789,14 @@ const DashBoardPersonal: React.FC = () => {
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#8B5CF6"]} // Color morado para Android
+            tintColor="#8B5CF6" // Color morado para iOS
+          />
+        }
       >
         {/* Filtro solo para tareas */}
         {activeTab === "tareas" && (

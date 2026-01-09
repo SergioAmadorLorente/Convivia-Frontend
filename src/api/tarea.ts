@@ -27,7 +27,8 @@ export const crearTarea = async (data: TareaPayload) => {
         }
 
         const response = await api.post(`/espacios/${espacioId}/tareas`, data);
-        console.log("✅ Plantilla creada:", response.data);
+        console.log("✅ Plantilla creada:");
+        console.log("🔍 DEBUG - Respuesta completa del backend:", JSON.stringify(response.data, null, 2));
         return response.data;
     } catch (error: any) {
         console.error("❌ Error al crear tarea:", error);
@@ -95,3 +96,27 @@ export const obtenerTareas = async () => {
         throw error;
     }
 };
+
+export const obtenerDetallePlantilla = async (espacioId: string, plantillaId: string) => {
+    try {
+        // Intento de obtener detalle de la plantilla (nivel 2)
+        const response = await api.get(`/espacios/${espacioId}/tareas/${plantillaId}`);
+        console.log(`🔍 Detalle Plantilla ${plantillaId}:`, JSON.stringify(response.data, null, 2));
+        return response.data;
+    } catch (error) {
+        console.warn(`⚠️ No se pudo obtener detalle de plantilla ${plantillaId}`, error);
+        return null;
+    }
+}
+
+export const obtenerDetalleTareaInstancia = async (espacioId: string, plantillaId: string, tareaId: string) => {
+    try {
+        // Intento de obtener detalle de la instancia de tarea (nivel 3)
+        const response = await api.get(`/espacios/${espacioId}/tareas/${plantillaId}/${tareaId}`);
+        console.log(`🔍 Detalle Instancia Tarea ${tareaId}:`, JSON.stringify(response.data, null, 2));
+        return response.data;
+    } catch (error) {
+        console.warn(`⚠️ No se pudo obtener detalle de instancia tarea ${tareaId}`, error);
+        return null;
+    }
+}

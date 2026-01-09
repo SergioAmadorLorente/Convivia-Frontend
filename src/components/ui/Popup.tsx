@@ -70,7 +70,7 @@ const Popup: React.FC<PopupProps> = ({
   title,
   description,
   imageType = "success",
-  buttons = [{ text: "Aceptar", onPress: () => {} }],
+  buttons = [{ text: "Aceptar", onPress: () => { } }],
   containerStyle,
   popupStyle,
   imageStyle,
@@ -97,7 +97,7 @@ const Popup: React.FC<PopupProps> = ({
   // ¿Tenemos code y queremos mostrarlo?
   const hasCode = showCode && code !== undefined && code !== null && String(code).length > 0;
 
-  // Normaliza el código a 6 dígitos SOLO si hay code
+  // Normaliza el código a 6 dígitos (extrayendo los primeros 6 números del UUID)
   const codeDigits = useMemo(() => {
     if (!hasCode) return [];
     const raw =
@@ -130,7 +130,7 @@ const Popup: React.FC<PopupProps> = ({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={() => {}}
+      onRequestClose={() => { }}
     >
       <View style={[styles.overlay, containerStyle]}>
         <View style={[styles.popup, popupStyle]}>
@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
   },
+
   codeRow: {
     flexDirection: "row",
     alignItems: "center",
