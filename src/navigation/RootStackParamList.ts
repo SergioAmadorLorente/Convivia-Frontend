@@ -13,4 +13,5 @@ export type RootStackParamList = {
   test: undefined;
   CreateTask: { taskToEdit: any } | undefined;
   CreateFactura: { facturaToEdit: any } | undefined;
+  InfoLegal: undefined;
 };
