@@ -108,7 +108,7 @@ const Perfil: React.FC = () => {
           {/* Mis Residencias */}
           <MenuItem
             label="Mis Residencias"
-            onPress={() => navigation.navigate("UnirResidencia")}
+            onPress={() => navigation.navigate("MiResidencia")}
             icon={<Miresidencia width={24} height={24} />}
           />
           <View style={styles.divider} />
@@ -116,7 +116,7 @@ const Perfil: React.FC = () => {
           {/* Preguntas frecuentes */}
           <MenuItem
             label="Preguntas frecuentes"
-            onPress={() => console.log('Preguntas frecuentes')}
+            onPress={() => navigation.navigate("FAQ")}
             icon={<IconoFAQ width={24} height={24} />}
           />
           <View style={styles.divider} />
@@ -124,7 +124,7 @@ const Perfil: React.FC = () => {
           {/* Información Legal */}
           <MenuItem
             label="Información Legal"
-            onPress={() => console.log('Información Legal')}
+            onPress={() => navigation.navigate("InfoLegal")}
             icon={<Infolegal width={24} height={24} />}
           />
           <View style={styles.divider} />

@@ -19,6 +19,7 @@ import CreateFactura from "../screens/Dashboard/CreateFactura";
 import InfoLegal from "../screens/Perfil/InfoLegal/InfoLegal";
 import { RootStackParamList } from "./RootStackParamList";
 import MiResidencia from "../screens/Perfil/MiResidencia/MiResidencia";
+import FAQ from "../screens/FAQ/FAQ";
 
 const Stack = createStackNavigator<RootStackParamList>();
 const headerOptions: StackNavigationOptions = {
@@ -77,11 +78,9 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="CreateTask" component={CreateTask} options={defaultScreenOptions} />
                 <Stack.Screen name="CreateFactura" component={CreateFactura} options={defaultScreenOptions} />
                 <Stack.Screen name="InfoLegal" component={InfoLegal} options={defaultScreenOptions} />
-                <Stack.Screen
-                    name="MiResidencia"
-                    component={MiResidencia}
-                    options={{ headerShown: false }}
-                />
+                <Stack.Screen name="MiResidencia" component={MiResidencia} options={defaultScreenOptions} />
+                <Stack.Screen name="FAQ" component={FAQ}
+                    options={defaultScreenOptions} />
             </Stack.Navigator>
         </NavigationContainer>
     );

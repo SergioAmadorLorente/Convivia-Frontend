@@ -6,11 +6,11 @@ import {
     TouchableOpacity,
     ScrollView,
     Dimensions,
-    Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../../styles/theme";
+import GLOBAL_STYLES from "../../../styles/styles";
 import BottomBar from "../../../components/ui/BottomBar";
 
 const { width } = Dimensions.get("window");
@@ -33,132 +33,101 @@ const MiResidencia: React.FC = () => {
     );
 
     return (
-        <View style={styles.container}>
-            {/* Custom Header Area */}
-            <View style={styles.headerArea}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="chevron-back" size={24} color={COLORS.accent} />
-                    <Text style={styles.backText}>Volver</Text>
-                </TouchableOpacity>
-                <Text style={styles.screenTitle}>Mis Residencias</Text>
-            </View>
+        <>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={GLOBAL_STYLES.container}>
+                    {/* Back Button */}
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-                {/* Residence Card */}
-                <View style={styles.residenciaCard}>
-                    <View style={styles.iconContainer}>
-                        <Ionicons name="home" size={30} color="#fff" />
-                    </View>
-                    <Text style={styles.residenciaName}>@Nombre Piso</Text>
-                    <TouchableOpacity style={styles.editIcon}>
-                        <FontAwesome5 name="edit" size={20} color={COLORS.accent} />
-                    </TouchableOpacity>
-                </View>
+                    <Text style={GLOBAL_STYLES.titulo}>Mis Residencias</Text>
 
-                {/* Code Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Código de tu Residencia</Text>
-                    <View style={styles.divider} />
-
-                    {residenciaCode ? (
-                        <View style={styles.codeContainer}>
-                            {residenciaCode.map((digit, index) => (
-                                <CodeBox key={index} digit={digit} />
-                            ))}
+                    <View style={{ width: "85%", marginTop: 20 }}>
+                        {/* Residence Card */}
+                        <View style={styles.residenciaCard}>
+                            <View style={styles.iconContainer}>
+                                <Ionicons name="home" size={30} color="#fff" />
+                            </View>
+                            <Text style={styles.residenciaName}>@Nombre Piso</Text>
+                            <TouchableOpacity style={styles.editIcon}>
+                                <FontAwesome5 name="edit" size={20} color={COLORS.accent} />
+                            </TouchableOpacity>
                         </View>
-                    ) : (
-                        <TouchableOpacity style={styles.generateButton} onPress={generateCode}>
-                            <Text style={styles.generateButtonText}>Generar Código</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
 
-                {/* Participants Section */}
-                <View style={styles.section}>
-                    <TouchableOpacity
-                        style={styles.sectionHeaderClickable}
-                        onPress={() => setIsParticipantsOpen(!isParticipantsOpen)}
-                    >
-                        <Text style={styles.sectionTitle}>Participantes</Text>
-                        <Ionicons
-                            name={isParticipantsOpen ? "chevron-up" : "chevron-down"}
-                            size={24}
-                            color={COLORS.secondary}
-                        />
-                    </TouchableOpacity>
-                    <View style={styles.divider} />
+                        {/* Code Section */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Código de tu Residencia</Text>
+                            <View style={styles.divider} />
 
-                    {isParticipantsOpen && (
-                        <View style={styles.participantsList}>
-                            <View style={styles.participantItem}>
-                                <Text style={styles.participantName}>PupuGugu</Text>
+                            {residenciaCode ? (
+                                <View style={styles.codeContainer}>
+                                    {residenciaCode.map((digit, index) => (
+                                        <CodeBox key={index} digit={digit} />
+                                    ))}
+                                </View>
+                            ) : (
+                                <TouchableOpacity style={styles.generateButton} onPress={generateCode}>
+                                    <Text style={styles.generateButtonText}>Generar Código</Text>
+                                </TouchableOpacity>
+                            )}
+                        </View>
+
+                        {/* Participants Section */}
+                        <View style={styles.section}>
+                            <TouchableOpacity
+                                style={styles.sectionHeaderClickable}
+                                onPress={() => setIsParticipantsOpen(!isParticipantsOpen)}
+                            >
+                                <Text style={styles.sectionTitle}>Participantes</Text>
+                                <Ionicons
+                                    name={isParticipantsOpen ? "chevron-up" : "chevron-down"}
+                                    size={24}
+                                    color={COLORS.secondary}
+                                />
+                            </TouchableOpacity>
+                            <View style={styles.divider} />
+
+                            {isParticipantsOpen && (
+                                <View style={styles.participantsList}>
+                                    <View style={styles.participantItem}>
+                                        <Text style={styles.participantName}>PupuGugu</Text>
+                                    </View>
+                                </View>
+                            )}
+                        </View>
+
+                        {/* Settings Section */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Ajustes</Text>
+                            <View style={styles.divider} />
+
+                            <View style={styles.buttonsContainer}>
+                                <TouchableOpacity style={styles.actionButton}>
+                                    <Text style={styles.actionButtonText}>Cambiar de Residencia</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.actionButton}>
+                                    <Text style={[styles.actionButtonText, { color: COLORS.error }]}>Abandonar Residencia</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.actionButton}>
+                                    <Text style={[styles.actionButtonText, { color: COLORS.error }]}>Eliminar Residencia</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
-                    )}
-                </View>
-
-                {/* Settings Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Ajustes</Text>
-                    <View style={styles.divider} />
-
-                    <View style={styles.buttonsContainer}>
-                        <TouchableOpacity style={styles.actionButton}>
-                            <Text style={styles.actionButtonText}>Cambiar de Residencia</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.actionButton}>
-                            <Text style={[styles.actionButtonText, { color: COLORS.error }]}>Abandonar Residencia</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.actionButton}>
-                            <Text style={[styles.actionButtonText, { color: COLORS.error }]}>Eliminar Residencia</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
 
-            </ScrollView>
+
+            </ScrollView >
 
             <BottomBar />
-
-            {/* Floating Create Button Wrapper (if needed to match Perfil, but BottomBar handles it) */}
-        </View>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#F5F4F2",
-    },
-    headerArea: {
-        paddingTop: Platform.OS === 'ios' ? 60 : 40,
-        paddingHorizontal: 20,
-        marginBottom: 20,
-    },
-    backButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    backText: {
-        fontFamily: FONTS.regular,
-        fontSize: 16,
-        color: COLORS.accent,
-        marginLeft: 5,
-    },
-    screenTitle: {
-        fontFamily: FONTS.title,
-        fontSize: 32,
-        color: COLORS.primary,
-        textAlign: 'center',
-    },
-    scrollContent: {
-        paddingBottom: 100,
-        paddingHorizontal: 20,
-        alignItems: 'center',
-    },
     residenciaCard: {
         width: '100%',
         backgroundColor: COLORS.background,
