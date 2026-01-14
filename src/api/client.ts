@@ -15,6 +15,7 @@ const getBaseUrl = () => {
 const api = axios.create({
   baseURL: getBaseUrl(),
   headers: {
+    'X-Api-Key': 'ConviviaDevelopmentKey2026',
     "Content-Type": "application/json",
     Accept: "application/json",
   },
