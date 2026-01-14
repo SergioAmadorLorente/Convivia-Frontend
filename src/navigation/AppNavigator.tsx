@@ -17,6 +17,8 @@ import TestScreen from "../screens/test";
 import CreateTask from "../screens/Dashboard/CreateTask";
 import CreateFactura from "../screens/Dashboard/CreateFactura";
 import { RootStackParamList } from "./RootStackParamList";
+import MiResidencia from "../screens/Perfil/MiResidencia/MiResidencia";
+
 const Stack = createStackNavigator<RootStackParamList>();
 const headerOptions: StackNavigationOptions = {
     headerShown: true,
@@ -73,6 +75,11 @@ const AppNavigator: React.FC = () => {
                 <Stack.Screen name="test" component={TestScreen} options={defaultScreenOptions} />
                 <Stack.Screen name="CreateTask" component={CreateTask} options={defaultScreenOptions} />
                 <Stack.Screen name="CreateFactura" component={CreateFactura} options={defaultScreenOptions} />
+                <Stack.Screen
+                    name="MiResidencia"
+                    component={MiResidencia}
+                    options={{ headerShown: false }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
