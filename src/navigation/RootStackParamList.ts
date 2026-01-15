@@ -15,5 +15,6 @@ export type RootStackParamList = {
   CreateFactura: { facturaToEdit: any } | undefined;
   InfoLegal: undefined;
   MiResidencia: undefined;
+  MiKarma: undefined;
   FAQ: undefined;
 };

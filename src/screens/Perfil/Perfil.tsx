@@ -106,7 +106,7 @@ const Perfil: React.FC = () => {
           {/* Mi Karma */}
           <MenuItem
             label="Mi Karma"
-            onPress={() => console.log('Mi Karma')}
+            onPress={() => navigation.navigate("MiKarma")}
             icon={<LogoKarma width={30} height={30} />}
           />
           <View style={styles.divider} />
