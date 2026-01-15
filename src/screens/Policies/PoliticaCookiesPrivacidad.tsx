@@ -138,8 +138,7 @@ const PoliticaCookiesPrivacidad: React.FC = () => {
               en tu dispositivo para analizar el uso de la plataforma y
               proporcionar servicios relacionados con el contenido y servicios
               de la plataforma. No somos responsables de las prácticas de
-              privacidad de terceros. Te animamos a que revises sus políticas de
-              privacidad.
+              privacidad de terceros.
             </Text>
           </Desplegable>
         </View>

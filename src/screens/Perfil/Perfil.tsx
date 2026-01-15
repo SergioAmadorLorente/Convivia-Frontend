@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -17,6 +17,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Keep for fallback or other icons
 import BottomBar from "../../components/ui/BottomBar";
+import Popup from "../../components/ui/Popup";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 // Import SVG Assets
@@ -31,6 +32,11 @@ const { width } = Dimensions.get("window");
 
 const Perfil: React.FC = () => {
   const navigation = useNavigation<any>();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleLogout = () => {
+    navigation.navigate('Main');
+  };
 
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
@@ -140,13 +146,26 @@ const Perfil: React.FC = () => {
           {/* Cerrar Sesión */}
           <MenuItem
             label="Cerrar Sesión"
-            onPress={() => console.log('Cerrar Sesión')}
+            onPress={() => setModalVisible(true)}
             icon={<LogoutSinFondo width={24} height={24} />}
           />
 
         </View>
 
       </ScrollView>
+
+      <Popup
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title="¿Estás seguro de que quieres cerrar la sesión?"
+        description=""
+        imageType="logout"
+        buttons={[
+          { text: 'Cancelar', onPress: () => { } },
+          { text: 'Cerrar sesión', onPress: handleLogout },
+        ]}
+      />
+
       <BottomBar />
     </View>
   );
