@@ -12,11 +12,12 @@ const InfoLegal: React.FC = () => {
     return (
         <>
             <ScrollView
-                contentContainerStyle={{ flexGrow: 1 }}
+                contentContainerStyle={{ flexGrow: 1, backgroundColor: "#F5F4F2" }}
                 showsVerticalScrollIndicator={false}
             >
+                <Text style={GLOBAL_STYLES.titulo}>Información Legal</Text>
+
                 <View style={GLOBAL_STYLES.container}>
-                    <Text style={GLOBAL_STYLES.titulo}>Información Legal</Text>
                     <View style={{ marginTop: 30, width: "100%", alignItems: "center" }}>
                         <Button
                             style={GLOBAL_STYLES.buttonPrimaryGreen}

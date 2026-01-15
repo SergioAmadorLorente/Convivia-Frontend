@@ -20,6 +20,8 @@ import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
+import GLOBAL_STYLES from "../../styles/styles";
+
 // Import SVG Assets
 import LogoKarma from "../../assets/logo_karma.svg";
 import Miresidencia from "../../assets/Miresidencia.svg";
@@ -73,7 +75,9 @@ const Perfil: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Header Title */}
-        <Text style={styles.headerTitle}>Mi Perfil</Text>
+        <View style={{ width: "100%" }}>
+          <Text style={GLOBAL_STYLES.titulo}>Mi Perfil</Text>
+        </View>
 
         {/* User Card */}
         <View style={styles.userCard}>
@@ -179,13 +183,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 100,
     alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: SIZES.largeTitle,
-    fontFamily: FONTS.title,
-    color: COLORS.primary,
-    marginTop: HELPERS.hp("7%"),
-    marginBottom: HELPERS.hp("3%"),
   },
   userCard: {
     width: width * 0.9,

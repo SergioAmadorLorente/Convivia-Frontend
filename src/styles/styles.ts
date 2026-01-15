@@ -38,7 +38,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
   fullWidth: {
     width: "100%",
   },
-  
+
   /** Wrapper blanco para el contenido de dashboard (tareas + carrusel) */
   dashboardWhiteSection: {
     backgroundColor: COLORS.background,
@@ -129,10 +129,13 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
   // Título grande para pantallas
   titulo: {
-    fontSize: moderateScale(48),
+    fontSize: moderateScale(22),
     color: COLORS.primary,
     fontFamily: FONTS.title,
     textAlign: "center",
+    marginTop: hp("1%"),
+    marginBottom: hp("2%"),
+    paddingHorizontal: wp("5%"),
   },
 
   // Subtítulo grande para pantallas
@@ -252,7 +255,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
   // Contenedor de checkbox y label
   checkboxContainer: {
     flexDirection: "row",
-    alignItems: "center", 
+    alignItems: "center",
     width: wp("80%"),
     marginTop: hp("1%"),
     marginBottom: hp("1%"),

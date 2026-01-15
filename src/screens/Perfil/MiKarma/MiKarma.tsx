@@ -69,7 +69,9 @@ const MiKarma: React.FC = () => {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Header Title */}
-                <Text style={styles.headerTitle}>Mi Karma</Text>
+                <View style={{ width: "100%" }}>
+                    <Text style={GLOBAL_STYLES.titulo}>Mi Karma</Text>
+                </View>
 
                 {/* Debug button - remove in production */}
                 <TouchableOpacity
@@ -294,11 +296,6 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingBottom: 100,
         alignItems: "center",
-    },
-    headerTitle: {
-        ...GLOBAL_STYLES.titulo,
-        marginTop: HELPERS.hp("2%"),
-        marginBottom: HELPERS.hp("3%"),
     },
     mainPointsCard: {
         backgroundColor: COLORS.background,

@@ -34,15 +34,12 @@ const MiResidencia: React.FC = () => {
 
     return (
         <>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}
+            <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: "#F5F4F2" }}
                 showsVerticalScrollIndicator={false}
             >
+                <Text style={GLOBAL_STYLES.titulo}>Mis Residencias</Text>
+
                 <View style={GLOBAL_STYLES.container}>
-                    {/* Back Button */}
-
-
-                    <Text style={GLOBAL_STYLES.titulo}>Mis Residencias</Text>
-
                     <View style={{ width: "85%", marginTop: 20 }}>
                         {/* Residence Card */}
                         <View style={styles.residenciaCard}>
