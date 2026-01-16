@@ -72,12 +72,10 @@ const CrearCuenta: React.FC = () => {
         email,
         password
       );
-
-      // Crear usuario en el backend para mantener consistencia
-      // Usamos crearUsuarioConId para forzar el mismo ID que Firebase
+      // 2. Usamos el UID generado por Firebase para crear el registro en tu BBDD
       const nameFromEmail = email.split("@")[0];
-      await crearUsuarioConId(userCredential.user.uid, {
-        id: userCredential.user.uid,
+      await crearUsuarioConId(userCredential.user.uid, { // <--- Pasamos el UID aquí
+        id: userCredential.user.uid, // <--- Y lo asignamos explícitamente en el cuerpo
         nombre: nameFromEmail,
         email: email,
         password: password,

@@ -21,7 +21,14 @@ import useCodigoResidencia from '../../hooks/useCodigoResidencia';
 import ConfettiButton from '../../components/ui/ConfettiButton';
 import { useAuthListener } from '../../hooks/useAuthListener';
 import { crearUsuarioEspacio, obtenerUsuarioEspacios } from '../../api/usuarioEspacio';
-import { obtenerEspacioPorId } from '../../api/espacio';
+import { obtenerEspacioPorId, obtenerEspacios } from '../../api/espacio';
+
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 const UnirResidencia: React.FC = () => {
   const { codigo, handleChange } = useCodigoResidencia();
@@ -75,12 +82,24 @@ const UnirResidencia: React.FC = () => {
 
     setLoading(true);
     try {
-      // 1. Verificar si el espacio existe
-      const espacioData = await obtenerEspacioPorId(codigo);
+      // 1. Buscar el espacio que coindcida con el código de 6 dígitos
+      // Como el código es una simplificación del UUID, debemos buscar en todos los espacios
+      // cuál tiene un ID que genere ese código.
+      const espacios = await obtenerEspacios();
+      const inputCode = codigo.replace(/-/g, ""); // "1-2..." -> "12..."
 
-      if (!espacioData) {
-        throw new Error("Espacio no encontrado");
+      const espacioEncontrado = espacios.find((s: any) => {
+        const raw = s.id.replace(/\D/g, "");
+        const six = raw.slice(0, 6);
+        return six === inputCode;
+      });
+
+      if (!espacioEncontrado) {
+        throw new Error("Espacio no encontrado (404)");
       }
+
+      const realId = espacioEncontrado.id;
+      const espacioData = espacioEncontrado;
 
       console.log("✅ Espacio encontrado:", espacioData.nombre);
 
@@ -88,7 +107,7 @@ const UnirResidencia: React.FC = () => {
       try {
         const relaciones = await obtenerUsuarioEspacios();
         const yaEsMiembro = Array.isArray(relaciones) && relaciones.some((r: any) =>
-          r.usuarioId === user.uid && r.espacioId === codigo
+          r.usuarioId === user.uid && r.espacioId === realId
         );
 
         if (yaEsMiembro) {
@@ -112,10 +131,13 @@ const UnirResidencia: React.FC = () => {
       // 2. Crear la relación UsuarioEspacio
       await crearUsuarioEspacio({
         usuarioId: user.uid,
-        espacioId: codigo,
+        espacioId: realId,
         rol: 'miembro',
         ausente: false,
-        karma: 0
+        karma: 0,
+        permisoId: generateUUID(),
+        tareasId: [],
+        facturasId: []
       });
 
       console.log("✅ Usuario unido al espacio exitosamente");

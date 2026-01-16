@@ -23,6 +23,7 @@ type Props =
     onClose: () => void;
     onComplete: () => void; // misma lógica que en dashboard
     onEdit: () => void;
+    onDelete: () => void;
   }
   | {
     visible: boolean;
@@ -31,11 +32,12 @@ type Props =
     onClose: () => void;
     onComplete: () => void; // marcar como pagada (dashboard valida)
     onEdit: () => void;
+    onDelete: () => void;
     onDownloadImage?: () => void;
   };
 
 const Detalle: React.FC<Props> = (props) => {
-  const { visible, onClose, onComplete, onEdit } = props;
+  const { visible, onClose, onComplete, onEdit, onDelete } = props;
 
   if (props.kind === "tarea") {
     const { task } = props;
@@ -65,11 +67,12 @@ const Detalle: React.FC<Props> = (props) => {
       return `${hh}:${mm}`;
     }, [task.HoraLimite, task.FechaLimite]);
 
-    // ✅ DiasRepeticion es number[] con 1=Lunes .. 7=Domingo
+    // ✅ DiasRepeticion es number[] con Lunes=0 .. Domingo=6
     const weekLabels = ["L", "M", "X", "J", "V", "S", "D"];
-    const isDaySelected = (idx0: number) =>
-      Array.isArray(task.DiasRepeticion) &&
-      task.DiasRepeticion.includes(idx0 + 1);
+    const isDaySelected = (idx0: number) => {
+      // Backend: Lunes=0 ... Domingo=6
+      return Array.isArray(task.DiasRepeticion) && task.DiasRepeticion.includes(idx0);
+    };
 
     return (
       <Modal
@@ -94,9 +97,18 @@ const Detalle: React.FC<Props> = (props) => {
                 ) : null}
               </View>
 
-              {/* Puntos de karma */}
-              <View style={styles.pointsPill}>
-                <Text style={styles.pointsText}>{task.karma ?? 0} Puntos</Text>
+              {/* Puntos de karma y Botón Eliminar */}
+              <View style={{ alignItems: "flex-end", gap: 10 }}>
+                <View style={styles.pointsPill}>
+                  <Text style={styles.pointsText}>{task.karma ?? 0} Puntos</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={onDelete}
+                  activeOpacity={0.7}
+                  style={styles.deleteButton}
+                >
+                  <Feather name="trash-2" size={20} color={COLORS.error} />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -535,6 +547,11 @@ const styles = StyleSheet.create({
     width: "48%",
     alignSelf: "auto",
     marginTop: 0,
+  },
+  deleteButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: "#FFEBEE",
   },
 });
 

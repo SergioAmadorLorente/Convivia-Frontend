@@ -8,10 +8,17 @@ import {
 import { COLORS, FONTS } from "../../styles/theme";
 interface KarmaSelectorProps {
     onSelect: (value: number) => void;
+    initialValue?: number;
 }
-const KarmaSelector: React.FC<KarmaSelectorProps> = ({ onSelect }) => {
+const KarmaSelector: React.FC<KarmaSelectorProps> = ({ onSelect, initialValue = 0 }) => {
     const KARMA_POINTS = [5, 15, 25, 50];
-    const [selected, setSelected] = useState<number | null>(null);
+    const [selected, setSelected] = useState<number | null>(initialValue !== 0 ? initialValue : null);
+
+    React.useEffect(() => {
+        if (initialValue !== 0) {
+            setSelected(initialValue);
+        }
+    }, [initialValue]);
     const handleSelect = (v: number) => {
         setSelected(v);
         onSelect(v);

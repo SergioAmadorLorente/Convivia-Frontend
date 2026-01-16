@@ -20,9 +20,11 @@ export const useEditTask = () => {
 
     const [isEditing, setIsEditing] = useState(false);
     const [taskId, setTaskId] = useState<string | undefined>(undefined);
+    const [instanceId, setInstanceId] = useState<string | undefined>(undefined);
 
-    const loadTask = (task: Task) => {
+    const loadTask = (task: Task & { instanceId?: string }) => {
         setTaskId(task.id);
+        setInstanceId(task.instanceId);
         setName(task.name);
         setDescription(task.description);
         setSelectedTime(task.time);
@@ -34,6 +36,7 @@ export const useEditTask = () => {
 
     const resetForm = () => {
         setTaskId(undefined);
+        setInstanceId(undefined);
         setName('');
         setDescription('');
         setSelectedTime('12:00');
@@ -43,8 +46,9 @@ export const useEditTask = () => {
         setIsEditing(false);
     };
 
-    const getTaskData = (): Task => ({
+    const getTaskData = (): Task & { instanceId?: string } => ({
         id: taskId,
+        instanceId,
         name,
         description,
         time: selectedTime,
@@ -62,6 +66,8 @@ export const useEditTask = () => {
         karma, setKarma,
         assignedUsers, setAssignedUsers,
         isEditing,
+        taskId,
+        instanceId,
 
         // Actions
         loadTask,
