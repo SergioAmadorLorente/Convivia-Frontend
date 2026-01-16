@@ -8,6 +8,7 @@ import {
 import { COLORS, FONTS } from "../../styles/theme";
 interface RepeatDaysSelectorProps {
     onChange: (days: string[]) => void;
+    initialValue?: string[];
 }
 const DAYS = [
     { label: "L", name: "Lunes" },
@@ -18,8 +19,12 @@ const DAYS = [
     { label: "S", name: "Sábado" },
     { label: "D", name: "Domingo" },
 ];
-const RepeatDaysSelector: React.FC<RepeatDaysSelectorProps> = ({ onChange }) => {
-    const [selected, setSelected] = useState<string[]>([]);
+const RepeatDaysSelector: React.FC<RepeatDaysSelectorProps> = ({ onChange, initialValue = [] }) => {
+    const [selected, setSelected] = useState<string[]>(initialValue);
+
+    React.useEffect(() => {
+        if (initialValue.length > 0) setSelected(initialValue);
+    }, [initialValue]);
     const toggleDay = (day: string) => {
         let updated = selected.includes(day)
             ? selected.filter(d => d !== day)

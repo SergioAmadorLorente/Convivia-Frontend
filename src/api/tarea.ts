@@ -4,11 +4,14 @@ export interface TareaPayload {
     nombre: string;
     descripcion?: string;
     fechaCreacion?: string | Date;
-    fechaLimite?: string | Date; // OPCIONAL temporalmente debido a bug backend
+    fechaLimite?: string | Date; // camelCase
+    FechaLimite?: string | Date; // PascalCase (para compatibilidad Firestore)
+    startDate?: string | Date;   // Usado por el backend para visualización
+    fechaFin?: string; // Usado en edición plantilla
     horaLimite: string; // Formato HH:mm:ss
     diasRepeticion: number[];
     karma: number;
-    usuariosAsignacion?: string[]; // Cambiado de usuarioAsignado a usuariosAsignacion (array)
+    usuariosAsignacion?: string[]; 
     espacioId: string;
     estado?: boolean;
     completada?: boolean;
@@ -18,17 +21,35 @@ export interface TareaPayload {
 export const crearTarea = async (data: TareaPayload) => {
     try {
         console.log("📤 Creando plantilla de tarea:", data);
-        // Nuevo endpoint: /api/espacios/{espacioId}/tareas
-        // Extraemos el espacioId y lo usamos en la URL
-        const { espacioId, ...restData } = data as any; 
+        const { espacioId } = data; 
         
         if (!espacioId) {
-            throw new Error("EspacioId es requerido para crear una tarea");
+            throw new Error("espacioId es requerido para crear una tarea");
         }
 
-        const response = await api.post(`/espacios/${espacioId}/tareas`, data);
+        // Normalizar fechas para evitar Error 400 (DateOnly)
+        const dateToFormat = data.fechaFin || data.fechaLimite || data.FechaLimite || data.startDate;
+        let shortDateStr: string | undefined;
+        if (dateToFormat) {
+            const dateObj = new Date(dateToFormat);
+            if (!isNaN(dateObj.getTime())) {
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                shortDateStr = `${year}-${month}-${day}`;
+            }
+        }
+
+        const normalizedPayload = {
+            ...data,
+            fechaFin: shortDateStr,
+            fechaLimite: shortDateStr,
+            FechaLimite: shortDateStr,
+            startDate: shortDateStr
+        };
+
+        const response = await api.post(`/espacios/${espacioId}/tareas`, normalizedPayload);
         console.log("✅ Plantilla creada:");
-        console.log("🔍 DEBUG - Respuesta completa del backend:", JSON.stringify(response.data, null, 2));
         return response.data;
     } catch (error: any) {
         console.error("❌ Error al crear tarea:", error);
@@ -39,19 +60,114 @@ export const crearTarea = async (data: TareaPayload) => {
     }
 };
 
-export const editarTarea = async (id: number, data: TareaPayload) => {
+export const editarTarea = async (plantillaId: string, data: any, instanceId?: string) => {
     try {
-        const response = await api.put(`/Plantillas/${id}`, data);
-        return response.data;
+        const { espacioId } = data;
+        
+        if (!espacioId) {
+            throw new Error("espacioId es requerido para editar una tarea");
+        }
+
+        // 1. Editar la Plantilla (Cuerpo exhaustivo para asegurar persistencia)
+        const urlPlantillaSingular = `/espacio/${espacioId}/${plantillaId}`;
+        const urlPlantillaDirecta = `/Plantillas/${plantillaId}`;
+
+        let shortDate: string | undefined;
+        let isoDate: string | undefined;
+
+        if (data.fechaFin) {
+            try {
+                const dateObj = new Date(data.fechaFin);
+                if (!isNaN(dateObj.getTime())) {
+                    isoDate = dateObj.toISOString();
+                    const year = dateObj.getFullYear();
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    shortDate = `${year}-${month}-${day}`; 
+                } else {
+                    isoDate = data.fechaFin;
+                    shortDate = data.fechaFin.split('T')[0];
+                }
+            } catch (e) {
+                isoDate = data.fechaFin;
+                shortDate = data.fechaFin.split('T')[0];
+            }
+        }
+        
+        const templateData = {
+            nombre: data.nombre,
+            descripcion: data.descripcion,
+            karma: data.karma,
+            diasRepeticion: data.diasRepeticion,
+            // Variaciones de Fecha (Cortas y ISO)
+            fechaFin: shortDate,
+            FechaFin: shortDate,
+            fechaLimite: shortDate,
+            FechaLimite: isoDate,      // Firestore suele usar este con PascalCase + ISO
+            startDate: isoDate,        // Usado en DashBoard
+            fecha_limite: shortDate,
+            fechaVencimiento: shortDate,
+            vencimiento: shortDate,
+            horaLimite: data.horaLimite,
+            usuariosAsignacion: data.usuariosAsignacion
+        };
+
+        const payloadPlantilla = {
+            ...templateData,
+            dto: templateData
+        };
+
+        console.log(`📝 [PATCH Plantilla] Intentando: ${urlPlantillaSingular}`);
+        try {
+            await api.patch(urlPlantillaSingular, payloadPlantilla);
+        } catch (e) {
+            console.warn("⚠️ Falló PATCH singular, probando directo...");
+            try { await api.patch(urlPlantillaDirecta, payloadPlantilla); } catch (e2) {}
+        }
+
+        // 2. Editar la Instancia (si existe)
+        if (instanceId) {
+            let relId = data.usuariosAsignacion?.[0]; 
+            if (relId) {
+                try {
+                    const { obtenerEspacioPorUsuarioId } = require("./usuarioEspacio");
+                    const userRel = await obtenerEspacioPorUsuarioId(relId);
+                    if (userRel) relId = userRel.id || userRel.id_UsuarioEspacio;
+                } catch (e) {}
+            }
+
+            const urlInstancia = `/espacios/${espacioId}/tareas/${plantillaId}/${instanceId}`;
+            const instanceData = {
+                horaLimite: data.horaLimite,
+                fechaLimite: shortDate,
+                FechaLimite: isoDate,      // Redundancia ISO para la instancia
+                fechaFin: shortDate,
+                startDate: isoDate,
+                usuarioEspacioId: relId,
+                relacionId: relId,
+                fechaRealizacion: null
+            };
+
+            const payloadInstancia = {
+                ...instanceData,
+                dto: instanceData
+            };
+            
+            console.log(`📝 [PATCH Instancia] URL: ${urlInstancia}`);
+            await api.patch(urlInstancia, payloadInstancia);
+        }
+
+        console.log("✅ Tarea e instancia actualizadas exitosamente");
+        return { success: true };
     } catch (error) {
-        console.error("Error al editar tarea:", error);
+        console.error("❌ Error al editar tarea:", error);
         throw error;
     }
 };
 
-export const eliminarTarea = async (id: number) => {
+export const eliminarTarea = async (espacioId: string, id: string | number) => {
     try {
-        const response = await api.delete(`/Plantillas/${id}`);
+        const response = await api.delete(`/espacios/${espacioId}/tareas/${id}`);
         return response.data;
     } catch (error) {
         console.error("Error al eliminar tarea:", error);
