@@ -19,70 +19,131 @@ import CreateFactura from "../screens/Dashboard/CreateFactura";
 import InfoLegal from "../screens/Perfil/InfoLegal/InfoLegal";
 import { RootStackParamList } from "./RootStackParamList";
 import MiResidencia from "../screens/Perfil/MiResidencia/MiResidencia";
+import EditarResidencia from "../screens/Perfil/MiResidencia/EditarResidencia";
 import FAQ from "../screens/FAQ/FAQ";
 
 const Stack = createStackNavigator<RootStackParamList>();
 const headerOptions: StackNavigationOptions = {
-    headerShown: true,
-    headerTintColor: "#ACBF8A",
-    headerTitleStyle: {
-        fontSize: 20,
-        fontFamily: "DMSerifDisplay_400Regular",
-        color: "#ACBF8A",
-    },
-    gestureEnabled: true,
-    gestureDirection: "horizontal",
-    headerShadowVisible: false,
-    headerStyle: {
-        backgroundColor: "#F5F4F2",
-        elevation: 0,
-        height: 150,
-        shadowOpacity: 0,
-        borderBottomWidth: 0,
-    },
+  headerShown: true,
+  headerTintColor: "#ACBF8A",
+  headerTitleStyle: {
+    fontSize: 20,
+    fontFamily: "DMSerifDisplay_400Regular",
+    color: "#ACBF8A",
+  },
+  gestureEnabled: true,
+  gestureDirection: "horizontal",
+  headerShadowVisible: false,
+  headerStyle: {
+    backgroundColor: "#F5F4F2",
+    elevation: 0,
+    height: 150,
+    shadowOpacity: 0,
+    borderBottomWidth: 0,
+  },
 };
 const defaultScreenOptions: StackNavigationOptions = {
-    ...headerOptions,
-    title: "",
-    headerBackTitle: "",
+  ...headerOptions,
+  title: "",
+  headerBackTitle: "",
 };
 const AppNavigator: React.FC = () => {
-    return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName="Main">
-                <Stack.Screen
-                    name="Main"
-                    component={Main}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Bienvenida"
-                    component={Bienvenida}
-                    options={defaultScreenOptions}
-                />
-                <Stack.Screen name="CrearCuenta" component={CrearCuenta} options={defaultScreenOptions} />
-                <Stack.Screen name="IniciarSesion" component={IniciarSesion} options={defaultScreenOptions} />
-                <Stack.Screen name="RecuperarPassword" component={RecuperarPassword} options={defaultScreenOptions} />
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Main">
+        <Stack.Screen
+          name="Main"
+          component={Main}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Bienvenida"
+          component={Bienvenida}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="CrearCuenta"
+          component={CrearCuenta}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="IniciarSesion"
+          component={IniciarSesion}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="RecuperarPassword"
+          component={RecuperarPassword}
+          options={defaultScreenOptions}
+        />
 
-                <Stack.Screen
-                    name="DashBoardPersonal"
-                    component={DashBoardPersonal}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen name="NuevaResidencia" component={NuevaResidencia} options={defaultScreenOptions} />
-                <Stack.Screen name="UnirResidencia" component={UnirResidencia} options={defaultScreenOptions} />
-                <Stack.Screen name="PoliticaCookiesPrivacidad" component={PoliticaCookiesPrivacidad} options={defaultScreenOptions} />
-                <Stack.Screen name="TerminosCondiciones" component={TerminosCondiciones} options={defaultScreenOptions} />
-                <Stack.Screen name="Perfil" component={Perfil} options={defaultScreenOptions} />
-                <Stack.Screen name="test" component={TestScreen} options={defaultScreenOptions} />
-                <Stack.Screen name="CreateTask" component={CreateTask} options={defaultScreenOptions} />
-                <Stack.Screen name="CreateFactura" component={CreateFactura} options={defaultScreenOptions} />
-                <Stack.Screen name="InfoLegal" component={InfoLegal} options={defaultScreenOptions} />
-                <Stack.Screen name="MiResidencia" component={MiResidencia} options={defaultScreenOptions} />
-                <Stack.Screen name="FAQ" component={FAQ}
-                    options={defaultScreenOptions} />
-            </Stack.Navigator>
-        </NavigationContainer>
-    );
+        <Stack.Screen
+          name="DashBoardPersonal"
+          component={DashBoardPersonal}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="NuevaResidencia"
+          component={NuevaResidencia}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="UnirResidencia"
+          component={UnirResidencia}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="PoliticaCookiesPrivacidad"
+          component={PoliticaCookiesPrivacidad}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="TerminosCondiciones"
+          component={TerminosCondiciones}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="Perfil"
+          component={Perfil}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="test"
+          component={TestScreen}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="CreateTask"
+          component={CreateTask}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="CreateFactura"
+          component={CreateFactura}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="InfoLegal"
+          component={InfoLegal}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="MiResidencia"
+          component={MiResidencia}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="EditarResidencia"
+          component={EditarResidencia}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FAQ"
+          component={FAQ}
+          options={defaultScreenOptions}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 };
 export default AppNavigator;
