@@ -135,7 +135,7 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="EditarResidencia"
           component={EditarResidencia}
-          options={defaultScreenOptions}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="FAQ"

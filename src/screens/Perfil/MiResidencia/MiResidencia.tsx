@@ -14,6 +14,11 @@ import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../../styles/theme";
 import GLOBAL_STYLES from "../../../styles/styles";
 import BottomBar from "../../../components/ui/BottomBar";
+import { useAuthListener } from "../../../hooks/useAuthListener";
+import { obtenerEspacioPorUsuarioId } from "../../../api/usuarioEspacio";
+import { obtenerEspacioPorId } from "../../../api/espacio";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 const { width } = Dimensions.get("window");
 
@@ -21,6 +26,32 @@ const MiResidencia: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [residenciaCode, setResidenciaCode] = useState<string[] | null>(null);
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(true);
+  const user = useAuthListener();
+  const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
+  const [residenciaData, setResidenciaData] = useState<any>(null);
+
+  const fetchResidencia = async () => {
+    if (!user) return;
+
+    try {
+      const relacion = await obtenerEspacioPorUsuarioId(user.uid);
+      if (relacion && relacion.espacioId) {
+        const espacio = await obtenerEspacioPorId(relacion.espacioId);
+        if (espacio) {
+          setResidenciaName(espacio.nombre);
+          setResidenciaData(espacio);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching residencia:", error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchResidencia();
+    }, [user])
+  );
 
   const generateCode = () => {
     // Generate a random 6-digit code
@@ -53,10 +84,16 @@ const MiResidencia: React.FC = () => {
               <View style={styles.iconContainer}>
                 <Ionicons name="home" size={30} color="#fff" />
               </View>
-              <Text style={styles.residenciaName}>@Nombre Piso</Text>
+              <Text style={styles.residenciaName}>{residenciaName}</Text>
               <TouchableOpacity
                 style={styles.editIcon}
-                onPress={() => navigation.navigate("EditarResidencia")}
+                onPress={() =>
+                  navigation.navigate("EditarResidencia", {
+                    espacioId: residenciaData?.id || "",
+                    nombreInicial: residenciaData?.nombre || "",
+                    ubicacionInicial: residenciaData?.direccion || "",
+                  })
+                }
               >
                 <FontAwesome5 name="edit" size={20} color={COLORS.accent} />
               </TouchableOpacity>

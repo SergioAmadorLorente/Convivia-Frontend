@@ -20,6 +20,7 @@ interface TextFieldProps {
   keyboardType?: TextInputProps["keyboardType"];
   error?: string;
   secureTextEntry?: boolean;
+  rightIcon?: React.ReactNode;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -30,6 +31,7 @@ const TextField: React.FC<TextFieldProps> = ({
   keyboardType = "default",
   error,
   secureTextEntry = false,
+  rightIcon,
 }) => {
   const [show, setShow] = useState<boolean>(false);
   const isPassword = !!secureTextEntry;
@@ -72,6 +74,10 @@ const TextField: React.FC<TextFieldProps> = ({
               color={COLORS.accent}
             />
           </TouchableOpacity>
+        )}
+
+        {!isPassword && rightIcon && (
+          <View style={styles.eyeButton}>{rightIcon}</View>
         )}
       </View>
 
