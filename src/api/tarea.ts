@@ -99,25 +99,16 @@ export const editarTarea = async (plantillaId: string, data: any, instanceId?: s
             descripcion: data.descripcion,
             karma: data.karma,
             diasRepeticion: data.diasRepeticion,
-            // Variaciones de Fecha (Cortas y ISO)
-            fechaFin: shortDate,
-            FechaFin: shortDate,
-            fechaLimite: shortDate,
-            FechaLimite: isoDate,      // Firestore suele usar este con PascalCase + ISO
-            startDate: isoDate,        // Usado en DashBoard
-            fecha_limite: shortDate,
-            fechaVencimiento: shortDate,
-            vencimiento: shortDate,
+            fechaFin: shortDate, 
+            fechaLimite: shortDate, // Clave requerida por el backend
             horaLimite: data.horaLimite,
-            usuariosAsignacion: data.usuariosAsignacion
-        };
-
-        const payloadPlantilla = {
-            ...templateData,
-            dto: templateData
+            usuariosAsignacion: data.usuariosAsignacion,
+            regenerar: true // Forzar regeneración de instancias
         };
 
         console.log(`📝 [PATCH Plantilla] Intentando: ${urlPlantillaSingular}`);
+        console.log(`📤 Payload Plantilla:`, JSON.stringify(templateData, null, 2));
+        const payloadPlantilla = templateData; // Enviar directamente sin wrapper dto
         try {
             await api.patch(urlPlantillaSingular, payloadPlantilla);
         } catch (e) {
@@ -147,14 +138,10 @@ export const editarTarea = async (plantillaId: string, data: any, instanceId?: s
                 relacionId: relId,
                 fechaRealizacion: null
             };
-
-            const payloadInstancia = {
-                ...instanceData,
-                dto: instanceData
-            };
             
             console.log(`📝 [PATCH Instancia] URL: ${urlInstancia}`);
-            await api.patch(urlInstancia, payloadInstancia);
+            console.log(`📤 Payload Instancia:`, JSON.stringify(instanceData, null, 2));
+            await api.patch(urlInstancia, instanceData); // Enviar sin wrapper dto
         }
 
         console.log("✅ Tarea e instancia actualizadas exitosamente");
