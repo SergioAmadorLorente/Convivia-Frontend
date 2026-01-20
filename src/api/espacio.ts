@@ -55,6 +55,17 @@ export const obtenerEspacioPorId = async (id: string) => {
   }
 };
 
+// Obtener código de invitación del espacio
+export const obtenerCodigoEspacio = async (id: string) => {
+  try {
+    const response = await api.get(`/Espacio/${id}/getCode`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener código de espacio:", error);
+    throw error;
+  }
+};
+
 // Actualizar un espacio
 export const actualizarEspacio = async (
   id: string,

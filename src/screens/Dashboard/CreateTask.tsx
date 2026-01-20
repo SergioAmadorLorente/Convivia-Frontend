@@ -49,6 +49,7 @@ const CreateTask: React.FC = () => {
         name, setName,
         description, setDescription,
         selectedTime, setSelectedTime,
+        selectedDate, setSelectedDate, // Get from hook now
         repeatDays, setRepeatDays,
         karma, setKarma,
         assignedUsers, setAssignedUsers,
@@ -79,15 +80,11 @@ const CreateTask: React.FC = () => {
                 name: t.name,
                 description: t.description,
                 time: t.time,
+                date: t.date ? new Date(t.date) : null, // Include date in loadTask
                 repeatDays: mappedDays,
                 karma: t.karma,
                 assignedUsers: t.assignedUsers,
             });
-
-            // 3. Cargar fecha (si existe)
-            if (t.date) {
-                setSelectedDate(new Date(t.date));
-            }
 
             // 4. Pre-llenar asignaciones de usuario
             // El normalizador envía 'assignedUsers' como array de 1 elemento si hay usuario asignado.
@@ -129,8 +126,6 @@ const CreateTask: React.FC = () => {
 
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
-    // Initialize with today's date so it's never null by default
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
     const [availableUsers, setAvailableUsers] = useState<UserItem[]>([]);
 
@@ -272,11 +267,7 @@ const CreateTask: React.FC = () => {
                 descripcion: description,
                 karma: karma,
                 diasRepeticion: diasNumeros,
-                fechaFin: selectedDate ? (() => {
-                    const d = new Date(selectedDate);
-                    d.setHours(12, 0, 0, 0); // Evitar saltos de día por zona horaria al convertir a ISO
-                    return d.toISOString();
-                })() : undefined,
+                fechaFin: selectedDate,
                 horaLimite: horaFormateada,
                 usuariosAsignacion: listaUsuariosAsignados,
                 espacioId: usuarioEspacio.espacioId,
@@ -288,9 +279,12 @@ const CreateTask: React.FC = () => {
             if (isEditing && taskId) {
                 // Para EDITAR: actualizamos la plantilla y la instancia (si existe)
                 console.log("✏️ Actualizando tarea. Plantilla:", taskId, "Instancia:", instanceId);
-                console.log("📤 Datos de edición a enviar:", JSON.stringify(baseData, null, 2));
+                const editPayload = {
+                    ...baseData
+                };
+                console.log("📤 Datos de edición a enviar:", JSON.stringify(editPayload, null, 2));
 
-                responseData = await editarTarea(taskId, baseData, instanceId);
+                responseData = await editarTarea(taskId, editPayload, instanceId);
                 resultId = taskId;
                 console.log("✅ Tarea e instancia actualizadas correctamente");
             } else {
@@ -370,7 +364,7 @@ const CreateTask: React.FC = () => {
                     name,
                     description,
                     time: selectedTime,
-                    date: selectedDate || undefined,
+                    date: selectedDate,
                     repeatDays: diasNumeros,
                     karma,
                     assignedUsers: listaUsuariosAsignados.map(id => ({
