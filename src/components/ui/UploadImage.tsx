@@ -5,7 +5,9 @@ import {
     TouchableOpacity,
     StyleSheet,
     Image,
+    Dimensions,
 } from "react-native";
+import ImageViewing from "react-native-image-viewing";
 import * as ImagePicker from "expo-image-picker";
 import { COLORS, FONTS } from "../../styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -13,16 +15,24 @@ interface UploadImageProps {
     label?: string;
     onImageSelected?: (uri: string | null) => void;
 }
+
+const { width, height } = Dimensions.get("window");
+
 const UploadImage: React.FC<UploadImageProps> = ({
     label = "Subir imagen",
     onImageSelected,
 }) => {
     const [imageUri, setImageUri] = useState<string | null>(null);
+    const [expanded, setExpanded] = useState<boolean>(false);
+    const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const showLabel = !imageUri || expanded;
+
     const pickImage = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== "granted") return;
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
             quality: 0.7,
         });
         if (!result.canceled && result.assets?.length > 0) {
@@ -31,29 +41,92 @@ const UploadImage: React.FC<UploadImageProps> = ({
             onImageSelected?.(uri);
         }
     };
+    const takePhoto = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") return;
+        const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 0.7,
+        });
+        if (!result.canceled && result.assets?.length > 0) {
+            const uri = result.assets[0].uri;
+            setImageUri(uri);
+            onImageSelected?.(uri);
+        }
+    };
+
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
-            {/* Mini vista previa opcional */}
-            {imageUri && (
-                <Image source={{ uri: imageUri }} style={styles.preview} />
+            {/* Cabecera siempre visible con Botones y Arrow */}
+            <View style={styles.header}>
+                <View style={[styles.headerContent, { flex: 1 }]}>
+                    {/* Mostrar label cuando no hay imagen o cuando está expandido; si no, mostrar miniatura tocable */}
+                    {showLabel ? (
+                        <Text style={styles.label}>{label}</Text>
+                    ) : (
+                        <TouchableOpacity onPress={() => setExpanded(true)}>
+                            <Image source={{ uri: imageUri! }} style={styles.imagePreview} />
+                        </TouchableOpacity>
+                    )}
+
+                    {imageUri && (
+                        <MaterialIcons name="check-circle" size={18} color={COLORS.primary} style={styles.checkIcon} />
+                    )}
+                </View>
+
+                {/* Botones de acción siempre visibles en la cabecera */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
+                        <MaterialIcons name="photo-camera" size={24} color={COLORS.secondary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
+                        <MaterialIcons name="upload" size={24} color={COLORS.secondary} />
+                    </TouchableOpacity>
+                    
+                    {/* Flecha para expandir/colapsar (solo si hay imagen para ver en grande) */}
+                    {imageUri && (
+                        <TouchableOpacity onPress={() => setExpanded(!expanded)} style={{ marginLeft: 5 }}>
+                            <MaterialIcons 
+                                name={expanded ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
+                                size={24} 
+                                color={COLORS.secondary} 
+                            />
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </View>
+
+            {/* Contenido Expandido: Imagen en Grande (dentro de la card) */}
+            {expanded && imageUri && (
+                <View style={styles.content}>
+                     <TouchableOpacity 
+                        style={styles.previewContainer} 
+                        onPress={() => setIsModalVisible(true)}
+                        activeOpacity={0.8}
+                     >
+                        <Image source={{ uri: imageUri }} style={styles.preview} />
+                        <View style={styles.overlay}>
+                            <MaterialIcons name="zoom-in" size={30} color="#FFF" />
+                        </View>
+                    </TouchableOpacity>
+                </View>
             )}
-            <TouchableOpacity style={styles.button} onPress={pickImage}>
-                <MaterialIcons name="upload" size={28} color={COLORS.secondary} />
-            </TouchableOpacity>
 
-
+            <ImageViewing
+                images={imageUri ? [{ uri: imageUri }] : []}
+                imageIndex={0}
+                visible={isModalVisible}
+                onRequestClose={() => setIsModalVisible(false)}
+                swipeToCloseEnabled={true}
+                doubleTapToZoomEnabled={true}
+            />
         </View>
     );
 };
 const styles = StyleSheet.create({
     container: {
         width: "100%",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 18,
-        paddingVertical: 14,
         backgroundColor: COLORS.background,
         borderRadius: 14,
         shadowColor: "#000",
@@ -62,26 +135,89 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         elevation: 4,
         marginBottom: 12,
+        overflow: "hidden",
+    },
+    checkIcon: {
+        marginLeft: 8,
+    },
+    header: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 18,
+        paddingVertical: 14, // Ajustado para que se vea bien como barra
+        backgroundColor: COLORS.background,
+    },
+    headerContent: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    actionButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: COLORS.inputBackground,
+        alignItems: "center",
+        justifyContent: "center",
+        marginLeft: 8,
     },
     label: {
         fontSize: 16,
         fontFamily: FONTS.regular,
         color: COLORS.secondary,
     },
-    button: {
-        width: 42,
-        height: 42,
+    content: {
+        paddingHorizontal: 18,
+        paddingBottom: 20,
+        backgroundColor: COLORS.background,
+    },
+    // Elimino estilos antiguos no usados o los reutilizo si coincide
+    previewContainer: {
+        marginTop: 0, // Ya tiene padding el content
+        alignSelf: "center",
+        width: "100%",
+        height: 200,
         borderRadius: 12,
-        backgroundColor: COLORS.inputBackground,
-        alignItems: "center",
-        justifyContent: "center",
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 3 },
-        elevation: 4,
+        overflow: "hidden",
+        position: "relative",
     },
     preview: {
+        width: "100%",
+        height: "100%",
+        resizeMode: "cover",
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: "rgba(0,0,0,0.2)",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    modalBackground: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.9)",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalCloseArea: {
+        width: "100%",
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    fullScreenImage: {
+        width: width,
+        height: height * 0.8,
+    },
+    closeButton: {
+        position: "absolute",
+        top: 50,
+        right: 20,
+        padding: 10,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        borderRadius: 25,
+    },
+    imagePreview: {
+        marginLeft: 25,
         width: 90,
         height: 90,
         borderRadius: 10,
