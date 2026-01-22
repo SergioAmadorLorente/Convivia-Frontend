@@ -32,7 +32,8 @@ type ButtonDef = {
 type PopupProps = {
   visible: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
+  titleComponent?: React.ReactNode;
   description?: string;
   imageType?: "error" | "logout" | "success" | "happy" | "convivia" | "delete" | "goback";
   buttons?: ButtonDef[];
@@ -68,6 +69,7 @@ const Popup: React.FC<PopupProps> = ({
   visible,
   onClose,
   title,
+  titleComponent,
   description,
   imageType = "success",
   buttons = [{ text: "Aceptar", onPress: () => { } }],
@@ -144,7 +146,7 @@ const Popup: React.FC<PopupProps> = ({
 
           {/* Título con estilo base (fontFamily ya en styles.title) */}
           <Text style={[styles.title, titleStyle]}>
-            {title}
+            {titleComponent || title}
           </Text>
 
           {/* Bloque de código: SOLO si imageType='convivia' y hasCode=true */}

@@ -54,7 +54,7 @@ const MiResidencia: React.FC = () => {
             const usuario = await obtenerUsuarioPorId(r.usuarioId);
             return usuario;
           } catch (e) {
-            console.error("Error fetching user details", e);
+            // Usuario no existe, lo ignoramos silenciosamente
             return null;
           }
         });
@@ -149,7 +149,7 @@ const MiResidencia: React.FC = () => {
         <View style={GLOBAL_STYLES.container}>
           {/* Back Button */}
 
-          <Text style={GLOBAL_STYLES.titulo}>Mis Residencias</Text>
+          <Text style={GLOBAL_STYLES.title}>Mis Residencias</Text>
 
           <View style={{ width: "85%", marginTop: 20 }}>
             {/* Residence Card */}
@@ -246,12 +246,6 @@ const MiResidencia: React.FC = () => {
               <View style={styles.divider} />
 
               <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.actionButton}>
-                  <Text style={styles.actionButtonText}>
-                    Cambiar de Residencia
-                  </Text>
-                </TouchableOpacity>
-
                 <TouchableOpacity
                   style={styles.actionButton}
                   onPress={handleAbandonarResidencia}
@@ -282,7 +276,11 @@ const MiResidencia: React.FC = () => {
         visible={isAbandonPopupOpen}
         onClose={() => setIsAbandonPopupOpen(false)}
         imageType="delete"
-        title="¿Estás seguro de que quieres abandonar esta residencia?"
+        titleComponent={
+          <Text>
+            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>abandonar</Text> esta residencia?
+          </Text>
+        }
         description="Perderas todos tus puntos de karma"
         buttons={[
           {

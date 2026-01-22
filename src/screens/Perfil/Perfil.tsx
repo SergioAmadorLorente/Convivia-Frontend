@@ -27,6 +27,7 @@ import IconoFAQ from "../../assets/IconoFAQ.svg";
 import Infolegal from "../../assets/Infolegal.svg";
 import IconoConviviaPRO from "../../assets/Icono_Convivia_PRO.svg";
 import LogoutSinFondo from "../../assets/Logout_sin_fondo.svg";
+import GLOBAL_STYLES from "../../styles/styles";
 
 const { width } = Dimensions.get("window");
 
@@ -67,93 +68,86 @@ const Perfil: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header Title */}
-        <Text style={styles.headerTitle}>Mi Perfil</Text>
+    <View style={styles.scrollContent}>
+      {/* Header Title */}
+      <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
 
-        {/* User Card */}
-        <View style={styles.userCard}>
-          <View style={styles.userInfoRow}>
-            {/* Avatar Placeholder */}
-            <View style={styles.avatarContainer}>
-              <Ionicons name="person-outline" size={30} color={COLORS.primary} />
-            </View>
-
-            {/* User Details */}
-            <View style={styles.userDetails}>
-              <Text style={styles.userName}>@Nombre</Text>
-              <Text style={styles.userKarma}>
-                Puntos Karma
-                <FontAwesome5 name="peace" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
-                : 290
-              </Text>
-            </View>
-
-            {/* Edit Icon */}
-            <TouchableOpacity style={styles.editButton}>
-              <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
-            </TouchableOpacity>
+      {/* User Card */}
+      <View style={styles.userCard}>
+        <View style={styles.userInfoRow}>
+          {/* Avatar Placeholder */}
+          <View style={styles.avatarContainer}>
+            <Ionicons name="person-outline" size={30} color={COLORS.primary} />
           </View>
+
+          {/* User Details */}
+          <View style={styles.userDetails}>
+            <Text style={styles.userName}>@Nombre</Text>
+            <Text style={styles.userKarma}>
+              Puntos Karma
+              <FontAwesome5 name="peace" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
+              : 290
+            </Text>
+          </View>
+
+          {/* Edit Icon */}
+          <TouchableOpacity style={styles.editButton}>
+            <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
+          </TouchableOpacity>
         </View>
+      </View>
 
-        {/* Menu List Container (White box with rounded corners) */}
-        <View style={styles.menuContainer}>
+      {/* Menu List Container (White box with rounded corners) */}
+      <View style={styles.menuContainer}>
 
-          {/* Mi Karma */}
-          <MenuItem
-            label="Mi Karma"
-            onPress={() => console.log('Mi Karma')}
-            icon={<LogoKarma width={30} height={30} />}
-          />
-          <View style={styles.divider} />
+        {/* Mi Karma */}
+        <MenuItem
+          label="Mi Karma"
+          onPress={() => console.log('Mi Karma')}
+          icon={<LogoKarma width={30} height={30} />}
+        />
+        <View style={styles.divider} />
 
-          {/* Mis Residencias */}
-          <MenuItem
-            label="Mis Residencias"
-            onPress={() => navigation.navigate("MiResidencia")}
-            icon={<Miresidencia width={24} height={24} />}
-          />
-          <View style={styles.divider} />
+        {/* Mis Residencias */}
+        <MenuItem
+          label="Mis Residencias"
+          onPress={() => navigation.navigate("MiResidencia")}
+          icon={<Miresidencia width={24} height={24} />}
+        />
+        <View style={styles.divider} />
 
-          {/* Preguntas frecuentes */}
-          <MenuItem
-            label="Preguntas frecuentes"
-            onPress={() => navigation.navigate("FAQ")}
-            icon={<IconoFAQ width={24} height={24} />}
-          />
-          <View style={styles.divider} />
+        {/* Preguntas frecuentes */}
+        <MenuItem
+          label="Preguntas frecuentes"
+          onPress={() => navigation.navigate("FAQ")}
+          icon={<IconoFAQ width={24} height={24} />}
+        />
+        <View style={styles.divider} />
 
-          {/* Información Legal */}
-          <MenuItem
-            label="Información Legal"
-            onPress={() => navigation.navigate("InfoLegal")}
-            icon={<Infolegal width={24} height={24} />}
-          />
-          <View style={styles.divider} />
+        {/* Información Legal */}
+        <MenuItem
+          label="Información Legal"
+          onPress={() => navigation.navigate("InfoLegal")}
+          icon={<Infolegal width={24} height={24} />}
+        />
+        <View style={styles.divider} />
 
-          {/* Convivia PRO */}
-          <MenuItem
-            label="Convivia PRO"
-            onPress={() => console.log('Convivia PRO')}
-            icon={<IconoConviviaPRO width={24} height={24} />}
-          />
-          <View style={styles.divider} />
+        {/* Convivia PRO */}
+        <MenuItem
+          label="Convivia PRO"
+          onPress={() => console.log('Convivia PRO')}
+          icon={<IconoConviviaPRO width={24} height={24} />}
+        />
+        <View style={styles.divider} />
 
-          {/* Cerrar Sesión */}
-          <MenuItem
-            label="Cerrar Sesión"
-            onPress={() => setModalVisible(true)}
-            icon={<LogoutSinFondo width={24} height={24} />}
-          />
+        {/* Cerrar Sesión */}
+        <MenuItem
+          label="Cerrar Sesión"
+          onPress={() => setModalVisible(true)}
+          icon={<LogoutSinFondo width={24} height={24} />}
+        />
 
-        </View>
-
-      </ScrollView>
-
+      </View>
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -165,8 +159,8 @@ const Perfil: React.FC = () => {
           { text: 'Cerrar sesión', onPress: handleLogout },
         ]}
       />
-
       <BottomBar />
+
     </View>
   );
 };
@@ -177,7 +171,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F4F2",
   },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: HELPERS.hp("7%"),
     alignItems: "center",
   },
   headerTitle: {
@@ -193,6 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 15,
     ...COMMON.SHADOW,
+    marginTop: HELPERS.hp("4%"),
     marginBottom: HELPERS.hp("4%"),
   },
   userInfoRow: {
