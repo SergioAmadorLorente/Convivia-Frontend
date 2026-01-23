@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -14,6 +14,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 interface UploadImageProps {
     label?: string;
     onImageSelected?: (uri: string | null) => void;
+    editable?: boolean; // true = modo edición, false = modo estático
+    initialImageUri?: string | null; // URI de la imagen inicial para precargar
 }
 
 const { width, height } = Dimensions.get("window");
@@ -21,11 +23,20 @@ const { width, height } = Dimensions.get("window");
 const UploadImage: React.FC<UploadImageProps> = ({
     label = "Subir imagen",
     onImageSelected,
+    editable = true,
+    initialImageUri = null,
 }) => {
-    const [imageUri, setImageUri] = useState<string | null>(null);
+    const [imageUri, setImageUri] = useState<string | null>(initialImageUri);
     const [expanded, setExpanded] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const showLabel = !imageUri || expanded;
+
+    // Efecto para actualizar la imagen cuando cambia initialImageUri
+    useEffect(() => {
+        if (initialImageUri) {
+            setImageUri(initialImageUri);
+        }
+    }, [initialImageUri]);
 
     const pickImage = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -56,6 +67,12 @@ const UploadImage: React.FC<UploadImageProps> = ({
         }
     };
 
+    const deleteImage = () => {
+        setImageUri(null);
+        setExpanded(false);
+        onImageSelected?.(null);
+    };
+
     return (
         <View style={styles.container}>
             {/* Cabecera siempre visible con Botones y Arrow */}
@@ -65,36 +82,49 @@ const UploadImage: React.FC<UploadImageProps> = ({
                     {showLabel ? (
                         <Text style={styles.label}>{label}</Text>
                     ) : (
+                        
                         <TouchableOpacity onPress={() => setExpanded(true)}>
                             <Image source={{ uri: imageUri! }} style={styles.imagePreview} />
                         </TouchableOpacity>
                     )}
 
-                    {imageUri && (
+                    {imageUri && editable && (
                         <MaterialIcons name="check-circle" size={18} color={COLORS.primary} style={styles.checkIcon} />
                     )}
                 </View>
 
                 {/* Botones de acción siempre visibles en la cabecera */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                    <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
-                        <MaterialIcons name="photo-camera" size={24} color={COLORS.secondary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
-                        <MaterialIcons name="upload" size={24} color={COLORS.secondary} />
-                    </TouchableOpacity>
-                    
-                    {/* Flecha para expandir/colapsar (solo si hay imagen para ver en grande) */}
-                    {imageUri && (
-                        <TouchableOpacity onPress={() => setExpanded(!expanded)} style={{ marginLeft: 5 }}>
-                            <MaterialIcons 
-                                name={expanded ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
-                                size={24} 
-                                color={COLORS.secondary} 
-                            />
+                {editable && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
+                            <MaterialIcons name="photo-camera" size={24} color={COLORS.secondary} />
                         </TouchableOpacity>
-                    )}
-                </View>
+                        <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
+                            <MaterialIcons name="upload" size={24} color={COLORS.secondary} />
+                        </TouchableOpacity>
+                        {/* Flecha para expandir/colapsar (solo si hay imagen para ver en grande) */}
+                        {imageUri && (
+                            <TouchableOpacity onPress={() => setExpanded(!expanded)} style={{ marginLeft: 5 }}>
+                                <MaterialIcons 
+                                    name={expanded ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
+                                    size={24} 
+                                    color={COLORS.secondary} 
+                                />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                )}
+                
+                {/* En modo estático, solo mostrar flecha si hay imagen */}
+                {!editable && imageUri && (
+                    <TouchableOpacity onPress={() => setExpanded(!expanded)} style={{ marginLeft: 5 }}>
+                        <MaterialIcons 
+                            name={expanded ? "keyboard-arrow-up" : "keyboard-arrow-down"} 
+                            size={24} 
+                            color={COLORS.secondary} 
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
 
             {/* Contenido Expandido: Imagen en Grande (dentro de la card) */}
@@ -110,6 +140,16 @@ const UploadImage: React.FC<UploadImageProps> = ({
                             <MaterialIcons name="zoom-in" size={30} color="#FFF" />
                         </View>
                     </TouchableOpacity>
+
+                    {/* Botones de editar y eliminar */}
+                    {editable && (
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={styles.deleteButton} onPress={deleteImage}>
+                                <MaterialIcons name="delete" size={20} color="#FFF" />
+                                <Text style={styles.buttonText}>Eliminar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             )}
 
@@ -223,6 +263,37 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: 10,
         alignSelf: "flex-start",
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 16,
+        gap: 12,
+    },
+    editButton: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: COLORS.primary,
+        paddingVertical: 12,
+        borderRadius: 10,
+        gap: 8,
+    },
+    deleteButton: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#E74C3C",
+        paddingVertical: 12,
+        borderRadius: 10,
+        gap: 8,
+    },
+    buttonText: {
+        color: "#FFF",
+        fontSize: 15,
+        fontFamily: FONTS.bold,
     },
 });
 export default UploadImage;
