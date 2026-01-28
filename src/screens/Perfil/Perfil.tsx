@@ -68,86 +68,92 @@ const Perfil: React.FC = () => {
   );
 
   return (
-    <View style={styles.scrollContent}>
-      {/* Header Title */}
-      <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
+    <View style={styles.container}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header Title */}
+        <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
 
-      {/* User Card */}
-      <View style={styles.userCard}>
-        <View style={styles.userInfoRow}>
-          {/* Avatar Placeholder */}
-          <View style={styles.avatarContainer}>
-            <Ionicons name="person-outline" size={30} color={COLORS.primary} />
+        {/* User Card */}
+        <View style={styles.userCard}>
+          <View style={styles.userInfoRow}>
+            {/* Avatar Placeholder */}
+            <View style={styles.avatarContainer}>
+              <Ionicons name="person-outline" size={30} color={COLORS.primary} />
+            </View>
+
+            {/* User Details */}
+            <View style={styles.userDetails}>
+              <Text style={styles.userName}>@Nombre</Text>
+              <Text style={styles.userKarma}>
+                Puntos Karma
+                <FontAwesome5 name="peace" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
+                : 290
+              </Text>
+            </View>
+
+            {/* Edit Icon */}
+            <TouchableOpacity style={styles.editButton}>
+              <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
+            </TouchableOpacity>
           </View>
-
-          {/* User Details */}
-          <View style={styles.userDetails}>
-            <Text style={styles.userName}>@Nombre</Text>
-            <Text style={styles.userKarma}>
-              Puntos Karma
-              <FontAwesome5 name="peace" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
-              : 290
-            </Text>
-          </View>
-
-          {/* Edit Icon */}
-          <TouchableOpacity style={styles.editButton}>
-            <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
-          </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Menu List Container (White box with rounded corners) */}
-      <View style={styles.menuContainer}>
+        {/* Menu List Container (White box with rounded corners) */}
+        <View style={styles.menuContainer}>
 
-        {/* Mi Karma */}
-        <MenuItem
-          label="Mi Karma"
-          onPress={() => console.log('Mi Karma')}
-          icon={<LogoKarma width={30} height={30} />}
-        />
-        <View style={styles.divider} />
+          {/* Mi Karma */}
+          <MenuItem
+            label="Mi Karma"
+            onPress={() => console.log('Mi Karma')}
+            icon={<LogoKarma width={30} height={30} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Mis Residencias */}
-        <MenuItem
-          label="Mis Residencias"
-          onPress={() => navigation.navigate("MiResidencia")}
-          icon={<Miresidencia width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Mis Residencias */}
+          <MenuItem
+            label="Mis Residencias"
+            onPress={() => navigation.navigate("MiResidencia")}
+            icon={<Miresidencia width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Preguntas frecuentes */}
-        <MenuItem
-          label="Preguntas frecuentes"
-          onPress={() => navigation.navigate("FAQ")}
-          icon={<IconoFAQ width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Preguntas frecuentes */}
+          <MenuItem
+            label="Preguntas frecuentes"
+            onPress={() => navigation.navigate("FAQ")}
+            icon={<IconoFAQ width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Información Legal */}
-        <MenuItem
-          label="Información Legal"
-          onPress={() => navigation.navigate("InfoLegal")}
-          icon={<Infolegal width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Información Legal */}
+          <MenuItem
+            label="Información Legal"
+            onPress={() => navigation.navigate("InfoLegal")}
+            icon={<Infolegal width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Convivia PRO */}
-        <MenuItem
-          label="Convivia PRO"
-          onPress={() => console.log('Convivia PRO')}
-          icon={<IconoConviviaPRO width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Convivia PRO */}
+          <MenuItem
+            label="Convivia PRO"
+            onPress={() => console.log('Convivia PRO')}
+            icon={<IconoConviviaPRO width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Cerrar Sesión */}
-        <MenuItem
-          label="Cerrar Sesión"
-          onPress={() => setModalVisible(true)}
-          icon={<LogoutSinFondo width={24} height={24} />}
-        />
+          {/* Cerrar Sesión */}
+          <MenuItem
+            label="Cerrar Sesión"
+            onPress={() => setModalVisible(true)}
+            icon={<LogoutSinFondo width={24} height={24} />}
+          />
 
-      </View>
+        </View>
+      </ScrollView>
+      
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -160,7 +166,6 @@ const Perfil: React.FC = () => {
         ]}
       />
       <BottomBar />
-
     </View>
   );
 };
@@ -168,11 +173,11 @@ const Perfil: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F4F2",
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingBottom: HELPERS.hp("7%"),
     alignItems: "center",
+    paddingBottom: HELPERS.hp("8%"),
   },
   headerTitle: {
     fontSize: SIZES.largeTitle,
