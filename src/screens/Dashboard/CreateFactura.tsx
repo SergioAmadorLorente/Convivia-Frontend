@@ -19,6 +19,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
 import { useEditFactura } from "../../hooks/useEditFactura";
+import { crearFactura, editarFactura, FacturaPayload } from "../../api/factura";
+import { obtenerEspacioPorId } from "../../api/espacio";
+import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 
 const { hp } = HELPERS;
 
@@ -36,6 +39,7 @@ const CreateFactura: React.FC = () => {
         imageUri, setImageUri,
         isEditing,
         loadFactura,
+        getFacturaData,
     } = useEditFactura();
 
     React.useLayoutEffect(() => {
@@ -194,12 +198,21 @@ const CreateFactura: React.FC = () => {
 
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
-                        onPress={() => {
-                            console.log("Factura creada:", {
-                                nombre: name,
-                                descripcion: description,
-                                usuarios: assignedUsers,
-                            });
+                        onPress={async() => {
+                            const fact = getFacturaData();
+                            const apifact: FacturaPayload = {
+                                Nombre: fact.name,
+                                Precio: Number(fact.amount),
+                                PagoMediano: null,
+                                Deudores: Object.fromEntries(
+                                fact.assignedUsers.map(u => [u.id, false])),
+                                Pagado: false,
+                                CreadorFactura: CURRENT_USER.id,
+                            }
+
+                            const usuarioEspacio = await obtenerEspacioPorUsuarioId(CURRENT_USER.id);
+                            
+                            isEditing ? editarFactura(fact.id, apifact) : crearFactura(usuarioEspacio.espacioId, apifact);
                         }}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
