@@ -87,14 +87,16 @@ const Perfil: React.FC = () => {
             <View style={styles.userDetails}>
               <Text style={styles.userName}>@Nombre</Text>
               <Text style={styles.userKarma}>
-                Puntos Karma
-                <FontAwesome5 name="peace" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
-                : 290
+                Puntos Karma: 290 
+                <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
               </Text>
             </View>
 
             {/* Edit Icon */}
-            <TouchableOpacity style={styles.editButton}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('EditarPerfil')}
+            >
               <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
             </TouchableOpacity>
           </View>
