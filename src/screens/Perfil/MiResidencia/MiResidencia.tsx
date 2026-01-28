@@ -18,15 +18,15 @@ import * as Clipboard from "expo-clipboard";
 import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
 import Popup from "../../../components/ui/Popup";
-import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
+import { obtenerEspacioPorUsuarioId, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../../../api/espacio";
-import { obtenerUsuarioPorId } from "../../../api/usuario";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 
 const { width } = Dimensions.get("window");
 
 import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
+import useFetchParticipants from "../../../hooks/useFetchParticipants";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const MiResidencia: React.FC = () => {
@@ -35,37 +35,11 @@ const MiResidencia: React.FC = () => {
   const user = useAuthListener();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
   const [residenciaData, setResidenciaData] = useState<any>(null);
-  const [participants, setParticipants] = useState<any[]>([]);
 
+  const { participants, fetchParticipants } = useFetchParticipants();
   const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
   const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  const fetchParticipants = async (espacioId: string) => {
-    try {
-      const todasRelaciones = await obtenerUsuarioEspacios();
-      if (Array.isArray(todasRelaciones)) {
-        const relacionesDelEspacio = todasRelaciones.filter(
-          (r: any) => r.espacioId === espacioId
-        );
-
-        const usuariosPromesas = relacionesDelEspacio.map(async (r: any) => {
-          try {
-            const usuario = await obtenerUsuarioPorId(r.usuarioId);
-            return usuario;
-          } catch (e) {
-            // Usuario no existe, lo ignoramos silenciosamente
-            return null;
-          }
-        });
-
-        const usuarios = await Promise.all(usuariosPromesas);
-        setParticipants(usuarios.filter((u) => u !== null));
-      }
-    } catch (e) {
-      console.error("Error fetching participants", e);
-    }
-  };
 
   const handleAbandonarResidencia = () => {
     if (!user || !residenciaData) return;
