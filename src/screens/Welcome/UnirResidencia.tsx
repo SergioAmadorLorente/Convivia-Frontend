@@ -21,7 +21,7 @@ import useCodigoResidencia from '../../hooks/useCodigoResidencia';
 import ConfettiButton from '../../components/ui/ConfettiButton';
 import { useAuthListener } from '../../hooks/useAuthListener';
 import { crearUsuarioEspacio, obtenerUsuarioEspacios } from '../../api/usuarioEspacio';
-import { obtenerEspacioPorId, obtenerEspacios } from '../../api/espacio';
+import { obtenerEspacioPorId, obtenerEspacios, obtenerCodigoEspacio } from '../../api/espacio';
 
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -82,17 +82,53 @@ const UnirResidencia: React.FC = () => {
 
     setLoading(true);
     try {
-      // 1. Buscar el espacio que coindcida con el código de 6 dígitos
-      // Como el código es una simplificación del UUID, debemos buscar en todos los espacios
-      // cuál tiene un ID que genere ese código.
+      // 1. Buscar el espacio que coindcida con el código
       const espacios = await obtenerEspacios();
-      const inputCode = codigo.replace(/-/g, ""); // "1-2..." -> "12..."
+      const inputCode = codigo.replace(/\D/g, ""); // Remove dashes from input
 
-      const espacioEncontrado = espacios.find((s: any) => {
-        const raw = s.id.replace(/\D/g, "");
-        const six = raw.slice(0, 6);
-        return six === inputCode;
-      });
+      let espacioEncontrado = null;
+
+      // Iteramos sobre los espacios para buscar cuál tiene el código correcto
+      // Nota: Esto debería ser un endpoint del backend (e.g. /findSpaceByCode), 
+      // pero por ahora lo hacemos en cliente.
+      for (const espacio of espacios) {
+        try {
+          const result = await obtenerCodigoEspacio(espacio.id);
+
+          // Extraer string del resultado (misma lógica que en el hook)
+          let codeStr = "";
+          if (typeof result === 'string') {
+            codeStr = result;
+          } else if (typeof result === 'object' && result !== null) {
+            if ('codigo' in result) codeStr = String(result.codigo);
+            else if ('code' in result) codeStr = String(result.code);
+            else if ('data' in result) codeStr = String(result.data);
+            else if ('value' in result) codeStr = String(result.value);
+            else if ('token' in result) codeStr = String(result.token);
+            else {
+              const values = Object.values(result);
+              if (values.length === 1 && (typeof values[0] === 'string' || typeof values[0] === 'number')) {
+                codeStr = String(values[0]);
+              } else {
+                codeStr = JSON.stringify(result);
+              }
+            }
+          } else {
+            codeStr = String(result);
+          }
+
+          // Limpiar el código del backend para comparar solo dígitos
+          const backendCodeClean = codeStr.replace(/\D/g, "");
+
+          if (backendCodeClean === inputCode) {
+            espacioEncontrado = espacio;
+            break; // Encontrado!
+          }
+        } catch (err) {
+          // Si falla obtener el código de un espacio, continuamos con el siguiente
+          console.warn(`No se pudo obtener código para espacio ${espacio.id}`, err);
+        }
+      }
 
       if (!espacioEncontrado) {
         throw new Error("Espacio no encontrado (404)");

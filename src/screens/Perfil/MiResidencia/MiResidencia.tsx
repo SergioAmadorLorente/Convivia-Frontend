@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -13,22 +14,87 @@ import { RootStackParamList } from "../../../navigation/RootStackParamList";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../../styles/theme";
 import GLOBAL_STYLES from "../../../styles/styles";
+import * as Clipboard from "expo-clipboard";
 import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
-import { obtenerEspacioPorUsuarioId } from "../../../api/usuarioEspacio";
+import Popup from "../../../components/ui/Popup";
+import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../../../api/espacio";
+import { obtenerUsuarioPorId } from "../../../api/usuario";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 
 const { width } = Dimensions.get("window");
 
+import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+
 const MiResidencia: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [residenciaCode, setResidenciaCode] = useState<string[] | null>(null);
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(true);
   const user = useAuthListener();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
   const [residenciaData, setResidenciaData] = useState<any>(null);
+  const [participants, setParticipants] = useState<any[]>([]);
+
+  const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
+  const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const fetchParticipants = async (espacioId: string) => {
+    try {
+      const todasRelaciones = await obtenerUsuarioEspacios();
+      if (Array.isArray(todasRelaciones)) {
+        const relacionesDelEspacio = todasRelaciones.filter(
+          (r: any) => r.espacioId === espacioId
+        );
+
+        const usuariosPromesas = relacionesDelEspacio.map(async (r: any) => {
+          try {
+            const usuario = await obtenerUsuarioPorId(r.usuarioId);
+            return usuario;
+          } catch (e) {
+            // Usuario no existe, lo ignoramos silenciosamente
+            return null;
+          }
+        });
+
+        const usuarios = await Promise.all(usuariosPromesas);
+        setParticipants(usuarios.filter((u) => u !== null));
+      }
+    } catch (e) {
+      console.error("Error fetching participants", e);
+    }
+  };
+
+  const handleAbandonarResidencia = () => {
+    if (!user || !residenciaData) return;
+    setIsAbandonPopupOpen(true);
+  };
+
+  const confirmAbandonarResidencia = async () => {
+    if (!user) return;
+    try {
+      // 1. Necesitamos el ID de la relación UsuarioEspacio para eliminarla
+      // Ya tenemos relacion.id si lo guardamos, o lo buscamos de nuevo
+      const relacion = await obtenerEspacioPorUsuarioId(user.uid);
+      if (relacion && relacion.id) {
+        await eliminarUsuarioEspacio(relacion.id);
+        // Alert.alert("Éxito", "Has abandonado la residencia correctamente.");
+        // Redirigir a UnirResidencia o refrescar
+        setIsAbandonPopupOpen(false);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UnirResidencia" }],
+        });
+      } else {
+        Alert.alert("Error", "No se encontró tu información de miembro.");
+      }
+    } catch (error) {
+      console.error("Error al abandonar residencia:", error);
+      Alert.alert("Error", "Ocurrió un error al intentar abandonar la residencia.");
+    }
+  };
 
   const fetchResidencia = async () => {
     if (!user) return;
@@ -40,6 +106,7 @@ const MiResidencia: React.FC = () => {
         if (espacio) {
           setResidenciaName(espacio.nombre);
           setResidenciaData(espacio);
+          fetchParticipants(espacio.id);
         }
       }
     } catch (error) {
@@ -53,12 +120,18 @@ const MiResidencia: React.FC = () => {
     }, [user])
   );
 
-  const generateCode = () => {
-    // Generate a random 6-digit code
-    const code = Math.floor(100000 + Math.random() * 900000)
-      .toString()
-      .split("");
-    setResidenciaCode(code);
+  const handleGenerateCode = async () => {
+    if (residenciaData?.id) {
+      await generarCodigo(residenciaData.id);
+    }
+  };
+
+  const handleCopyCode = async () => {
+    if (generatedCode) {
+      await Clipboard.setStringAsync(generatedCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const CodeBox = ({ digit }: { digit: string }) => (
@@ -76,7 +149,7 @@ const MiResidencia: React.FC = () => {
         <View style={GLOBAL_STYLES.container}>
           {/* Back Button */}
 
-          <Text style={GLOBAL_STYLES.titulo}>Mis Residencias</Text>
+          <Text style={GLOBAL_STYLES.title}>Mis Residencias</Text>
 
           <View style={{ width: "85%", marginTop: 20 }}>
             {/* Residence Card */}
@@ -104,18 +177,28 @@ const MiResidencia: React.FC = () => {
               <Text style={styles.sectionTitle}>Código de tu Residencia</Text>
               <View style={styles.divider} />
 
-              {residenciaCode ? (
-                <View style={styles.codeContainer}>
-                  {residenciaCode.map((digit, index) => (
-                    <CodeBox key={index} digit={digit} />
-                  ))}
-                </View>
+              {generatedCode ? (
+                <TouchableOpacity onPress={handleCopyCode} activeOpacity={0.8} style={{ alignItems: 'center', width: '100%' }}>
+                  <View style={styles.codeContainer}>
+                    {generatedCode.split("").map((digit, index) => (
+                      <CodeBox key={index} digit={digit} />
+                    ))}
+                  </View>
+                  {copied && (
+                    <Text style={{ marginTop: 10, color: COLORS.primary, fontFamily: FONTS.bold, fontSize: 14 }}>
+                      ¡Copiado!
+                    </Text>
+                  )}
+                </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.generateButton}
-                  onPress={generateCode}
+                  onPress={handleGenerateCode}
+                  disabled={loadingCode}
                 >
-                  <Text style={styles.generateButtonText}>Generar Código</Text>
+                  <Text style={styles.generateButtonText}>
+                    {loadingCode ? "Generando..." : "Generar Código"}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -137,9 +220,22 @@ const MiResidencia: React.FC = () => {
 
               {isParticipantsOpen && (
                 <View style={styles.participantsList}>
-                  <View style={styles.participantItem}>
-                    <Text style={styles.participantName}>PupuGugu</Text>
-                  </View>
+                  {participants.length > 0 ? (
+                    participants.map((participant, index) => (
+                      <View key={index} style={styles.participantItem}>
+                        <View style={styles.participantIcon}>
+                          <Ionicons name="person" size={20} color={COLORS.primary} />
+                        </View>
+                        <Text style={styles.participantName}>
+                          {participant.nombre || participant.email || "Usuario sin nombre"}
+                        </Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text style={{ fontFamily: FONTS.regular, color: "#666", marginTop: 5 }}>
+                      Cargando participantes...
+                    </Text>
+                  )}
                 </View>
               )}
             </View>
@@ -150,13 +246,10 @@ const MiResidencia: React.FC = () => {
               <View style={styles.divider} />
 
               <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.actionButton}>
-                  <Text style={styles.actionButtonText}>
-                    Cambiar de Residencia
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={handleAbandonarResidencia}
+                >
                   <Text
                     style={[styles.actionButtonText, { color: COLORS.error }]}
                   >
@@ -178,6 +271,32 @@ const MiResidencia: React.FC = () => {
       </ScrollView>
 
       <BottomBar />
+
+      <Popup
+        visible={isAbandonPopupOpen}
+        onClose={() => setIsAbandonPopupOpen(false)}
+        imageType="delete"
+        titleComponent={
+          <Text>
+            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>abandonar</Text> esta residencia?
+          </Text>
+        }
+        description="Perderas todos tus puntos de karma"
+        buttons={[
+          {
+            text: "Cancelar",
+            onPress: () => setIsAbandonPopupOpen(false),
+            style: GLOBAL_STYLES.buttonSecondaryGrey,
+            textStyle: { color: COLORS.primary }
+          },
+          {
+            text: "Abandonar",
+            onPress: confirmAbandonarResidencia,
+            style: [GLOBAL_STYLES.buttonPrimaryGreen,],
+            textStyle: { color: COLORS.primary }
+          },
+        ]}
+      />
     </>
   );
 };
@@ -268,10 +387,24 @@ const styles = StyleSheet.create({
   participantItem: {
     ...COMMON.SHADOW,
     backgroundColor: COLORS.background,
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  participantIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E6ECDC',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15
   },
   participantName: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
+    fontFamily: FONTS.bold,
+    fontSize: 16,
     color: "#333",
   },
   buttonsContainer: {
