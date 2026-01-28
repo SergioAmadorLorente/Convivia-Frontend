@@ -19,7 +19,6 @@ import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
 import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
-import ParticipantModal from "../../../components/ui/ParticipantModal";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../../../api/espacio";
 import { obtenerUsuarioPorId } from "../../../api/usuario";
