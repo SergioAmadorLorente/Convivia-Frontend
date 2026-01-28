@@ -34,14 +34,118 @@ type Props =
     onEdit: () => void;
     onDelete: () => void;
     onDownloadImage?: () => void;
+  }
+  | {
+    visible: boolean;
+    kind: "participante";
+    participant: any;
+    residenciaName: string;
+    onClose: () => void;
+    onEliminar: () => void;
   };
 
 const Detalle: React.FC<Props> = (props) => {
-  const { visible, onClose, onComplete, onEdit, onDelete } = props;
+  const { visible, onClose } = props;
+
+  // ---- PARTICIPANTE ----
+  if (props.kind === "participante") {
+    const { participant, residenciaName, onEliminar } = props;
+
+    // Datos de ejemplo - aquí deberías obtener los datos reales del usuario
+    const karmaPoints = 290;
+    const tareasCompletadas = 65; // porcentaje
+    const tareasFueraPlazo = 35; // porcentaje
+
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View style={styles.overlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+
+          <View style={styles.sheet}>
+            <View style={styles.handle} />
+
+            {/* Header */}
+            <View style={styles.headerBlock}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.title}>
+                  {participant?.nombre || participant?.email || "Usuario"}
+                </Text>
+                <Text style={styles.subtitle}>{residenciaName}</Text>
+              </View>
+            </View>
+
+            {/* Puntos de Karma */}
+            <View style={styles.section}>
+              <View style={styles.karmaContainer}>
+                <Text style={styles.karmaPoints}>¡{karmaPoints} puntos!</Text>
+                <Text style={styles.karmaLabel}>de karma</Text>
+              </View>
+            </View>
+
+            {/* Gráfico de Tareas */}
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>
+                Tareas completas y fuera de plazo
+              </Text>
+
+              <View style={styles.chartContainer}>
+                <View style={styles.donutChart}>
+                  <View style={styles.donutSegment} />
+                  <View style={styles.donutHole} />
+                </View>
+
+                <View style={styles.legendContainer}>
+                  <View style={styles.legendItem}>
+                    <View
+                      style={[styles.legendDot, { backgroundColor: "#4A5942" }]} />
+                    <Text style={styles.legendText}>Fuera de plazo</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View
+                      style={[styles.legendDot, { backgroundColor: "#E6ECDC" }]} />
+                    <Text style={styles.legendText}>Completadas</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* Usuario info adicional */}
+            {participant?.email && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Correo electrónico</Text>
+                <TextInput
+                  editable={false}
+                  value={participant.email}
+                  style={styles.input}
+                />
+              </View>
+            )}
+
+            {/* Botón Eliminar */}
+            <TouchableOpacity
+              style={[GLOBAL_STYLES.buttonSecondaryGrey, styles.deleteButtonFull]}
+              activeOpacity={0.85}
+              onPress={onEliminar}
+            >
+              <Text
+                style={[GLOBAL_STYLES.textoBoton, { color: COLORS.error }]}
+              >
+                Eliminar de la residencia
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   if (props.kind === "tarea") {
-    const { task } = props;
-    console.log("🔍 Detalle recibiendo tarea:", JSON.stringify(task, null, 2));
+    const { task, onComplete, onEdit, onDelete } = props;
 
     const fechaStr = useMemo(() => {
       if (!task.FechaLimite) return "-";
@@ -200,7 +304,7 @@ const Detalle: React.FC<Props> = (props) => {
   }
 
   // ---- FACTURA ----
-  const { factura, onDownloadImage } = props;
+  const { factura, onComplete, onEdit, onDelete, onDownloadImage } = props;
 
   const totalImporte = factura.Precio ?? 0;
   const usuarios: IFacturaUser[] = Array.isArray(factura.UsuariosAsignados)
@@ -552,6 +656,76 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     backgroundColor: "#FFEBEE",
+  },
+
+  // Estilos para participante
+  karmaContainer: {
+    alignItems: "center",
+    paddingVertical: HELPERS.verticalScale(15),
+  },
+  karmaPoints: {
+    fontFamily: FONTS.bold,
+    fontSize: HELPERS.moderateScale(32),
+    color: "#4A5942",
+  },
+  karmaLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text16,
+    color: COLORS.secondary,
+    opacity: 0.7,
+  },
+  chartContainer: {
+    alignItems: "center",
+    marginTop: HELPERS.verticalScale(10),
+  },
+  donutChart: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    marginBottom: HELPERS.verticalScale(20),
+    position: "relative",
+    backgroundColor: "#E6ECDC",
+  },
+  donutSegment: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    position: "absolute",
+    backgroundColor: "#4A5942",
+  },
+  donutHole: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: COLORS.background,
+    position: "absolute",
+    top: 25,
+    left: 25,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingHorizontal: HELPERS.wp("5%"),
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  legendText: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
+  },
+  deleteButtonFull: {
+    marginTop: HELPERS.hp("2%"),
+    width: "100%",
   },
 });
 

@@ -18,6 +18,8 @@ import * as Clipboard from "expo-clipboard";
 import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
 import Popup from "../../../components/ui/Popup";
+import Detalle from "../../../components/ui/Detalle";
+import ParticipantModal from "../../../components/ui/ParticipantModal";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../../../api/espacio";
 import { obtenerUsuarioPorId } from "../../../api/usuario";
@@ -40,6 +42,8 @@ const MiResidencia: React.FC = () => {
   const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
   const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
+  const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
 
   const fetchParticipants = async (espacioId: string) => {
     try {
@@ -140,6 +144,30 @@ const MiResidencia: React.FC = () => {
     </View>
   );
 
+  const handleParticipantPress = (participant: any) => {
+    setSelectedParticipant(participant);
+    setIsParticipantModalOpen(true);
+  };
+
+  const handleEliminarParticipante = () => {
+    setIsParticipantModalOpen(false);
+    Alert.alert(
+      "Eliminar participante",
+      `¿Estás seguro de que quieres eliminar a ${selectedParticipant?.nombre || "este usuario"} de la residencia?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            // Aquí implementar la lógica para eliminar el usuario
+            console.log("Eliminando usuario:", selectedParticipant);
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <>
       <ScrollView
@@ -222,14 +250,19 @@ const MiResidencia: React.FC = () => {
                 <View style={styles.participantsList}>
                   {participants.length > 0 ? (
                     participants.map((participant, index) => (
-                      <View key={index} style={styles.participantItem}>
+                      <TouchableOpacity 
+                        key={index} 
+                        style={styles.participantItem}
+                        onPress={() => handleParticipantPress(participant)}
+                        activeOpacity={0.7}
+                      >
                         <View style={styles.participantIcon}>
                           <Ionicons name="person" size={20} color={COLORS.primary} />
                         </View>
                         <Text style={styles.participantName}>
                           {participant.nombre || participant.email || "Usuario sin nombre"}
                         </Text>
-                      </View>
+                      </TouchableOpacity>
                     ))
                   ) : (
                     <Text style={{ fontFamily: FONTS.regular, color: "#666", marginTop: 5 }}>
@@ -296,6 +329,15 @@ const MiResidencia: React.FC = () => {
             textStyle: { color: COLORS.primary }
           },
         ]}
+      />
+
+      <Detalle
+        visible={isParticipantModalOpen}
+        kind="participante"
+        participant={selectedParticipant}
+        residenciaName={residenciaName}
+        onClose={() => setIsParticipantModalOpen(false)}
+        onEliminar={handleEliminarParticipante}
       />
     </>
   );
