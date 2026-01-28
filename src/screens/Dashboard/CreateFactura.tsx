@@ -66,9 +66,7 @@ const CreateFactura: React.FC = () => {
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
 
     const [availableUsers] = useState([
-        { id: "1", name: "Juan Pérez" },
-        { id: "2", name: "María García" },
-        { id: "3", name: "Lucía Fernández" },
+        //anyadir hook de jose aqui
     ]);
 
     function handleToggleTask(id: any) {
