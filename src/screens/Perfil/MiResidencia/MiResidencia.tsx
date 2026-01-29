@@ -19,7 +19,7 @@ import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
 import Popup from "../../../components/ui/Popup";
 import { obtenerEspacioPorUsuarioId, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
-import { obtenerEspacioPorId } from "../../../api/espacio";
+import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 
@@ -39,6 +39,7 @@ const MiResidencia: React.FC = () => {
   const { participants, fetchParticipants } = useFetchParticipants();
   const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
   const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleAbandonarResidencia = () => {
@@ -67,6 +68,26 @@ const MiResidencia: React.FC = () => {
     } catch (error) {
       console.error("Error al abandonar residencia:", error);
       Alert.alert("Error", "Ocurrió un error al intentar abandonar la residencia.");
+    }
+  };
+
+  const handleEliminarResidencia = () => {
+    if (!user || !residenciaData) return;
+    setIsDeletePopupOpen(true);
+  };
+
+  const confirmEliminarResidencia = async () => {
+    if (!residenciaData?.id) return;
+    try {
+      await eliminarEspacio(residenciaData.id);
+      setIsDeletePopupOpen(false);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Bienvenida" }],
+      });
+    } catch (error) {
+      console.error("Error al eliminar residencia:", error);
+      Alert.alert("Error", "Ocurrió un error al intentar eliminar la residencia.");
     }
   };
 
@@ -231,7 +252,10 @@ const MiResidencia: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={handleEliminarResidencia}
+                >
                   <Text
                     style={[styles.actionButtonText, { color: COLORS.error }]}
                   >
@@ -266,6 +290,32 @@ const MiResidencia: React.FC = () => {
           {
             text: "Abandonar",
             onPress: confirmAbandonarResidencia,
+            style: [GLOBAL_STYLES.buttonPrimaryGreen,],
+            textStyle: { color: COLORS.primary }
+          },
+        ]}
+      />
+
+      <Popup
+        visible={isDeletePopupOpen}
+        onClose={() => setIsDeletePopupOpen(false)}
+        imageType="delete"
+        titleComponent={
+          <Text>
+            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>eliminar</Text> esta residencia?
+          </Text>
+        }
+        description="Se eliminarán todos los datos, tareas y facturas de esta residencia. Esta acción no se puede deshacer."
+        buttons={[
+          {
+            text: "Cancelar",
+            onPress: () => setIsDeletePopupOpen(false),
+            style: GLOBAL_STYLES.buttonSecondaryGrey,
+            textStyle: { color: COLORS.primary }
+          },
+          {
+            text: "Eliminar",
+            onPress: confirmEliminarResidencia,
             style: [GLOBAL_STYLES.buttonPrimaryGreen,],
             textStyle: { color: COLORS.primary }
           },
