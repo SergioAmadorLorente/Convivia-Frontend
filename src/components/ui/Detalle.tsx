@@ -34,14 +34,107 @@ type Props =
     onEdit: () => void;
     onDelete: () => void;
     onDownloadImage?: () => void;
+  }
+  | {
+    visible: boolean;
+    kind: "participante";
+    participant: any;
+    participantRelacion?: any;
+    residenciaName: string;
+    onClose: () => void;
+    onEliminar: () => void;
   };
 
 const Detalle: React.FC<Props> = (props) => {
-  const { visible, onClose, onComplete, onEdit, onDelete } = props;
+  const { visible, onClose } = props;
+
+  // ---- PARTICIPANTE ----
+  if (props.kind === "participante") {
+    const { participant, participantRelacion, residenciaName, onEliminar } = props;
+
+    // Obtener karma real de la relación usuarioEspacio
+    const karmaPoints = participantRelacion?.karma ?? 0;
+    const tareasCompletadas = 65; // porcentaje
+    const tareasFueraPlazo = 35; // porcentaje
+
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View style={styles.overlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+
+          <View style={styles.sheet}>
+            <View style={styles.handle} />
+
+            {/* Header */}
+            <View style={styles.headerBlock}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.title, { color: '#6B705C' }]}>
+                  {participant?.nombre || participant?.email || "Usuario"}
+                </Text>
+                <Text style={[styles.subtitle, { color: '#ACBF8A' }]}>{residenciaName}</Text>
+              </View>
+            </View>
+
+            {/* Puntos de Karma */}
+            <View style={styles.section}>
+              <View style={[styles.karmaContainer, { paddingVertical: HELPERS.verticalScale(8) }]}>
+                <Text style={styles.karmaPoints}>¡{karmaPoints} puntos!</Text>
+                <Text style={styles.karmaLabel}>de karma</Text>
+              </View>
+            </View>
+
+            {/* Gráfico de Tareas */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionLabel, { color: '#6B705C' }]}>
+                Tareas completas y fuera de plazo
+              </Text>
+
+              <View style={[styles.chartContainer, { marginTop: HELPERS.verticalScale(5) }]}>
+                  <View style={styles.donutChart}>
+                    <View style={styles.donutSegment} />
+                    <View style={styles.donutHole} />
+                  </View>
+
+                <View style={styles.legendContainer}>
+                  <View style={styles.legendItem}>
+                    <View
+                      style={[styles.legendDot, { backgroundColor: "#4A5942" }]} />
+                    <Text style={styles.legendText}>Fuera de plazo</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View
+                      style={[styles.legendDot, { backgroundColor: "#E6ECDC" }]} />
+                    <Text style={styles.legendText}>Completadas</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            {/* Botón Eliminar */}
+            <TouchableOpacity
+              style={[GLOBAL_STYLES.buttonSecondaryGrey, styles.deleteButtonFull, { backgroundColor: '#D9D9D9', marginTop: HELPERS.hp("1%") }]}
+              activeOpacity={0.85}
+              onPress={onEliminar}
+            >
+              <Text
+                style={[GLOBAL_STYLES.textoBoton, { color: COLORS.error }]}
+              >
+                Eliminar de la residencia
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   if (props.kind === "tarea") {
-    const { task } = props;
-    console.log("🔍 Detalle recibiendo tarea:", JSON.stringify(task, null, 2));
+    const { task, onComplete, onEdit, onDelete } = props;
 
     const fechaStr = useMemo(() => {
       if (!task.FechaLimite) return "-";
@@ -200,7 +293,7 @@ const Detalle: React.FC<Props> = (props) => {
   }
 
   // ---- FACTURA ----
-  const { factura, onDownloadImage } = props;
+  const { factura, onComplete, onEdit, onDelete, onDownloadImage } = props;
 
   const totalImporte = factura.Precio ?? 0;
   const usuarios: IFacturaUser[] = Array.isArray(factura.UsuariosAsignados)
@@ -351,7 +444,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderTopLeftRadius: HELPERS.moderateScale(25),
     borderTopRightRadius: HELPERS.moderateScale(25),
-    paddingHorizontal: HELPERS.wp("5%"),
+    paddingHorizontal: HELPERS.wp("8%"),
     paddingBottom: HELPERS.verticalScale(18),
     paddingTop: HELPERS.verticalScale(10),
   },
@@ -361,17 +454,18 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: COLORS.border,
     alignSelf: "center",
-    marginBottom: HELPERS.verticalScale(8),
+    marginBottom: HELPERS.verticalScale(4),
   },
   headerBlock: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: HELPERS.verticalScale(6),
+    marginBottom: HELPERS.verticalScale(0),
   },
   title: {
     fontSize: SIZES.welcomeTitle,
     color: COLORS.secondary,
     fontFamily: FONTS.title,
+    paddingHorizontal: HELPERS.wp("2%"),
   },
   subtitle: {
     marginTop: HELPERS.verticalScale(4),
@@ -379,10 +473,11 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     opacity: 0.7,
     fontFamily: FONTS.regular,
+    paddingHorizontal: HELPERS.wp("2%"),
   },
 
   section: {
-    marginTop: HELPERS.hp("2%"),
+    marginTop: 0,
     width: "100%",
   },
   sectionLabel: {
@@ -392,8 +487,9 @@ const styles = StyleSheet.create({
     opacity: 1,
     marginBottom: HELPERS.hp("1%"),
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: "#6B705C",
     paddingBottom: HELPERS.verticalScale(4),
+    paddingHorizontal: HELPERS.wp("2%"),
   },
 
   // ---- Tarea: fecha/hora ----
@@ -552,6 +648,78 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     backgroundColor: "#FFEBEE",
+  },
+
+  // Estilos para participante
+  karmaContainer: {
+    alignItems: "center",
+    paddingVertical: HELPERS.verticalScale(2),
+  },
+  karmaPoints: {
+    fontFamily: FONTS.bold,
+    fontSize: HELPERS.moderateScale(32),
+    color: "#4A5942",
+  },
+  karmaLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text16,
+    color: COLORS.secondary,
+    opacity: 0.7,
+  },
+  chartContainer: {
+    alignItems: "center",
+    marginTop: HELPERS.verticalScale(4),
+    paddingHorizontal: HELPERS.wp("2%"),
+  },
+  donutChart: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    marginBottom: HELPERS.verticalScale(12),
+    position: "relative",
+    backgroundColor: "#E6ECDC",
+  },
+  donutSegment: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    position: "absolute",
+    backgroundColor: "#4A5942",
+  },
+  donutHole: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: COLORS.background,
+    position: "absolute",
+    top: 35,
+    left: 35,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingHorizontal: HELPERS.wp("2%"),
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  legendText: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
+  },
+  deleteButtonFull: {
+    marginTop: HELPERS.hp("2%"),
+    width: "85%",
+    alignSelf: "center",
   },
 });
 

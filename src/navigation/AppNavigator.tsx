@@ -1,6 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { StackNavigationOptions } from "@react-navigation/stack";
 import Main from "../screens/Main";
 import CrearCuenta from "../screens/SignIn/CrearCuenta";
@@ -22,6 +23,7 @@ import MiResidencia from "../screens/Perfil/MiResidencia/MiResidencia";
 import EditarResidencia from "../screens/Perfil/MiResidencia/EditarResidencia";
 import EditarPerfil from "../screens/Perfil/EditarPerfil/EditarPerfil";
 import FAQ from "../screens/FAQ/FAQ";
+import { COLORS } from "../styles/theme";
 
 const Stack = createStackNavigator<RootStackParamList>();
 const headerOptions: StackNavigationOptions = {
@@ -38,7 +40,7 @@ const headerOptions: StackNavigationOptions = {
   headerStyle: {
     backgroundColor: "#F5F4F2",
     elevation: 0,
-    height: 150,
+    height: 80,
     shadowOpacity: 0,
     borderBottomWidth: 0,
   },
@@ -50,8 +52,9 @@ const defaultScreenOptions: StackNavigationOptions = {
 };
 const AppNavigator: React.FC = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Main">
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.inputBackground }} edges={['top', 'bottom']}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Main"> 
         <Stack.Screen
           name="Main"
           component={Main}
@@ -148,8 +151,9 @@ const AppNavigator: React.FC = () => {
           component={FAQ}
           options={defaultScreenOptions}
         />
-      </Stack.Navigator>
-    </NavigationContainer>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SafeAreaView>
   );
 };
 export default AppNavigator;

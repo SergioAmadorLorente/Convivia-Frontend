@@ -269,7 +269,9 @@ const DashBoardPersonal: React.FC = () => {
           // Lo hacemos en un timeout para no bloquear el renderizado del setTareas
           setTimeout(() => {
             const tasksToEnrich = mergedTasks.filter(t => {
-              return t.tareasId && t.tareasId.length > 0 && t.HoraLimite === "12:00";
+              // Enriquecer si falta la hora (es "12:00") O si falta la asignación (ej: tarea puntual)
+              const needsEnrichment = t.HoraLimite === "12:00" || !t.usuarioAsignado;
+              return t.tareasId && t.tareasId.length > 0 && needsEnrichment;
             });
 
             if (tasksToEnrich.length > 0) {

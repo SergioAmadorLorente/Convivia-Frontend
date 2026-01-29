@@ -1,8 +1,9 @@
 import axios from "axios";
 import { Platform } from "react-native";
 
-const ANDROID_URL = "https://6hp0bmnf-7226.uks1.devtunnels.ms/api";
-const IOS_WEB_URL = "https://6hp0bmnf-7226.uks1.devtunnels.ms/api";
+const ANDROID_URL = "https://xp5h45z8-7226.uks1.devtunnels.ms/api";
+const IOS_WEB_URL = "https://xp5h45z8-7226.uks1.devtunnels.ms/api";
+
 
 const getBaseUrl = () => {
   if (Platform.OS === "android") {
@@ -15,7 +16,7 @@ const getBaseUrl = () => {
 const api = axios.create({
   baseURL: getBaseUrl(),
   headers: {
-    'X-Api-Key': 'ConviviaDevelopmentKey2026',
+    "X-Api-Key": "ConviviaDevelopmentKey2026",
     "Content-Type": "application/json",
     Accept: "application/json",
   },

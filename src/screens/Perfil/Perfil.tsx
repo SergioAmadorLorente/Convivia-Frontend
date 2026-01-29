@@ -30,6 +30,7 @@ import IconoFAQ from "../../assets/IconoFAQ.svg";
 import Infolegal from "../../assets/Infolegal.svg";
 import IconoConviviaPRO from "../../assets/Icono_Convivia_PRO.svg";
 import LogoutSinFondo from "../../assets/Logout_sin_fondo.svg";
+import GLOBAL_STYLES from "../../styles/styles";
 
 const { width } = Dimensions.get("window");
 
@@ -106,12 +107,12 @@ const Perfil: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      <ScrollView 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Header Title */}
-        <Text style={styles.headerTitle}>Mi Perfil</Text>
+        <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
 
         {/* User Card */}
         <View style={styles.userCard}>
@@ -195,9 +196,8 @@ const Perfil: React.FC = () => {
           />
 
         </View>
-
       </ScrollView>
-
+      
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -209,7 +209,6 @@ const Perfil: React.FC = () => {
           { text: 'Cerrar sesión', onPress: handleLogout },
         ]}
       />
-
       <BottomBar />
     </View>
   );
@@ -218,11 +217,11 @@ const Perfil: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F4F2",
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingBottom: 100,
     alignItems: "center",
+    paddingBottom: HELPERS.hp("8%"),
   },
   headerTitle: {
     fontSize: SIZES.largeTitle,
@@ -237,6 +236,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 15,
     ...COMMON.SHADOW,
+    marginTop: HELPERS.hp("4%"),
     marginBottom: HELPERS.hp("4%"),
   },
   userInfoRow: {
