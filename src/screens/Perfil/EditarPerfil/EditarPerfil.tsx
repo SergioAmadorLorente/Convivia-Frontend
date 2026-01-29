@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { GLOBAL_STYLES, WEB_FULL_VIEWPORT } from '../../../styles/styles';
 import styles from '../../../styles/styles';
 import {
@@ -15,6 +15,8 @@ import {
 	StyleSheet,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useAuthListener } from '../../../hooks/useAuthListener';
+import { obtenerUsuarioPorId, actualizarUsuario } from '../../../api/usuario';
 import { Ionicons } from '@expo/vector-icons';
 import useLoadFonts from '../../../hooks/useLoadFonts';
 import { useKeyboardAware } from '../../../hooks';
@@ -30,6 +32,8 @@ import Perfilicono from '../../../assets/Perfilicono.svg';
 const { width } = Dimensions.get('window');
 
 const EditarPerfil = () => {
+	const currentUser = useAuthListener();
+	const [dbPassword, setDbPassword] = useState('');
 	const [foto, setFoto] = useState<string | null>(null);
 	const [nombre, setNombre] = useState('');
 	const [telefono, setTelefono] = useState('');
@@ -39,6 +43,7 @@ const EditarPerfil = () => {
 	const [repetirContrasena, setRepetirContrasena] = useState('');
 	const [popupVisible, setPopupVisible] = useState(false);
 	const [popupOptions, setPopupOptions] = useState<any>({});
+	const [isLoading, setIsLoading] = useState(false);
 
 	const fontsLoaded = useLoadFonts();
 	const containerRef = useRef<any>(null);
@@ -50,6 +55,30 @@ const EditarPerfil = () => {
 	};
 
 	const handleClosePopup = () => setPopupVisible(false);
+
+	useEffect(() => {
+		const loadUserData = async () => {
+			if (currentUser?.uid) {
+				try {
+					setIsLoading(true);
+					const userData = await obtenerUsuarioPorId(currentUser.uid);
+					console.log('User Data fetched:', userData);
+					if (userData) {
+						setNombre(userData.nombre || userData.Nombre || '');
+						setTelefono(userData.telefono || userData.Telefono || '');
+						setCorreo(userData.email || userData.Email || '');
+						setDbPassword(userData.password || userData.Password || '');
+						// Si tienes lógica para la foto, añádela aquí
+					}
+				} catch (error) {
+					console.error("Error cargando perfil:", error);
+				} finally {
+					setIsLoading(false);
+				}
+			}
+		};
+		loadUserData();
+	}, [currentUser]);
 
 	if (!fontsLoaded) {
 		return null;
@@ -67,28 +96,96 @@ const EditarPerfil = () => {
 		}
 	};
 
-	const handleSubmit = () => {
-		if (nuevaContrasena && nuevaContrasena !== repetirContrasena) {
+	const handleSubmit = async () => {
+		if (!currentUser?.uid) {
 			showPopup({
 				title: 'Error',
-				description: 'Las contraseñas nuevas no coinciden',
+				description: 'Usuario no identificado',
 				imageType: 'error',
-				buttons: [{ text: 'Aceptar' }],
+				buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
 			});
 			return;
 		}
-		// Enviar datos al backend
-		showPopup({
-			title: 'Éxito',
-			description: 'Perfil actualizado correctamente',
-			imageType: 'success',
-			buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
-		});
+
+		let finalPassword = dbPassword;
+
+		// Si el usuario intenta cambiar la contraseña
+		if (nuevaContrasena) {
+			if (nuevaContrasena.length < 8 || !/\d/.test(nuevaContrasena)) {
+				showPopup({
+					title: 'Error',
+					description: 'La contraseña debe tener al menos 8 caracteres y un número.',
+					imageType: 'error',
+					buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+				});
+				return;
+			}
+
+			if (nuevaContrasena !== repetirContrasena) {
+				showPopup({
+					title: 'Error',
+					description: 'Las contraseñas nuevas no coinciden',
+					imageType: 'error',
+					buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+				});
+				return;
+			}
+
+			if (contrasenaActual !== dbPassword) {
+				showPopup({
+					title: 'Error',
+					description: 'La contraseña actual no es correcta',
+					imageType: 'error',
+					buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+				});
+				return;
+			}
+
+			finalPassword = nuevaContrasena;
+		}
+
+		try {
+			setIsLoading(true);
+			const payload: any = {
+				nombre,
+				email: correo,
+				telefono,
+				password: finalPassword, // Siempre enviamos la contraseña (nueva o la actual)
+			};
+
+			console.log('Enviando actualización de perfil:', payload);
+			await actualizarUsuario(currentUser.uid, payload);
+
+			// Limpiar campos de contraseña tras éxito
+			setContrasenaActual('');
+			setNuevaContrasena('');
+			setRepetirContrasena('');
+			// Actualizar la contraseña guardada si cambió
+			if (nuevaContrasena) setDbPassword(nuevaContrasena);
+
+			showPopup({
+				title: 'Éxito',
+				description: 'Perfil actualizado correctamente',
+				imageType: 'success',
+				buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+			});
+		} catch (error) {
+			console.error("Error actualizando perfil:", error);
+			showPopup({
+				title: 'Error',
+				description: 'No se pudo actualizar el perfil',
+				imageType: 'error',
+				buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+			});
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
 		<>
 			<Text style={[styles.titulo, { fontSize: 28, marginTop: 0, marginBottom: hp('3%') }]}>Editar Mi Perfil</Text>
+
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<KeyboardAvoidingView
 					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -104,8 +201,12 @@ const EditarPerfil = () => {
 						]}
 					>
 
-                        
-						<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center' }}>
+
+						<ScrollView
+							showsVerticalScrollIndicator={false}
+							style={{ width: '100%' }}
+							contentContainerStyle={{ alignItems: 'center', paddingBottom: hp('5%') }}
+						>
 
 							{/* Avatar Container */}
 							<TouchableOpacity style={editarPerfilStyles.avatarWrapper} onPress={pickImage}>
@@ -156,6 +257,9 @@ const EditarPerfil = () => {
 								placeholder="• • • • • • • •"
 								secureTextEntry
 							/>
+							<Text style={[GLOBAL_STYLES.helperText, { marginTop: 5, paddingLeft: 5 }]}>
+								* Mínimo 8 caracteres y al menos un número.
+							</Text>
 
 							<Text style={editarPerfilStyles.fieldLabel}>Confirma la Contraseña</Text>
 							<TextField
@@ -205,7 +309,7 @@ const editarPerfilStyles = StyleSheet.create({
 	},
 	submitButton: {
 		marginTop: hp('3%'),
-		marginBottom: hp('2%'),
+		marginBottom: hp('8%'),
 	},
 	sectionTitle: {
 		fontSize: 16,

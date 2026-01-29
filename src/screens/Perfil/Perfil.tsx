@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -18,6 +19,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Keep for fallback or other icons
 import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
+import { useAuthListener } from "../../hooks/useAuthListener";
+import { obtenerUsuarioPorId } from "../../api/usuario";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 // Import SVG Assets
@@ -33,6 +36,10 @@ const { width } = Dimensions.get("window");
 const Perfil: React.FC = () => {
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState(false);
+  const user = useAuthListener();
+  const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
+  const [userKarma, setUserKarma] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleLogout = () => {
     navigation.navigate('Main');
@@ -43,6 +50,37 @@ const Perfil: React.FC = () => {
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
+
+  useEffect(() => {
+    if (user) {
+      const displayName = user.displayName || user.email?.split("@")[0] || "Usuario";
+      setUserName(displayName);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        if (user?.uid) {
+          const userData = await obtenerUsuarioPorId(user.uid);
+          if (userData) {
+            const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
+            setUserName(realName);
+            // setUserKarma(userData.karma || 0); // Activate when karma is available
+          }
+        }
+      } catch (error) {
+        console.error("Error al cargar los datos del usuario:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (fontsLoaded && user) {
+      fetchUserData();
+    }
+  }, [fontsLoaded, user]);
 
   if (!fontsLoaded) {
     return null;
@@ -85,11 +123,15 @@ const Perfil: React.FC = () => {
 
             {/* User Details */}
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>@Nombre</Text>
-              <Text style={styles.userKarma}>
-                Puntos Karma: 290 
-                <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
-              </Text>
+              <Text style={styles.userName}>{userName}</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Text style={styles.userKarma}>
+                  Puntos Karma: {userKarma}
+                  <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
+                </Text>
+              )}
             </View>
 
             {/* Edit Icon */}
