@@ -21,6 +21,7 @@ import InfoLegal from "../screens/Perfil/InfoLegal/InfoLegal";
 import { RootStackParamList } from "./RootStackParamList";
 import MiResidencia from "../screens/Perfil/MiResidencia/MiResidencia";
 import EditarResidencia from "../screens/Perfil/MiResidencia/EditarResidencia";
+import EditarPerfil from "../screens/Perfil/EditarPerfil/EditarPerfil";
 import FAQ from "../screens/FAQ/FAQ";
 import { COLORS } from "../styles/theme";
 
@@ -108,6 +109,11 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="Perfil"
           component={Perfil}
+          options={defaultScreenOptions}
+        />
+        <Stack.Screen
+          name="EditarPerfil"
+          component={EditarPerfil}
           options={defaultScreenOptions}
         />
         <Stack.Screen

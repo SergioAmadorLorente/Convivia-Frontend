@@ -34,7 +34,7 @@ import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerEspacioPorId, obtenerEspacios } from "../../api/espacio";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
 import { obtenerTareasPorEspacio, obtenerDetallePlantilla, obtenerDetalleTareaInstancia, eliminarTarea } from "../../api/tarea";
-import { obtenerUsuarios } from "../../api/usuario";
+import { obtenerUsuarios, obtenerUsuarioPorId } from "../../api/usuario";
 
 const { hp } = HELPERS;
 
@@ -65,8 +65,19 @@ const DashBoardPersonal: React.FC = () => {
     const cargarEspacio = async () => {
       try {
         if (user?.uid) {
-          // Obtener nombre del usuario desde Firebase
-          const displayName = user.displayName || user.email?.split("@")[0] || "Usuario";
+          // Obtener nombre del usuario desde Firebase como fallback
+          let displayName = user.displayName || user.email?.split("@")[0] || "Usuario";
+
+          try {
+            // Intentar obtener el nombre real desde la BD
+            const usuarioData = await obtenerUsuarioPorId(user.uid);
+            if (usuarioData?.nombre || usuarioData?.Nombre) {
+              displayName = usuarioData.nombre || usuarioData.Nombre;
+            }
+          } catch (e) {
+            console.log("No se pudo obtener usuario de la BD, usando firebase profile/email");
+          }
+
           setUserName(displayName);
 
           // Obtener espacio del usuario
@@ -870,7 +881,7 @@ const DashBoardPersonal: React.FC = () => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
       <Header
-        username={`@${userName.split(" ")[0].toLowerCase()}`}
+        username={userName}
         date={new Date()}
         location={espacioNombre}
       />
