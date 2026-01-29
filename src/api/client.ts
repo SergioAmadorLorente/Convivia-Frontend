@@ -1,8 +1,9 @@
 import axios from "axios";
 import { Platform } from "react-native";
 
-const ANDROID_URL = "https://pbbtmgfm-5082.uks1.devtunnels.ms/api";
-const IOS_WEB_URL = "https://pbbtmgfm-5082.uks1.devtunnels.ms/api";
+const ANDROID_URL = "https://xp5h45z8-7226.uks1.devtunnels.ms/api";
+const IOS_WEB_URL = "https://xp5h45z8-7226.uks1.devtunnels.ms/api";
+
 
 const getBaseUrl = () => {
   if (Platform.OS === "android") {

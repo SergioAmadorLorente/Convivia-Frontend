@@ -48,6 +48,7 @@ const TextField: React.FC<TextFieldProps> = ({
         <TextInput
           style={[COMMON.INPUT_BASE, { flex: 1 }]}
           placeholder={placeholder}
+          placeholderTextColor="rgba(0, 0, 0, 0.4)"
           keyboardType={keyboardType}
           autoCapitalize={
             keyboardType === "email-address" ? "none" : "sentences"

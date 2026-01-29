@@ -10,6 +10,7 @@ export type RootStackParamList = {
   PoliticaCookiesPrivacidad: undefined;
   TerminosCondiciones: undefined;
   Perfil: undefined;
+  EditarPerfil: undefined;
   test: undefined;
   CreateTask: { taskToEdit: any } | undefined;
   CreateFactura: { facturaToEdit: any } | undefined;

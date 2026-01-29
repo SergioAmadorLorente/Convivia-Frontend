@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -18,6 +19,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Keep for fallback or other icons
 import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
+import { useAuthListener } from "../../hooks/useAuthListener";
+import { obtenerUsuarioPorId } from "../../api/usuario";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 // Import SVG Assets
@@ -34,6 +37,10 @@ const { width } = Dimensions.get("window");
 const Perfil: React.FC = () => {
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState(false);
+  const user = useAuthListener();
+  const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
+  const [userKarma, setUserKarma] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleLogout = () => {
     navigation.navigate('Main');
@@ -44,6 +51,37 @@ const Perfil: React.FC = () => {
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
+
+  useEffect(() => {
+    if (user) {
+      const displayName = user.displayName || user.email?.split("@")[0] || "Usuario";
+      setUserName(displayName);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        if (user?.uid) {
+          const userData = await obtenerUsuarioPorId(user.uid);
+          if (userData) {
+            const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
+            setUserName(realName);
+            // setUserKarma(userData.karma || 0); // Activate when karma is available
+          }
+        }
+      } catch (error) {
+        console.error("Error al cargar los datos del usuario:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (fontsLoaded && user) {
+      fetchUserData();
+    }
+  }, [fontsLoaded, user]);
 
   if (!fontsLoaded) {
     return null;
@@ -68,86 +106,98 @@ const Perfil: React.FC = () => {
   );
 
   return (
-    <View style={styles.scrollContent}>
-      {/* Header Title */}
-      <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
+    <View style={styles.container}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header Title */}
+        <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
 
-      {/* User Card */}
-      <View style={styles.userCard}>
-        <View style={styles.userInfoRow}>
-          {/* Avatar Placeholder */}
-          <View style={styles.avatarContainer}>
-            <Ionicons name="person-outline" size={30} color={COLORS.primary} />
+        {/* User Card */}
+        <View style={styles.userCard}>
+          <View style={styles.userInfoRow}>
+            {/* Avatar Placeholder */}
+            <View style={styles.avatarContainer}>
+              <Ionicons name="person-outline" size={30} color={COLORS.primary} />
+            </View>
+
+            {/* User Details */}
+            <View style={styles.userDetails}>
+              <Text style={styles.userName}>{userName}</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Text style={styles.userKarma}>
+                  Puntos Karma: {userKarma}
+                  <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
+                </Text>
+              )}
+            </View>
+
+            {/* Edit Icon */}
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('EditarPerfil')}
+            >
+              <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
+            </TouchableOpacity>
           </View>
-
-          {/* User Details */}
-          <View style={styles.userDetails}>
-            <Text style={styles.userName}>@Nombre</Text>
-            <Text style={styles.userKarma}>
-              Puntos Karma
-              <FontAwesome5 name="peace" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
-              : 290
-            </Text>
-          </View>
-
-          {/* Edit Icon */}
-          <TouchableOpacity style={styles.editButton}>
-            <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
-          </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Menu List Container (White box with rounded corners) */}
-      <View style={styles.menuContainer}>
+        {/* Menu List Container (White box with rounded corners) */}
+        <View style={styles.menuContainer}>
 
-        {/* Mi Karma */}
-        <MenuItem
-          label="Mi Karma"
-          onPress={() => console.log('Mi Karma')}
-          icon={<LogoKarma width={30} height={30} />}
-        />
-        <View style={styles.divider} />
+          {/* Mi Karma */}
+          <MenuItem
+            label="Mi Karma"
+            onPress={() => console.log('Mi Karma')}
+            icon={<LogoKarma width={30} height={30} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Mis Residencias */}
-        <MenuItem
-          label="Mis Residencias"
-          onPress={() => navigation.navigate("MiResidencia")}
-          icon={<Miresidencia width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Mis Residencias */}
+          <MenuItem
+            label="Mis Residencias"
+            onPress={() => navigation.navigate("MiResidencia")}
+            icon={<Miresidencia width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Preguntas frecuentes */}
-        <MenuItem
-          label="Preguntas frecuentes"
-          onPress={() => navigation.navigate("FAQ")}
-          icon={<IconoFAQ width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Preguntas frecuentes */}
+          <MenuItem
+            label="Preguntas frecuentes"
+            onPress={() => navigation.navigate("FAQ")}
+            icon={<IconoFAQ width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Información Legal */}
-        <MenuItem
-          label="Información Legal"
-          onPress={() => navigation.navigate("InfoLegal")}
-          icon={<Infolegal width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Información Legal */}
+          <MenuItem
+            label="Información Legal"
+            onPress={() => navigation.navigate("InfoLegal")}
+            icon={<Infolegal width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Convivia PRO */}
-        <MenuItem
-          label="Convivia PRO"
-          onPress={() => console.log('Convivia PRO')}
-          icon={<IconoConviviaPRO width={24} height={24} />}
-        />
-        <View style={styles.divider} />
+          {/* Convivia PRO */}
+          <MenuItem
+            label="Convivia PRO"
+            onPress={() => console.log('Convivia PRO')}
+            icon={<IconoConviviaPRO width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
-        {/* Cerrar Sesión */}
-        <MenuItem
-          label="Cerrar Sesión"
-          onPress={() => setModalVisible(true)}
-          icon={<LogoutSinFondo width={24} height={24} />}
-        />
+          {/* Cerrar Sesión */}
+          <MenuItem
+            label="Cerrar Sesión"
+            onPress={() => setModalVisible(true)}
+            icon={<LogoutSinFondo width={24} height={24} />}
+          />
 
-      </View>
+        </View>
+      </ScrollView>
+      
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -160,7 +210,6 @@ const Perfil: React.FC = () => {
         ]}
       />
       <BottomBar />
-
     </View>
   );
 };
@@ -168,11 +217,11 @@ const Perfil: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F4F2",
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingBottom: HELPERS.hp("7%"),
     alignItems: "center",
+    paddingBottom: HELPERS.hp("8%"),
   },
   headerTitle: {
     fontSize: SIZES.largeTitle,
