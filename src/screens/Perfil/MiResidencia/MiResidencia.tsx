@@ -21,13 +21,13 @@ import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../../../api/espacio";
-import { obtenerUsuarioPorId } from "../../../api/usuario";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 
 const { width } = Dimensions.get("window");
 
 import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
+import useFetchParticipants from "../../../hooks/useFetchParticipants";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const MiResidencia: React.FC = () => {
@@ -36,40 +36,14 @@ const MiResidencia: React.FC = () => {
   const user = useAuthListener();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
   const [residenciaData, setResidenciaData] = useState<any>(null);
-  const [participants, setParticipants] = useState<any[]>([]);
 
+  const { participants, fetchParticipants } = useFetchParticipants();
   const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
   const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [selectedParticipantRelacion, setSelectedParticipantRelacion] = useState<any>(null);
-
-  const fetchParticipants = async (espacioId: string) => {
-    try {
-      const todasRelaciones = await obtenerUsuarioEspacios();
-      if (Array.isArray(todasRelaciones)) {
-        const relacionesDelEspacio = todasRelaciones.filter(
-          (r: any) => r.espacioId === espacioId
-        );
-
-        const usuariosPromesas = relacionesDelEspacio.map(async (r: any) => {
-          try {
-            const usuario = await obtenerUsuarioPorId(r.usuarioId);
-            return usuario;
-          } catch (e) {
-            // Usuario no existe, lo ignoramos silenciosamente
-            return null;
-          }
-        });
-
-        const usuarios = await Promise.all(usuariosPromesas);
-        setParticipants(usuarios.filter((u) => u !== null));
-      }
-    } catch (e) {
-      console.error("Error fetching participants", e);
-    }
-  };
 
   const handleAbandonarResidencia = () => {
     if (!user || !residenciaData) return;
