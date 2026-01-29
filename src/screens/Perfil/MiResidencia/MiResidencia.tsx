@@ -19,9 +19,7 @@ import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
 import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
-import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
-import { obtenerEspacioPorId } from "../../../api/espacio";
-import { obtenerEspacioPorUsuarioId, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
+import { obtenerEspacioPorUsuarioId, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
@@ -257,8 +255,8 @@ const MiResidencia: React.FC = () => {
                 <View style={styles.participantsList}>
                   {participants.length > 0 ? (
                     participants.map((participant, index) => (
-                      <TouchableOpacity 
-                        key={index} 
+                      <TouchableOpacity
+                        key={index}
                         style={styles.participantItem}
                         onPress={() => handleParticipantPress(participant)}
                         activeOpacity={0.7}
@@ -349,6 +347,8 @@ const MiResidencia: React.FC = () => {
         residenciaName={residenciaName}
         onClose={() => setIsParticipantModalOpen(false)}
         onEliminar={handleEliminarParticipante}
+      />
+
       <Popup
         visible={isDeletePopupOpen}
         onClose={() => setIsDeletePopupOpen(false)}
