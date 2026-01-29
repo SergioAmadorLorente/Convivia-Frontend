@@ -39,6 +39,7 @@ type Props =
     visible: boolean;
     kind: "participante";
     participant: any;
+    participantRelacion?: any;
     residenciaName: string;
     onClose: () => void;
     onEliminar: () => void;
@@ -49,10 +50,10 @@ const Detalle: React.FC<Props> = (props) => {
 
   // ---- PARTICIPANTE ----
   if (props.kind === "participante") {
-    const { participant, residenciaName, onEliminar } = props;
+    const { participant, participantRelacion, residenciaName, onEliminar } = props;
 
-    // Datos de ejemplo - aquí deberías obtener los datos reales del usuario
-    const karmaPoints = 290;
+    // Obtener karma real de la relación usuarioEspacio
+    const karmaPoints = participantRelacion?.karma ?? 0;
     const tareasCompletadas = 65; // porcentaje
     const tareasFueraPlazo = 35; // porcentaje
 
@@ -72,16 +73,16 @@ const Detalle: React.FC<Props> = (props) => {
             {/* Header */}
             <View style={styles.headerBlock}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.title}>
+                <Text style={[styles.title, { color: '#6B705C' }]}>
                   {participant?.nombre || participant?.email || "Usuario"}
                 </Text>
-                <Text style={styles.subtitle}>{residenciaName}</Text>
+                <Text style={[styles.subtitle, { color: '#ACBF8A' }]}>{residenciaName}</Text>
               </View>
             </View>
 
             {/* Puntos de Karma */}
             <View style={styles.section}>
-              <View style={styles.karmaContainer}>
+              <View style={[styles.karmaContainer, { paddingVertical: HELPERS.verticalScale(8) }]}>
                 <Text style={styles.karmaPoints}>¡{karmaPoints} puntos!</Text>
                 <Text style={styles.karmaLabel}>de karma</Text>
               </View>
@@ -89,15 +90,15 @@ const Detalle: React.FC<Props> = (props) => {
 
             {/* Gráfico de Tareas */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>
+              <Text style={[styles.sectionLabel, { color: '#6B705C' }]}>
                 Tareas completas y fuera de plazo
               </Text>
 
-              <View style={styles.chartContainer}>
-                <View style={styles.donutChart}>
-                  <View style={styles.donutSegment} />
-                  <View style={styles.donutHole} />
-                </View>
+              <View style={[styles.chartContainer, { marginTop: HELPERS.verticalScale(5) }]}>
+                  <View style={styles.donutChart}>
+                    <View style={styles.donutSegment} />
+                    <View style={styles.donutHole} />
+                  </View>
 
                 <View style={styles.legendContainer}>
                   <View style={styles.legendItem}>
@@ -114,21 +115,9 @@ const Detalle: React.FC<Props> = (props) => {
               </View>
             </View>
 
-            {/* Usuario info adicional */}
-            {participant?.email && (
-              <View style={styles.section}>
-                <Text style={styles.sectionLabel}>Correo electrónico</Text>
-                <TextInput
-                  editable={false}
-                  value={participant.email}
-                  style={styles.input}
-                />
-              </View>
-            )}
-
             {/* Botón Eliminar */}
             <TouchableOpacity
-              style={[GLOBAL_STYLES.buttonSecondaryGrey, styles.deleteButtonFull]}
+              style={[GLOBAL_STYLES.buttonSecondaryGrey, styles.deleteButtonFull, { backgroundColor: '#D9D9D9', marginTop: HELPERS.hp("1%") }]}
               activeOpacity={0.85}
               onPress={onEliminar}
             >
@@ -455,7 +444,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderTopLeftRadius: HELPERS.moderateScale(25),
     borderTopRightRadius: HELPERS.moderateScale(25),
-    paddingHorizontal: HELPERS.wp("5%"),
+    paddingHorizontal: HELPERS.wp("8%"),
     paddingBottom: HELPERS.verticalScale(18),
     paddingTop: HELPERS.verticalScale(10),
   },
@@ -465,17 +454,18 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: COLORS.border,
     alignSelf: "center",
-    marginBottom: HELPERS.verticalScale(8),
+    marginBottom: HELPERS.verticalScale(4),
   },
   headerBlock: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: HELPERS.verticalScale(6),
+    marginBottom: HELPERS.verticalScale(0),
   },
   title: {
     fontSize: SIZES.welcomeTitle,
     color: COLORS.secondary,
     fontFamily: FONTS.title,
+    paddingHorizontal: HELPERS.wp("2%"),
   },
   subtitle: {
     marginTop: HELPERS.verticalScale(4),
@@ -483,10 +473,11 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     opacity: 0.7,
     fontFamily: FONTS.regular,
+    paddingHorizontal: HELPERS.wp("2%"),
   },
 
   section: {
-    marginTop: HELPERS.hp("2%"),
+    marginTop: 0,
     width: "100%",
   },
   sectionLabel: {
@@ -496,8 +487,9 @@ const styles = StyleSheet.create({
     opacity: 1,
     marginBottom: HELPERS.hp("1%"),
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: "#6B705C",
     paddingBottom: HELPERS.verticalScale(4),
+    paddingHorizontal: HELPERS.wp("2%"),
   },
 
   // ---- Tarea: fecha/hora ----
@@ -661,7 +653,7 @@ const styles = StyleSheet.create({
   // Estilos para participante
   karmaContainer: {
     alignItems: "center",
-    paddingVertical: HELPERS.verticalScale(15),
+    paddingVertical: HELPERS.verticalScale(2),
   },
   karmaPoints: {
     fontFamily: FONTS.bold,
@@ -676,37 +668,38 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     alignItems: "center",
-    marginTop: HELPERS.verticalScale(10),
+    marginTop: HELPERS.verticalScale(4),
+    paddingHorizontal: HELPERS.wp("2%"),
   },
   donutChart: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    marginBottom: HELPERS.verticalScale(20),
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    marginBottom: HELPERS.verticalScale(12),
     position: "relative",
     backgroundColor: "#E6ECDC",
   },
   donutSegment: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
     position: "absolute",
     backgroundColor: "#4A5942",
   },
   donutHole: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     backgroundColor: COLORS.background,
     position: "absolute",
-    top: 25,
-    left: 25,
+    top: 35,
+    left: 35,
   },
   legendContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
-    paddingHorizontal: HELPERS.wp("5%"),
+    paddingHorizontal: HELPERS.wp("2%"),
   },
   legendItem: {
     flexDirection: "row",
@@ -725,7 +718,8 @@ const styles = StyleSheet.create({
   },
   deleteButtonFull: {
     marginTop: HELPERS.hp("2%"),
-    width: "100%",
+    width: "85%",
+    alignSelf: "center",
   },
 });
 

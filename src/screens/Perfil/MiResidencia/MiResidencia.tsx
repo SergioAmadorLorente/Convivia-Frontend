@@ -19,7 +19,7 @@ import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
 import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
-import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
+import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../../../api/espacio";
 import { obtenerUsuarioPorId } from "../../../api/usuario";
 import { useFocusEffect } from "@react-navigation/native";
@@ -43,6 +43,7 @@ const MiResidencia: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
+  const [selectedParticipantRelacion, setSelectedParticipantRelacion] = useState<any>(null);
 
   const fetchParticipants = async (espacioId: string) => {
     try {
@@ -143,8 +144,18 @@ const MiResidencia: React.FC = () => {
     </View>
   );
 
-  const handleParticipantPress = (participant: any) => {
+  const handleParticipantPress = async (participant: any) => {
     setSelectedParticipant(participant);
+    // Obtener la relación usuarioEspacio para este participante y el espacio actual
+    if (participant?.id && residenciaData?.id) {
+      try {
+        const relacion = await obtenerRelacionUsuarioEspacio(participant.id, residenciaData.id);
+        setSelectedParticipantRelacion(relacion);
+      } catch (error) {
+        console.error("Error al obtener relación usuarioEspacio:", error);
+        setSelectedParticipantRelacion(null);
+      }
+    }
     setIsParticipantModalOpen(true);
   };
 
@@ -334,6 +345,7 @@ const MiResidencia: React.FC = () => {
         visible={isParticipantModalOpen}
         kind="participante"
         participant={selectedParticipant}
+        participantRelacion={selectedParticipantRelacion}
         residenciaName={residenciaName}
         onClose={() => setIsParticipantModalOpen(false)}
         onEliminar={handleEliminarParticipante}
