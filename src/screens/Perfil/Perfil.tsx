@@ -183,7 +183,7 @@ const Perfil: React.FC = () => {
           {/* Convivia PRO */}
           <MenuItem
             label="Convivia PRO"
-            onPress={() => console.log('Convivia PRO')}
+            onPress={() => navigation.navigate('ConviviaPro')}
             icon={<IconoConviviaPRO width={24} height={24} />}
           />
           <View style={styles.divider} />

@@ -12,6 +12,7 @@ export type RootStackParamList = {
   Perfil: undefined;
   EditarPerfil: undefined;
   test: undefined;
+  ConviviaPro: undefined;
   CreateTask: { taskToEdit: any } | undefined;
   CreateFactura: { facturaToEdit: any } | undefined;
   InfoLegal: undefined;
@@ -22,4 +23,5 @@ export type RootStackParamList = {
     ubicacionInicial?: string;
   };
   FAQ: undefined;
+ 
 };
