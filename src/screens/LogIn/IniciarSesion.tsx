@@ -87,16 +87,49 @@ const IniciarSesion: React.FC = () => {
         navigation.navigate("VerificacionCuentaNueva");
         return;
       }
-      // OK login
+
+      // OK login - Verificar si el usuario tiene una residencia
       setShowConfetti(true);
-      showPopup({
-        title: "Éxito",
-        description: "Login exitoso",
-        imageType: "success",
-        buttons: [
-          { text: "Aceptar", onPress: () => navigation.navigate("Bienvenida") },
-        ],
-      });
+
+      // Importar la función para verificar residencia
+      const { obtenerEspacioPorUsuarioId } = require("../../api/usuarioEspacio");
+
+      try {
+        const espacioExistente = await obtenerEspacioPorUsuarioId(userCredential.user.uid);
+
+        if (espacioExistente && espacioExistente.espacioId && espacioExistente.espacioId !== "string") {
+          // Usuario tiene residencia -> ir al Dashboard
+          showPopup({
+            title: "¡Bienvenido de nuevo!",
+            description: "Redirigiendo a tu residencia...",
+            imageType: "success",
+            buttons: [
+              { text: "Continuar", onPress: () => navigation.navigate("DashBoardPersonal") },
+            ],
+          });
+        } else {
+          // Usuario NO tiene residencia -> ir a Bienvenida para crear/unirse
+          showPopup({
+            title: "Éxito",
+            description: "Login exitoso. Crea o únete a una residencia para continuar.",
+            imageType: "success",
+            buttons: [
+              { text: "Continuar", onPress: () => navigation.navigate("Bienvenida") },
+            ],
+          });
+        }
+      } catch (espacioError) {
+        console.log("Error verificando residencia, redirigiendo a Bienvenida:", espacioError);
+        // Si hay error verificando, ir a Bienvenida por seguridad
+        showPopup({
+          title: "Éxito",
+          description: "Login exitoso",
+          imageType: "success",
+          buttons: [
+            { text: "Aceptar", onPress: () => navigation.navigate("Bienvenida") },
+          ],
+        });
+      }
     } catch (error) {
       showPopup({
         title: "Error",

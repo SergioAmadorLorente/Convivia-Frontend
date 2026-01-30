@@ -20,8 +20,6 @@ import { useAuthListener } from "../../../hooks/useAuthListener";
 import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
-import { obtenerEspacioPorId } from "../../../api/espacio";
-import { obtenerEspacioPorUsuarioId, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
@@ -61,12 +59,11 @@ const MiResidencia: React.FC = () => {
       const relacion = await obtenerEspacioPorUsuarioId(user.uid);
       if (relacion && relacion.id) {
         await eliminarUsuarioEspacio(relacion.id);
-        // Alert.alert("Éxito", "Has abandonado la residencia correctamente.");
-        // Redirigir a UnirResidencia o refrescar
         setIsAbandonPopupOpen(false);
+        // Redirigir a Bienvenida para que pueda crear o unirse a otra residencia
         navigation.reset({
           index: 0,
-          routes: [{ name: "UnirResidencia" }],
+          routes: [{ name: "Bienvenida" }],
         });
       } else {
         Alert.alert("Error", "No se encontró tu información de miembro.");
@@ -87,6 +84,7 @@ const MiResidencia: React.FC = () => {
     try {
       await eliminarEspacio(residenciaData.id);
       setIsDeletePopupOpen(false);
+      // Redirigir a Bienvenida para que pueda crear o unirse a otra residencia
       navigation.reset({
         index: 0,
         routes: [{ name: "Bienvenida" }],
@@ -257,8 +255,8 @@ const MiResidencia: React.FC = () => {
                 <View style={styles.participantsList}>
                   {participants.length > 0 ? (
                     participants.map((participant, index) => (
-                      <TouchableOpacity 
-                        key={index} 
+                      <TouchableOpacity
+                        key={index}
                         style={styles.participantItem}
                         onPress={() => handleParticipantPress(participant)}
                         activeOpacity={0.7}
@@ -349,6 +347,7 @@ const MiResidencia: React.FC = () => {
         residenciaName={residenciaName}
         onClose={() => setIsParticipantModalOpen(false)}
         onEliminar={handleEliminarParticipante}
+      />
       <Popup
         visible={isDeletePopupOpen}
         onClose={() => setIsDeletePopupOpen(false)}

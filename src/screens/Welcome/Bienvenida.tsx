@@ -8,26 +8,50 @@ import GLOBAL_STYLES from '../../styles/styles';
 import Popup from '../../components/ui/Popup';
 import Button from '../../components/ui/Button';
 import CustomHeader from '../../components/ui/CustomHeader';
+import { useAuthListener } from '../../hooks/useAuthListener';
+import { obtenerEspacioPorUsuarioId } from '../../api/usuarioEspacio';
 
 const Bienvenida: React.FC = () => {
   const navigation = useNavigation<any>();
+  const user = useAuthListener();
   const [activo, setActivo] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [modalTipo, setModalTipo] = useState<string>('exito');
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
+  const [checkingResidence, setCheckingResidence] = useState<boolean>(true);
+
+  // Verificar si el usuario ya tiene una residencia al cargar la pantalla
+  useEffect(() => {
+    const verificarYRedirigir = async () => {
+      if (!user?.uid) {
+        setCheckingResidence(false);
+        return;
+      }
+
+      try {
+        const espacioExistente = await obtenerEspacioPorUsuarioId(user.uid);
+
+        if (espacioExistente && espacioExistente.espacioId && espacioExistente.espacioId !== "string") {
+          // El usuario ya tiene una residencia -> redirigir al Dashboard
+          console.log("✅ Usuario ya tiene residencia, redirigiendo al Dashboard");
+          navigation.replace('DashBoardPersonal');
+          return;
+        }
+      } catch (error) {
+        console.log('Error verificando residencia en Bienvenida:', error);
+      }
+
+      setCheckingResidence(false);
+    };
+
+    verificarYRedirigir();
+  }, [user]);
 
   const handleLogout = () => {
     navigation.navigate('Main');
   };
 
-  if (!fontsLoaded) {
-    return (
-      <View style={GLOBAL_STYLES.container}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
+  // useLayoutEffect debe estar ANTES del return condicional
   React.useLayoutEffect(() => {
     navigation.setOptions({
       header: () => (
@@ -37,6 +61,14 @@ const Bienvenida: React.FC = () => {
       ),
     });
   }, [navigation]);
+
+  if (!fontsLoaded || checkingResidence) {
+    return (
+      <View style={GLOBAL_STYLES.container}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={GLOBAL_STYLES.container} keyboardShouldPersistTaps="handled">
