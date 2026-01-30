@@ -9,6 +9,7 @@ export interface ITask {
   isCompleted: boolean;
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
+  tareasId?: string[]; // IDs de las instancias hijas
 }
 
 function startOfDay(d: Date) {
@@ -26,6 +27,7 @@ export class TaskModel implements ITask {
   isCompleted: boolean;
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
+  tareasId: string[];
 
   constructor(props: ITask) {
     this.id = props.id;
@@ -38,6 +40,7 @@ export class TaskModel implements ITask {
     this.isCompleted = !!props.isCompleted;
     this.FechaCompletada = props.FechaCompletada ? new Date(props.FechaCompletada) : null;
     this.usuarioAsignado = props.usuarioAsignado ?? null;
+    this.tareasId = props.tareasId ?? [];
   }
 
   formattedTime() {

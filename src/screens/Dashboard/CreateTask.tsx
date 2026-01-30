@@ -22,8 +22,9 @@ import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
 import { useEditTask } from "../../hooks/useEditTask";
 import { useAuthListener } from "../../hooks/useAuthListener";
-import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio } from "../../api/usuarioEspacio";
-import { crearTarea } from "../../api/tarea";
+import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
+import { crearTarea, editarTarea, TareaPayload } from "../../api/tarea";
+import { obtenerUsuarios } from "../../api/usuario";
 import Popup from "../../components/ui/Popup";
 
 const { hp } = HELPERS;
@@ -48,25 +49,59 @@ const CreateTask: React.FC = () => {
         name, setName,
         description, setDescription,
         selectedTime, setSelectedTime,
+        selectedDate, setSelectedDate, // Get from hook now
         repeatDays, setRepeatDays,
         karma, setKarma,
         assignedUsers, setAssignedUsers,
         loadTask,
         isEditing,
+        taskId,
+        instanceId,
     } = useEditTask();
 
     useEffect(() => {
         if (route.params?.taskToEdit) {
             const t = route.params.taskToEdit;
+            console.log("📝 Editando tarea (Datos recibidos):", t);
+
+            // 1. Mapear días numéricos a strings (para el selector visual)
+            // Usamos Lunes=0, ..., Domingo=6 para que sea consistente con la lógica de envío
+            const reverseDaysMap: Record<number, string> = {
+                0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
+                4: 'Viernes', 5: 'Sábado', 6: 'Domingo'
+            };
+            // t.repeatDays viene como array de números
+            const mappedDays = (t.repeatDays || []).map((d: number) => reverseDaysMap[d]).filter(Boolean);
+
+            // 2. Cargar en hooks (text inputs, selectores)
             loadTask({
                 id: t.id,
-                name: t.title,
-                description: t.subtitle || "",
+                instanceId: t.instanceId, // Cargar ID de instancia
+                name: t.name,
+                description: t.description,
                 time: t.time,
-                repeatDays: [],
-                karma: 0,
-                assignedUsers: [],
+                date: t.date ? new Date(t.date) : null, // Include date in loadTask
+                repeatDays: mappedDays,
+                karma: t.karma,
+                assignedUsers: t.assignedUsers,
             });
+
+            // 4. Pre-llenar asignaciones de usuario
+            // El normalizador envía 'assignedUsers' como array de 1 elemento si hay usuario asignado.
+            if (t.assignedUsers && t.assignedUsers.length > 0) {
+                const u = t.assignedUsers[0];
+                if (mappedDays.length > 0) {
+                    // Caso Repetición: llenar el mapa de días
+                    const newAssignments: Record<string, UserItem | null> = {};
+                    mappedDays.forEach((day: string) => {
+                        newAssignments[day] = u;
+                    });
+                    setDayUserAssignments(newAssignments);
+                } else {
+                    // Caso Puntual: llenar usuario único
+                    setSingleUserAssignment(u);
+                }
+            }
         }
     }, [route.params]);
 
@@ -91,13 +126,53 @@ const CreateTask: React.FC = () => {
 
     // Time Picker State
     const [timePopupVisible, setTimePopupVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-    const [availableUsers] = useState([
-        { id: "1", name: "Juan Pérez" },
-        { id: "2", name: "María García" },
-        { id: "3", name: "Lucía Fernández" },
-    ]);
+    const [availableUsers, setAvailableUsers] = useState<UserItem[]>([]);
+
+    useEffect(() => {
+        const fetchUsersInSpace = async () => {
+            if (!user?.uid) return;
+            try {
+                // 1. Obtener la relación usuario-espacio del usuario actual para saber en qué espacio estamos
+                const myUserSpace = await obtenerEspacioPorUsuarioId(user.uid);
+                if (!myUserSpace?.espacioId) return;
+
+                const currentEspacioId = myUserSpace.espacioId;
+                console.log("🏠 Buscando miembros para el espacio:", currentEspacioId);
+
+                // 2. Obtener todas las relaciones UsuarioEspacio para filtrar por espacioId
+                const allRelations = await obtenerUsuarioEspacios();
+                if (!Array.isArray(allRelations)) return;
+
+                const spaceRelations = allRelations.filter((r: any) => r.espacioId === currentEspacioId);
+                const userIdsInSpace = spaceRelations.map((r: any) => r.usuarioId);
+
+                if (userIdsInSpace.length === 0) {
+                    setAvailableUsers([]);
+                    return;
+                }
+
+                // 3. Obtener nombres de los usuarios (cruce de datos)
+                const allUsers = await obtenerUsuarios();
+                if (!Array.isArray(allUsers)) return;
+
+                const usersInSpace = allUsers
+                    .filter((u: any) => userIdsInSpace.includes(u.id))
+                    .map((u: any) => ({
+                        id: u.id,
+                        name: u.nombre || u.email || "Usuario sin nombre"
+                    }));
+
+                console.log(`👥 ${usersInSpace.length} usuarios encontrados en el espacio.`);
+                setAvailableUsers(usersInSpace);
+
+            } catch (error) {
+                console.error("❌ Error fetching users in space:", error);
+            }
+        };
+
+        fetchUsersInSpace();
+    }, [user]);
 
 
     const handleCrearTareaPress = () => {
@@ -146,6 +221,7 @@ const CreateTask: React.FC = () => {
         setSingleUserAssignment(singleUser);
 
         // Proceder con la creación de la tarea
+        console.log("💾 Guardando tarea. Fecha seleccionada en state:", selectedDate?.toISOString());
         await executeCreateTask(assignments, singleUser);
     };
 
@@ -162,23 +238,22 @@ const CreateTask: React.FC = () => {
                 throw new Error("No se encontró un espacio asignado al usuario");
             }
 
-            // Determinar usuario asignado basado en LO QUE SE ACABA DE CONFIRMAR en el popup
-            let usuarioAsignado: string | undefined = undefined;
-
+            // Determinar todos los usuarios asignados basado en LO QUE SE ACABA DE CONFIRMAR en el popup
+            const usuariosUnicos = new Set<string>();
             if (repeatDays.length > 0) {
-                // Si hay días repetidos, usar las asignaciones por día
-                const firstAssignment = Object.values(currentAssignments).find(u => u !== null);
-                usuarioAsignado = firstAssignment?.id;
-            } else {
-                // Si no hay repetición, usar la asignación single
-                usuarioAsignado = currentSingleUser?.id;
+                Object.values(currentAssignments).forEach(u => {
+                    if (u?.id) usuariosUnicos.add(u.id);
+                });
+            } else if (currentSingleUser?.id) {
+                usuariosUnicos.add(currentSingleUser.id);
             }
+            const listaUsuariosAsignados = Array.from(usuariosUnicos);
 
             // Convertir días de string a números
             const diasNumeros = repeatDays.map(day => {
                 const daysMap: Record<string, number> = {
-                    'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4,
-                    'Viernes': 5, 'Sábado': 6, 'Domingo': 0
+                    'Lunes': 0, 'Martes': 1, 'Miércoles': 2, 'Jueves': 3,
+                    'Viernes': 4, 'Sábado': 5, 'Domingo': 6
                 };
                 return daysMap[day];
             });
@@ -186,52 +261,123 @@ const CreateTask: React.FC = () => {
             // Formatear hora
             const horaFormateada = selectedTime.length === 5 ? `${selectedTime}:00` : selectedTime;
 
-            const tareaData: any = {
-                nombre: name.trim(),
-                descripcion: description.trim() || undefined,
-                fechaCreacion: new Date().toISOString(),
-                // Backend usa DateOnly, así que enviamos solo la parte de la fecha YYYY-MM-DD
-                FechaLimite: selectedDate ? selectedDate.toISOString().split('T')[0] : undefined,
-                horaLimite: horaFormateada,
-                diasRepeticion: diasNumeros.length > 0 ? diasNumeros : [],
+            // Payload para editar plantilla (según endpoint /api/espacio/{espacioId}/{id})
+            const baseData = {
+                nombre: name,
+                descripcion: description,
                 karma: karma,
-                usuariosAsignacion: usuarioAsignado ? [usuarioAsignado] : [],
+                diasRepeticion: diasNumeros,
+                fechaFin: selectedDate,
+                horaLimite: horaFormateada,
+                usuariosAsignacion: listaUsuariosAsignados,
                 espacioId: usuarioEspacio.espacioId,
-                estado: true,
-                completada: false,
-                tareasId: [],
             };
 
-            console.log("📤 Datos a enviar:", JSON.stringify(tareaData, null, 2));
-            console.log("📅 Fecha Límite a enviar (Mayúscula):", tareaData.FechaLimite); // LOG IMPORTANTE
-            console.log("⏰ Hora Límite a enviar:", tareaData.horaLimite);
-            const tareaCreada = await crearTarea(tareaData);
-            console.log("✅ Tarea creada con ID:", tareaCreada);
+            let resultId: string | undefined;
+            let responseData: any;
 
-            // Actualizar UsuarioEspacio si corresponde
-            if (usuarioAsignado && tareaCreada) {
-                try {
-                    const usuarioEspacioAsignado = await obtenerEspacioPorUsuarioId(usuarioAsignado);
-                    if (usuarioEspacioAsignado?.id_UsuarioEspacio) {
-                        const tareasActualizadas = [
-                            ...(usuarioEspacioAsignado.tareasId || []),
-                            tareaCreada
-                        ];
-                        await actualizarUsuarioEspacio(usuarioEspacioAsignado.id_UsuarioEspacio, {
-                            tareasId: tareasActualizadas
-                        });
+            if (isEditing && taskId) {
+                // Para EDITAR: actualizamos la plantilla y la instancia (si existe)
+                console.log("✏️ Actualizando tarea. Plantilla:", taskId, "Instancia:", instanceId);
+                const editPayload = {
+                    ...baseData
+                };
+                console.log("📤 Datos de edición a enviar:", JSON.stringify(editPayload, null, 2));
+
+                responseData = await editarTarea(taskId, editPayload, instanceId);
+                resultId = taskId;
+                console.log("✅ Tarea e instancia actualizadas correctamente");
+            } else {
+                // Para CREAR: incluimos todos los campos adicionales con redundancia para mapeo del backend
+                const tareaData: any = {
+                    nombre: name.trim(),
+                    descripcion: description.trim() || undefined,
+                    fechaCreacion: new Date().toISOString(),
+                    fechaLimite: baseData.fechaFin, // camelCase
+                    FechaLimite: baseData.fechaFin, // PascalCase (para Firestore)
+                    startDate: baseData.fechaFin,   // Campo que el backend suele devolver
+                    fechaFin: baseData.fechaFin,    // Según schema de plantilla
+                    horaLimite: baseData.horaLimite,
+                    diasRepeticion: diasNumeros.length > 0 ? diasNumeros : [],
+                    karma: karma,
+                    usuariosAsignacion: listaUsuariosAsignados,
+                    espacioId: baseData.espacioId,
+                    estado: true,
+                    completada: false,
+                    tareasId: [],
+                };
+
+                console.log("✨ Creando nueva tarea");
+                console.log("📤 Datos de creación a enviar:", JSON.stringify(tareaData, null, 2));
+
+                responseData = await crearTarea(tareaData);
+                console.log("✅ Tarea creada con ID:", responseData);
+                resultId = typeof responseData === 'string' ? responseData : responseData?.id;
+            }
+
+            // Actualizar cada UsuarioEspacio asignado si corresponde
+            if (listaUsuariosAsignados.length > 0 && resultId) {
+                // Recopilar todos los IDs de tareas a añadir (Template + Instancias si las hay)
+                const idsATareas: string[] = [resultId];
+                if (typeof responseData === 'object' && Array.isArray(responseData?.tareasId)) {
+                    responseData.tareasId.forEach((tid: string) => {
+                        if (!idsATareas.includes(tid)) idsATareas.push(tid);
+                    });
+                }
+
+                for (const userId of listaUsuariosAsignados) {
+                    try {
+                        const usuarioEspacioAsignado = await obtenerEspacioPorUsuarioId(userId);
+                        const relacionId = usuarioEspacioAsignado?.id || usuarioEspacioAsignado?.id_UsuarioEspacio;
+
+                        if (relacionId) {
+                            const currentTasks = usuarioEspacioAsignado.tareasId || [];
+                            // Filtrar IDs que ya existen para no duplicar
+                            const nuevosIds = idsATareas.filter(id => !currentTasks.includes(id));
+
+                            if (nuevosIds.length > 0) {
+                                const tareasActualizadas = [...currentTasks, ...nuevosIds];
+                                // actualizarUsuarioEspacio ahora usa PATCH
+                                await actualizarUsuarioEspacio(relacionId, {
+                                    tareasId: tareasActualizadas
+                                });
+                                console.log(`✅ UsuarioEspacio actualizado para usuario ${userId} con tareas: ${nuevosIds.join(', ')}`);
+                            } else {
+                                console.log(`ℹ️ Las tareas ya estaban asignadas al usuario ${userId}.`);
+                            }
+                        } else {
+                            console.warn(`⚠️ No se encontró ID de relación UsuarioEspacio para usuario ${userId}`);
+                        }
+                    } catch (updateError) {
+                        console.warn(`⚠️ No se pudo actualizar UsuarioEspacio para usuario ${userId}:`, updateError);
                     }
-                } catch (updateError) {
-                    console.warn("⚠️ No se pudo actualizar UsuarioEspacio con la tarea:", updateError);
                 }
             }
 
-            // Cerrar popup de asignación si seguía abierto (aunque el flujo normal lo cierra antes)
+            // Cerrar popup de asignación si seguía abierto
             setAssignPopupVisible(false);
 
+            // Llamar al callback onSave si existe (para actualizar estado en Dashboard)
+            if (isEditing && route.params?.onSave) {
+                const updatedData = {
+                    id: taskId!,
+                    name,
+                    description,
+                    time: selectedTime,
+                    date: selectedDate,
+                    repeatDays: diasNumeros,
+                    karma,
+                    assignedUsers: listaUsuariosAsignados.map(id => ({
+                        id,
+                        name: availableUsers.find(u => u.id === id)?.name || id
+                    })),
+                };
+                route.params.onSave(updatedData);
+            }
+
             showPopup({
-                title: 'Tarea creada',
-                description: 'La tarea se ha creado exitosamente.',
+                title: isEditing ? 'Tarea actualizada' : 'Tarea creada',
+                description: isEditing ? 'La tarea se ha actualizado exitosamente.' : 'La tarea se ha creado exitosamente.',
                 imageType: 'convivia',
                 buttons: [{
                     text: 'Aceptar',
@@ -307,7 +453,11 @@ const CreateTask: React.FC = () => {
                         <Calendar
                             time={selectedTime}
                             onTimeClick={() => setTimePopupVisible(true)}
-                            onDateSelect={(date) => setSelectedDate(date)}
+                            onDateSelect={(date) => {
+                                console.log("📅 Calendario seleccionó fecha (Local):", date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : "null");
+                                setSelectedDate(date);
+                            }}
+                            selectedDate={selectedDate}
                         />
                     </Desplegable>
 
@@ -319,6 +469,7 @@ const CreateTask: React.FC = () => {
                         showIcon={false}
                     >
                         <RepeatDaysSelector
+                            initialValue={repeatDays}
                             onChange={(days: string[]) => {
                                 setRepeatDays(days);
                                 setDayUserAssignments((prev) => {
@@ -342,6 +493,7 @@ const CreateTask: React.FC = () => {
                         showIcon={false}
                     >
                         <KarmaSelector
+                            initialValue={karma}
                             onSelect={(points: number) => {
                                 setKarma(points);
                             }}

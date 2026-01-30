@@ -16,5 +16,10 @@ export type RootStackParamList = {
   InfoLegal: undefined;
   MiResidencia: undefined;
   MiKarma: undefined;
+  EditarResidencia: {
+    espacioId: string;
+    nombreInicial?: string;
+    ubicacionInicial?: string;
+  };
   FAQ: undefined;
 };

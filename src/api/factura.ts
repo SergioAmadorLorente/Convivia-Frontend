@@ -46,3 +46,85 @@ export const obtenerFacturas = async () => {
         throw error;
     }
 };
+
+// ==================== MÉTODOS PARA IMÁGENES DE FACTURAS ====================
+
+export const obtenerImagenFactura = async (espacioId: string, facturaId: string) => {
+    try {
+        const response = await api.get(`/espacio/${espacioId}/factura/${facturaId}/imagen`, {
+            responseType: 'blob'
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener imagen de factura:", error);
+        throw error;
+    }
+};
+
+export const subirImagenFactura = async (espacioId: string, facturaId: string, imageUri: string) => {
+    try {
+        const formData = new FormData();
+        const filename = imageUri.split('/').pop() || 'image.jpg';
+        const match = /\.([\w]+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+        formData.append('imagen', {
+            uri: imageUri,
+            name: filename,
+            type: type,
+        } as any);
+
+        const response = await api.post(
+            `/espacio/${espacioId}/factura/${facturaId}/imagen`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error al subir imagen de factura:", error);
+        throw error;
+    }
+};
+
+export const actualizarImagenFactura = async (espacioId: string, facturaId: string, imageUri: string) => {
+    try {
+        const formData = new FormData();
+        const filename = imageUri.split('/').pop() || 'image.jpg';
+        const match = /\.([\w]+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+        formData.append('imagen', {
+            uri: imageUri,
+            name: filename,
+            type: type,
+        } as any);
+
+        const response = await api.put(
+            `/espacio/${espacioId}/factura/${facturaId}/imagen`,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Error al actualizar imagen de factura:", error);
+        throw error;
+    }
+};
+
+export const eliminarImagenFactura = async (espacioId: string, facturaId: string) => {
+    try {
+        const response = await api.delete(`/espacio/${espacioId}/factura/${facturaId}/imagen`);
+        return response.data;
+    } catch (error) {
+        console.error("Error al eliminar imagen de factura:", error);
+        throw error;
+    }
+};

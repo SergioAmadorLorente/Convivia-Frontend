@@ -45,17 +45,33 @@ export const obtenerUsuarioEspacioPorId = async (id: string) => {
   }
 };
 
-// Actualizar una relación UsuarioEspacio
+// Actualizar una relación UsuarioEspacio (Usa PATCH como indica el backend)
 export const actualizarUsuarioEspacio = async (
   id: string,
   data: Partial<UsuarioEspacioPayload>
 ) => {
   try {
-    const response = await api.put(`/UsuarioEspacio/${id}`, data);
+    const response = await api.patch(`/UsuarioEspacio/${id}`, data);
     return response.data;
   } catch (error) {
     console.error("Error al actualizar UsuarioEspacio:", error);
     throw error;
+  }
+};
+
+/**
+ * Obtener la relación específica entre un usuario y un espacio
+ */
+export const obtenerRelacionUsuarioEspacio = async (usuarioId: string, espacioId: string) => {
+  try {
+    const response = await api.get("/UsuarioEspacio");
+    const relaciones = Array.isArray(response.data) ? response.data : [];
+    return relaciones.find((r: any) => 
+      r.usuarioId === usuarioId && r.espacioId === espacioId
+    );
+  } catch (error) {
+    console.error("Error al obtener relación específica:", error);
+    return null;
   }
 };
 

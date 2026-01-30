@@ -42,13 +42,12 @@ export const GLOBAL_STYLES = StyleSheet.create({
   /** Wrapper blanco para el contenido de dashboard (tareas + carrusel) */
   dashboardWhiteSection: {
     backgroundColor: COLORS.background,
-    alignItems: "stretch",                 // 🔑 ancho completo para hijos
+    alignItems: "stretch", // 🔑 ancho completo para hijos
     paddingHorizontal: SIZES.paddingHorizontal,
     paddingBottom: HELPERS.hp("2%"),
     // si quieres esquinas redondeadas aquí, podemos usar COMMON.PAGE_CARD;
     // por ahora lo dejamos plano como en tu working version.
   },
-
 
   //contenedor principal de pantallas
   container: {
@@ -56,6 +55,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     backgroundColor: COLORS.background,
     alignItems: "center",
     paddingTop: hp("2%"),
+    paddingBottom: hp("12%"),
     paddingHorizontal: SIZES.paddingHorizontal,
     borderRadius: moderateScale(25),
   },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   ScrollView,
@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -31,8 +32,9 @@ import Popup from "../../components/ui/Popup";
 import Detalle from "../../components/ui/Detalle";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerEspacioPorId, obtenerEspacios } from "../../api/espacio";
-import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
-import { obtenerTareasPorEspacio } from "../../api/tarea";
+import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
+import { obtenerTareasPorEspacio, obtenerDetallePlantilla, obtenerDetalleTareaInstancia, eliminarTarea } from "../../api/tarea";
+import { obtenerUsuarios } from "../../api/usuario";
 
 const { hp } = HELPERS;
 
@@ -49,6 +51,7 @@ const DashBoardPersonal: React.FC = () => {
   const [espacioNombre, setEspacioNombre] = useState<string>(route.params?.newSpaceName || "Mi espacio");
   const [espacioId, setEspacioId] = useState<string | null>(null);
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
+  const [userNamesMap, setUserNamesMap] = useState<Record<string, string>>({});
 
   // Escuchar cambios en los parámetros de navegación (ej: al crear una nueva residencia)
   useEffect(() => {
@@ -109,6 +112,43 @@ const DashBoardPersonal: React.FC = () => {
     cargarEspacio();
   }, [user, route.params?.newSpaceName]);
 
+  // Cargar mapa de nombres de usuario (mapea tanto UID como UsuarioEspacioId al nombre)
+  useEffect(() => {
+    const cargarNombresUsuario = async () => {
+      try {
+        const [users, uEspacios] = await Promise.all([
+          obtenerUsuarios(),
+          obtenerUsuarioEspacios()
+        ]);
+
+        if (Array.isArray(users)) {
+          const map: Record<string, string> = {};
+
+          // 1. Mapear UID -> Nombre
+          users.forEach((u: any) => {
+            map[u.id] = u.nombre || u.email || u.id;
+          });
+
+          // 2. Mapear UsuarioEspacioId -> Nombre (usando el mapa anterior)
+          if (Array.isArray(uEspacios)) {
+            uEspacios.forEach((rel: any) => {
+              const relId = rel.id || rel.id_UsuarioEspacio;
+              if (relId && rel.usuarioId && map[rel.usuarioId]) {
+                map[relId] = map[rel.usuarioId];
+              }
+            });
+          }
+
+          setUserNamesMap(map);
+        }
+      } catch (error) {
+        console.error("Error cargando nombres de usuario:", error);
+      }
+    };
+    cargarNombresUsuario();
+  }, [espacioId]);
+
+
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
   const [selectedFilter, setSelectedFilter] = useState<
     "today" | "week" | "all"
@@ -124,66 +164,218 @@ const DashBoardPersonal: React.FC = () => {
   // -------------------------
   const [tareas, setTareas] = useState<TaskModel[]>([]);
   const [loadingTareas, setLoadingTareas] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Cargar tareas al enfocar la pantalla o cuando cambie el espacioId
+  // Ref para el intervalo de polling
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Función reutilizable para cargar tareas
+  const cargarTareas = async (showLoading = true) => {
+    if (!espacioId) return;
+
+    if (showLoading) {
+      setLoadingTareas(true);
+    }
+
+    try {
+      console.log("🔄 Cargando tareas para espacio:", espacioId);
+      const tareasRaw = await obtenerTareasPorEspacio(espacioId);
+
+      if (Array.isArray(tareasRaw)) {
+        console.log("✅ Tareas (plantillas) recibidas:", tareasRaw.length);
+
+        const mappedTasks = tareasRaw.map((t: any) => {
+          // Intentar capturar cualquier variante del backend (PascalCase, camelCase, snake_case)
+          const fechaFuente = t.startDate || t.fechaFin || t.fechaLimite || t.FechaLimite || t.fecha_limite;
+
+          // Debugging log para ver qué llega exactamente en la fecha del template
+          if (!fechaFuente) {
+            // console.log(`⚠️ Tarea ${t.id || t.Nombre} no tiene fecha definida en el template (recibido: ${JSON.stringify(t)})`);
+          }
+
+          // Si no hay fecha, usamos null temporalmente en lugar de "Today" para que el merge sea más inteligente
+          const fechaObj = fechaFuente ? new Date(fechaFuente) : null;
+
+          const rawTime = t.HoraLimite ?? t.horaLimite ??
+            t.time ?? t.Time ??
+            t.hora ?? t.Hora;
+
+          let cleanTime = "12:00";
+          if (rawTime && typeof rawTime === 'string' && rawTime.length >= 5) {
+            cleanTime = rawTime.substring(0, 5);
+          }
+
+          const userId = t.usuariosAsignacion?.[0];
+          // userNamesMap ahora contiene tanto UID como UsuarioEspacioId, 
+          // así que la resolución funcionará enviemos lo que enviemos.
+          const userNameResolved = userId ? userNamesMap[userId] || userId : null;
+
+          return new TaskModel({
+            id: t.id,
+            Nombre: t.nombre || t.Nombre,
+            Descripcion: t.descripcion || t.Descripcion,
+            karma: t.karma,
+            DiasRepeticion: t.diasRepeticion || [],
+            FechaLimite: (fechaObj as any) || new Date(), // Fallback final para el constructor
+            HoraLimite: cleanTime,
+            isCompleted: t.completada || t.Completada || false,
+            usuarioAsignado: userNameResolved,
+            tareasId: t.tareasId || []
+          });
+        });
+
+        // 🚀 OPTIMIZACIÓN: Fusión Inteligente (Smart Merge)
+        // En lugar de reemplazar todo ciegamente, comparamos con lo que ya tenemos.
+        // Si la tarea ya existe y tiene la misma instancia, preservamos los datos enriquecidos (Hora/Fecha)
+        // para evitar un fetch innecesario y parpadeos en la UI.
+
+        setTareas(prevTareas => {
+          const mergedTasks = mappedTasks.map(newTask => {
+            const existing = prevTareas.find(t => t.id === newTask.id);
+
+            if (existing) {
+              // Verificar si es la misma instancia de tarea (mismo ID de tarea hija)
+              const prevLastInstance = existing.tareasId?.[existing.tareasId.length - 1];
+              const newLastInstance = newTask.tareasId?.[newTask.tareasId.length - 1];
+
+              // Si es la misma instancia: PRESERVAR datos locales enriquecidos/editados
+              const sameInstance = prevLastInstance === newLastInstance;
+
+              if (sameInstance) {
+                // Siempre preservamos los datos locales (editados o enriquecidos) para la misma instancia.
+                // Esto evita que actualizaciones lentas del backend reviertan cambios visuales.
+                return new TaskModel({
+                  ...newTask as any,
+                  FechaLimite: existing.FechaLimite,
+                  HoraLimite: existing.HoraLimite,
+                });
+              }
+            }
+            return newTask;
+          });
+
+          // Identificar qué tareas NECESITAN ser enriquecidas (son nuevas o cambió su instancia)
+          // Lo hacemos en un timeout para no bloquear el renderizado del setTareas
+          setTimeout(() => {
+            const tasksToEnrich = mergedTasks.filter(t => {
+              // Enriquecer si falta la hora (es "12:00") O si falta la asignación (ej: tarea puntual)
+              const needsEnrichment = t.HoraLimite === "12:00" || !t.usuarioAsignado;
+              return t.tareasId && t.tareasId.length > 0 && needsEnrichment;
+            });
+
+            if (tasksToEnrich.length > 0) {
+              fetchRealTaskTimes(tasksToEnrich, espacioId);
+            }
+          }, 100);
+
+          return mergedTasks;
+        });
+      }
+    } catch (error) {
+      console.error("Error cargando tareas:", error);
+    } finally {
+      if (showLoading) {
+        setLoadingTareas(false);
+      }
+      setRefreshing(false);
+    }
+  };
+
+  // Handler para pull-to-refresh
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    cargarTareas(false);
+  }, [espacioId]);
+
+  // Cargar tareas al enfocar la pantalla
   useFocusEffect(
     React.useCallback(() => {
-      const cargarTareas = async () => {
-        if (!espacioId) return;
-
-        setLoadingTareas(true);
-        try {
-          console.log("🔄 Cargando tareas para espacio:", espacioId);
-          const tareasRaw = await obtenerTareasPorEspacio(espacioId);
-
-          if (Array.isArray(tareasRaw)) {
-            // Log para depuración
-            if (tareasRaw.length > 0) {
-              // debug log removed
-            }
-
-            const mappedTasks = tareasRaw.map((t: any) => {
-              // BACKEND devuelve 'startDate' en lugar de 'fechaLimite'
-              // y NO devuelve hora explícita.
-              // Usaremos startDate como fecha límite.
-
-              const fechaFuente = t.startDate || t.fechaLimite || t.FechaLimite;
-              const fechaObj = fechaFuente ? new Date(fechaFuente) : new Date();
-
-              // Hora: no viene en el JSON actual. Intentamos buscarla por si acaso, si no '12:00'
-              const rawTime = t.horaLimite || t.HoraLimite;
-              let cleanTime = "12:00";
-              if (rawTime && typeof rawTime === 'string' && rawTime.length >= 5) {
-                cleanTime = rawTime.substring(0, 5);
-              }
-
-              return new TaskModel({
-                id: t.id,
-                Nombre: t.nombre || t.Nombre,
-                Descripcion: t.descripcion || t.Descripcion,
-                karma: t.karma,
-                DiasRepeticion: t.diasRepeticion || [],
-
-                FechaLimite: fechaObj,
-                HoraLimite: cleanTime,
-
-                isCompleted: t.completada || t.Completada || false,
-                usuarioAsignado: t.usuariosAsignacion?.[0] || null
-              });
-            });
-            setTareas(mappedTasks);
-            console.log("✅ Tareas cargadas:", mappedTasks.length);
-          }
-        } catch (error) {
-          console.error("Error cargando tareas:", error);
-        } finally {
-          setLoadingTareas(false);
-        }
-      };
-
+      // Cargar tareas una vez al entrar o volver a la pantalla
       cargarTareas();
-    }, [espacioId])
+
+      return () => {
+        // Cleanup si fuera necesario
+      };
+    }, [espacioId, userNamesMap])
   );
+
+  // Función para enriquecer tareas con detalles de instancias (solo fecha y hora)
+  const fetchRealTaskTimes = async (currentTasks: TaskModel[], eId: string) => {
+    // Solo procesamos tareas que tienen instancias
+    const candidates = currentTasks.filter(t => t.tareasId && t.tareasId.length > 0);
+
+    if (candidates.length === 0) return;
+
+    console.log(`🕒 Buscando fecha/hora reales de instancias para ${candidates.length} tareas...`);
+
+    // Hacemos las peticiones en paralelo
+    const updates = await Promise.all(candidates.map(async (task) => {
+      try {
+        // Tomamos la última instancia (asumiendo que es la más relevante/reciente)
+        const lastInstanceId = task.tareasId[task.tareasId.length - 1];
+        const detail = await obtenerDetalleTareaInstancia(eId, task.id, lastInstanceId);
+
+        const result: any = { id: task.id };
+        let hasUpdate = false;
+
+        // 1. HORA
+        const timeFound = detail?.horaLimite || detail?.HoraLimite || detail?.hora;
+        if (timeFound && typeof timeFound === 'string' && timeFound.length >= 5) {
+          result.realTime = timeFound.substring(0, 5);
+          hasUpdate = true;
+        }
+
+        // 2. FECHA LIMITE
+        const dateFound = detail?.fechaLimite || detail?.FechaLimite;
+        if (dateFound) {
+          result.realDate = new Date(dateFound);
+          hasUpdate = true;
+        }
+
+        // 3. USUARIO ASIGNADO (DE LA INSTANCIA)
+        const userRelId = detail?.usuarioEspacioId || detail?.relacionId;
+        if (userRelId) {
+          result.realUserId = userRelId;
+          hasUpdate = true;
+        }
+
+        if (hasUpdate) return result;
+
+      } catch (e) {
+        console.warn(`Falló al obtener detalles para tarea ${task.Nombre}`, e);
+      }
+      return null;
+    }));
+
+    // Filtramos actualizaciones válidas
+    const validUpdates = updates.filter(u => u !== null);
+
+    if (validUpdates.length > 0) {
+      console.log(`✅ Actualizando ${validUpdates.length} tareas con fecha/hora de instancias.`);
+      setTareas(prevTareas => prevTareas.map(t => {
+        const update = validUpdates.find(u => u.id === t.id);
+        if (update) {
+          const assignedName = update.realUserId ? userNamesMap[update.realUserId] || update.realUserId : t.usuarioAsignado;
+
+          // Solo actualizamos fecha, hora y asignación
+          return new TaskModel({
+            id: t.id,
+            Nombre: t.Nombre,
+            Descripcion: t.Descripcion,
+            karma: t.karma,
+            DiasRepeticion: t.DiasRepeticion,
+            FechaLimite: update.realDate || t.FechaLimite,
+            HoraLimite: update.realTime || t.HoraLimite,
+            isCompleted: t.isCompleted,
+            FechaCompletada: t.FechaCompletada,
+            usuarioAsignado: assignedName,
+            tareasId: t.tareasId
+          });
+        }
+        return t;
+      }));
+    }
+  };
 
   const [facturas, setFacturas] = useState<FacturaModel[]>([
     new FacturaModel({
@@ -275,9 +467,12 @@ const DashBoardPersonal: React.FC = () => {
     time: t.HoraLimite ?? "12:00",
     repeatDays: Array.isArray(t.DiasRepeticion) ? t.DiasRepeticion : [],
     karma: typeof t.karma === "number" ? t.karma : 0,
+    // Asegurar que enviamos la fecha real al formulario
+    date: t.FechaLimite instanceof Date ? t.FechaLimite.toISOString() : (t.FechaLimite || null),
     assignedUsers: t.usuarioAsignado
       ? [{ id: t.usuarioAsignado, name: t.usuarioAsignado }]
       : [],
+    instanceId: Array.isArray(t.tareasId) && t.tareasId.length > 0 ? t.tareasId[0] : null,
   });
 
   const normalizeFacturaForEdit = (f: FacturaModel) => ({
@@ -301,6 +496,7 @@ const DashBoardPersonal: React.FC = () => {
     name: string;
     description: string;
     time: string;
+    date?: Date;
     repeatDays: number[];
     karma: number;
     assignedUsers: { id: string; name: string }[];
@@ -315,7 +511,7 @@ const DashBoardPersonal: React.FC = () => {
             HoraLimite: updated.time,
             DiasRepeticion: updated.repeatDays ?? [],
             karma: updated.karma,
-            FechaLimite: t.FechaLimite,
+            FechaLimite: updated.date || t.FechaLimite,
             isCompleted: t.isCompleted,
             FechaCompletada: t.FechaCompletada ?? null,
             usuarioAsignado:
@@ -510,6 +706,51 @@ const DashBoardPersonal: React.FC = () => {
     }
   };
 
+  const handleDeleteTask = async (id: string) => {
+    if (!espacioId) {
+      console.warn("No se puede eliminar la tarea: espacioId no disponible.");
+      return;
+    }
+
+    showPopup({
+      imageType: "goback",
+      title: "¿Eliminar tarea?",
+      description: "Esta acción eliminará la plantilla y todas sus instancias de forma permanente.",
+      buttons: [
+        { text: "Cancelar", onPress: () => { } },
+        {
+          text: "Eliminar",
+          onPress: async () => {
+            try {
+              await eliminarTarea(espacioId, id);
+              setTareas((prev) => prev.filter((t) => t.id !== id));
+              closeDetalle();
+              showPopup({
+                title: "Éxito",
+                description: "La tarea ha sido eliminada.",
+                imageType: "success",
+                buttons: [{ text: "Aceptar", onPress: () => { } }]
+              });
+            } catch (error) {
+              console.error("Error al eliminar tarea:", error);
+              showPopup({
+                title: "Error",
+                description: "No se pudo eliminar la tarea. Intenta de nuevo.",
+                imageType: "error",
+                buttons: [{ text: "Aceptar", onPress: () => { } }]
+              });
+            }
+          }
+        },
+      ],
+    });
+  };
+
+  const handleDeleteFactura = (id: string) => {
+    // Implementación similar para facturas si fuera necesario
+    console.log("Eliminar factura:", id);
+  };
+
   // -------------------------
   // Navegación a editar (desde Detalle)
   // -------------------------
@@ -645,6 +886,14 @@ const DashBoardPersonal: React.FC = () => {
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
         keyboardShouldPersistTaps="handled"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#8B5CF6"]} // Color morado para Android
+            tintColor="#8B5CF6" // Color morado para iOS
+          />
+        }
       >
         {/* Filtro solo para tareas */}
         {activeTab === "tareas" && (
@@ -840,6 +1089,7 @@ const DashBoardPersonal: React.FC = () => {
             closeDetalle(); // cierra tras completar
           }}
           onEdit={() => handleEditTask(selectedTask)}
+          onDelete={() => handleDeleteTask(selectedTask.id)}
         />
       )}
 
@@ -854,6 +1104,7 @@ const DashBoardPersonal: React.FC = () => {
             closeDetalle(); // cierra tras completar
           }}
           onEdit={() => handleEditFactura(selectedFactura)}
+          onDelete={() => handleDeleteFactura(selectedFactura.IdFactura)}
         />
       )}
 
