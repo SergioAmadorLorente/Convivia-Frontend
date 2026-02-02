@@ -48,5 +48,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
+// exportar para usar en toda la app
 export default api;
