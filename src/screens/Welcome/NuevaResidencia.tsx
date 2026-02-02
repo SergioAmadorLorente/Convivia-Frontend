@@ -27,7 +27,6 @@ import { obtenerEspacioPorUsuarioId } from '../../api/usuarioEspacio';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
-  const [direccion, setDireccion] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
   const user = useAuthListener();
@@ -47,12 +46,8 @@ const NuevaResidencia: React.FC = () => {
     nombreResidencia.trim().length > 0 &&
     nombreResidencia.trim().length <= 20;
 
-  const direccionValida =
-    direccion.trim().length > 0 &&
-    direccion.trim().length <= 100;
-
-  // El botón solo se habilita si ambos son válidos
-  const hasText = nombreValido && direccionValida;
+  // El botón solo se habilita si el nombre es válido
+  const hasText = nombreValido;
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
@@ -105,7 +100,7 @@ const NuevaResidencia: React.FC = () => {
     if (!hasText) {
       showPopup({
         title: 'Campo requerido',
-        description: 'Por favor, ingresa un nombre y dirección válidos para la residencia.',
+        description: 'Por favor, ingresa un nombre válido para la residencia.',
         imageType: 'error',
         buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
@@ -127,7 +122,7 @@ const NuevaResidencia: React.FC = () => {
       const result = await crearEspacioConUsuario(
         {
           nombre: nombreResidencia.trim(),
-          direccion: direccion.trim(),
+          direccion: '',
         },
         user.uid
       );
@@ -167,7 +162,6 @@ const NuevaResidencia: React.FC = () => {
 
       // Limpiar campos después de crear
       setNombreResidencia('');
-      setDireccion('');
     } catch (error) {
       console.error('Error al crear residencia:', error);
       showPopup({
@@ -211,19 +205,6 @@ const NuevaResidencia: React.FC = () => {
               <Text style={styles.errorText}>El nombre no puede superar 20 caracteres</Text>
             )}
 
-            {/* Dirección */}
-            <TextField
-              label="Dirección de la residencia"
-              value={direccion}
-              onChangeText={setDireccion}
-              placeholder="Calle Mayor 123, Madrid"
-            />
-            {direccion.trim().length === 0 && (
-              <Text style={styles.errorText}>Ingresa una dirección válida</Text>
-            )}
-            {direccion.trim().length > 100 && (
-              <Text style={styles.errorText}>La dirección no puede superar 100 caracteres</Text>
-            )}
 
             {/* Botón */}
             <ConfettiButton
