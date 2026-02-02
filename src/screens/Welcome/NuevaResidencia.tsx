@@ -1,5 +1,5 @@
 // src/screens/NuevaResidencia.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Text,
   View,
@@ -23,6 +23,7 @@ import ConfettiButton from '../../components/ui/ConfettiButton';
 
 import { crearEspacio, crearEspacioConUsuario } from '../../api/espacio';
 import { useAuthListener } from '../../hooks/useAuthListener';
+import { obtenerEspacioPorUsuarioId } from '../../api/usuarioEspacio';
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
@@ -57,6 +58,40 @@ const NuevaResidencia: React.FC = () => {
 
   const containerRef = useRef<any>(null);
   useKeyboardAware({ containerRef, padding: 12 });
+
+  // Verificar si el usuario ya tiene una residencia
+  useEffect(() => {
+    const verificarResidenciaExistente = async () => {
+      if (!user?.uid) return;
+
+      try {
+        const espacioExistente = await obtenerEspacioPorUsuarioId(user.uid);
+
+        if (espacioExistente && espacioExistente.espacioId && espacioExistente.espacioId !== "string") {
+          // El usuario ya tiene una residencia
+          showPopup({
+            title: 'Ya tienes una residencia',
+            description: 'Solo puedes crear una residencia por cuenta. Serás redirigido a tu dashboard.',
+            imageType: 'error',
+            buttons: [
+              {
+                text: 'Ir al Dashboard',
+                onPress: () => {
+                  setPopupVisible(false);
+                  navigation.navigate('DashBoardPersonal');
+                }
+              }
+            ],
+          });
+        }
+      } catch (error) {
+        console.log('Error verificando residencia existente:', error);
+        // Si hay error, permitimos continuar (podría ser que no tenga residencia)
+      }
+    };
+
+    verificarResidenciaExistente();
+  }, [user]);
 
   if (!fontsLoaded) {
     return (
