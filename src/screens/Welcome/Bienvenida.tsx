@@ -78,7 +78,7 @@ const Bienvenida: React.FC = () => {
 
       <Button style={GLOBAL_STYLES.buttonSecondaryGrey} onPress={() => navigation.navigate('UnirResidencia')}>Únete a una residencia</Button>
 
-      <Button style={GLOBAL_STYLES.buttonSecondaryGrey} onPress={() => navigation.navigate('test')}>Test</Button>
+
 
       <Popup
         visible={modalVisible}
