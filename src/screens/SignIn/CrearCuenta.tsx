@@ -40,6 +40,7 @@ const CrearCuenta: React.FC = () => {
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
   const { password, setPassword, validations, isValidPassword } =
     usePasswordValidation();
+  const [nombre, setNombre] = useState("");
   const [password2, setPassword2] = useState("");
   const [errorMatch, setErrorMatch] = useState("");
   const [checkedPolitica, setCheckedPolitica] = useState(false);
@@ -73,10 +74,9 @@ const CrearCuenta: React.FC = () => {
         password
       );
       // 2. Usamos el UID generado por Firebase para crear el registro en tu BBDD
-      const nameFromEmail = email.split("@")[0];
       await crearUsuarioConId(userCredential.user.uid, { // <--- Pasamos el UID aquí
         id: userCredential.user.uid, // <--- Y lo asignamos explícitamente en el cuerpo
-        nombre: nameFromEmail,
+        nombre: nombre,
         email: email,
         password: password,
         premium: false,
@@ -133,6 +133,14 @@ const CrearCuenta: React.FC = () => {
             <Text style={GLOBAL_STYLES.subtitle}>
               ¿Quieres empezar tu experiencia con Convivia?
             </Text>
+            {/* NOMBRE */}
+            <TextField
+              label="Nombre"
+              value={nombre}
+              onChangeText={setNombre}
+              placeholder="Tu nombre"
+              keyboardType="default"
+            />
             {/* EMAIL */}
             <TextField
               label="Correo electrónico"
@@ -255,7 +263,8 @@ const CrearCuenta: React.FC = () => {
                 GLOBAL_STYLES.buttonPrimaryGreen,
                 {
                   backgroundColor:
-                    isValidEmail &&
+                    nombre.trim() &&
+                      isValidEmail &&
                       checkedPolitica &&
                       checkedTerminos &&
                       password === password2 &&
@@ -269,6 +278,7 @@ const CrearCuenta: React.FC = () => {
               disabled={
                 isCounting ||
                 !(
+                  nombre.trim() &&
                   isValidEmail &&
                   checkedPolitica &&
                   checkedTerminos &&
