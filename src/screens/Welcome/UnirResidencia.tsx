@@ -196,10 +196,11 @@ const UnirResidencia: React.FC = () => {
               label="Código de la residencia"
               value={codigo}
               onChangeText={handleChange}
-              placeholder="Pegar código aquí..."
+              placeholder="- - - - - -"
               keyboardType="numeric"
               error={undefined}
-            />
+              textAlign="center"
+              caretHidden={true} showClipboard={true} />
 
             <ConfettiButton
               style={[
@@ -209,6 +210,7 @@ const UnirResidencia: React.FC = () => {
               disabled={!isValidCode || loading}
               onPress={handleUnirse}
               loading={loading}
+
             >
               Unirse
             </ConfettiButton>
