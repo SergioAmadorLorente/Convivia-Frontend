@@ -23,6 +23,7 @@ import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspa
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { useToast } from "../../../hooks/useToast";
 
 const { width } = Dimensions.get("window");
 
@@ -41,10 +42,13 @@ const MiResidencia: React.FC = () => {
   const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
   const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [isEliminarParticipantePopupOpen, setIsEliminarParticipantePopupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [selectedParticipantRelacion, setSelectedParticipantRelacion] = useState<any>(null);
+  const [isEliminandoParticipante, setIsEliminandoParticipante] = useState(false);
+  const { show: showToast } = useToast();
 
   const handleAbandonarResidencia = () => {
     if (!user || !residenciaData) return;
@@ -156,21 +160,44 @@ const MiResidencia: React.FC = () => {
 
   const handleEliminarParticipante = () => {
     setIsParticipantModalOpen(false);
-    Alert.alert(
-      "Eliminar participante",
-      `¿Estás seguro de que quieres eliminar a ${selectedParticipant?.nombre || "este usuario"} de la residencia?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            // Aquí implementar la lógica para eliminar el usuario
-            console.log("Eliminando usuario:", selectedParticipant);
-          },
-        },
-      ]
-    );
+    setIsEliminarParticipantePopupOpen(true);
+  };
+
+  const confirmEliminarParticipante = async () => {
+    if (!selectedParticipantRelacion?.id) {
+      showToast({
+        entity: "tarea",
+        name: "Error al obtener datos del participante",
+        tone: "error",
+      });
+      return;
+    }
+
+    setIsEliminandoParticipante(true);
+    try {
+      await eliminarUsuarioEspacio(selectedParticipantRelacion.id);
+      setIsEliminarParticipantePopupOpen(false);
+      showToast({
+        entity: "tarea",
+        name: "Participante eliminado de la residencia",
+        tone: "success",
+      });
+      // Refrescar la lista de participantes
+      if (residenciaData?.id) {
+        await fetchParticipants(residenciaData.id);
+      }
+      setSelectedParticipant(null);
+      setSelectedParticipantRelacion(null);
+    } catch (error) {
+      console.error("Error al eliminar participante:", error);
+      showToast({
+        entity: "tarea",
+        name: "Error al eliminar el participante",
+        tone: "error",
+      });
+    } finally {
+      setIsEliminandoParticipante(false);
+    }
   };
 
   return (
@@ -371,6 +398,32 @@ const MiResidencia: React.FC = () => {
             style: [GLOBAL_STYLES.buttonPrimaryGreen,],
             textStyle: { color: COLORS.primary }
           },
+        ]}
+      />
+
+      <Popup
+        visible={isEliminarParticipantePopupOpen}
+        onClose={() => setIsEliminarParticipantePopupOpen(false)}
+        imageType="delete"
+        titleComponent={
+          <Text>
+            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>eliminar</Text> a {selectedParticipant?.nombre || "este usuario"}?
+          </Text>
+        }
+        description="Se eliminará de la residencia y perderá acceso a todos los datos compartidos."
+        buttons={[
+          {
+            text: "Cancelar",
+            onPress: () => setIsEliminarParticipantePopupOpen(false),
+            style: GLOBAL_STYLES.buttonSecondaryGrey,
+            textStyle: { color: COLORS.primary }
+          },
+          {
+            text: "Eliminar",
+            onPress: confirmEliminarParticipante,
+            style: GLOBAL_STYLES.buttonPrimaryGreen,
+            textStyle: { color: COLORS.primary },
+          }
         ]}
       />
     </>
