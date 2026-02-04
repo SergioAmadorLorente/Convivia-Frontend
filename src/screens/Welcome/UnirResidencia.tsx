@@ -55,7 +55,7 @@ const UnirResidencia: React.FC = () => {
   const handleClosePopup = () => setPopupVisible(false);
 
   // Simplificado para aceptar cualquier ID por ahora
-  const formatoValido = codigo.length > 0;
+  const formatoValido = codigo.length > 0 && codigo.match(/^[a-zA-Z0-9\-]+$/);
   const isValidCode = formatoValido;
   const user = useAuthListener();
 
@@ -196,7 +196,7 @@ const UnirResidencia: React.FC = () => {
               label="Código de la residencia"
               value={codigo}
               onChangeText={handleChange}
-              placeholder="- - - - - -"
+              placeholder="- - - - -"
               keyboardType="numeric"
               error={undefined}
               textAlign="center"
