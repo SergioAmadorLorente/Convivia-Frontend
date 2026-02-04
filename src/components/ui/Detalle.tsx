@@ -43,6 +43,7 @@ type Props =
     residenciaName: string;
     onClose: () => void;
     onEliminar: () => void;
+    isCurrentUser?: boolean;
   };
 
 const Detalle: React.FC<Props> = (props) => {
@@ -50,7 +51,7 @@ const Detalle: React.FC<Props> = (props) => {
 
   // ---- PARTICIPANTE ----
   if (props.kind === "participante") {
-    const { participant, participantRelacion, residenciaName, onEliminar } = props;
+    const { participant, participantRelacion, residenciaName, onEliminar, isCurrentUser = false } = props;
 
     // Obtener karma real de la relación usuarioEspacio
     const karmaPoints = participantRelacion?.karma ?? 0;
@@ -117,14 +118,26 @@ const Detalle: React.FC<Props> = (props) => {
 
             {/* Botón Eliminar */}
             <TouchableOpacity
-              style={[GLOBAL_STYLES.buttonSecondaryGrey, styles.deleteButtonFull, { backgroundColor: '#D9D9D9', marginTop: HELPERS.hp("1%") }]}
+              style={[
+                GLOBAL_STYLES.buttonSecondaryGrey,
+                styles.deleteButtonFull,
+                {
+                  backgroundColor: isCurrentUser ? '#E5E5E5' : '#D9D9D9',
+                  marginTop: HELPERS.hp("1%"),
+                  opacity: isCurrentUser ? 0.5 : 1
+                }
+              ]}
               activeOpacity={0.85}
               onPress={onEliminar}
+              disabled={isCurrentUser}
             >
               <Text
-                style={[GLOBAL_STYLES.textoBoton, { color: COLORS.error }]}
+                style={[
+                  GLOBAL_STYLES.textoBoton,
+                  { color: isCurrentUser ? '#999' : COLORS.error }
+                ]}
               >
-                Eliminar de la residencia
+                {isCurrentUser ? 'No puedes eliminarte a ti mismo' : 'Eliminar de la residencia'}
               </Text>
             </TouchableOpacity>
           </View>
