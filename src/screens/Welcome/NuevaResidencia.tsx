@@ -25,9 +25,64 @@ import { crearEspacio, crearEspacioConUsuario } from '../../api/espacio';
 import { useAuthListener } from '../../hooks/useAuthListener';
 import { obtenerEspacioPorUsuarioId } from '../../api/usuarioEspacio';
 
+// Lista de palabras prohibidas (insultos en español e inglés)
+const PALABRAS_PROHIBIDAS = [
+  // Español
+  'puta', 'puto', 'mierda', 'cono', 'joder', 'cabron', 'cabrón', 'gilipollas', 
+  'idiota', 'tonto', 'estupido', 'estúpido', 'imbecil', 'imbécil', 'pendejo',
+  'carajo', 'verga', 'chingar', 'marica', 'maricon', 'maricón', 'gay',
+  // Inglés
+  'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'damn', 'crap', 'dick',
+  'pussy', 'cock', 'slut', 'whore', 'nigger', 'fag', 'retard',
+];
+
+// Función para validar el nombre de la residencia
+const validarNombreResidencia = (nombre: string): { valido: boolean; mensaje?: string } => {
+  const nombreTrimmed = nombre.trim();
+  const nombreLower = nombreTrimmed.toLowerCase();
+
+  // Verificar palabras prohibidas
+  for (const palabra of PALABRAS_PROHIBIDAS) {
+    if (nombreLower.includes(palabra)) {
+      return { valido: false, mensaje: 'El nombre contiene palabras inapropiadas.' };
+    }
+  }
+
+  // Verificar símbolos sospechosos y patrones SQL maliciosos
+  const patronesSospechosos = [
+    /[<>{}[\]\\]/,  // Símbolos raros
+    /script/i,       // Posible XSS
+    /select.*from/i, // SQL SELECT
+    /drop.*table/i,  // SQL DROP
+    /insert.*into/i, // SQL INSERT
+    /update.*set/i,  // SQL UPDATE
+    /delete.*from/i, // SQL DELETE
+    /union.*select/i, // SQL UNION
+    /exec\s*\(/i,    // Ejecución de código
+    /--/,            // Comentarios SQL
+    /;.*drop/i,      // Comandos SQL encadenados
+    /'\s*or\s*'1'\s*=\s*'1/i, // SQL Injection clásico
+  ];
+
+  for (const patron of patronesSospechosos) {
+    if (patron.test(nombre)) {
+      return { valido: false, mensaje: 'El nombre contiene caracteres o código no permitido.' };
+    }
+  }
+
+  // Verificar que solo contenga caracteres permitidos (letras, números, espacios y algunos símbolos básicos)
+  const caracteresPermitidos = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s\-_.,!?()]+$/;
+  if (!caracteresPermitidos.test(nombre)) {
+    return { valido: false, mensaje: 'El nombre solo puede contener letras, números y símbolos básicos (. , - _ ! ?)' };
+  }
+
+  return { valido: true };
+};
+
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [touched, setTouched] = useState<boolean>(false);
   const navigation = useNavigation<any>();
   const user = useAuthListener();
 
@@ -43,8 +98,9 @@ const NuevaResidencia: React.FC = () => {
 
   // Validaciones independientes
   const nombreValido =
-    nombreResidencia.trim().length > 0 &&
-    nombreResidencia.trim().length <= 20;
+    nombreResidencia.trim().length >= 2 &&
+    nombreResidencia.trim().length <= 80 &&
+    validarNombreResidencia(nombreResidencia).valido;
 
   // El botón solo se habilita si el nombre es válido
   const hasText = nombreValido;
@@ -101,6 +157,18 @@ const NuevaResidencia: React.FC = () => {
       showPopup({
         title: 'Campo requerido',
         description: 'Por favor, ingresa un nombre válido para la residencia.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+      });
+      return;
+    }
+
+    // Validar contenido del nombre
+    const validacion = validarNombreResidencia(nombreResidencia);
+    if (!validacion.valido) {
+      showPopup({
+        title: 'Nombre no válido',
+        description: validacion.mensaje,
         imageType: 'error',
         buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
@@ -197,12 +265,19 @@ const NuevaResidencia: React.FC = () => {
               value={nombreResidencia}
               onChangeText={setNombreResidencia}
               placeholder="Piso Tarragona"
+              onBlur={() => setTouched(true)}
             />
-            {nombreResidencia.trim().length === 0 && (
+            {touched && nombreResidencia.trim().length < 2 && nombreResidencia.trim().length > 0 && (
+              <Text style={styles.errorText}>El nombre debe tener al menos 2 caracteres</Text>
+            )}
+            {touched && nombreResidencia.trim().length === 0 && (
               <Text style={styles.errorText}>Ingresa un nombre válido</Text>
             )}
-            {nombreResidencia.trim().length > 20 && (
-              <Text style={styles.errorText}>El nombre no puede superar 20 caracteres</Text>
+            {touched && nombreResidencia.trim().length > 80 && (
+              <Text style={styles.errorText}>El nombre no puede superar 80 caracteres</Text>
+            )}
+            {touched && nombreResidencia.trim().length >= 2 && nombreResidencia.trim().length <= 80 && !validarNombreResidencia(nombreResidencia).valido && (
+              <Text style={styles.errorText}>{validarNombreResidencia(nombreResidencia).mensaje}</Text>
             )}
 
 
