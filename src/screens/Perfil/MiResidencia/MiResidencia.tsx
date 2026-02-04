@@ -17,6 +17,7 @@ import GLOBAL_STYLES from "../../../styles/styles";
 import * as Clipboard from "expo-clipboard";
 import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
+import { useUser } from "../../../hooks";
 import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
@@ -35,6 +36,7 @@ const MiResidencia: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(true);
   const user = useAuthListener();
+  const { userData } = useUser();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
   const [residenciaData, setResidenciaData] = useState<any>(null);
 
@@ -374,6 +376,7 @@ const MiResidencia: React.FC = () => {
         residenciaName={residenciaName}
         onClose={() => setIsParticipantModalOpen(false)}
         onEliminar={handleEliminarParticipante}
+        isCurrentUser={selectedParticipant?.id === userData?.id}
       />
       <Popup
         visible={isDeletePopupOpen}
