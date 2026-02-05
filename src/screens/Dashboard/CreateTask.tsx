@@ -511,7 +511,7 @@ const CreateTask: React.FC = () => {
                         disabled={loading}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
-                            {loading ? "Guardando..." : (isEditing ? "Guardar cambios" : "Crear tarea")}
+                            {loading ? "Guardando..." : (isEditing ? "Assignar Usuarios y Guardar" : "Assignar Usuarios y Crear")}
                         </Text>
                     </Button>
                 </View>
