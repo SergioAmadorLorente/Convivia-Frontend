@@ -143,7 +143,7 @@ export const editarTarea = async (
         try {
           // Solo si creemos que es ghost (transición).
           // Pero como el usuario pide 'editar una en una', vamos a confiar en el bucle de abajo.
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // 2.2. Obtener todas las instancias de la plantilla
@@ -175,7 +175,7 @@ export const editarTarea = async (
               } = require("./usuarioEspacio");
               const userRel = await obtenerEspacioPorUsuarioId(relId);
               if (userRel) relId = userRel.id || userRel.id_UsuarioEspacio;
-            } catch (e) {}
+            } catch (e) { }
           }
 
           for (const inst of instancias) {
@@ -213,7 +213,7 @@ export const editarTarea = async (
             const { obtenerEspacioPorUsuarioId } = require("./usuarioEspacio");
             const userRel = await obtenerEspacioPorUsuarioId(relId);
             if (userRel) relId = userRel.id || userRel.id_UsuarioEspacio;
-          } catch (e) {}
+          } catch (e) { }
         }
 
         const urlInstancia = `/espacios/${espacioId}/tareas/${plantillaId}/${instanceId}`;
@@ -364,5 +364,42 @@ export const obtenerDetalleTareaInstancia = async (
       error,
     );
     return null;
+  }
+};
+
+/**
+ * Cambia el estado de una instancia de tarea a completada o pendiente
+ * @param espacioId ID del espacio
+ * @param plantillaId ID de la plantilla de tarea
+ * @param tareaId ID de la instancia de tarea (tercer nivel)
+ * @param completada true para completada, false para pendiente
+ */
+export const completarTareaInstancia = async (
+  espacioId: string,
+  plantillaId: string,
+  tareaId: string,
+  completada: boolean,
+) => {
+  try {
+    const url = `/espacios/${espacioId}/tareas/${plantillaId}/${tareaId}`;
+
+    // El backend espera el campo 'completada' (bool) y 'estado' como string.
+    // El error 400 indica que 'estado' debe ser System.String.
+    const data = {
+      completada: completada,
+      fechaRealizacion: completada ? new Date().toISOString() : null,
+      estado: completada ? "Completada" : "Pendiente"
+    };
+
+    console.log(`📤 Enviando PATCH a ${url} para marcar como ${completada ? 'Completada' : 'Pendiente'}`);
+
+    const response = await api.patch(url, data);
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ Error al completar instancia de tarea:", error);
+    if (error.response?.data) {
+      console.error("Detalles:", JSON.stringify(error.response.data));
+    }
+    throw error;
   }
 };
