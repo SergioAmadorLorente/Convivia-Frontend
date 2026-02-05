@@ -80,8 +80,7 @@ export const editarTarea = async (
     }
 
     // 1. Editar la Plantilla (Cuerpo exhaustivo para asegurar persistencia)
-    const urlPlantillaSingular = `/espacios/${espacioId}/tareas/${plantillaId}`;
-    const urlPlantillaDirecta = `/Tareas/${plantillaId}`;
+    const urlPlantilla = `/espacios/${espacioId}/tareas/${plantillaId}`;
 
     let shortDate: string | undefined;
     let isoDate: string | undefined;
@@ -120,18 +119,6 @@ export const editarTarea = async (
       usuariosAsignacion: isSingleTask ? [] : data.usuariosAsignacion,
       regenerar: true,
     };
-
-    console.log(`📝 [PATCH Plantilla] Intentando: ${urlPlantillaSingular}`);
-    console.log(`📤 Payload Plantilla:`, JSON.stringify(templateData, null, 2));
-    const payloadPlantilla = templateData; // Enviar directamente sin wrapper dto
-    try {
-      await api.patch(urlPlantillaSingular, payloadPlantilla);
-    } catch (e) {
-      console.warn("⚠️ Falló PATCH singular, probando directo...");
-      try {
-        await api.patch(urlPlantillaDirecta, payloadPlantilla);
-      } catch (e2) {}
-    }
 
     // 2. Gestionar Instancias (Iterar sobre todas si es recurrente, o una si es puntual)
     const hasRepetition =
