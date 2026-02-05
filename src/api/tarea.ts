@@ -379,16 +379,15 @@ export const completarTareaInstancia = async (
   plantillaId: string,
   tareaId: string,
   completada: boolean,
+  estadoPersonalizado?: string,
 ) => {
   try {
     const url = `/espacios/${espacioId}/tareas/${plantillaId}/${tareaId}`;
 
-    // El backend espera el campo 'completada' (bool) y 'estado' como string.
-    // El error 400 indica que 'estado' debe ser System.String.
     const data = {
       completada: completada,
       fechaRealizacion: completada ? new Date().toISOString() : null,
-      estado: completada ? "Completada" : "Pendiente"
+      estado: estadoPersonalizado || (completada ? "Completada" : "Pendiente")
     };
 
     console.log(`📤 Enviando PATCH a ${url} para marcar como ${completada ? 'Completada' : 'Pendiente'}`);

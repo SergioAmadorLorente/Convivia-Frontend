@@ -68,7 +68,7 @@ export const useDashboardActions = ({
                             onPress: async () => {
                                 try {
                                     if (espacioId && task.tareasId && task.tareasId.length > 0) {
-                                        await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], false);
+                                        await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], false, "Pendiente");
                                     }
                                     if (userRelacionId) {
                                         const nuevoKarma = Math.max(0, currentKarma - (task.karma || 0));
@@ -89,7 +89,8 @@ export const useDashboardActions = ({
             // Completar
             try {
                 if (espacioId && task.tareasId && task.tareasId.length > 0) {
-                    await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], true);
+                    const nuevoEstado = wasOverdue ? "Completada Fuera de Plazo" : "Completada";
+                    await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], true, nuevoEstado);
                 }
             } catch (error) { console.error("Error al completar tarea:", error); }
 
