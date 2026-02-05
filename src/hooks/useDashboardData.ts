@@ -170,8 +170,9 @@ export const useDashboardData = (newSpaceName?: string) => {
 
                     setTimeout(() => {
                         const tasksToEnrich = mergedTasks.filter(t => {
-                            const needsEnrichment = t.HoraLimite === "12:00" || !t.usuarioAsignado;
-                            return t.tareasId && t.tareasId.length > 0 && needsEnrichment;
+                            // Enriquecemos si falta info O si queremos asegurar el estado de completado/asignación
+                            // que suele vivir en la instancia y no en la plantilla.
+                            return t.tareasId && t.tareasId.length > 0;
                         });
                         if (tasksToEnrich.length > 0) fetchRealTaskTimes(tasksToEnrich, espacioId);
                     }, 100);
@@ -212,6 +213,11 @@ export const useDashboardData = (newSpaceName?: string) => {
                     result.realUserId = userRelId;
                     hasUpdate = true;
                 }
+                const isComp = detail?.completada || detail?.Completada || detail?.estado?.includes("Completada");
+                if (typeof isComp === 'boolean') {
+                    result.realCompleted = isComp;
+                    hasUpdate = true;
+                }
                 if (hasUpdate) return result;
             } catch (e) { }
             return null;
@@ -223,7 +229,13 @@ export const useDashboardData = (newSpaceName?: string) => {
                 const update = validUpdates.find(u => u.id === t.id);
                 if (update) {
                     const assignedName = update.realUserId ? userNamesMap[update.realUserId] || update.realUserId : t.usuarioAsignado;
-                    return new TaskModel({ ...t, FechaLimite: update.realDate || t.FechaLimite, HoraLimite: update.realTime || t.HoraLimite, usuarioAsignado: assignedName });
+                    return new TaskModel({
+                        ...t,
+                        FechaLimite: update.realDate || t.FechaLimite,
+                        HoraLimite: update.realTime || t.HoraLimite,
+                        usuarioAsignado: assignedName,
+                        isCompleted: update.realCompleted !== undefined ? update.realCompleted : t.isCompleted
+                    });
                 }
                 return t;
             }));
