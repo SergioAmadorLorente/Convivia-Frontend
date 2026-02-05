@@ -238,16 +238,18 @@ const CreateTask: React.FC = () => {
                 throw new Error("No se encontró un espacio asignado al usuario");
             }
 
-            // Determinar todos los usuarios asignados basado en LO QUE SE ACABA DE CONFIRMAR en el popup
-            const usuariosUnicos = new Set<string>();
+            // Construir array de usuarios asignados en el mismo orden que diasNumeros
+            // Cada posición corresponde al usuario asignado para ese día específico
+            let listaUsuariosAsignados: string[] = [];
             if (repeatDays.length > 0) {
-                Object.values(currentAssignments).forEach(u => {
-                    if (u?.id) usuariosUnicos.add(u.id);
-                });
+                // Para cada día en repeatDays, añadir el usuario asignado (puede repetirse)
+                listaUsuariosAsignados = repeatDays.map(day => {
+                    const userForDay = currentAssignments[day];
+                    return userForDay?.id || '';
+                }).filter(id => id !== ''); // Filtrar vacíos por si algún día no tiene asignación
             } else if (currentSingleUser?.id) {
-                usuariosUnicos.add(currentSingleUser.id);
+                listaUsuariosAsignados = [currentSingleUser.id];
             }
-            const listaUsuariosAsignados = Array.from(usuariosUnicos);
 
             // Convertir días de string a números
             const diasNumeros = repeatDays.map(day => {
@@ -509,7 +511,7 @@ const CreateTask: React.FC = () => {
                         disabled={loading}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
-                            {loading ? "Guardando..." : (isEditing ? "Guardar cambios" : "Crear tarea")}
+                            {loading ? "Guardando..." : (isEditing ? "Assignar Usuarios y Guardar" : "Assignar Usuarios y Crear")}
                         </Text>
                     </Button>
                 </View>

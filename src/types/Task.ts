@@ -49,17 +49,62 @@ export class TaskModel implements ITask {
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
+  /**
+   * Obtiene la próxima fecha en que la tarea debería ejecutarse
+   * Considera DiasRepeticion si están definidos, sino usa FechaLimite
+   */
+  getNextOccurrenceDate() {
+    // Si la tarea se repite determinados días
+    if (this.DiasRepeticion && this.DiasRepeticion.length > 0) {
+      const today = startOfDay(new Date());
+      const msPerDay = 1000 * 60 * 60 * 24;
+      const todayDayOfWeek = today.getDay();
+
+      // Convertir DiasRepeticion de formato 0-based (0=lunes, 6=domingo) a getDay() (0=domingo, 6=sábado)
+      // Conversión: (valor + 1) % 7
+      const diasEnFormatoGetDay = this.DiasRepeticion.map(d => (d + 1) % 7);
+
+      // Primero verificar si HOY es uno de los días de repetición
+      if (
+        diasEnFormatoGetDay.includes(todayDayOfWeek) &&
+        today.getTime() <= startOfDay(this.FechaLimite).getTime()
+      ) {
+        return today;
+      }
+
+      // Si no es hoy, buscar la próxima ocurrencia a partir de MAÑANA (i=1)
+      for (let i = 1; i <= 60; i++) {
+        const checkDate = new Date(today.getTime() + i * msPerDay);
+        const dayOfWeek = checkDate.getDay();
+
+        // Verificar si este día está en DiasRepeticion Y no ha excedido FechaLimite
+        if (
+          diasEnFormatoGetDay.includes(dayOfWeek) &&
+          startOfDay(checkDate).getTime() <= startOfDay(this.FechaLimite).getTime()
+        ) {
+          return startOfDay(checkDate);
+        }
+      }
+
+      // Si no encontró una ocurrencia, retornar la FechaLimite
+      return startOfDay(this.FechaLimite);
+    }
+
+    // Si no hay repetición, usar directamente FechaLimite
+    return startOfDay(this.FechaLimite);
+  }
+
   isDueToday() {
     const today = startOfDay(new Date());
-    const due = startOfDay(this.FechaLimite);
-    return due.getTime() === today.getTime();
+    const nextOccurrence = this.getNextOccurrenceDate();
+    return nextOccurrence.getTime() === today.getTime();
   }
 
   isDueWithinDays(days: number) {
     const today = startOfDay(new Date());
-    const due = startOfDay(this.FechaLimite);
+    const nextOccurrence = this.getNextOccurrenceDate();
     const msPerDay = 1000 * 60 * 60 * 24;
-    const diff = Math.ceil((due.getTime() - today.getTime()) / msPerDay);
+    const diff = Math.ceil((nextOccurrence.getTime() - today.getTime()) / msPerDay);
     return diff >= 0 && diff <= days;
   }
 

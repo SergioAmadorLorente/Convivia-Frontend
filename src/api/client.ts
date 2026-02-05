@@ -1,14 +1,12 @@
 import axios from "axios";
 import { Platform } from "react-native";
-
-const ANDROID_URL = "https://6hp0bmnf-7226.uks1.devtunnels.ms/api";
-const IOS_WEB_URL = "https://6hp0bmnf-7226.uks1.devtunnels.ms/api";
+import { API_CONFIG } from "../configs/apiConfig";
 
 const getBaseUrl = () => {
   if (Platform.OS === "android") {
-    return ANDROID_URL;
+    return API_CONFIG.ANDROID_URL;
   }
-  return IOS_WEB_URL;
+  return API_CONFIG.IOS_WEB_URL;
 };
 
 // Centralized Axios instance

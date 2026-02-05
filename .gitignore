@@ -47,6 +47,9 @@ coverage/
 .env.local
 secret.properties
 
+# API Configuration (local)
+src/configs/apiConfig.ts
+
 # macOS
 .AppleDouble
 ._*
