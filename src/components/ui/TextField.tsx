@@ -27,6 +27,7 @@ interface TextFieldProps {
   caretHidden?: boolean;
   fontSize?: number;
   showClipboard?: boolean;
+  onBlur?: () => void;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -43,6 +44,7 @@ const TextField: React.FC<TextFieldProps> = ({
   caretHidden = false,
   fontSize,
   showClipboard = false,
+  onBlur,
 }) => {
   const [show, setShow] = useState<boolean>(false);
   const isPassword = !!secureTextEntry;
@@ -87,6 +89,7 @@ const TextField: React.FC<TextFieldProps> = ({
           value={value}
           onChangeText={onChangeText}
           caretHidden={caretHidden}
+          onBlur={onBlur}
         />
 
         {isPassword && (
