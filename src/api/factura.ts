@@ -50,6 +50,20 @@ export const obtenerFacturas = async () => {
     }
 };
 
+export const obtenerFacturasPorEspacio = async (espacioId: string) => {
+    try {
+        const response = await api.get(`/espacio/${espacioId}/factura`);
+        return response.data;
+    } catch (error: any) {
+        // Si el endpoint no existe o no hay facturas para el espacio devolvemos [] para no romper la UI
+        if (error?.response?.status === 404) {
+            return [];
+        }
+        console.error("Error al obtener facturas por espacio:", error);
+        throw error;
+    }
+};
+
 // ==================== MÉTODOS PARA IMÁGENES DE FACTURAS ====================
 
 export const obtenerImagenFactura = async (espacioId: string, facturaId: string) => {

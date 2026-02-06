@@ -1,6 +1,7 @@
 
 // src/types/Factura.ts
 export type IFacturaUser = {
+  usuarioEspacioId: any;
   id: string;
   name: string;
   /** true si ese usuario ya ha completado/pagado su parte */
