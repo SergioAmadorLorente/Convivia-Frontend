@@ -213,12 +213,24 @@ export const useDashboardData = (newSpaceName?: string) => {
                     result.realUserId = userRelId;
                     hasUpdate = true;
                 }
-                const isComp = detail?.completada || detail?.Completada || detail?.estado?.includes("Completada");
-                if (typeof isComp === 'boolean') {
-                    result.realCompleted = isComp;
+                const fechaReal = detail?.fechaRealizacion || detail?.FechaRealizacion || detail?.completadoEl;
+                if (fechaReal) {
+                    result.realDoneDate = new Date(fechaReal);
                     hasUpdate = true;
                 }
-                if (hasUpdate) return result;
+
+                const rawState = detail?.estado || detail?.Estado;
+                const isComp = rawState === "Pendiente" ? false : !!(
+                    detail?.completada ||
+                    detail?.Completada ||
+                    (rawState && typeof rawState === 'string' && rawState.includes("Completada")) ||
+                    (fechaReal && !isNaN(new Date(fechaReal).getTime())) ||
+                    rawState === 'Completada'
+                );
+
+                result.realCompleted = isComp;
+
+                if (hasUpdate || result.realCompleted !== undefined) return result;
             } catch (e) { }
             return null;
         }));
@@ -234,7 +246,9 @@ export const useDashboardData = (newSpaceName?: string) => {
                         FechaLimite: update.realDate || t.FechaLimite,
                         HoraLimite: update.realTime || t.HoraLimite,
                         usuarioAsignado: assignedName,
-                        isCompleted: update.realCompleted !== undefined ? update.realCompleted : t.isCompleted
+                        isCompleted: update.realCompleted !== undefined ? update.realCompleted : t.isCompleted,
+                        FechaCompletada: update.realDoneDate || t.FechaCompletada,
+                        tareasId: t.tareasId
                     });
                 }
                 return t;

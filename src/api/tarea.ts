@@ -384,13 +384,23 @@ export const completarTareaInstancia = async (
   try {
     const url = `/espacios/${espacioId}/tareas/${plantillaId}/${tareaId}`;
 
+    // 1. Obtener detalles actuales de la instancia para preservar usuario y hora
+    let currentDetails: any = {};
+    try {
+      const responseGet = await api.get(url);
+      currentDetails = responseGet.data;
+    } catch (e) {
+      console.warn("⚠️ No se pudo obtener detalle previo para PATCH completar:", e);
+    }
+
     const data = {
-      completada: completada,
       fechaRealizacion: completada ? new Date().toISOString() : null,
-      estado: estadoPersonalizado || (completada ? "Completada" : "Pendiente")
+      estado: estadoPersonalizado || (completada ? "Completada" : "Pendiente"),
+      usuarioEspacioId: currentDetails.usuarioEspacioId || currentDetails.relacionId || "String", // Fallback por si acaso
+      horaLimite: currentDetails.horaLimite || "12:00:00"
     };
 
-    console.log(`📤 Enviando PATCH a ${url} para marcar como ${completada ? 'Completada' : 'Pendiente'}`);
+    console.log(`📤 Enviando PATCH a ${url} para marcar como ${completada ? 'Completada' : 'Pendiente'}. Data:`, data);
 
     const response = await api.patch(url, data);
     return response.data;

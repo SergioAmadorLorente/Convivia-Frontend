@@ -68,6 +68,7 @@ export const useDashboardActions = ({
                             onPress: async () => {
                                 try {
                                     if (espacioId && task.tareasId && task.tareasId.length > 0) {
+                                        console.log("Revertir tarea a Pendiente...");
                                         await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], false, "Pendiente");
                                     }
                                     if (userRelacionId) {
