@@ -129,6 +129,34 @@ const CreateTask: React.FC = () => {
 
     const [availableUsers, setAvailableUsers] = useState<UserItem[]>([]);
 
+    // Button validation state
+    const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+
+    // Field validation states
+    const [nameError, setNameError] = useState<string>('');
+    const [nameTouched, setNameTouched] = useState(false);
+
+    // Validate required fields: name, date, and karma (solo para creación, no edición)
+    useEffect(() => {
+        const hasName = name.trim().length > 0;
+        const hasKarma = karma > 0;
+
+        // Validar error de nombre solo si el campo ha sido tocado
+        if (nameTouched && !hasName) {
+            setNameError('El nombre no puede estar vacío');
+        } else {
+            setNameError('');
+        }
+
+        // Al editar, solo requerir nombre
+        // Al crear, requerir nombre y karma
+        if (isEditing) {
+            setIsButtonEnabled(hasName);
+        } else {
+            setIsButtonEnabled(hasName && hasKarma);
+        }
+    }, [name, karma, isEditing, nameTouched]);
+
     useEffect(() => {
         const fetchUsersInSpace = async () => {
             if (!user?.uid) return;
@@ -458,13 +486,18 @@ const CreateTask: React.FC = () => {
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
                         value={name}
-                        onChangeText={(text: string) => setName(text)}
+                        onChangeText={(text: string) => {
+                            setName(text);
+                            if (!nameTouched) setNameTouched(true);
+                        }}
                         placeholder="Nombre"
+                        error={nameError}
+                        onBlur={() => setNameTouched(true)}
                     />
                     <LargeTextField
                         value={description}
                         onChangeText={(text: string) => setDescription(text)}
-                        placeholder="Descripcion"
+                        placeholder="Descripción (opcional) "
                     />
                 </View>
 
@@ -532,7 +565,7 @@ const CreateTask: React.FC = () => {
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
                         onPress={handleCrearTareaPress}
-                        disabled={loading}
+                        disabled={loading || !isButtonEnabled}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
                             {loading ? "Guardando..." : (isEditing ? "Assignar Usuarios y Guardar" : "Assignar Usuarios y Crear")}
