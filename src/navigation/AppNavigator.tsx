@@ -110,7 +110,7 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="Perfil"
           component={Perfil}
-          options={defaultScreenOptions}
+          options={{ ...defaultScreenOptions, headerLeft: () => null }}
         />
         <Stack.Screen
           name="EditarPerfil"

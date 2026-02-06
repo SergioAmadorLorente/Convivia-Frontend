@@ -140,7 +140,7 @@ const Perfil: React.FC = () => {
               style={styles.editButton}
               onPress={() => navigation.navigate('EditarPerfil')}
             >
-              <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
+              <FontAwesome5 name="edit" size={18} color="#ACBF8A" />
             </TouchableOpacity>
           </View>
         </View>
@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: "center",
     paddingBottom: HELPERS.hp("8%"),
+    backgroundColor: "#F5F4F2",
   },
   headerTitle: {
     fontSize: SIZES.largeTitle,
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   userDetails: {
-    flex: 1,
+    marginRight: HELPERS.wp("15%"),
   },
   userName: {
     fontFamily: FONTS.bold,
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   editButton: {
-    padding: 10,
+    padding: 5,
   },
   menuContainer: {
     width: width,
