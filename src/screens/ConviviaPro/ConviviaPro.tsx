@@ -41,9 +41,9 @@ const ConviviaPro: React.FC = () => {
   }
 
   const features = [
-    "Funcionalidad premium 1: Residencias ilimitadas",
-    "Funcionalidad premium 2: Soporte 24/7",
-   // "Funcionalidad premium 3: Cena gratis con el equipo de Convivia",
+    "Ventaja PRO: Residencias ilimitadas",
+    "Ventaja PRO: Soporte 24/7",
+   
   ];
 
   return (

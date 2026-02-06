@@ -129,6 +129,34 @@ const CreateTask: React.FC = () => {
 
     const [availableUsers, setAvailableUsers] = useState<UserItem[]>([]);
 
+    // Button validation state
+    const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+
+    // Field validation states
+    const [nameError, setNameError] = useState<string>('');
+    const [nameTouched, setNameTouched] = useState(false);
+
+    // Validate required fields: name, date, and karma (solo para creación, no edición)
+    useEffect(() => {
+        const hasName = name.trim().length > 0;
+        const hasKarma = karma > 0;
+
+        // Validar error de nombre solo si el campo ha sido tocado
+        if (nameTouched && !hasName) {
+            setNameError('El nombre no puede estar vacío');
+        } else {
+            setNameError('');
+        }
+
+        // Al editar, solo requerir nombre
+        // Al crear, requerir nombre y karma
+        if (isEditing) {
+            setIsButtonEnabled(hasName);
+        } else {
+            setIsButtonEnabled(hasName && hasKarma);
+        }
+    }, [name, karma, isEditing, nameTouched]);
+
     useEffect(() => {
         const fetchUsersInSpace = async () => {
             if (!user?.uid) return;
@@ -239,16 +267,40 @@ const CreateTask: React.FC = () => {
             }
 
             // Construir array de usuarios asignados en el mismo orden que diasNumeros
+            // IMPORTANTE: Necesitamos los IDs de UsuarioEspacio, no los IDs de Usuario
             // Cada posición corresponde al usuario asignado para ese día específico
             let listaUsuariosAsignados: string[] = [];
             if (repeatDays.length > 0) {
-                // Para cada día en repeatDays, añadir el usuario asignado (puede repetirse)
-                listaUsuariosAsignados = repeatDays.map(day => {
+                // Para cada día en repeatDays, obtener el usuarioEspacioId del usuario asignado
+                const promesasUsuarios = repeatDays.map(async (day) => {
                     const userForDay = currentAssignments[day];
-                    return userForDay?.id || '';
-                }).filter(id => id !== ''); // Filtrar vacíos por si algún día no tiene asignación
+                    if (!userForDay?.id) return '';
+
+                    try {
+                        // Convertir userId a usuarioEspacioId
+                        const usuarioEspacioRel = await obtenerEspacioPorUsuarioId(userForDay.id);
+                        const relacionId = usuarioEspacioRel?.id || usuarioEspacioRel?.id_UsuarioEspacio;
+                        console.log(`👤 ${day}: userId=${userForDay.id} → usuarioEspacioId=${relacionId}`);
+                        return relacionId || '';
+                    } catch (e) {
+                        console.warn(`⚠️ Error al obtener UsuarioEspacio para ${userForDay.id}:`, e);
+                        return '';
+                    }
+                });
+
+                listaUsuariosAsignados = (await Promise.all(promesasUsuarios)).filter(id => id !== '');
             } else if (currentSingleUser?.id) {
-                listaUsuariosAsignados = [currentSingleUser.id];
+                // Convertir userId a usuarioEspacioId para tarea puntual
+                try {
+                    const usuarioEspacioRel = await obtenerEspacioPorUsuarioId(currentSingleUser.id);
+                    const relacionId = usuarioEspacioRel?.id || usuarioEspacioRel?.id_UsuarioEspacio;
+                    if (relacionId) {
+                        listaUsuariosAsignados = [relacionId];
+                        console.log(`👤 Usuario único: userId=${currentSingleUser.id} → usuarioEspacioId=${relacionId}`);
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Error al obtener UsuarioEspacio para usuario único:`, e);
+                }
             }
 
             // Convertir días de string a números
@@ -271,7 +323,7 @@ const CreateTask: React.FC = () => {
                 diasRepeticion: diasNumeros,
                 fechaFin: selectedDate,
                 horaLimite: horaFormateada,
-                usuariosAsignacion: listaUsuariosAsignados,
+                usuariosAsignacion: listaUsuariosAsignados, // Ahora contiene usuarioEspacioIds
                 espacioId: usuarioEspacio.espacioId,
             };
 
@@ -434,13 +486,18 @@ const CreateTask: React.FC = () => {
                 <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
                     <TextField
                         value={name}
-                        onChangeText={(text: string) => setName(text)}
+                        onChangeText={(text: string) => {
+                            setName(text);
+                            if (!nameTouched) setNameTouched(true);
+                        }}
                         placeholder="Nombre"
+                        error={nameError}
+                        onBlur={() => setNameTouched(true)}
                     />
                     <LargeTextField
                         value={description}
                         onChangeText={(text: string) => setDescription(text)}
-                        placeholder="Descripcion"
+                        placeholder="Descripción (opcional) "
                     />
                 </View>
 
@@ -508,7 +565,7 @@ const CreateTask: React.FC = () => {
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
                         onPress={handleCrearTareaPress}
-                        disabled={loading}
+                        disabled={loading || !isButtonEnabled}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
                             {loading ? "Guardando..." : (isEditing ? "Assignar Usuarios y Guardar" : "Assignar Usuarios y Crear")}
