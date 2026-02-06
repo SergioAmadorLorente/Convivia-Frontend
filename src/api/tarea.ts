@@ -429,30 +429,17 @@ export const completarTareaInstancia = async (
   plantillaId: string,
   tareaId: string,
   completada: boolean,
-  estadoPersonalizado?: string,
 ) => {
   try {
-    const url = `/espacios/${espacioId}/tareas/${plantillaId}/${tareaId}`;
-
-    // 1. Obtener detalles actuales de la instancia para preservar usuario y hora
-    let currentDetails: any = {};
-    try {
-      const responseGet = await api.get(url);
-      currentDetails = responseGet.data;
-    } catch (e) {
-      console.warn("⚠️ No se pudo obtener detalle previo para PATCH completar:", e);
-    }
+    const url = `/espacios/${espacioId}/tareas/${plantillaId}/${tareaId}/completar`;
 
     const data = {
-      fechaRealizacion: completada ? new Date().toISOString() : null,
-      estado: estadoPersonalizado || (completada ? "Completada" : "Pendiente"),
-      usuarioEspacioId: currentDetails.usuarioEspacioId || currentDetails.relacionId || "String", // Fallback por si acaso
-      horaLimite: currentDetails.horaLimite || "12:00:00"
+      tareaCompletada: completada
     };
 
-    console.log(`📤 Enviando PATCH a ${url} para marcar como ${completada ? 'Completada' : 'Pendiente'}. Data:`, data);
+    console.log(`📤 Enviando POST a ${url} para marcar como ${completada ? 'Completada' : 'Pendiente'}. Data:`, data);
 
-    const response = await api.patch(url, data);
+    const response = await api.post(url, data);
     return response.data;
   } catch (error: any) {
     console.error("❌ Error al completar instancia de tarea:", error);

@@ -69,7 +69,7 @@ export const useDashboardActions = ({
                                 try {
                                     if (espacioId && task.tareasId && task.tareasId.length > 0) {
                                         console.log("Revertir tarea a Pendiente...");
-                                        await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], false, "Pendiente");
+                                        await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], false);
                                     }
                                     if (userRelacionId) {
                                         const nuevoKarma = Math.max(0, currentKarma - (task.karma || 0));
@@ -91,7 +91,7 @@ export const useDashboardActions = ({
             try {
                 if (espacioId && task.tareasId && task.tareasId.length > 0) {
                     const nuevoEstado = wasOverdue ? "Completada Fuera de Plazo" : "Completada";
-                    await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], true, nuevoEstado);
+                    await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], true);
                 }
             } catch (error) { console.error("Error al completar tarea:", error); }
 
