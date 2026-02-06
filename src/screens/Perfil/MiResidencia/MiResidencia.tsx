@@ -22,6 +22,10 @@ import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
+import Popup from "../../../components/ui/Popup";
+import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio } from "../../../api/usuarioEspacio";
+import { obtenerEspacioPorId } from "../../../api/espacio";
+import { obtenerUsuarioPorId } from "../../../api/usuario";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useToast } from "../../../hooks/useToast";
@@ -39,6 +43,66 @@ const MiResidencia: React.FC = () => {
   const { userData } = useUser();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
   const [residenciaData, setResidenciaData] = useState<any>(null);
+  const [participants, setParticipants] = useState<any[]>([]);
+
+  const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
+  const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const fetchParticipants = async (espacioId: string) => {
+    try {
+      const todasRelaciones = await obtenerUsuarioEspacios();
+      if (Array.isArray(todasRelaciones)) {
+        const relacionesDelEspacio = todasRelaciones.filter(
+          (r: any) => r.espacioId === espacioId
+        );
+
+        const usuariosPromesas = relacionesDelEspacio.map(async (r: any) => {
+          try {
+            const usuario = await obtenerUsuarioPorId(r.usuarioId);
+            return usuario;
+          } catch (e) {
+            // Usuario no existe, lo ignoramos silenciosamente
+            return null;
+          }
+        });
+
+        const usuarios = await Promise.all(usuariosPromesas);
+        setParticipants(usuarios.filter((u) => u !== null));
+      }
+    } catch (e) {
+      console.error("Error fetching participants", e);
+    }
+  };
+
+  const handleAbandonarResidencia = () => {
+    if (!user || !residenciaData) return;
+    setIsAbandonPopupOpen(true);
+  };
+
+  const confirmAbandonarResidencia = async () => {
+    if (!user) return;
+    try {
+      // 1. Necesitamos el ID de la relación UsuarioEspacio para eliminarla
+      // Ya tenemos relacion.id si lo guardamos, o lo buscamos de nuevo
+      const relacion = await obtenerEspacioPorUsuarioId(user.uid);
+      if (relacion && relacion.id) {
+        await eliminarUsuarioEspacio(relacion.id);
+        // Alert.alert("Éxito", "Has abandonado la residencia correctamente.");
+        // Redirigir a UnirResidencia o refrescar
+        setIsAbandonPopupOpen(false);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "UnirResidencia" }],
+        });
+      } else {
+        Alert.alert("Error", "No se encontró tu información de miembro.");
+      }
+    } catch (error) {
+      console.error("Error al abandonar residencia:", error);
+      Alert.alert("Error", "Ocurrió un error al intentar abandonar la residencia.");
+    }
+  };
 
   const { participants, fetchParticipants } = useFetchParticipants();
   const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();

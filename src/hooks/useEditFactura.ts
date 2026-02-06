@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export interface Factura {
-    id?: string;
+    id: string;
     name: string;
     description: string;
     amount: string;
@@ -41,7 +41,7 @@ export const useEditFactura = () => {
     };
 
     const getFacturaData = (): Factura => ({
-        id: facturaId,
+        id: String(facturaId),
         name,
         description,
         amount,
