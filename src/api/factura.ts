@@ -1,18 +1,15 @@
 import api from "./client";
 
 export interface FacturaPayload {
-    Nombre: string;
+    Titulo: string;
     Precio: number;
-    PagoMediano: number | null;
-    Deudores: Record<string, boolean>;
+    Reparto: string;
     Pagado: boolean;
-    CreadorFactura: string;
 }
 
-
-export const crearFactura = async (espacioId: string, data: FacturaPayload) => {
+export const crearFactura = async (data: FacturaPayload) => {
     try {
-        const response = await api.post(`/espacio/${espacioId}/factura`, data);
+        const response = await api.post("/Factura", data);
         return response.data;
     } catch (error) {
         console.error("Error al crear factura:", error);
@@ -20,7 +17,7 @@ export const crearFactura = async (espacioId: string, data: FacturaPayload) => {
     }
 };
 
-export const editarFactura = async (id: string, data: FacturaPayload) => {
+export const editarFactura = async (id: number, data: FacturaPayload) => {
     try {
         const response = await api.put(`/Factura/${id}`, data);
         return response.data;
@@ -30,7 +27,7 @@ export const editarFactura = async (id: string, data: FacturaPayload) => {
     }
 };
 
-export const eliminarFactura = async (id: string) => {
+export const eliminarFactura = async (id: number) => {
     try {
         const response = await api.delete(`/Factura/${id}`);
         return response.data;

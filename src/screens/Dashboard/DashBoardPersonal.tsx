@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
-  Text,
   ScrollView,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -302,9 +301,8 @@ const DashBoardPersonal: React.FC = () => {
   // Cargar tareas al enfocar la pantalla
   useFocusEffect(
     React.useCallback(() => {
-      // Cargar tareas y facturas una vez al entrar o volver a la pantalla
+      // Cargar tareas una vez al entrar o volver a la pantalla
       cargarTareas();
-      cargarFacturas();
 
       return () => {
         // Cleanup si fuera necesario
@@ -390,37 +388,34 @@ const DashBoardPersonal: React.FC = () => {
     }
   };
 
-  const [facturas, setFacturas] = useState<FacturaModel[]>([]);
-  const [loadingFacturas, setLoadingFacturas] = useState<boolean>(false);
-
-  const cargarFacturas = async (showLoading = true) => {
-    if (!espacioId) return;
-
-    if (showLoading) setLoadingFacturas(true);
-
-    try {
-      console.log("🔄 Cargando facturas para espacio:", espacioId);
-      const facturasRaw = await obtenerFacturasPorEspacio(espacioId);
-      if (Array.isArray(facturasRaw)) {
-        const mapped = facturasRaw.map((f: any) => new FacturaModel({
-          IdFactura: f.id || f.IdFactura || f.Id || "",
-          Nombre: f.nombre || f.Nombre || f.NombreFactura || "",
-          Descripcion: f.descripcion || f.Descripcion || "",
-          Precio: typeof f.precio === 'number' ? f.precio : (f.Precio ?? 0),
-          UsuariosAsignados: Array.isArray(f.UsuariosAsignados) ? f.UsuariosAsignados : (f.Deudores ? Object.keys(f.Deudores).map(k => ({ id: k, name: k, completed: !!f.Deudores[k] })) : []),
-          Pagado: !!(f.pagado || f.Pagado),
-          FechaCreacion: f.fechaCreacion ? new Date(f.fechaCreacion) : new Date(),
-          FechaCompletada: f.fechaCompletada ? new Date(f.fechaCompletada) : null,
-        }));
-
-        setFacturas(mapped);
-      }
-    } catch (e) {
-      console.error("Error cargando facturas:", e);
-    } finally {
-      if (showLoading) setLoadingFacturas(false);
-    }
-  };
+  const [facturas, setFacturas] = useState<FacturaModel[]>([
+    new FacturaModel({
+      IdFactura: "f1",
+      Nombre: "Electricidad",
+      Precio: 120,
+      UsuariosAsignados: [
+        { id: "u1", name: "Juan", completed: true },
+        { id: "u2", name: "María", completed: false },
+        { id: "u3", name: "Pedro", completed: true },
+      ],
+      Pagado: false,
+      FechaCreacion: new Date(),
+      Descripcion: "Factura mensual",
+    }),
+    new FacturaModel({
+      IdFactura: "f2",
+      Nombre: "Internet",
+      Precio: 45,
+      UsuariosAsignados: [
+        { id: "u1", name: "Juan", completed: true },
+        { id: "u2", name: "María", completed: true },
+      ],
+      Pagado: true,
+      FechaCreacion: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      FechaCompletada: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      Descripcion: "Fibra 300Mb",
+    }),
+  ]);
   // -------------------------
 
   const [fontsLoaded] = useFonts({
@@ -763,43 +758,8 @@ const DashBoardPersonal: React.FC = () => {
   };
 
   const handleDeleteFactura = (id: string) => {
-    if (!espacioId) {
-      console.warn("No se puede eliminar la factura: espacioId no disponible.");
-      return;
-    }
-
-    showPopup({
-      imageType: "goback",
-      title: "¿Eliminar factura?",
-      description: "Esta acción eliminará la factura de forma permanente.",
-      buttons: [
-        { text: "Cancelar", onPress: () => { } },
-        {
-          text: "Eliminar",
-          onPress: async () => {
-            try {
-              await eliminarFactura(id);
-              setFacturas((prev) => prev.filter((f) => f.IdFactura !== id));
-              closeDetalle();
-              showPopup({
-                title: "Éxito",
-                description: "La factura ha sido eliminada.",
-                imageType: "success",
-                buttons: [{ text: "Aceptar", onPress: () => { } }]
-              });
-            } catch (error) {
-              console.error("Error al eliminar factura:", error);
-              showPopup({
-                title: "Error",
-                description: "No se pudo eliminar la factura. Intenta de nuevo.",
-                imageType: "error",
-                buttons: [{ text: "Aceptar", onPress: () => { } }]
-              });
-            }
-          }
-        },
-      ],
-    });
+    // Implementación similar para facturas si fuera necesario
+    console.log("Eliminar factura:", id);
   };
 
   // -------------------------
@@ -962,21 +922,14 @@ const DashBoardPersonal: React.FC = () => {
         )}
 
         <View style={GLOBAL_STYLES.container}>
-          {/* Mensaje si no hay facturas */}
-          {activeTab === 'facturas' && !loadingFacturas && facturas.length === 0 && (
-            <View style={{ padding: 20 }}>
-              <Text style={{ textAlign: 'center', color: '#6B7280' }}>Aún no hay facturas en esta residencia.</Text>
-            </View>
-          )}
-
           {/* PENDIENTES */}
           {pendingItems.length > 0 && (
             <Desplegable
               title="Pendientes"
               fontSize={SIZES.text16}
               fontWeight="bold"
-              defaultOpen={true}>
-
+              defaultOpen={true}
+            >
               {pendingItems.map((item: any) => {
                 if (activeTab === "tareas") {
                   const task = item as TaskModel;

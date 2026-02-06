@@ -143,6 +143,34 @@ const Perfil: React.FC = () => {
               <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
             </TouchableOpacity>
           </View>
+        </View>
+
+        {/* Menu List Container (White box with rounded corners) */}
+        <View style={styles.menuContainer}>
+
+          {/* Mi Karma */}
+          <MenuItem
+            label="Mi Karma"
+            onPress={() => console.log('Mi Karma')}
+            icon={<LogoKarma width={30} height={30} />}
+          />
+          <View style={styles.divider} />
+
+          {/* Mis Residencias */}
+          <MenuItem
+            label="Mis Residencias"
+            onPress={() => navigation.navigate("MiResidencia")}
+            icon={<Miresidencia width={24} height={24} />}
+          />
+          <View style={styles.divider} />
+
+          {/* Preguntas frecuentes */}
+          <MenuItem
+            label="Preguntas frecuentes"
+            onPress={() => navigation.navigate("FAQ")}
+            icon={<IconoFAQ width={24} height={24} />}
+          />
+          <View style={styles.divider} />
 
           {/* Información Legal */}
           <MenuItem
@@ -167,64 +195,9 @@ const Perfil: React.FC = () => {
             icon={<LogoutSinFondo width={24} height={24} />}
           />
 
-          {/* Edit Icon */}
-          <TouchableOpacity style={styles.editButton}>
-            <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
-          </TouchableOpacity>
         </View>
-      </View>
-
-      {/* Menu List Container (White box with rounded corners) */}
-      <View style={styles.menuContainer}>
-
-        {/* Mi Karma */}
-        <MenuItem
-          label="Mi Karma"
-          onPress={() => console.log('Mi Karma')}
-          icon={<LogoKarma width={30} height={30} />}
-        />
-        <View style={styles.divider} />
-
-        {/* Mis Residencias */}
-        <MenuItem
-          label="Mis Residencias"
-          onPress={() => navigation.navigate("MiResidencia")}
-          icon={<Miresidencia width={24} height={24} />}
-        />
-        <View style={styles.divider} />
-
-        {/* Preguntas frecuentes */}
-        <MenuItem
-          label="Preguntas frecuentes"
-          onPress={() => navigation.navigate("FAQ")}
-          icon={<IconoFAQ width={24} height={24} />}
-        />
-        <View style={styles.divider} />
-
-        {/* Información Legal */}
-        <MenuItem
-          label="Información Legal"
-          onPress={() => navigation.navigate("InfoLegal")}
-          icon={<Infolegal width={24} height={24} />}
-        />
-        <View style={styles.divider} />
-
-        {/* Convivia PRO */}
-        <MenuItem
-          label="Convivia PRO"
-          onPress={() => console.log('Convivia PRO')}
-          icon={<IconoConviviaPRO width={24} height={24} />}
-        />
-        <View style={styles.divider} />
-
-        {/* Cerrar Sesión */}
-        <MenuItem
-          label="Cerrar Sesión"
-          onPress={() => setModalVisible(true)}
-          icon={<LogoutSinFondo width={24} height={24} />}
-        />
-
-      </View>
+      </ScrollView>
+      
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -237,7 +210,6 @@ const Perfil: React.FC = () => {
         ]}
       />
       <BottomBar />
-
     </View>
   );
 };
