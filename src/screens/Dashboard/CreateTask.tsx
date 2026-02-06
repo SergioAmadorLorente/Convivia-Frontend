@@ -239,16 +239,40 @@ const CreateTask: React.FC = () => {
             }
 
             // Construir array de usuarios asignados en el mismo orden que diasNumeros
+            // IMPORTANTE: Necesitamos los IDs de UsuarioEspacio, no los IDs de Usuario
             // Cada posición corresponde al usuario asignado para ese día específico
             let listaUsuariosAsignados: string[] = [];
             if (repeatDays.length > 0) {
-                // Para cada día en repeatDays, añadir el usuario asignado (puede repetirse)
-                listaUsuariosAsignados = repeatDays.map(day => {
+                // Para cada día en repeatDays, obtener el usuarioEspacioId del usuario asignado
+                const promesasUsuarios = repeatDays.map(async (day) => {
                     const userForDay = currentAssignments[day];
-                    return userForDay?.id || '';
-                }).filter(id => id !== ''); // Filtrar vacíos por si algún día no tiene asignación
+                    if (!userForDay?.id) return '';
+
+                    try {
+                        // Convertir userId a usuarioEspacioId
+                        const usuarioEspacioRel = await obtenerEspacioPorUsuarioId(userForDay.id);
+                        const relacionId = usuarioEspacioRel?.id || usuarioEspacioRel?.id_UsuarioEspacio;
+                        console.log(`👤 ${day}: userId=${userForDay.id} → usuarioEspacioId=${relacionId}`);
+                        return relacionId || '';
+                    } catch (e) {
+                        console.warn(`⚠️ Error al obtener UsuarioEspacio para ${userForDay.id}:`, e);
+                        return '';
+                    }
+                });
+
+                listaUsuariosAsignados = (await Promise.all(promesasUsuarios)).filter(id => id !== '');
             } else if (currentSingleUser?.id) {
-                listaUsuariosAsignados = [currentSingleUser.id];
+                // Convertir userId a usuarioEspacioId para tarea puntual
+                try {
+                    const usuarioEspacioRel = await obtenerEspacioPorUsuarioId(currentSingleUser.id);
+                    const relacionId = usuarioEspacioRel?.id || usuarioEspacioRel?.id_UsuarioEspacio;
+                    if (relacionId) {
+                        listaUsuariosAsignados = [relacionId];
+                        console.log(`👤 Usuario único: userId=${currentSingleUser.id} → usuarioEspacioId=${relacionId}`);
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Error al obtener UsuarioEspacio para usuario único:`, e);
+                }
             }
 
             // Convertir días de string a números
@@ -271,7 +295,7 @@ const CreateTask: React.FC = () => {
                 diasRepeticion: diasNumeros,
                 fechaFin: selectedDate,
                 horaLimite: horaFormateada,
-                usuariosAsignacion: listaUsuariosAsignados,
+                usuariosAsignacion: listaUsuariosAsignados, // Ahora contiene usuarioEspacioIds
                 espacioId: usuarioEspacio.espacioId,
             };
 

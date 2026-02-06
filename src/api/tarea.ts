@@ -80,7 +80,8 @@ export const editarTarea = async (
     }
 
     // 1. Editar la Plantilla (Cuerpo exhaustivo para asegurar persistencia)
-    const urlPlantilla = `/espacios/${espacioId}/tareas/${plantillaId}`;
+    // Endpoint correcto para PATCH plantilla: /api/espacio/{espacioid}/{plantillaId}
+    const urlPlantilla = `/espacio/${espacioId}/${plantillaId}`;
 
     let shortDate: string | undefined;
     let isoDate: string | undefined;
@@ -115,41 +116,26 @@ export const editarTarea = async (
       fechaFin: shortDate,
       fechaLimite: shortDate, // Clave requerida por el backend
       horaLimite: data.horaLimite,
-      // Si es tarea puntual (sin repetición), enviamos array vacío al TEMPLATE para evitar error 500 del backend
-      usuariosAsignacion: isSingleTask ? [] : data.usuariosAsignacion,
-      regenerar: true,
+      // Siempre incluir usuarios asignados en la plantilla para que se mantengan en futuras regeneraciones
+      usuariosAsignacion: data.usuariosAsignacion || [],
+      regenerar: false, // No regenerar para no perder instancias existentes
     };
 
     // 2. Gestionar Instancias (Iterar sobre todas si es recurrente, o una si es puntual)
     const hasRepetition =
       Array.isArray(data.diasRepeticion) && data.diasRepeticion.length > 0;
 
+    // 2.1. PRIMERO actualizamos la plantilla
+    console.log(`📝 [PATCH Plantilla] URL: ${urlPlantilla}`);
+    console.log(`📤 Datos de plantilla:`, templateData);
+    await api.patch(urlPlantilla, templateData);
+    console.log(`✅ Plantilla actualizada correctamente`);
+
     if (hasRepetition) {
-      // Caso: Tarea Recurrente
-      // 2.1. Eliminamos la instancia puntual "fantasma" si venimos de un cambio Single -> Recurring
-      if (instanceId) {
-        // Intentamos borrarla por si acaso era la instancia única antigua
-        // (Si ya era recurrente, esto podría borrar una instancia válida, pero el backend regenerará
-        // nuevas instancias. El usuario pide "editar de una en una", así que quizás
-        // deberíamos obtener TODAS y editarlas).
-        // NOTA: Si `regenerar: true` funciona, el backend podría haber recreado cosas.
-        // Pero el usuario dice explícitamente: "obtener todas... y editarlas de una en una".
-
-        // Primero borramos la 'ghost' si fuera el caso de transición.
-        // Asumimos que instanceId refería a la tarea que se clicó.
-        // Si era Single, se borra. Si era una de las recurrentes, se borrará y se 'regenerará'
-        // o la actualizaremos en el bucle abajo si la API filter la devuelve.
-        // Para mayor seguridad en transición:
-        try {
-          // Solo si creemos que es ghost (transición).
-          // Pero como el usuario pide 'editar una en una', vamos a confiar en el bucle de abajo.
-        } catch (e) {}
-      }
-
-      // 2.2. Obtener todas las instancias de la plantilla
+      // Caso: Tarea Recurrente - Actualizar TODAS las instancias existentes
       try {
         console.log(
-          `� Obteniendo instancias de plantilla ${plantillaId} para edición masiva...`,
+          `🔍 Obteniendo instancias de plantilla ${plantillaId} para actualización...`,
         );
         // Endpoint sugerido por usuario: GET /api/espacios/{espacioid}/tareas/filter?plantillaId={id}
         const filterRes = await api.get(
@@ -160,36 +146,74 @@ export const editarTarea = async (
         );
         const instancias = filterRes.data; // Asumimos array
 
-        if (Array.isArray(instancias)) {
+        if (Array.isArray(instancias) && instancias.length > 0) {
           console.log(
-            `🔄 Actualizando ${instancias.length} instancias manualmente...`,
+            `🔄 Actualizando ${instancias.length} instancias con nuevos usuarios asignados...`,
           );
 
-          // Preparamos payload común para instancias
-          // OJO: No sobreescribir fechaLimite específica de la instancia con la fechaFin del template
-          let relId = data.usuariosAsignacion?.[0];
-          if (relId) {
-            try {
-              const {
-                obtenerEspacioPorUsuarioId,
-              } = require("./usuarioEspacio");
-              const userRel = await obtenerEspacioPorUsuarioId(relId);
-              if (userRel) relId = userRel.id || userRel.id_UsuarioEspacio;
-            } catch (e) {}
+          // Crear mapeo de día de semana (0-6) → usuarioEspacioId
+          // diasRepeticion y usuariosAsignacion están en el mismo orden
+          // IMPORTANTE: usuariosAsignacion ya contiene usuarioEspacioIds (no userIds)
+          const dayToUserEspacioIdMap: Record<number, string> = {};
+          
+          if (Array.isArray(data.diasRepeticion) && Array.isArray(data.usuariosAsignacion)) {
+            data.diasRepeticion.forEach((dayNum: number, index: number) => {
+              const usuarioEspacioId = data.usuariosAsignacion[index];
+              if (usuarioEspacioId) {
+                dayToUserEspacioIdMap[dayNum] = usuarioEspacioId;
+              }
+            });
+            console.log('📅 Mapa día→usuarioEspacioId creado:', dayToUserEspacioIdMap);
           }
 
+          // Actualizar cada instancia con el usuarioEspacioId correspondiente a su día
+          let updateCount = 0;
           for (const inst of instancias) {
+            // Determinar el día de la semana de esta instancia
+            let instanceDayOfWeek: number | null = null;
+            
+            // La instancia debe tener una fecha (fechaLimite, startDate, o FechaLimite)
+            const instanceDate = inst.fechaLimite || inst.startDate || inst.FechaLimite;
+            
+            if (instanceDate) {
+              try {
+                const dateObj = new Date(instanceDate);
+                // getDay() retorna 0=Domingo, 1=Lunes, ..., 6=Sábado
+                // Pero nuestro sistema usa 0=Lunes, ..., 6=Domingo
+                // Conversión: getDay() -> nuestro sistema
+                const jsDay = dateObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
+                instanceDayOfWeek = jsDay === 0 ? 6 : jsDay - 1; // Convertir: Dom=6, Lun=0, Mar=1, ...
+                console.log(`📅 Instancia ${inst.id}: fecha=${instanceDate}, día=${instanceDayOfWeek}`);
+              } catch (e) {
+                console.warn(`⚠️ Error al parsear fecha de instancia ${inst.id}:`, e);
+              }
+            }
+
             const iUrl = `/espacios/${espacioId}/tareas/${plantillaId}/${inst.id}`;
-            // Mantenemos la fecha original de la instancia, solo actualizamos hora y asignación
-            const updatePayload = {
+            
+            // Payload base
+            const updatePayload: any = {
               horaLimite: data.horaLimite,
-              usuarioEspacioId: relId,
-              relacionId: relId,
               karma: data.karma,
+              nombre: data.nombre,
+              descripcion: data.descripcion,
               // No enviamos fechaLimite/startDate para no aplanar la recurrencia
             };
+
+            // Asignar usuarioEspacioId correspondiente al día de esta instancia
+            if (instanceDayOfWeek !== null && dayToUserEspacioIdMap[instanceDayOfWeek]) {
+              const usuarioEspacioId = dayToUserEspacioIdMap[instanceDayOfWeek];
+              updatePayload.usuarioEspacioId = usuarioEspacioId;
+              updatePayload.relacionId = usuarioEspacioId;
+              console.log(`👤 Instancia ${inst.id} (día ${instanceDayOfWeek}) → usuarioEspacioId=${usuarioEspacioId}`);
+            } else {
+              console.log(`ℹ️ Instancia ${inst.id}: no se encontró usuario para día ${instanceDayOfWeek}`);
+            }
+
             try {
+              console.log(`📤 Actualizando instancia ${inst.id}...`);
               await api.patch(iUrl, updatePayload);
+              updateCount++;
             } catch (errPatch) {
               console.warn(
                 `⚠️ Error actualizando instancia ${inst.id}`,
@@ -197,6 +221,9 @@ export const editarTarea = async (
               );
             }
           }
+          console.log(`✅ Se actualizaron ${updateCount} de ${instancias.length} instancias`);
+        } else {
+          console.log("ℹ️ No se encontraron instancias para actualizar (puede ser normal si es nueva tarea)");
         }
       } catch (errFilter) {
         console.warn(
@@ -205,31 +232,34 @@ export const editarTarea = async (
         );
       }
     } else {
-      // Caso: Tarea Puntual (Single)
+      // Caso: Tarea Puntual (Single) - Actualizar la instancia única
       if (instanceId) {
-        let relId = data.usuariosAsignacion?.[0];
-        if (relId) {
-          try {
-            const { obtenerEspacioPorUsuarioId } = require("./usuarioEspacio");
-            const userRel = await obtenerEspacioPorUsuarioId(relId);
-            if (userRel) relId = userRel.id || userRel.id_UsuarioEspacio;
-          } catch (e) {}
-        }
+        // usuariosAsignacion[0] ya contiene el usuarioEspacioId (no el userId)
+        const usuarioEspacioId = data.usuariosAsignacion?.[0];
 
         const urlInstancia = `/espacios/${espacioId}/tareas/${plantillaId}/${instanceId}`;
-        const instanceData = {
+        const instanceData: any = {
           horaLimite: data.horaLimite,
           fechaLimite: shortDate,
           FechaLimite: isoDate,
           fechaFin: shortDate,
           startDate: isoDate,
-          usuarioEspacioId: relId,
-          relacionId: relId,
+          karma: data.karma,
+          nombre: data.nombre,
+          descripcion: data.descripcion,
           fechaRealizacion: null,
         };
 
+        // Solo añadir usuario si hay uno asignado
+        if (usuarioEspacioId) {
+          instanceData.usuarioEspacioId = usuarioEspacioId;
+          instanceData.relacionId = usuarioEspacioId;
+          console.log(`👤 Tarea puntual: usuarioEspacioId=${usuarioEspacioId}`);
+        }
+
         console.log(`📝 [PATCH Instancia única] URL: ${urlInstancia}`);
         await api.patch(urlInstancia, instanceData);
+        console.log(`✅ Instancia única actualizada correctamente`);
       }
     }
 

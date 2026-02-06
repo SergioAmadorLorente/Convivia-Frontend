@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Modal,
   View,
@@ -96,10 +96,10 @@ const Detalle: React.FC<Props> = (props) => {
               </Text>
 
               <View style={[styles.chartContainer, { marginTop: HELPERS.verticalScale(5) }]}>
-                  <View style={styles.donutChart}>
-                    <View style={styles.donutSegment} />
-                    <View style={styles.donutHole} />
-                  </View>
+                <View style={styles.donutChart}>
+                  <View style={styles.donutSegment} />
+                  <View style={styles.donutHole} />
+                </View>
 
                 <View style={styles.legendContainer}>
                   <View style={styles.legendItem}>
@@ -148,6 +148,7 @@ const Detalle: React.FC<Props> = (props) => {
 
   if (props.kind === "tarea") {
     const { task, onComplete, onEdit, onDelete } = props;
+    const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
 
     const fechaStr = useMemo(() => {
       if (!task.FechaLimite) return "-";
@@ -175,9 +176,23 @@ const Detalle: React.FC<Props> = (props) => {
 
     // ✅ DiasRepeticion es number[] con Lunes=0 .. Domingo=6
     const weekLabels = ["L", "M", "X", "J", "V", "S", "D"];
+    const weekFullNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
     const isDaySelected = (idx0: number) => {
       // Backend: Lunes=0 ... Domingo=6
       return Array.isArray(task.DiasRepeticion) && task.DiasRepeticion.includes(idx0);
+    };
+
+    // Obtener usuario asignado para el día seleccionado
+    const getAssignedUserForDay = (dayIndex: number | null): string => {
+      if (dayIndex === null) {
+        return task.usuarioAsignado ?? "";
+      }
+      // Si hay mapa de usuarios por día, usar ese
+      if (task.usuariosPorDia && task.usuariosPorDia[dayIndex]) {
+        return task.usuariosPorDia[dayIndex];
+      }
+      // Sino, usar el usuario general
+      return task.usuarioAsignado ?? "";
     };
 
     return (
@@ -233,14 +248,22 @@ const Detalle: React.FC<Props> = (props) => {
               <View style={styles.weekRow}>
                 {weekLabels.map((l, idx) => {
                   const selected = isDaySelected(idx);
+                  const isSelected = selectedDayIndex === idx;
                   return (
-                    <View
+                    <TouchableOpacity
                       key={l}
+                      onPress={() => {
+                        if (selected) {
+                          setSelectedDayIndex(isSelected ? null : idx);
+                        }
+                      }}
+                      activeOpacity={selected ? 0.7 : 1}
                       style={[
                         styles.dayChip,
                         selected
                           ? styles.dayChipSelected
                           : styles.dayChipUnselected,
+                        isSelected && selected && styles.dayChipFocused,
                       ]}
                     >
                       <Text
@@ -253,10 +276,11 @@ const Detalle: React.FC<Props> = (props) => {
                       >
                         {l}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   );
                 })}
               </View>
+
             </View>
 
             {/* Usuario asignado */}
@@ -264,7 +288,9 @@ const Detalle: React.FC<Props> = (props) => {
               <Text style={styles.sectionLabel}>Usuario asignado</Text>
               <TextInput
                 editable={false}
-                value={task.usuarioAsignado ?? ""}
+                value={selectedDayIndex !== null && isDaySelected(selectedDayIndex)
+                  ? getAssignedUserForDay(selectedDayIndex) || "Sin asignar"
+                  : (task.usuarioAsignado ?? "")}
                 placeholder="Usuarios asignados"
                 placeholderTextColor={COLORS.border}
                 style={styles.input}
@@ -572,6 +598,25 @@ const styles = StyleSheet.create({
   dayChipTextUnselected: {
     color: COLORS.secondary,
     opacity: 0.65,
+  },
+  dayChipFocused: {
+    borderWidth: 2,
+    borderColor: COLORS.accent,
+    shadowColor: COLORS.accent,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  daySelectionNote: {
+    marginTop: HELPERS.verticalScale(8),
+    alignItems: "center",
+  },
+  daySelectionNoteText: {
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
+    fontFamily: FONTS.regular,
+    opacity: 0.7,
   },
 
   // ---- Factura: precios ----

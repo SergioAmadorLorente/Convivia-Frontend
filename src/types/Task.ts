@@ -10,6 +10,7 @@ export interface ITask {
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
   tareasId?: string[]; // IDs de las instancias hijas
+  usuariosPorDia?: Record<number, string>; // Mapa de día (0-6) a usuario asignado
 }
 
 function startOfDay(d: Date) {
@@ -28,6 +29,7 @@ export class TaskModel implements ITask {
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
   tareasId: string[];
+  usuariosPorDia?: Record<number, string>;
 
   constructor(props: ITask) {
     this.id = props.id;
@@ -41,6 +43,7 @@ export class TaskModel implements ITask {
     this.FechaCompletada = props.FechaCompletada ? new Date(props.FechaCompletada) : null;
     this.usuarioAsignado = props.usuarioAsignado ?? null;
     this.tareasId = props.tareasId ?? [];
+    this.usuariosPorDia = props.usuariosPorDia ?? {};
   }
 
   formattedTime() {
