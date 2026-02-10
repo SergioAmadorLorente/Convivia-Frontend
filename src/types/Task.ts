@@ -133,6 +133,7 @@ export class TaskModel implements ITask {
       isCompleted: !this.isCompleted,
       FechaCompletada: !this.isCompleted ? now : null,
       usuarioAsignado: this.usuarioAsignado,
+      tareasId: this.tareasId.slice(),
     });
   }
 }
