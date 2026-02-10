@@ -46,14 +46,27 @@ export const useDashboardActions = ({
             today.setHours(0, 0, 0, 0);
             const wasOverdue = new Date(due.getFullYear(), due.getMonth(), due.getDate()).getTime() < today.getTime();
 
-            if (!task.isCompleted && !task.usuarioAsignado) {
-                showPopup({
-                    imageType: "error",
-                    title: "Para completar una tarea debe estar asignada",
-                    description: "Ve al detalle de la tarea y asígnala a un usuario.",
-                    buttons: [{ text: "Cancelar" }, { text: "Ir al detalle", onPress: () => openDetalleTarea(task) }],
-                });
-                return;
+            if (!task.isCompleted) {
+                if (!task.usuarioAsignado) {
+                    showPopup({
+                        imageType: "error",
+                        title: "Para completar una tarea debe estar asignada",
+                        description: "Ve al detalle de la tarea y asígnala a un usuario.",
+                        buttons: [{ text: "Cancelar" }, { text: "Ir al detalle", onPress: () => openDetalleTarea(task) }],
+                    });
+                    return;
+                }
+
+                // Bloquear si no está asignada al usuario actual
+                if (userRelacionId && task.usuarioAsignadoId && task.usuarioAsignadoId !== userRelacionId) {
+                    showPopup({
+                        imageType: "error",
+                        title: "No puedes completar esta tarea",
+                        description: `Esta tarea está asignada a ${task.usuarioAsignado || "otro usuario"}.\nSolo el usuario asignado puede completarla.`,
+                        buttons: [{ text: "Entendido" }],
+                    });
+                    return;
+                }
             }
 
             if (task.isCompleted) {

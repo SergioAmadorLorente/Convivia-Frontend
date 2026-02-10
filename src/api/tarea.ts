@@ -147,8 +147,10 @@ export const editarTarea = async (
         } catch (e) { }
       }
 
-    if (hasRepetition) {
       // Caso: Tarea Recurrente - Actualizar TODAS las instancias existentes
+      // Validar mapa de usuarios por día
+      const dayToUserEspacioIdMap = data.usuariosPorDia || {};
+
       try {
         console.log(
           `🔍 Obteniendo instancias de plantilla ${plantillaId} para actualización...`,
@@ -271,10 +273,10 @@ export const editarTarea = async (
         };
 
         // Solo añadir usuario si hay uno asignado
-        if (usuarioEspacioId) {
-          instanceData.usuarioEspacioId = usuarioEspacioId;
-          instanceData.relacionId = usuarioEspacioId;
-          console.log(`👤 Tarea puntual: usuarioEspacioId=${usuarioEspacioId}`);
+        if (relId) {
+          instanceData.usuarioEspacioId = relId;
+          instanceData.relacionId = relId;
+          console.log(`👤 Tarea puntual: usuarioEspacioId=${relId}`);
         }
 
         console.log(`📝 [PATCH Instancia única] URL: ${urlInstancia}`);

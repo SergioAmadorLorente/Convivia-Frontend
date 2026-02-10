@@ -9,6 +9,7 @@ export interface ITask {
   isCompleted: boolean;
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
+  usuarioAsignadoId?: string | null;
   tareasId?: string[]; // IDs de las instancias hijas
   usuariosPorDia?: Record<number, string>; // Mapa de día (0-6) a usuario asignado
 }
@@ -28,6 +29,7 @@ export class TaskModel implements ITask {
   isCompleted: boolean;
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
+  usuarioAsignadoId?: string | null;
   tareasId: string[];
   usuariosPorDia?: Record<number, string>;
 
@@ -42,6 +44,7 @@ export class TaskModel implements ITask {
     this.isCompleted = !!props.isCompleted;
     this.FechaCompletada = props.FechaCompletada ? new Date(props.FechaCompletada) : null;
     this.usuarioAsignado = props.usuarioAsignado ?? null;
+    this.usuarioAsignadoId = props.usuarioAsignadoId ?? null;
     this.tareasId = props.tareasId ?? [];
     this.usuariosPorDia = props.usuariosPorDia ?? {};
   }
@@ -133,6 +136,7 @@ export class TaskModel implements ITask {
       isCompleted: !this.isCompleted,
       FechaCompletada: !this.isCompleted ? now : null,
       usuarioAsignado: this.usuarioAsignado,
+      usuarioAsignadoId: this.usuarioAsignadoId,
       tareasId: this.tareasId.slice(),
     });
   }
