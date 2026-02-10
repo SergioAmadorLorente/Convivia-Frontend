@@ -147,6 +147,7 @@ export const useDashboardData = (newSpaceName?: string) => {
                         HoraLimite: cleanTime,
                         isCompleted: t.completada || t.Completada || false,
                         usuarioAsignado: userNameResolved,
+                        usuarioAsignadoId: userId || null, // Guardar ID de asignación
                         tareasId: t.tareasId || []
                     });
                 });
@@ -248,6 +249,7 @@ export const useDashboardData = (newSpaceName?: string) => {
                         usuarioAsignado: assignedName,
                         isCompleted: update.realCompleted !== undefined ? update.realCompleted : t.isCompleted,
                         FechaCompletada: update.realDoneDate || t.FechaCompletada,
+                        usuarioAsignadoId: update.realUserId || t.usuarioAsignadoId, // Actualizar ID si viene de instancia
                         tareasId: t.tareasId
                     });
                 }
