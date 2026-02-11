@@ -58,7 +58,7 @@ export const useDashboardActions = ({
                 }
 
                 // Bloquear si no está asignada al usuario actual
-                if (userRelacionId && task.usuarioAsignadoId && task.usuarioAsignadoId !== userRelacionId) {
+                if (CURRENT_USER_ID && task.usuarioAsignadoId && task.usuarioAsignadoId !== CURRENT_USER_ID) {
                     showPopup({
                         imageType: "error",
                         title: "No puedes completar esta tarea",
