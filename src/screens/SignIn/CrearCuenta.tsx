@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  AppState,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -40,14 +41,18 @@ const CrearCuenta: React.FC = () => {
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
   const { password, setPassword, validations, isValidPassword } =
     usePasswordValidation();
+  const [nombre, setNombre] = useState("");
   const [password2, setPassword2] = useState("");
   const [errorMatch, setErrorMatch] = useState("");
   const [checkedPolitica, setCheckedPolitica] = useState(false);
   const [checkedTerminos, setCheckedTerminos] = useState(false);
   const [emailUsedError, setEmailUsedError] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [verificacionEnviada, setVerificacionEnviada] = useState(false);
   const { seconds, isCounting, startCountdown } = useCountdown(60);
   const scrollRef = useRef<any>(null);
+  const appState = useRef(AppState.currentState);
+  
   useKeyboardAware({
     containerRef: scrollRef,
     padding: 12,
@@ -64,6 +69,38 @@ const CrearCuenta: React.FC = () => {
     else if (password2.length > 0)
       setErrorMatch("Las contraseñas no coinciden");
   }, [password, password2]);
+
+  // Detectar cuando la app vuelve al primer plano y verificar email
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", async (nextAppState) => {
+      // Solo verificar si se envió la verificación y la app vuelve a estar activa
+      if (
+        verificacionEnviada &&
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        try {
+          // Recargar el usuario actual de Firebase
+          await auth.currentUser?.reload();
+          
+          // Verificar si el email fue verificado
+          if (auth.currentUser?.emailVerified) {
+            // Email verificado, redirigir a inicio de sesión
+            setModalVisible(false);
+            navigation.navigate("IniciarSesion");
+          }
+        } catch (error) {
+          console.error("Error al verificar el estado del email:", error);
+        }
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [verificacionEnviada, navigation]);
+  
   const validarBBDD = async () => {
     try {
       setEmailUsedError("");
@@ -73,10 +110,9 @@ const CrearCuenta: React.FC = () => {
         password
       );
       // 2. Usamos el UID generado por Firebase para crear el registro en tu BBDD
-      const nameFromEmail = email.split("@")[0];
       await crearUsuarioConId(userCredential.user.uid, { // <--- Pasamos el UID aquí
         id: userCredential.user.uid, // <--- Y lo asignamos explícitamente en el cuerpo
-        nombre: nameFromEmail,
+        nombre: nombre,
         email: email,
         password: password,
         premium: false,
@@ -84,6 +120,7 @@ const CrearCuenta: React.FC = () => {
 
       await sendEmailVerification(userCredential.user);
       setModalVisible(true);
+      setVerificacionEnviada(true);
       startCountdown();
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
@@ -133,6 +170,14 @@ const CrearCuenta: React.FC = () => {
             <Text style={GLOBAL_STYLES.subtitle}>
               ¿Quieres empezar tu experiencia con Convivia?
             </Text>
+            {/* NOMBRE */}
+            <TextField
+              label="Nombre"
+              value={nombre}
+              onChangeText={setNombre}
+              placeholder="Tu nombre"
+              keyboardType="default"
+            />
             {/* EMAIL */}
             <TextField
               label="Correo electrónico"
@@ -255,7 +300,8 @@ const CrearCuenta: React.FC = () => {
                 GLOBAL_STYLES.buttonPrimaryGreen,
                 {
                   backgroundColor:
-                    isValidEmail &&
+                    nombre.trim() &&
+                      isValidEmail &&
                       checkedPolitica &&
                       checkedTerminos &&
                       password === password2 &&
@@ -269,6 +315,7 @@ const CrearCuenta: React.FC = () => {
               disabled={
                 isCounting ||
                 !(
+                  nombre.trim() &&
                   isValidEmail &&
                   checkedPolitica &&
                   checkedTerminos &&

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -18,6 +19,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Keep for fallback or other icons
 import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
+import { useAuthListener } from "../../hooks/useAuthListener";
+import { obtenerUsuarioPorId } from "../../api/usuario";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
@@ -34,6 +37,10 @@ const { width } = Dimensions.get("window");
 const Perfil: React.FC = () => {
   const navigation = useNavigation<any>();
   const [modalVisible, setModalVisible] = useState(false);
+  const user = useAuthListener();
+  const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
+  const [userKarma, setUserKarma] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const handleLogout = () => {
     navigation.navigate('Main');
@@ -44,6 +51,37 @@ const Perfil: React.FC = () => {
     Montserrat_400Regular,
     Montserrat_700Bold,
   });
+
+  useEffect(() => {
+    if (user) {
+      const displayName = user.displayName || user.email?.split("@")[0] || "Usuario";
+      setUserName(displayName);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        if (user?.uid) {
+          const userData = await obtenerUsuarioPorId(user.uid);
+          if (userData) {
+            const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
+            setUserName(realName);
+            // setUserKarma(userData.karma || 0); // Activate when karma is available
+          }
+        }
+      } catch (error) {
+        console.error("Error al cargar los datos del usuario:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (fontsLoaded && user) {
+      fetchUserData();
+    }
+  }, [fontsLoaded, user]);
 
   if (!fontsLoaded) {
     return null;
@@ -86,17 +124,23 @@ const Perfil: React.FC = () => {
 
             {/* User Details */}
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>@Nombre</Text>
-              <Text style={styles.userKarma}>
-                Puntos Karma
-                <FontAwesome5 name="peace" size={14} color={COLORS.primary} style={{ marginLeft: 4 }} />
-                : 290
-              </Text>
+              <Text style={styles.userName}>{userName}</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Text style={styles.userKarma}>
+                  Puntos Karma: {userKarma}
+                  <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
+                </Text>
+              )}
             </View>
 
             {/* Edit Icon */}
-            <TouchableOpacity style={styles.editButton}>
-              <FontAwesome5 name="edit" size={18} color={COLORS.primary} />
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('EditarPerfil')}
+            >
+              <FontAwesome5 name="edit" size={18} color="#ACBF8A" />
             </TouchableOpacity>
           </View>
         </View>
@@ -139,7 +183,7 @@ const Perfil: React.FC = () => {
           {/* Convivia PRO */}
           <MenuItem
             label="Convivia PRO"
-            onPress={() => console.log('Convivia PRO')}
+            onPress={() => navigation.navigate('ConviviaPro')}
             icon={<IconoConviviaPRO width={24} height={24} />}
           />
           <View style={styles.divider} />
@@ -178,6 +222,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     alignItems: "center",
     paddingBottom: HELPERS.hp("8%"),
+    backgroundColor: "#F5F4F2",
   },
   userCard: {
     width: width * 0.9,
@@ -202,7 +247,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   userDetails: {
-    flex: 1,
+    marginRight: HELPERS.wp("15%"),
   },
   userName: {
     fontFamily: FONTS.bold,
@@ -216,7 +261,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   editButton: {
-    padding: 10,
+    padding: 5,
   },
   menuContainer: {
     width: width,

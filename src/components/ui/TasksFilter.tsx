@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Dimensions,
   LayoutChangeEvent,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { COLORS, FONTS } from "../../styles/theme";
@@ -34,6 +36,7 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [headerY, setHeaderY] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
 
   const [showUnassigned, setShowUnassigned] = useState(true);
@@ -42,6 +45,9 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
 
   const handleHeaderLayout = (e: LayoutChangeEvent) => {
     setHeaderHeight(e.nativeEvent.layout.height);
+    e.currentTarget.measure((x, y, width, height, pageX, pageY) => {
+      setHeaderY(pageY);
+    });
   };
 
   const handleFilterSelect = (filter: "today" | "week" | "all") => {
@@ -87,78 +93,89 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
         />
       </TouchableOpacity>
 
-      {/* Contenido del dropdown (overlay absoluto) */}
-      {isOpen && (
-        <View style={[styles.dropdownContent, { top: headerHeight }]}>
-          {/* CUÁNDO — 3 botones compactos */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Cuándo</Text>
-            <View style={styles.filterRow}>
-              {FILTER_OPTIONS.map((item, idx) => {
-                const active = item.key === selectedFilter;
-                return (
-                  <TouchableOpacity
-                    key={item.key}
-                    onPress={() => handleFilterSelect(item.key)}
-                    style={[
-                      styles.filterButton,
-                      active && styles.filterButtonActive,
-                      idx < FILTER_OPTIONS.length - 1 && styles.filterButtonGap,
-                    ]}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: active }}
-                    hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-                  >
-                    <Text
-                      style={[
-                        styles.filterButtonText,
-                        active && styles.filterButtonTextActive,
-                      ]}
-                    >
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* Divider compacto */}
-          <View style={styles.divider} />
-
-          {/* MOSTRAR — checkboxes compactos */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Mostrar</Text>
-            <View style={styles.checkboxGroup}>
-              {[
-                { key: "unassigned", label: "Tareas sin asignar", value: showUnassigned },
-                { key: "overdue", label: "Fuera de plazo", value: showOverdue },
-                { key: "completed", label: "Completadas", value: showCompleted },
-              ].map((option) => (
-                <TouchableOpacity
-                  key={option.key}
-                  style={styles.checkboxItem}
-                  onPress={() =>
-                    handleVisibilityChange(option.key as "unassigned" | "overdue" | "completed")
-                  }
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: option.value }}
-                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                >
-                  <View style={[styles.checkboxTouchArea, { marginTop: 0 }]}>
-                    <Feather
-                      name={option.value ? "check-square" : "square"}
-                      size={18} // un poquito más grande
-                      color={COLORS.secondary}
-                    />
+      {/* Modal para cerrar al tocar fuera */}
+      <Modal
+        visible={isOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsOpen(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setIsOpen(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+              <View style={[styles.dropdownContent, { top: headerY + headerHeight, marginHorizontal: 15 }]}>
+                {/* CUÁNDO — 3 botones compactos */}
+                <View style={styles.section}>
+                  <Text style={styles.sectionLabel}>Cuándo</Text>
+                  <View style={styles.filterRow}>
+                    {FILTER_OPTIONS.map((item, idx) => {
+                      const active = item.key === selectedFilter;
+                      return (
+                        <TouchableOpacity
+                          key={item.key}
+                          onPress={() => handleFilterSelect(item.key)}
+                          style={[
+                            styles.filterButton,
+                            active && styles.filterButtonActive,
+                            idx < FILTER_OPTIONS.length - 1 && styles.filterButtonGap,
+                          ]}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: active }}
+                          hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                        >
+                          <Text
+                            style={[
+                              styles.filterButtonText,
+                              active && styles.filterButtonTextActive,
+                            ]}
+                          >
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
-                  <Text style={styles.checkboxLabel}>{option.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                </View>
+
+                {/* Divider compacto */}
+                <View style={styles.divider} />
+
+                {/* MOSTRAR — checkboxes compactos */}
+                <View style={styles.section}>
+                  <Text style={styles.sectionLabel}>Mostrar</Text>
+                  <View style={styles.checkboxGroup}>
+                    {[
+                      { key: "unassigned", label: "Tareas sin asignar", value: showUnassigned },
+                      { key: "overdue", label: "Fuera de plazo", value: showOverdue },
+                      { key: "completed", label: "Completadas", value: showCompleted },
+                    ].map((option) => (
+                      <TouchableOpacity
+                        key={option.key}
+                        style={styles.checkboxItem}
+                        onPress={() =>
+                          handleVisibilityChange(option.key as "unassigned" | "overdue" | "completed")
+                        }
+                        accessibilityRole="checkbox"
+                        accessibilityState={{ checked: option.value }}
+                        hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                      >
+                        <View style={[styles.checkboxTouchArea, { marginTop: 0 }]}>
+                          <Feather
+                            name={option.value ? "check-square" : "square"}
+                            size={18} // un poquito más grande
+                            color={COLORS.secondary}
+                          />
+                        </View>
+                        <Text style={styles.checkboxLabel}>{option.label}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
-      )}
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -194,6 +211,13 @@ const styles = StyleSheet.create({
     fontSize: 15, // antes 16
     fontFamily: FONTS.bold,
     color: COLORS.secondary,
+  },
+
+  // Overlay del modal para cerrar al tocar fuera
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.1)",
+    justifyContent: "flex-start",
   },
 
   // Backdrop para cerrar al tocar fuera

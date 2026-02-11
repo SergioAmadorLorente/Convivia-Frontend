@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useFonts } from "expo-font";
 import SplashScreen from "./src/screens/SplashScreen";
 import { ToastProvider } from "./src/components/ui/ToastProvider"; // ✅ Importa el Provider
+import { UserProvider } from "./src/contexts/UserContext"; // ✅ Importa el UserProvider
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
 import {
   Montserrat_400Regular,
@@ -33,9 +34,11 @@ const App: React.FC = () => {
   }
 
   return (
-    <ToastProvider position="top" maxToasts={3}>
-      <AppNavigator />
-    </ToastProvider>
+    <UserProvider>
+      <ToastProvider position="top" maxToasts={3}>
+        <AppNavigator />
+      </ToastProvider>
+    </UserProvider>
   );
 };
 

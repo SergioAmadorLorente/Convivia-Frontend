@@ -17,12 +17,14 @@ import GLOBAL_STYLES from "../../../styles/styles";
 import * as Clipboard from "expo-clipboard";
 import BottomBar from "../../../components/ui/BottomBar";
 import { useAuthListener } from "../../../hooks/useAuthListener";
+import { useUser } from "../../../hooks";
 import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
-import { obtenerEspacioPorId } from "../../../api/espacio";
+import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { useToast } from "../../../hooks/useToast";
 
 const { width } = Dimensions.get("window");
 
@@ -34,16 +36,21 @@ const MiResidencia: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(true);
   const user = useAuthListener();
+  const { userData } = useUser();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
   const [residenciaData, setResidenciaData] = useState<any>(null);
 
   const { participants, fetchParticipants } = useFetchParticipants();
   const { generatedCode, generarCodigo, loadingCode } = useCodigoResidencia();
   const [isAbandonPopupOpen, setIsAbandonPopupOpen] = useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [isEliminarParticipantePopupOpen, setIsEliminarParticipantePopupOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isParticipantModalOpen, setIsParticipantModalOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [selectedParticipantRelacion, setSelectedParticipantRelacion] = useState<any>(null);
+  const [isEliminandoParticipante, setIsEliminandoParticipante] = useState(false);
+  const { show: showToast } = useToast();
 
   const handleAbandonarResidencia = () => {
     if (!user || !residenciaData) return;
@@ -58,12 +65,11 @@ const MiResidencia: React.FC = () => {
       const relacion = await obtenerEspacioPorUsuarioId(user.uid);
       if (relacion && relacion.id) {
         await eliminarUsuarioEspacio(relacion.id);
-        // Alert.alert("Éxito", "Has abandonado la residencia correctamente.");
-        // Redirigir a UnirResidencia o refrescar
         setIsAbandonPopupOpen(false);
+        // Redirigir a Bienvenida para que pueda crear o unirse a otra residencia
         navigation.reset({
           index: 0,
-          routes: [{ name: "UnirResidencia" }],
+          routes: [{ name: "Bienvenida" }],
         });
       } else {
         Alert.alert("Error", "No se encontró tu información de miembro.");
@@ -71,6 +77,27 @@ const MiResidencia: React.FC = () => {
     } catch (error) {
       console.error("Error al abandonar residencia:", error);
       Alert.alert("Error", "Ocurrió un error al intentar abandonar la residencia.");
+    }
+  };
+
+  const handleEliminarResidencia = () => {
+    if (!user || !residenciaData) return;
+    setIsDeletePopupOpen(true);
+  };
+
+  const confirmEliminarResidencia = async () => {
+    if (!residenciaData?.id) return;
+    try {
+      await eliminarEspacio(residenciaData.id);
+      setIsDeletePopupOpen(false);
+      // Redirigir a Bienvenida para que pueda crear o unirse a otra residencia
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Bienvenida" }],
+      });
+    } catch (error) {
+      console.error("Error al eliminar residencia:", error);
+      Alert.alert("Error", "Ocurrió un error al intentar eliminar la residencia.");
     }
   };
 
@@ -135,21 +162,44 @@ const MiResidencia: React.FC = () => {
 
   const handleEliminarParticipante = () => {
     setIsParticipantModalOpen(false);
-    Alert.alert(
-      "Eliminar participante",
-      `¿Estás seguro de que quieres eliminar a ${selectedParticipant?.nombre || "este usuario"} de la residencia?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            // Aquí implementar la lógica para eliminar el usuario
-            console.log("Eliminando usuario:", selectedParticipant);
-          },
-        },
-      ]
-    );
+    setIsEliminarParticipantePopupOpen(true);
+  };
+
+  const confirmEliminarParticipante = async () => {
+    if (!selectedParticipantRelacion?.id) {
+      showToast({
+        entity: "tarea",
+        name: "Error al obtener datos del participante",
+        tone: "error",
+      });
+      return;
+    }
+
+    setIsEliminandoParticipante(true);
+    try {
+      await eliminarUsuarioEspacio(selectedParticipantRelacion.id);
+      setIsEliminarParticipantePopupOpen(false);
+      showToast({
+        entity: "tarea",
+        name: "Participante eliminado de la residencia",
+        tone: "success",
+      });
+      // Refrescar la lista de participantes
+      if (residenciaData?.id) {
+        await fetchParticipants(residenciaData.id);
+      }
+      setSelectedParticipant(null);
+      setSelectedParticipantRelacion(null);
+    } catch (error) {
+      console.error("Error al eliminar participante:", error);
+      showToast({
+        entity: "tarea",
+        name: "Error al eliminar el participante",
+        tone: "error",
+      });
+    } finally {
+      setIsEliminandoParticipante(false);
+    }
   };
 
   return (
@@ -234,8 +284,8 @@ const MiResidencia: React.FC = () => {
                 <View style={styles.participantsList}>
                   {participants.length > 0 ? (
                     participants.map((participant, index) => (
-                      <TouchableOpacity 
-                        key={index} 
+                      <TouchableOpacity
+                        key={index}
                         style={styles.participantItem}
                         onPress={() => handleParticipantPress(participant)}
                         activeOpacity={0.7}
@@ -274,7 +324,10 @@ const MiResidencia: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={handleEliminarResidencia}
+                >
                   <Text
                     style={[styles.actionButtonText, { color: COLORS.error }]}
                   >
@@ -323,6 +376,58 @@ const MiResidencia: React.FC = () => {
         residenciaName={residenciaName}
         onClose={() => setIsParticipantModalOpen(false)}
         onEliminar={handleEliminarParticipante}
+        isCurrentUser={selectedParticipant?.id === userData?.id}
+      />
+      <Popup
+        visible={isDeletePopupOpen}
+        onClose={() => setIsDeletePopupOpen(false)}
+        imageType="delete"
+        titleComponent={
+          <Text>
+            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>eliminar</Text> esta residencia?
+          </Text>
+        }
+        description="Se eliminarán todos los datos, tareas y facturas de esta residencia. Esta acción no se puede deshacer."
+        buttons={[
+          {
+            text: "Cancelar",
+            onPress: () => setIsDeletePopupOpen(false),
+            style: GLOBAL_STYLES.buttonSecondaryGrey,
+            textStyle: { color: COLORS.primary }
+          },
+          {
+            text: "Eliminar",
+            onPress: confirmEliminarResidencia,
+            style: [GLOBAL_STYLES.buttonPrimaryGreen,],
+            textStyle: { color: COLORS.primary }
+          },
+        ]}
+      />
+
+      <Popup
+        visible={isEliminarParticipantePopupOpen}
+        onClose={() => setIsEliminarParticipantePopupOpen(false)}
+        imageType="delete"
+        titleComponent={
+          <Text>
+            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>eliminar</Text> a {selectedParticipant?.nombre || "este usuario"}?
+          </Text>
+        }
+        description="Se eliminará de la residencia y perderá acceso a todos los datos compartidos."
+        buttons={[
+          {
+            text: "Cancelar",
+            onPress: () => setIsEliminarParticipantePopupOpen(false),
+            style: GLOBAL_STYLES.buttonSecondaryGrey,
+            textStyle: { color: COLORS.primary }
+          },
+          {
+            text: "Eliminar",
+            onPress: confirmEliminarParticipante,
+            style: GLOBAL_STYLES.buttonPrimaryGreen,
+            textStyle: { color: COLORS.primary },
+          }
+        ]}
       />
     </>
   );

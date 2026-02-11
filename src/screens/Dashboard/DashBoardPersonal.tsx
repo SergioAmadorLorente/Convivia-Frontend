@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   RefreshControl,
 } from "react-native";
 import { useFonts } from "expo-font";
@@ -30,382 +29,110 @@ import Desplegable from "../../components/ui/Desplegable";
 import TasksFilter from "../../components/ui/TasksFilter";
 import Popup from "../../components/ui/Popup";
 import Detalle from "../../components/ui/Detalle";
-import { useAuthListener } from "../../hooks/useAuthListener";
-import { obtenerEspacioPorId, obtenerEspacios } from "../../api/espacio";
-import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
-import { obtenerTareasPorEspacio, obtenerDetallePlantilla, obtenerDetalleTareaInstancia, eliminarTarea } from "../../api/tarea";
-import { obtenerUsuarios } from "../../api/usuario";
+import { useDashboardData } from "../../hooks/useDashboardData";
+import { useDashboardActions } from "../../hooks/useDashboardActions";
 
 const { hp } = HELPERS;
 
 const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const user = useAuthListener();
 
-  // Identificador del usuario actual (ajústalo a tu auth real)
+  const {
+    user,
+    userName,
+    espacioNombre,
+    espacioId,
+    userRelacionId,
+    currentKarma,
+    setCurrentKarma,
+    userNamesMap,
+    tareas,
+    setTareas,
+    loadingTareas,
+    refreshing,
+    setRefreshing,
+    cargarTareas,
+    facturas,
+    setFacturas,
+  } = useDashboardData(route.params?.newSpaceName);
+
   const CURRENT_USER_ID = user?.uid || "u2";
 
-  const [userName, setUserName] = useState<string>("Usuario");
-  // Priorizar el nombre pasado por parámetro si existe
-  const [espacioNombre, setEspacioNombre] = useState<string>(route.params?.newSpaceName || "Mi espacio");
-  const [espacioId, setEspacioId] = useState<string | null>(null);
-  const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
-  const [userNamesMap, setUserNamesMap] = useState<Record<string, string>>({});
-
-  // Escuchar cambios en los parámetros de navegación (ej: al crear una nueva residencia)
-  useEffect(() => {
-    if (route.params?.newSpaceName) {
-      setEspacioNombre(route.params.newSpaceName);
-    }
-  }, [route.params?.newSpaceName]);
-
-  // Cargar información del espacio del usuario
-  useEffect(() => {
-    const cargarEspacio = async () => {
-      try {
-        if (user?.uid) {
-          // Obtener nombre del usuario desde Firebase
-          const displayName = user.displayName || user.email?.split("@")[0] || "Usuario";
-          setUserName(displayName);
-
-          // Obtener espacio del usuario
-          const result = await obtenerEspacioPorUsuarioId(user.uid);
-
-          if (result?.espacioId && result.espacioId !== "string") {
-            setEspacioId(result.espacioId);
-            // Obtener los datos completos del espacio usando su ID
-            try {
-              const espacioData = await obtenerEspacioPorId(result.espacioId);
-              if (espacioData?.nombre) {
-                console.log("✅ Espacio cargado:", espacioData.nombre);
-                // Solo actualizar si NO hay un nombre nuevo en los parámetros
-                if (!route.params?.newSpaceName) {
-                  setEspacioNombre(espacioData.nombre);
-                }
-              }
-            } catch (espacioError) {
-              console.warn("⚠️ Espacio asignado no encontrado (404), buscando fallback...");
-
-              // Si ya tenemos un nombre válido por parámetro, no sobreescribir con fallback aleatorio
-              if (route.params?.newSpaceName) {
-                console.log("✅ Usando nombre de espacio pasado por parámetros:", route.params.newSpaceName);
-                return;
-              }
-
-              // Fallback: Si falla la obtención del espacio específico, mostramos "Mi espacio"
-              setEspacioNombre("Mi espacio");
-            }
-          } else {
-            console.warn("No se encontró espacioId en el resultado");
-            setEspacioNombre("Mi espacio");
-          }
-        }
-      } catch (error) {
-        console.error("Error al cargar espacio:", error);
-        setEspacioNombre("Mi espacio");
-      } finally {
-        setLoadingEspacio(false);
-      }
-    };
-
-    cargarEspacio();
-  }, [user, route.params?.newSpaceName]);
-
-  // Cargar mapa de nombres de usuario (mapea tanto UID como UsuarioEspacioId al nombre)
-  useEffect(() => {
-    const cargarNombresUsuario = async () => {
-      try {
-        const [users, uEspacios] = await Promise.all([
-          obtenerUsuarios(),
-          obtenerUsuarioEspacios()
-        ]);
-
-        if (Array.isArray(users)) {
-          const map: Record<string, string> = {};
-
-          // 1. Mapear UID -> Nombre
-          users.forEach((u: any) => {
-            map[u.id] = u.nombre || u.email || u.id;
-          });
-
-          // 2. Mapear UsuarioEspacioId -> Nombre (usando el mapa anterior)
-          if (Array.isArray(uEspacios)) {
-            uEspacios.forEach((rel: any) => {
-              const relId = rel.id || rel.id_UsuarioEspacio;
-              if (relId && rel.usuarioId && map[rel.usuarioId]) {
-                map[relId] = map[rel.usuarioId];
-              }
-            });
-          }
-
-          setUserNamesMap(map);
-        }
-      } catch (error) {
-        console.error("Error cargando nombres de usuario:", error);
-      }
-    };
-    cargarNombresUsuario();
-  }, [espacioId]);
-
-
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
-  const [selectedFilter, setSelectedFilter] = useState<
-    "today" | "week" | "all"
-  >("today");
+  const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
   const [visibility, setVisibility] = useState({
     showUnassigned: true,
     showOverdue: true,
     showCompleted: true,
   });
 
-  // -------------------------
-  // Datos reales (inicializados vacíos)
-  // -------------------------
-  const [tareas, setTareas] = useState<TaskModel[]>([]);
-  const [loadingTareas, setLoadingTareas] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupOptions, setPopupOptions] = useState<any>({});
+  const showPopup = (opts: any) => { setPopupOptions(opts); setPopupVisible(true); };
+  const handleClosePopup = () => setPopupVisible(false);
 
-  // Ref para el intervalo de polling
-  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [detalleVisible, setDetalleVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
+  const [selectedFactura, setSelectedFactura] = useState<FacturaModel | null>(null);
 
-  // Función reutilizable para cargar tareas
-  const cargarTareas = async (showLoading = true) => {
-    if (!espacioId) return;
+  const closeDetalle = () => { setDetalleVisible(false); setSelectedTask(null); setSelectedFactura(null); };
 
-    if (showLoading) {
-      setLoadingTareas(true);
-    }
+  const openDetalleTarea = (task: TaskModel) => { setSelectedTask(task); setSelectedFactura(null); setDetalleVisible(true); };
+  const openDetalleFactura = (factura: FacturaModel) => { setSelectedFactura(factura); setSelectedTask(null); setDetalleVisible(true); };
 
-    try {
-      console.log("🔄 Cargando tareas para espacio:", espacioId);
-      const tareasRaw = await obtenerTareasPorEspacio(espacioId);
+  const { handleToggleTask, handleDeleteTask, handleDeleteFactura } = useDashboardActions({
+    espacioId,
+    userRelacionId,
+    currentKarma,
+    setCurrentKarma,
+    tareas,
+    setTareas,
+    facturas,
+    setFacturas,
+    showPopup,
+    closeDetalle,
+    CURRENT_USER_ID,
+    activeTab,
+    openDetalleTarea,
+  });
 
-      if (Array.isArray(tareasRaw)) {
-        console.log("✅ Tareas (plantillas) recibidas:", tareasRaw.length);
+  const onRefresh = React.useCallback(() => { setRefreshing(true); cargarTareas(false); }, [cargarTareas, setRefreshing]);
 
-        const mappedTasks = tareasRaw.map((t: any) => {
-          // Intentar capturar cualquier variante del backend (PascalCase, camelCase, snake_case)
-          const fechaFuente = t.startDate || t.fechaFin || t.fechaLimite || t.FechaLimite || t.fecha_limite;
+  useFocusEffect(React.useCallback(() => { cargarTareas(); }, [espacioId, userNamesMap]));
 
-          // Debugging log para ver qué llega exactamente en la fecha del template
-          if (!fechaFuente) {
-            // console.log(`⚠️ Tarea ${t.id || t.Nombre} no tiene fecha definida en el template (recibido: ${JSON.stringify(t)})`);
-          }
-
-          // Si no hay fecha, usamos null temporalmente en lugar de "Today" para que el merge sea más inteligente
-          const fechaObj = fechaFuente ? new Date(fechaFuente) : null;
-
-          const rawTime = t.HoraLimite ?? t.horaLimite ??
-            t.time ?? t.Time ??
-            t.hora ?? t.Hora;
-
-          let cleanTime = "12:00";
-          if (rawTime && typeof rawTime === 'string' && rawTime.length >= 5) {
-            cleanTime = rawTime.substring(0, 5);
-          }
-
-          const userId = t.usuariosAsignacion?.[0];
-          // userNamesMap ahora contiene tanto UID como UsuarioEspacioId, 
-          // así que la resolución funcionará enviemos lo que enviemos.
-          const userNameResolved = userId ? userNamesMap[userId] || userId : null;
-
-          return new TaskModel({
-            id: t.id,
-            Nombre: t.nombre || t.Nombre,
-            Descripcion: t.descripcion || t.Descripcion,
-            karma: t.karma,
-            DiasRepeticion: t.diasRepeticion || [],
-            FechaLimite: (fechaObj as any) || new Date(), // Fallback final para el constructor
-            HoraLimite: cleanTime,
-            isCompleted: t.completada || t.Completada || false,
-            usuarioAsignado: userNameResolved,
-            tareasId: t.tareasId || []
-          });
-        });
-
-        // 🚀 OPTIMIZACIÓN: Fusión Inteligente (Smart Merge)
-        // En lugar de reemplazar todo ciegamente, comparamos con lo que ya tenemos.
-        // Si la tarea ya existe y tiene la misma instancia, preservamos los datos enriquecidos (Hora/Fecha)
-        // para evitar un fetch innecesario y parpadeos en la UI.
-
-        setTareas(prevTareas => {
-          const mergedTasks = mappedTasks.map(newTask => {
-            const existing = prevTareas.find(t => t.id === newTask.id);
-
-            if (existing) {
-              // Verificar si es la misma instancia de tarea (mismo ID de tarea hija)
-              const prevLastInstance = existing.tareasId?.[existing.tareasId.length - 1];
-              const newLastInstance = newTask.tareasId?.[newTask.tareasId.length - 1];
-
-              // Si es la misma instancia: PRESERVAR datos locales enriquecidos/editados
-              const sameInstance = prevLastInstance === newLastInstance;
-
-              if (sameInstance) {
-                // Siempre preservamos los datos locales (editados o enriquecidos) para la misma instancia.
-                // Esto evita que actualizaciones lentas del backend reviertan cambios visuales.
-                return new TaskModel({
-                  ...newTask as any,
-                  FechaLimite: existing.FechaLimite,
-                  HoraLimite: existing.HoraLimite,
-                });
-              }
-            }
-            return newTask;
-          });
-
-          // Identificar qué tareas NECESITAN ser enriquecidas (son nuevas o cambió su instancia)
-          // Lo hacemos en un timeout para no bloquear el renderizado del setTareas
-          setTimeout(() => {
-            const tasksToEnrich = mergedTasks.filter(t => {
-              // Enriquecer si falta la hora (es "12:00") O si falta la asignación (ej: tarea puntual)
-              const needsEnrichment = t.HoraLimite === "12:00" || !t.usuarioAsignado;
-              return t.tareasId && t.tareasId.length > 0 && needsEnrichment;
-            });
-
-            if (tasksToEnrich.length > 0) {
-              fetchRealTaskTimes(tasksToEnrich, espacioId);
-            }
-          }, 100);
-
-          return mergedTasks;
-        });
-      }
-    } catch (error) {
-      console.error("Error cargando tareas:", error);
-    } finally {
-      if (showLoading) {
-        setLoadingTareas(false);
-      }
-      setRefreshing(false);
-    }
+  const handleEditTask = (task: TaskModel) => {
+    navigation.navigate("CreateTask", {
+      taskToEdit: {
+        id: task.id,
+        name: task.Nombre,
+        description: task.Descripcion,
+        time: task.HoraLimite,
+        repeatDays: task.DiasRepeticion,
+        karma: task.karma,
+        date: task.FechaLimite instanceof Date ? task.FechaLimite.toISOString() : task.FechaLimite,
+        assignedUsers: task.usuarioAsignado ? [{ id: task.usuarioAsignado, name: task.usuarioAsignado }] : [],
+        instanceId: task.tareasId?.[0]
+      },
+      onSave: () => cargarTareas(),
+    });
+    closeDetalle();
   };
 
-  // Handler para pull-to-refresh
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    cargarTareas(false);
-  }, [espacioId]);
-
-  // Cargar tareas al enfocar la pantalla
-  useFocusEffect(
-    React.useCallback(() => {
-      // Cargar tareas una vez al entrar o volver a la pantalla
-      cargarTareas();
-
-      return () => {
-        // Cleanup si fuera necesario
-      };
-    }, [espacioId, userNamesMap])
-  );
-
-  // Función para enriquecer tareas con detalles de instancias (solo fecha y hora)
-  const fetchRealTaskTimes = async (currentTasks: TaskModel[], eId: string) => {
-    // Solo procesamos tareas que tienen instancias
-    const candidates = currentTasks.filter(t => t.tareasId && t.tareasId.length > 0);
-
-    if (candidates.length === 0) return;
-
-    console.log(`🕒 Buscando fecha/hora reales de instancias para ${candidates.length} tareas...`);
-
-    // Hacemos las peticiones en paralelo
-    const updates = await Promise.all(candidates.map(async (task) => {
-      try {
-        // Tomamos la última instancia (asumiendo que es la más relevante/reciente)
-        const lastInstanceId = task.tareasId[task.tareasId.length - 1];
-        const detail = await obtenerDetalleTareaInstancia(eId, task.id, lastInstanceId);
-
-        const result: any = { id: task.id };
-        let hasUpdate = false;
-
-        // 1. HORA
-        const timeFound = detail?.horaLimite || detail?.HoraLimite || detail?.hora;
-        if (timeFound && typeof timeFound === 'string' && timeFound.length >= 5) {
-          result.realTime = timeFound.substring(0, 5);
-          hasUpdate = true;
-        }
-
-        // 2. FECHA LIMITE
-        const dateFound = detail?.fechaLimite || detail?.FechaLimite;
-        if (dateFound) {
-          result.realDate = new Date(dateFound);
-          hasUpdate = true;
-        }
-
-        // 3. USUARIO ASIGNADO (DE LA INSTANCIA)
-        const userRelId = detail?.usuarioEspacioId || detail?.relacionId;
-        if (userRelId) {
-          result.realUserId = userRelId;
-          hasUpdate = true;
-        }
-
-        if (hasUpdate) return result;
-
-      } catch (e) {
-        console.warn(`Falló al obtener detalles para tarea ${task.Nombre}`, e);
-      }
-      return null;
-    }));
-
-    // Filtramos actualizaciones válidas
-    const validUpdates = updates.filter(u => u !== null);
-
-    if (validUpdates.length > 0) {
-      console.log(`✅ Actualizando ${validUpdates.length} tareas con fecha/hora de instancias.`);
-      setTareas(prevTareas => prevTareas.map(t => {
-        const update = validUpdates.find(u => u.id === t.id);
-        if (update) {
-          const assignedName = update.realUserId ? userNamesMap[update.realUserId] || update.realUserId : t.usuarioAsignado;
-
-          // Solo actualizamos fecha, hora y asignación
-          return new TaskModel({
-            id: t.id,
-            Nombre: t.Nombre,
-            Descripcion: t.Descripcion,
-            karma: t.karma,
-            DiasRepeticion: t.DiasRepeticion,
-            FechaLimite: update.realDate || t.FechaLimite,
-            HoraLimite: update.realTime || t.HoraLimite,
-            isCompleted: t.isCompleted,
-            FechaCompletada: t.FechaCompletada,
-            usuarioAsignado: assignedName,
-            tareasId: t.tareasId
-          });
-        }
-        return t;
-      }));
-    }
+  const handleEditFactura = (f: FacturaModel) => {
+    navigation.navigate("CreateFactura", {
+      facturaToEdit: {
+        IdFactura: f.IdFactura,
+        Nombre: f.Nombre,
+        Descripcion: f.Descripcion,
+        Precio: f.Precio,
+        UsuariosAsignados: f.UsuariosAsignados,
+        Pagado: f.Pagado
+      },
+      onSave: () => { },
+    });
+    closeDetalle();
   };
-
-  const [facturas, setFacturas] = useState<FacturaModel[]>([
-    new FacturaModel({
-      IdFactura: "f1",
-      Nombre: "Electricidad",
-      Precio: 120,
-      UsuariosAsignados: [
-        { id: "u1", name: "Juan", completed: true },
-        { id: "u2", name: "María", completed: false },
-        { id: "u3", name: "Pedro", completed: true },
-      ],
-      Pagado: false,
-      FechaCreacion: new Date(),
-      Descripcion: "Factura mensual",
-    }),
-    new FacturaModel({
-      IdFactura: "f2",
-      Nombre: "Internet",
-      Precio: 45,
-      UsuariosAsignados: [
-        { id: "u1", name: "Juan", completed: true },
-        { id: "u2", name: "María", completed: true },
-      ],
-      Pagado: true,
-      FechaCreacion: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      FechaCompletada: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      Descripcion: "Fibra 300Mb",
-    }),
-  ]);
-  // -------------------------
 
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
@@ -421,447 +148,43 @@ const DashBoardPersonal: React.FC = () => {
     );
   }
 
-  // -------------------------
-  // Popup helper
-  // -------------------------
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupOptions, setPopupOptions] = useState<any>({});
-  const showPopup = (opts: any) => {
-    setPopupOptions(opts);
-    setPopupVisible(true);
-  };
-  const handleClosePopup = () => setPopupVisible(false);
-
-  // -------------------------
-  // Detalle (tarea/factura)
-  // -------------------------
-  const [detalleVisible, setDetalleVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
-  const [selectedFactura, setSelectedFactura] = useState<FacturaModel | null>(
-    null
-  );
-
-  const openDetalleTarea = (task: TaskModel) => {
-    setSelectedTask(task);
-    setSelectedFactura(null);
-    setDetalleVisible(true);
-  };
-  const openDetalleFactura = (factura: FacturaModel) => {
-    setSelectedFactura(factura);
-    setSelectedTask(null);
-    setDetalleVisible(true);
-  };
-  const closeDetalle = () => {
-    setDetalleVisible(false);
-    setSelectedTask(null);
-    setSelectedFactura(null);
-  };
-
-  // -------------------------
-  // Normalizadores para EDITAR (CreateTask / CreateFactura)
-  // -------------------------
-  const normalizeTaskForEdit = (t: TaskModel) => ({
-    id: t.id,
-    name: t.Nombre ?? "",
-    description: t.Descripcion ?? "",
-    time: t.HoraLimite ?? "12:00",
-    repeatDays: Array.isArray(t.DiasRepeticion) ? t.DiasRepeticion : [],
-    karma: typeof t.karma === "number" ? t.karma : 0,
-    // Asegurar que enviamos la fecha real al formulario
-    date: t.FechaLimite instanceof Date ? t.FechaLimite.toISOString() : (t.FechaLimite || null),
-    assignedUsers: t.usuarioAsignado
-      ? [{ id: t.usuarioAsignado, name: t.usuarioAsignado }]
-      : [],
-    instanceId: Array.isArray(t.tareasId) && t.tareasId.length > 0 ? t.tareasId[0] : null,
-  });
-
-  const normalizeFacturaForEdit = (f: FacturaModel) => ({
-    IdFactura: f.IdFactura,
-    Nombre: f.Nombre ?? "",
-    Descripcion: f.Descripcion ?? "",
-    Precio: typeof f.Precio === "number" ? f.Precio : 0,
-    UsuariosAsignados: Array.isArray(f.UsuariosAsignados)
-      ? f.UsuariosAsignados
-      : [],
-    Pagado: !!f.Pagado,
-    FechaCreacion: f.FechaCreacion,
-    FechaCompletada: f.FechaCompletada ?? null,
-  });
-
-  // -------------------------
-  // Actualizadores tras guardar
-  // -------------------------
-  const updateTaskInState = (updated: {
-    id: string;
-    name: string;
-    description: string;
-    time: string;
-    date?: Date;
-    repeatDays: number[];
-    karma: number;
-    assignedUsers: { id: string; name: string }[];
-  }) => {
-    setTareas((prev) =>
-      prev.map((t) =>
-        t.id === updated.id
-          ? new TaskModel({
-            id: updated.id,
-            Nombre: updated.name,
-            Descripcion: updated.description,
-            HoraLimite: updated.time,
-            DiasRepeticion: updated.repeatDays ?? [],
-            karma: updated.karma,
-            FechaLimite: updated.date || t.FechaLimite,
-            isCompleted: t.isCompleted,
-            FechaCompletada: t.FechaCompletada ?? null,
-            usuarioAsignado:
-              updated.assignedUsers?.[0]?.name ?? t.usuarioAsignado ?? null,
-          })
-          : t
-      )
-    );
-  };
-
-  const updateFacturaInState = (
-    updated: Partial<ReturnType<FacturaModel["toProps"]>> & {
-      IdFactura: string;
-    }
-  ) => {
-    setFacturas((prev) =>
-      prev.map((f) =>
-        f.IdFactura === updated.IdFactura
-          ? new FacturaModel({
-            ...f.toProps(),
-            ...updated,
-          })
-          : f
-      )
-    );
-  };
-
-  // -------------------------
-  // Toggle (tarea/factura)
-  // -------------------------
-  const handleToggleTask = (id: string) => {
-    if (activeTab === "tareas") {
-      // ---------- TAREAS ----------
-      const task = tareas.find((t) => t.id === id);
-      if (!task) return;
-
-      const due = new Date(task.FechaLimite);
-      const dueStart = new Date(
-        due.getFullYear(),
-        due.getMonth(),
-        due.getDate()
-      );
-      const today = new Date();
-      const todayStart = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate()
-      );
-      const wasOverdue = dueStart.getTime() < todayStart.getTime();
-
-      // Bloquear completar si no está asignada
-      if (!task.isCompleted && !task.usuarioAsignado) {
-        showPopup({
-          imageType: "error",
-          title: "Para completar una tarea debe estar asignada",
-          description:
-            "Ve al detalle de la tarea y asígnala a un usuario para poder marcarla como completada.",
-          buttons: [
-            { text: "Cancelar", onPress: () => { } },
-            { text: "Ir al detalle", onPress: () => openDetalleTarea(task) },
-          ],
-        });
-        return;
-      }
-
-      // Desmarcar -> confirmar
-      if (task.isCompleted) {
-        showPopup({
-          imageType: "goback",
-          title: "¿Estás seguro de que quieres marcar la tarea como pendiente?",
-          description:
-            "Perderás los puntos de Karma obtenidos con esta tarea. Podrás recuperarlos al completarla de nuevo.",
-          buttons: [
-            { text: "Cancelar", onPress: () => { } },
-            {
-              text: "Aceptar",
-              onPress: () => {
-                setTareas((prev) =>
-                  prev.map((t) => (t.id === id ? t.toggleComplete() : t))
-                );
-              },
-            },
-          ],
-        });
-        return;
-      }
-
-      // Completar -> popups
-      if (!task.isCompleted) {
-        if (wasOverdue) {
-          showPopup({
-            imageType: "happy",
-            title: "¡Casi lo logras!",
-            description:
-              "La próxima vez, intenta completar la tarea dentro del plazo.\n\nHas ganado 0 puntos de Karma.",
-            buttons: [{ text: "Aceptar", onPress: () => { } }],
-          });
-        } else {
-          showPopup({
-            imageType: "happy",
-            title: "¡Felicidades!",
-            description: `Has completado una tarea. Has ganado ${task.karma} puntos de Karma.`,
-            buttons: [{ text: "Aceptar", onPress: () => { } }],
-          });
-        }
-
-        setTareas((prev) =>
-          prev.map((t) => (t.id === id ? t.toggleComplete() : t))
-        );
-      }
-    } else {
-
-      // ---------- FACTURAS ----------
-      const factura = facturas.find((f) => f.IdFactura === id);
-      if (!factura) return;
-
-      // Desmarcar (Pagado -> pendiente): confirmar
-      if (factura.Pagado) {
-        showPopup({
-          imageType: "goback",
-          title: "¿Estás seguro de que quieres marcar la factura como pendiente?",
-          buttons: [
-            { text: "Cancelar", onPress: () => { } },
-            {
-              text: "Aceptar",
-              onPress: () => {
-                setFacturas((prev) =>
-                  prev.map((f) => (f.IdFactura === id ? f.togglePaid() : f))
-                );
-              },
-            },
-          ],
-        });
-        return;
-      }
-
-      // 👉 Nueva lógica: permitir que el usuario actual marque su parte y, si con ello
-      // quedan todos completos, completar factura.
-
-      // 1) Buscar usuario actual en la factura
-      const usuarios = Array.isArray(factura.UsuariosAsignados)
-        ? factura.UsuariosAsignados
-        : [];
-      const yo = usuarios.find((u) => u.id === CURRENT_USER_ID);
-
-      // 2) Si no estás asignado a esta factura, no puedes marcar
-      if (!yo) {
-        showPopup({
-          imageType: "error",
-          title: "No estás asignado a esta factura",
-          description: "Solo los usuarios asignados pueden marcar su parte como pagada.",
-          buttons: [{ text: "Aceptar", onPress: () => { } }],
-        });
-        return;
-      }
-
-      // 3) Si tu parte no estaba completada, complétala primero en el modelo
-      let facturaActualizada = factura;
-      if (!yo.completed) {
-        facturaActualizada = facturaActualizada.withUserCompleted(CURRENT_USER_ID, true);
-
-        // Persistir actualización en estado
-        setFacturas((prev) =>
-          prev.map((f) => (f.IdFactura === id ? facturaActualizada : f))
-        );
-      }
-
-      // 4) Re-evaluar si ahora todos han completado su parte
-      if (!facturaActualizada.canMarkPaid()) {
-        // Todavía falta alguien -> popup informativo (no marcamos Pagado aún)
-        const restantes = (facturaActualizada.UsuariosAsignados ?? []).filter((u) => !u.completed);
-        const nombresRestantes = restantes.map((u) => u.name).join(", ");
-        showPopup({
-          imageType: "success", // puedes usar "error" si prefieres
-          title: "Has marcado tu parte como pagada",
-          description: restantes.length > 0 ? `Faltan por pagar: ${nombresRestantes}.` : undefined,
-          buttons: [{ text: "Aceptar", onPress: () => { } }],
-        });
-        return;
-      }
-
-      // 5) ✅ Todos completos -> marcar como Pagada + popup happy
-      showPopup({
-        imageType: "happy",
-        title: "Has gestionado correctamente una factura. ¡Así se hace!",
-        buttons: [{ text: "Aceptar", onPress: () => { } }],
-      });
-
-      setFacturas((prev) =>
-        prev.map((f) => (f.IdFactura === id ? f.togglePaid() : f))
-      );
-    }
-  };
-
-  const handleDeleteTask = async (id: string) => {
-    if (!espacioId) {
-      console.warn("No se puede eliminar la tarea: espacioId no disponible.");
-      return;
-    }
-
-    showPopup({
-      imageType: "goback",
-      title: "¿Eliminar tarea?",
-      description: "Esta acción eliminará la plantilla y todas sus instancias de forma permanente.",
-      buttons: [
-        { text: "Cancelar", onPress: () => { } },
-        {
-          text: "Eliminar",
-          onPress: async () => {
-            try {
-              await eliminarTarea(espacioId, id);
-              setTareas((prev) => prev.filter((t) => t.id !== id));
-              closeDetalle();
-              showPopup({
-                title: "Éxito",
-                description: "La tarea ha sido eliminada.",
-                imageType: "success",
-                buttons: [{ text: "Aceptar", onPress: () => { } }]
-              });
-            } catch (error) {
-              console.error("Error al eliminar tarea:", error);
-              showPopup({
-                title: "Error",
-                description: "No se pudo eliminar la tarea. Intenta de nuevo.",
-                imageType: "error",
-                buttons: [{ text: "Aceptar", onPress: () => { } }]
-              });
-            }
-          }
-        },
-      ],
-    });
-  };
-
-  const handleDeleteFactura = (id: string) => {
-    // Implementación similar para facturas si fuera necesario
-    console.log("Eliminar factura:", id);
-  };
-
-  // -------------------------
-  // Navegación a editar (desde Detalle)
-  // -------------------------
-  const handleEditTask = (task: TaskModel) => {
-    const normalized = normalizeTaskForEdit(task);
-    navigation.navigate("CreateTask", {
-      taskToEdit: normalized,
-      onSave: (updatedTaskData: any) => {
-        updateTaskInState(updatedTaskData);
-      },
-    });
-    closeDetalle();
-  };
-
-  const handleEditFactura = (factura: FacturaModel) => {
-    const normalized = normalizeFacturaForEdit(factura);
-    navigation.navigate("CreateFactura", {
-      facturaToEdit: normalized,
-      onSave: (updatedFacturaData: any) => {
-        updateFacturaInState(updatedFacturaData);
-      },
-    });
-    closeDetalle();
-  };
-
-  // -------------------------
-  // Listas y filtros
-  // -------------------------
-  const currentItems = activeTab === "tareas" ? tareas : facturas;
-
-  const isDone = (i: any) => {
-    if (typeof i.isCompleted === "boolean") return i.isCompleted;
-    if (typeof i.Pagado === "boolean") return i.Pagado;
-    return false;
-  };
-
+  // Filtrado de items para la UI
   let pendingItems: any[] = [];
   let completedItems: any[] = [];
   let overdueItems: any[] = [];
-  let unassignedPendingItems: any[] = [];
-  let unassignedOverdueItems: any[] = [];
 
   if (activeTab === "tareas") {
-    const today = new Date();
-    const todayStart = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
     const isOverdue = (it: TaskModel) => {
       const d = new Date(it.FechaLimite);
-      const dStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      return dStart.getTime() < todayStart.getTime();
+      d.setHours(0, 0, 0, 0);
+      return d.getTime() < todayStart.getTime();
     };
 
-    const allPending = (currentItems as TaskModel[]).filter((i) => !isDone(i));
-    const assignedPending = allPending.filter((i) => i.usuarioAsignado);
-    const allUnassignedPending = allPending.filter((i) => !i.usuarioAsignado);
+    const allPending = tareas.filter(i => !i.isCompleted);
+    overdueItems = allPending.filter(isOverdue);
+    const onTimePending = allPending.filter(i => !isOverdue(i));
 
-    overdueItems = assignedPending.filter(isOverdue);
-    const onTimePending = assignedPending.filter((i) => !isOverdue(i));
-
-    pendingItems = onTimePending.filter((item) => {
+    const filterFunc = (item: TaskModel) => {
       if (selectedFilter === "all") return true;
       if (selectedFilter === "today") return item.isDueToday();
       if (selectedFilter === "week") return item.isDueWithinDays(7);
       return true;
-    });
+    };
 
-    if (visibility.showUnassigned) {
-      const unassignedOnTime = allUnassignedPending.filter(
-        (i) => !isOverdue(i)
-      );
-      const unassignedOverdue = allUnassignedPending.filter(isOverdue);
-
-      unassignedPendingItems = unassignedOnTime.filter((item) => {
-        if (selectedFilter === "all") return true;
-        if (selectedFilter === "today") return item.isDueToday();
-        if (selectedFilter === "week") return item.isDueWithinDays(7);
-        return true;
-      });
-
-      unassignedOverdueItems = unassignedOverdue;
-
-      pendingItems = [...pendingItems, ...unassignedPendingItems];
-      overdueItems = [...overdueItems, ...unassignedOverdueItems];
+    pendingItems = onTimePending.filter(filterFunc);
+    if (!visibility.showUnassigned) {
+      pendingItems = pendingItems.filter(i => i.usuarioAsignado);
+      overdueItems = overdueItems.filter(i => i.usuarioAsignado);
     }
-
-    completedItems = (currentItems as TaskModel[]).filter((i) => {
-      return (
-        isDone(i) &&
-        (typeof (i as any).isCompletedWithinDays === "function"
-          ? (i as any).isCompletedWithinDays(7)
-          : true)
-      );
-    });
+    completedItems = tareas.filter(i => i.isCompleted && i.isCompletedWithinDays(7));
   } else {
-    // FACTURAS: pendientes vs pagadas
-    pendingItems = currentItems.filter((i: any) => !isDone(i));
-    completedItems = currentItems.filter((i: any) => isDone(i));
+    pendingItems = facturas.filter(i => !i.Pagado);
+    completedItems = facturas.filter(i => i.Pagado);
   }
 
-  // -------------------------
-  // Helpers para facturas
-  // -------------------------
-  const fmtEUR = (n: number) =>
-    new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "EUR",
-    }).format(n || 0);
+  const fmtEUR = (n: number) => new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n || 0);
 
   return (
     <KeyboardAvoidingView
@@ -869,225 +192,95 @@ const DashBoardPersonal: React.FC = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
-      <Header
-        username={`@${userName.split(" ")[0].toLowerCase()}`}
-        date={new Date()}
-        location={espacioNombre}
-      />
-
+      <Header username={userName} date={new Date()} location={espacioNombre} />
       <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
 
       <ScrollView
-        contentContainerStyle={[
-          GLOBAL_STYLES.scrollContainer2,
-          { paddingBottom: hp("15%") },
-          Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
-        ]}
+        contentContainerStyle={[GLOBAL_STYLES.scrollContainer2, { paddingBottom: hp("15%") }, Platform.OS === "web" ? WEB_FULL_VIEWPORT : {}]}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
         keyboardShouldPersistTaps="handled"
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={["#8B5CF6"]} // Color morado para Android
-            tintColor="#8B5CF6" // Color morado para iOS
-          />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#8B5CF6"]} tintColor="#8B5CF6" />}
       >
-        {/* Filtro solo para tareas */}
         {activeTab === "tareas" && (
-          <View
-            style={[
-              GLOBAL_STYLES.fullWidth,
-              { marginTop: 10, marginBottom: 15 },
-            ]}
-          >
-            <TasksFilter
-              onFilterChange={setSelectedFilter}
-              onVisibilityChange={setVisibility}
-            />
+          <View style={[GLOBAL_STYLES.fullWidth, { marginTop: 10, marginBottom: 15 }]}>
+            <TasksFilter onFilterChange={setSelectedFilter} onVisibilityChange={setVisibility} />
           </View>
         )}
 
         <View style={GLOBAL_STYLES.container}>
-          {/* PENDIENTES */}
           {pendingItems.length > 0 && (
-            <Desplegable
-              title="Pendientes"
-              fontSize={SIZES.text16}
-              fontWeight="bold"
-              defaultOpen={true}
-            >
-              {pendingItems.map((item: any) => {
-                if (activeTab === "tareas") {
-                  const task = item as TaskModel;
-                  return (
-                    <TaskItem
-                      key={task.id}
-                      variant="tarea"
-                      time={
-                        typeof (task as any).formattedTime === "function"
-                          ? task.formattedTime()
-                          : undefined
-                      }
-                      fechaLimite={
-                        task.FechaLimite
-                          ? new Date(task.FechaLimite).toLocaleDateString(
-                            "es-ES",
-                            { day: "2-digit", month: "2-digit" }
-                          )
-                          : undefined
-                      }
-                      title={task.Nombre}
-                      isCompleted={task.isCompleted}
-                      unassigned={!task.usuarioAsignado}
-                      onToggle={() => handleToggleTask(task.id)}
-                      onPressRow={() => openDetalleTarea(task)}
-                    />
-                  );
-                } else {
-                  const f = item as FacturaModel;
-                  const perStr = fmtEUR(f.perPersonPrice());
-                  return (
-                    <TaskItem
-                      key={f.IdFactura}
-                      variant="factura"
-                      dateLabel={f.formattedDate("es-ES")}
-                      perPersonPrice={perStr}
-                      title={f.Nombre}
-                      isCompleted={f.Pagado}
-                      paidCount={f.paidUsersCount()}
-                      totalAssigned={f.totalUsersCount()}
-                      onToggle={() => handleToggleTask(f.IdFactura)}
-                      onPressRow={() => openDetalleFactura(f)}
-                    />
-                  );
-                }
-              })}
+            <Desplegable title="Pendientes" fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+              {pendingItems.map((item: any) => (
+                <TaskItem
+                  key={activeTab === "tareas" ? item.id : item.IdFactura}
+                  variant={activeTab === "tareas" ? "tarea" : "factura"}
+                  title={item.Nombre}
+                  isCompleted={activeTab === "tareas" ? item.isCompleted : item.Pagado}
+                  onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
+                  onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
+                  time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
+                  fechaLimite={activeTab === "tareas" ? new Date(item.FechaLimite).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" }) : undefined}
+                  dateLabel={activeTab === "facturas" ? item.formattedDate?.("es-ES") : undefined}
+                  perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
+                  paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
+                  totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
+                />
+              ))}
             </Desplegable>
           )}
 
-          {/* FUERA DE PLAZO (solo tareas) */}
-          {activeTab === "tareas" &&
-            visibility.showOverdue &&
-            overdueItems.length > 0 && (
-              <Desplegable
-                title="Fuera de plazo"
-                fontSize={SIZES.text16}
-                fontWeight="bold"
-                defaultOpen={true}
-              >
-                {overdueItems.map((task: TaskModel) => (
-                  <TaskItem
-                    key={task.id}
-                    variant="tarea"
-                    time={
-                      typeof (task as any).formattedTime === "function"
-                        ? task.formattedTime()
-                        : undefined
-                    }
-                    fechaLimite={
-                      task.FechaLimite
-                        ? new Date(task.FechaLimite).toLocaleDateString(
-                          "es-ES",
-                          { day: "2-digit", month: "2-digit" }
-                        )
-                        : undefined
-                    }
-                    title={task.Nombre}
-                    isCompleted={task.isCompleted}
-                    unassigned={!task.usuarioAsignado}
-                    onToggle={() => handleToggleTask(task.id)}
-                    onPressRow={() => openDetalleTarea(task)}
-                  />
-                ))}
-              </Desplegable>
-            )}
+          {activeTab === "tareas" && visibility.showOverdue && overdueItems.length > 0 && (
+            <Desplegable title="Fuera de plazo" fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+              {overdueItems.map((task: TaskModel) => (
+                <TaskItem
+                  key={task.id}
+                  variant="tarea"
+                  title={task.Nombre}
+                  isCompleted={task.isCompleted}
+                  onToggle={() => handleToggleTask(task.id)}
+                  onPressRow={() => openDetalleTarea(task)}
+                  time={task.formattedTime()}
+                  fechaLimite={new Date(task.FechaLimite).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" })}
+                />
+              ))}
+            </Desplegable>
+          )}
 
-          {/* COMPLETADAS / PAGADAS */}
           {visibility.showCompleted && completedItems.length > 0 && (
-            <Desplegable
-              title={activeTab === "tareas" ? "Completadas" : "Pagadas"}
-              fontSize={SIZES.text16}
-              fontWeight="bold"
-              defaultOpen={true}
-            >
-              {completedItems.map((item: any) => {
-                if (activeTab === "tareas") {
-                  const task = item as TaskModel;
-                  return (
-                    <TaskItem
-                      key={task.id}
-                      variant="tarea"
-                      time={
-                        typeof (task as any).formattedTime === "function"
-                          ? task.formattedTime()
-                          : undefined
-                      }
-                      fechaLimite={
-                        task.FechaLimite
-                          ? new Date(task.FechaLimite).toLocaleDateString(
-                            "es-ES",
-                            { day: "2-digit", month: "2-digit" }
-                          )
-                          : undefined
-                      }
-                      title={task.Nombre}
-                      isCompleted={task.isCompleted}
-                      unassigned={!task.usuarioAsignado}
-                      onToggle={() => handleToggleTask(task.id)}
-                      onPressRow={() => openDetalleTarea(task)}
-                    />
-                  );
-                } else {
-                  const f = item as FacturaModel;
-                  const perStr = fmtEUR(f.perPersonPrice());
-                  return (
-                    <TaskItem
-                      key={f.IdFactura}
-                      variant="factura"
-                      dateLabel={f.formattedDate("es-ES")}
-                      perPersonPrice={perStr}
-                      title={f.Nombre}
-                      isCompleted={f.Pagado}
-                      paidCount={f.paidUsersCount()}
-                      totalAssigned={f.totalUsersCount()}
-                      onToggle={() => handleToggleTask(f.IdFactura)}
-                      onPressRow={() => openDetalleFactura(f)}
-                    />
-                  );
-                }
-              })}
+            <Desplegable title={activeTab === "tareas" ? "Completadas" : "Pagadas"} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+              {completedItems.map((item: any) => (
+                <TaskItem
+                  key={activeTab === "tareas" ? item.id : item.IdFactura}
+                  variant={activeTab === "tareas" ? "tarea" : "factura"}
+                  title={item.Nombre}
+                  isCompleted={activeTab === "tareas" ? item.isCompleted : item.Pagado}
+                  onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
+                  onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
+                  time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
+                />
+              ))}
             </Desplegable>
           )}
         </View>
       </ScrollView>
 
-      {/* Popup global */}
       <Popup
         visible={popupVisible}
         onClose={handleClosePopup}
         title={popupOptions.title || ""}
         description={popupOptions.description}
         imageType={popupOptions.imageType}
-        buttons={
-          popupOptions.buttons ?? [{ text: "Aceptar", onPress: () => { } }]
-        }
-        code={popupOptions.code}
+        buttons={popupOptions.buttons ?? [{ text: "Aceptar", onPress: handleClosePopup }]}
       />
 
-      {/* Detalle unificado */}
       {selectedTask && (
         <Detalle
           visible={detalleVisible}
           kind="tarea"
           task={selectedTask}
           onClose={closeDetalle}
-          onComplete={() => {
-            handleToggleTask(selectedTask.id);
-            closeDetalle(); // cierra tras completar
-          }}
+          onComplete={() => { handleToggleTask(selectedTask.id); closeDetalle(); }}
           onEdit={() => handleEditTask(selectedTask)}
           onDelete={() => handleDeleteTask(selectedTask.id)}
         />
@@ -1099,10 +292,7 @@ const DashBoardPersonal: React.FC = () => {
           kind="factura"
           factura={selectedFactura}
           onClose={closeDetalle}
-          onComplete={() => {
-            handleToggleTask(selectedFactura.IdFactura);
-            closeDetalle(); // cierra tras completar
-          }}
+          onComplete={() => { handleToggleTask(selectedFactura.IdFactura); closeDetalle(); }}
           onEdit={() => handleEditFactura(selectedFactura)}
           onDelete={() => handleDeleteFactura(selectedFactura.IdFactura)}
         />

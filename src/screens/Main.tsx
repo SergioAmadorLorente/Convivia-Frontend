@@ -39,12 +39,7 @@ const Main: React.FC = () => {
       >
         Inicia sesión
       </Button>
-      <Button
-        style={GLOBAL_STYLES.buttonSecondaryGrey}
-        onPress={() => navigation.navigate("DashBoardPersonal")}
-      >
-        DashBoard (Temporal)
-      </Button>
+
     </ScrollView>
   );
 };

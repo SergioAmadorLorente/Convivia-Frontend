@@ -21,8 +21,10 @@ import InfoLegal from "../screens/Perfil/InfoLegal/InfoLegal";
 import { RootStackParamList } from "./RootStackParamList";
 import MiResidencia from "../screens/Perfil/MiResidencia/MiResidencia";
 import EditarResidencia from "../screens/Perfil/MiResidencia/EditarResidencia";
+import EditarPerfil from "../screens/Perfil/EditarPerfil/EditarPerfil";
 import FAQ from "../screens/FAQ/FAQ";
 import MiKarma from "../screens/Perfil/MiKarma/MiKarma";
+import ConviviaPro from "../screens/ConviviaPro/ConviviaPro";
 import { COLORS } from "../styles/theme";
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -109,6 +111,11 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="Perfil"
           component={Perfil}
+          options={{ ...defaultScreenOptions, headerLeft: () => null }}
+        />
+        <Stack.Screen
+          name="EditarPerfil"
+          component={EditarPerfil}
           options={defaultScreenOptions}
         />
         <Stack.Screen
@@ -149,7 +156,11 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen 
           name="MiKarma" 
           component={MiKarma}
-          options={defaultScreenOptions} 
+          options={defaultScreenOptions} />
+        <Stack.Screen
+          name="ConviviaPro"
+          component={ConviviaPro}
+          options={{ headerShown: false }}
         />
         </Stack.Navigator>
       </NavigationContainer>

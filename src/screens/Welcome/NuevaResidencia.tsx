@@ -1,5 +1,5 @@
 // src/screens/NuevaResidencia.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Text,
   View,
@@ -23,11 +23,66 @@ import ConfettiButton from '../../components/ui/ConfettiButton';
 
 import { crearEspacio, crearEspacioConUsuario } from '../../api/espacio';
 import { useAuthListener } from '../../hooks/useAuthListener';
+import { obtenerEspacioPorUsuarioId } from '../../api/usuarioEspacio';
+
+// Lista de palabras prohibidas (insultos en español e inglés)
+const PALABRAS_PROHIBIDAS = [
+  // Español
+  'puta', 'puto', 'mierda', 'cono', 'joder', 'cabron', 'cabrón', 'gilipollas', 
+  'idiota', 'tonto', 'estupido', 'estúpido', 'imbecil', 'imbécil', 'pendejo',
+  'carajo', 'verga', 'chingar', 'marica', 'maricon', 'maricón', 'gay',
+  // Inglés
+  'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'damn', 'crap', 'dick',
+  'pussy', 'cock', 'slut', 'whore', 'nigger', 'fag', 'retard',
+];
+
+// Función para validar el nombre de la residencia
+const validarNombreResidencia = (nombre: string): { valido: boolean; mensaje?: string } => {
+  const nombreTrimmed = nombre.trim();
+  const nombreLower = nombreTrimmed.toLowerCase();
+
+  // Verificar palabras prohibidas
+  for (const palabra of PALABRAS_PROHIBIDAS) {
+    if (nombreLower.includes(palabra)) {
+      return { valido: false, mensaje: 'El nombre contiene palabras inapropiadas.' };
+    }
+  }
+
+  // Verificar símbolos sospechosos y patrones SQL maliciosos
+  const patronesSospechosos = [
+    /[<>{}[\]\\]/,  // Símbolos raros
+    /script/i,       // Posible XSS
+    /select.*from/i, // SQL SELECT
+    /drop.*table/i,  // SQL DROP
+    /insert.*into/i, // SQL INSERT
+    /update.*set/i,  // SQL UPDATE
+    /delete.*from/i, // SQL DELETE
+    /union.*select/i, // SQL UNION
+    /exec\s*\(/i,    // Ejecución de código
+    /--/,            // Comentarios SQL
+    /;.*drop/i,      // Comandos SQL encadenados
+    /'\s*or\s*'1'\s*=\s*'1/i, // SQL Injection clásico
+  ];
+
+  for (const patron of patronesSospechosos) {
+    if (patron.test(nombre)) {
+      return { valido: false, mensaje: 'El nombre contiene caracteres o código no permitido.' };
+    }
+  }
+
+  // Verificar que solo contenga caracteres permitidos (letras, números, espacios y algunos símbolos básicos)
+  const caracteresPermitidos = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s\-_.,!?()]+$/;
+  if (!caracteresPermitidos.test(nombre)) {
+    return { valido: false, mensaje: 'El nombre solo puede contener letras, números y símbolos básicos (. , - _ ! ?)' };
+  }
+
+  return { valido: true };
+};
 
 const NuevaResidencia: React.FC = () => {
   const [nombreResidencia, setNombreResidencia] = useState<string>('');
-  const [direccion, setDireccion] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [touched, setTouched] = useState<boolean>(false);
   const navigation = useNavigation<any>();
   const user = useAuthListener();
 
@@ -43,20 +98,51 @@ const NuevaResidencia: React.FC = () => {
 
   // Validaciones independientes
   const nombreValido =
-    nombreResidencia.trim().length > 0 &&
-    nombreResidencia.trim().length <= 20;
+    nombreResidencia.trim().length >= 2 &&
+    nombreResidencia.trim().length <= 80 &&
+    validarNombreResidencia(nombreResidencia).valido;
 
-  const direccionValida =
-    direccion.trim().length > 0 &&
-    direccion.trim().length <= 100;
-
-  // El botón solo se habilita si ambos son válidos
-  const hasText = nombreValido && direccionValida;
+  // El botón solo se habilita si el nombre es válido
+  const hasText = nombreValido;
 
   const [fontsLoaded] = useFonts({ DMSerifDisplay_400Regular, Montserrat_400Regular, Montserrat_700Bold });
 
   const containerRef = useRef<any>(null);
   useKeyboardAware({ containerRef, padding: 12 });
+
+  // Verificar si el usuario ya tiene una residencia
+  useEffect(() => {
+    const verificarResidenciaExistente = async () => {
+      if (!user?.uid) return;
+
+      try {
+        const espacioExistente = await obtenerEspacioPorUsuarioId(user.uid);
+
+        if (espacioExistente && espacioExistente.espacioId && espacioExistente.espacioId !== "string") {
+          // El usuario ya tiene una residencia
+          showPopup({
+            title: 'Ya tienes una residencia',
+            description: 'Solo puedes crear una residencia por cuenta. Serás redirigido a tu dashboard.',
+            imageType: 'error',
+            buttons: [
+              {
+                text: 'Ir al Dashboard',
+                onPress: () => {
+                  setPopupVisible(false);
+                  navigation.navigate('DashBoardPersonal');
+                }
+              }
+            ],
+          });
+        }
+      } catch (error) {
+        console.log('Error verificando residencia existente:', error);
+        // Si hay error, permitimos continuar (podría ser que no tenga residencia)
+      }
+    };
+
+    verificarResidenciaExistente();
+  }, [user]);
 
   if (!fontsLoaded) {
     return (
@@ -70,7 +156,19 @@ const NuevaResidencia: React.FC = () => {
     if (!hasText) {
       showPopup({
         title: 'Campo requerido',
-        description: 'Por favor, ingresa un nombre y dirección válidos para la residencia.',
+        description: 'Por favor, ingresa un nombre válido para la residencia.',
+        imageType: 'error',
+        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+      });
+      return;
+    }
+
+    // Validar contenido del nombre
+    const validacion = validarNombreResidencia(nombreResidencia);
+    if (!validacion.valido) {
+      showPopup({
+        title: 'Nombre no válido',
+        description: validacion.mensaje,
         imageType: 'error',
         buttons: [{ text: 'Aceptar', onPress: () => { } }],
       });
@@ -92,7 +190,7 @@ const NuevaResidencia: React.FC = () => {
       const result = await crearEspacioConUsuario(
         {
           nombre: nombreResidencia.trim(),
-          direccion: direccion.trim(),
+          direccion: '',
         },
         user.uid
       );
@@ -132,7 +230,6 @@ const NuevaResidencia: React.FC = () => {
 
       // Limpiar campos después de crear
       setNombreResidencia('');
-      setDireccion('');
     } catch (error) {
       console.error('Error al crear residencia:', error);
       showPopup({
@@ -168,27 +265,21 @@ const NuevaResidencia: React.FC = () => {
               value={nombreResidencia}
               onChangeText={setNombreResidencia}
               placeholder="Piso Tarragona"
+              onBlur={() => setTouched(true)}
             />
-            {nombreResidencia.trim().length === 0 && (
+            {touched && nombreResidencia.trim().length < 2 && nombreResidencia.trim().length > 0 && (
+              <Text style={styles.errorText}>El nombre debe tener al menos 2 caracteres</Text>
+            )}
+            {touched && nombreResidencia.trim().length === 0 && (
               <Text style={styles.errorText}>Ingresa un nombre válido</Text>
             )}
-            {nombreResidencia.trim().length > 20 && (
-              <Text style={styles.errorText}>El nombre no puede superar 20 caracteres</Text>
+            {touched && nombreResidencia.trim().length > 80 && (
+              <Text style={styles.errorText}>El nombre no puede superar 80 caracteres</Text>
+            )}
+            {touched && nombreResidencia.trim().length >= 2 && nombreResidencia.trim().length <= 80 && !validarNombreResidencia(nombreResidencia).valido && (
+              <Text style={styles.errorText}>{validarNombreResidencia(nombreResidencia).mensaje}</Text>
             )}
 
-            {/* Dirección */}
-            <TextField
-              label="Dirección de la residencia"
-              value={direccion}
-              onChangeText={setDireccion}
-              placeholder="Calle Mayor 123, Madrid"
-            />
-            {direccion.trim().length === 0 && (
-              <Text style={styles.errorText}>Ingresa una dirección válida</Text>
-            )}
-            {direccion.trim().length > 100 && (
-              <Text style={styles.errorText}>La dirección no puede superar 100 caracteres</Text>
-            )}
 
             {/* Botón */}
             <ConfettiButton

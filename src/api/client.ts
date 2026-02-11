@@ -1,15 +1,12 @@
 import axios from "axios";
 import { Platform } from "react-native";
-
-const ANDROID_URL = "https://xp5h45z8-7226.uks1.devtunnels.ms/api";
-const IOS_WEB_URL = "https://xp5h45z8-7226.uks1.devtunnels.ms/api";
-
+import { API_CONFIG } from "../configs/apiConfig";
 
 const getBaseUrl = () => {
   if (Platform.OS === "android") {
-    return ANDROID_URL;
+    return API_CONFIG.ANDROID_URL;
   }
-  return IOS_WEB_URL;
+  return API_CONFIG.IOS_WEB_URL;
 };
 
 // Centralized Axios instance
@@ -47,7 +44,7 @@ api.interceptors.response.use(
       });
     }
     return Promise.reject(error);
-  }
+  },
 );
-
+// exportar para usar en toda la app
 export default api;
