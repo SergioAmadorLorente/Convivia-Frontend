@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
-  ScrollView,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
@@ -120,9 +119,8 @@ const Perfil: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+      <View 
+        style={styles.scrollContent}
       >
         {/* Header Title */}
         <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
@@ -209,7 +207,7 @@ const Perfil: React.FC = () => {
           />
 
         </View>
-      </ScrollView>
+      </View>
       
       <Popup
         visible={modalVisible}
