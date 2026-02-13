@@ -21,7 +21,11 @@ import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerUsuarioPorId } from "../../api/usuario";
+import { obtenerKarmaUsuario } from "../../api/karma";
+import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
+
+import GLOBAL_STYLES from "../../styles/styles";
 
 // Import SVG Assets
 import LogoKarma from "../../assets/logo_karma.svg";
@@ -30,8 +34,6 @@ import IconoFAQ from "../../assets/IconoFAQ.svg";
 import Infolegal from "../../assets/Infolegal.svg";
 import IconoConviviaPRO from "../../assets/Icono_Convivia_PRO.svg";
 import LogoutSinFondo from "../../assets/Logout_sin_fondo.svg";
-import GLOBAL_STYLES from "../../styles/styles";
-
 const { width } = Dimensions.get("window");
 
 const Perfil: React.FC = () => {
@@ -68,7 +70,18 @@ const Perfil: React.FC = () => {
           if (userData) {
             const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
             setUserName(realName);
-            // setUserKarma(userData.karma || 0); // Activate when karma is available
+          }
+          
+          // Obtener karma del usuario
+          try {
+            const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
+            if (usuarioEspacio?.espacioId) {
+              const karmaData = await obtenerKarmaUsuario(usuarioEspacio.espacioId, usuarioEspacio.usuarioId);
+              setUserKarma(karmaData.karmaTotal || 0);
+            }
+          } catch (karmaError) {
+            console.error("Error al cargar karma:", karmaError);
+            setUserKarma(0);
           }
         }
       } catch (error) {
@@ -151,7 +164,7 @@ const Perfil: React.FC = () => {
           {/* Mi Karma */}
           <MenuItem
             label="Mi Karma"
-            onPress={() => console.log('Mi Karma')}
+            onPress={() => navigation.navigate("MiKarma")}
             icon={<LogoKarma width={30} height={30} />}
           />
           <View style={styles.divider} />
@@ -223,13 +236,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: HELPERS.hp("8%"),
     backgroundColor: "#F5F4F2",
-  },
-  headerTitle: {
-    fontSize: SIZES.largeTitle,
-    fontFamily: FONTS.title,
-    color: COLORS.primary,
-    marginTop: HELPERS.hp("7%"),
-    marginBottom: HELPERS.hp("3%"),
   },
   userCard: {
     width: width * 0.9,

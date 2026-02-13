@@ -23,6 +23,7 @@ import MiResidencia from "../screens/Perfil/MiResidencia/MiResidencia";
 import EditarResidencia from "../screens/Perfil/MiResidencia/EditarResidencia";
 import EditarPerfil from "../screens/Perfil/EditarPerfil/EditarPerfil";
 import FAQ from "../screens/FAQ/FAQ";
+import MiKarma from "../screens/Perfil/MiKarma/MiKarma";
 import ConviviaPro from "../screens/ConviviaPro/ConviviaPro";
 import { COLORS } from "../styles/theme";
 
@@ -152,6 +153,10 @@ const AppNavigator: React.FC = () => {
           component={FAQ}
           options={defaultScreenOptions}
         />
+        <Stack.Screen 
+          name="MiKarma" 
+          component={MiKarma}
+          options={defaultScreenOptions} />
         <Stack.Screen
           name="ConviviaPro"
           component={ConviviaPro}

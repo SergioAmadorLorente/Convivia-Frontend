@@ -6,12 +6,12 @@ import { Desplegable } from "../../components/ui";
 const FAQ: React.FC = () => {
     return (
         <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
+            contentContainerStyle={{ flexGrow: 1, backgroundColor: "#F5F4F2" }}
             showsVerticalScrollIndicator={false}
         >
-            <View style={GLOBAL_STYLES.container}>
-                <Text style={GLOBAL_STYLES.titulo}>Preguntas Frecuentes</Text>
+            <Text style={GLOBAL_STYLES.titulo}>Preguntas Frecuentes</Text>
 
+            <View style={GLOBAL_STYLES.container}>
                 <View style={{ width: "85%", marginTop: 20 }}>
                     <Text style={[GLOBAL_STYLES.subtitle, { marginBottom: 12 }]}>
                         Aquí encontrarás respuestas a las dudas más comunes.

@@ -129,10 +129,13 @@ export const GLOBAL_STYLES = StyleSheet.create({
 
   // Título grande para pantallas
   titulo: {
-    fontSize: moderateScale(48),
+    fontSize: moderateScale(22),
     color: COLORS.primary,
     fontFamily: FONTS.title,
     textAlign: "center",
+    marginTop: hp("1%"),
+    marginBottom: hp("2%"),
+    paddingHorizontal: wp("5%"),
   },
 
   // Subtítulo grande para pantallas
