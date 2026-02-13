@@ -119,15 +119,21 @@ const CreateFactura: React.FC = () => {
         fetchMembers();
     }, [user]);
 
+    const [saving, setSaving] = useState(false);
+
+    // Obtener la relación del usuario actual una vez que los miembros estén cargados
+    const currentUserWithRelacion = useMemo(() => {
+        const found = availableUsers.find(au => au.id === user?.uid);
+        return found || { ...currentUserData, relacionId: undefined };
+    }, [availableUsers, currentUserData, user]);
+
     useEffect(() => {
-        if (assignedUsers.some(u => u.id === currentUserData.id)) {
+        if (currentUserWithRelacion.relacionId && assignedUsers.some(u => u.id === currentUserData.id)) {
             setcheckedAutoasign(true);
         } else {
             setcheckedAutoasign(false);
         }
-    }, [assignedUsers, currentUserData.id]);
-
-    const [saving, setSaving] = useState(false);
+    }, [assignedUsers, currentUserData.id, currentUserWithRelacion]);
 
     const handleSave = async () => {
         if (!name || !amount) {
@@ -152,12 +158,23 @@ const CreateFactura: React.FC = () => {
                 return found ? found.relacionId : u.relacionId;
             }).filter(id => !!id);
 
-            const eIdToUse = eId; // Usar el ID tal cual viene (con guiones si los tiene)
-            const creadorId = relacion.id || relacion.id_UsuarioEspacio;
+            const formatGuid = (id: string) => {
+                if (!id || typeof id !== 'string') return id;
+                // Si ya tiene guiones, lo dejamos igual
+                if (id.includes("-")) return id;
+                // Si tiene 32 caracteres (hex sin guiones), los añadimos
+                if (id.length === 32) {
+                    return `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`;
+                }
+                return id;
+            };
+
+            const eIdFormatted = formatGuid(eId);
+            const creadorId = formatGuid(relacion.id || relacion.id_UsuarioEspacio);
             const deudoresDict: Record<string, boolean> = {};
 
             usuariosAsignacionRaw.forEach(id => {
-                deudoresDict[id] = true; // true = Pendiente de pago
+                deudoresDict[formatGuid(id)] = true; // true = Pendiente de pago
             });
 
             const numDeudores = Object.keys(deudoresDict).length || 1;
@@ -178,9 +195,9 @@ const CreateFactura: React.FC = () => {
             const facturaIdToEdit = route.params?.facturaToEdit?.IdFactura || route.params?.facturaToEdit?.id;
 
             if (isEditing && facturaIdToEdit) {
-                result = await editarFactura(eIdToUse, facturaIdToEdit, payload);
+                result = await editarFactura(eIdFormatted, facturaIdToEdit, payload);
             } else {
-                result = await crearFacturaEnEspacio(eIdToUse, payload);
+                result = await crearFacturaEnEspacio(eIdFormatted, payload);
             }
 
             const newFacturaId = result?.id || result?.IdFactura;
@@ -275,7 +292,8 @@ const CreateFactura: React.FC = () => {
                                     setcheckedAutoasign(newValue);
                                     if (newValue) {
                                         if (!assignedUsers.find((u: any) => u.id === currentUserData.id)) {
-                                            setAssignedUsers((prev: any[]) => [...prev, currentUserData]);
+                                            // Usar los datos con relacionId si están disponibles
+                                            setAssignedUsers((prev: any[]) => [...prev, currentUserWithRelacion]);
                                         }
                                     } else {
                                         setAssignedUsers((prev: any[]) => prev.filter((u: any) => u.id !== currentUserData.id));

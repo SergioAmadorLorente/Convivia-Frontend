@@ -100,32 +100,50 @@ export const useDashboardData = (newSpaceName?: string) => {
         if (!espacioId) return;
         if (showLoading) setLoadingFacturas(true);
         try {
-            const facturasRaw = await obtenerFacturasPorEspacio(espacioId);
+            const result = await obtenerFacturasPorEspacio(espacioId);
+            console.log("📡 Facturas Recibidas (raw):", JSON.stringify(result, null, 2));
+
+            // Manejar tanto array directo como objeto con $values (común en .NET)
+            const facturasRaw = Array.isArray(result) ? result : (result?.$values || []);
+
             if (Array.isArray(facturasRaw)) {
+                // Función para limpiar GUIDs y comparar sin guiones
+                const cleanId = (id: string) => id?.replace(/-/g, '').toLowerCase() || "";
+
                 const mapped = facturasRaw.map((f: any) => {
-                    // Mapear IDs de relación a objetos finales
-                    const userNames = Array.isArray(f.usuariosAsignacion)
-                        ? f.usuariosAsignacion.map((relId: string) => ({
-                            id: relId, // Original REL ID 
-                            name: userNamesMap[relId] || relId,
-                            completed: f.usuariosCompletados?.includes(relId) || false
-                        }))
-                        : [];
+                    // El nuevo backend usa un diccionario 'deudores'
+                    const deudoresDict = f.deudores || f.Deudores || {};
+                    const relIds = Object.keys(deudoresDict);
+
+                    const userNames = relIds.map((relId: string) => {
+                        const cleanedRelId = cleanId(relId);
+                        // Buscar en el mapa usando el ID limpio
+                        const nameKey = Object.keys(userNamesMap).find(k => cleanId(k) === cleanedRelId);
+
+                        return {
+                            id: relId,
+                            name: nameKey ? userNamesMap[nameKey] : (f.nombresDeudores?.[relId] || `Usuario (${relId.slice(0, 4)})`),
+                            // en deudores: true = pendiente (no pagado), false = pagado
+                            completed: deudoresDict[relId] === false
+                        };
+                    });
 
                     return new FacturaModel({
-                        IdFactura: f.id || f.IdFactura,
-                        Nombre: f.nombre || f.Nombre || f.titulo || f.Titulo,
-                        Descripcion: f.descripcion || f.Descripcion,
-                        Precio: f.precio || f.Precio,
+                        IdFactura: f.id || f.Id || f.IdFactura || "",
+                        Nombre: f.nombre || f.Nombre || "Factura sin nombre",
+                        Descripcion: f.descripcion || f.Descripcion || "",
+                        Precio: f.precio || f.Precio || 0,
                         Pagado: f.pagado || f.Pagado || false,
                         FechaCreacion: f.fechaCreacion || f.FechaCreacion || new Date(),
                         UsuariosAsignados: userNames
                     });
                 });
+
+                console.log("✅ Facturas mapeadas:", mapped.length);
                 setFacturas(mapped);
             }
         } catch (err) {
-            console.error("Error cargando facturas:", err);
+            console.error("❌ Error cargando facturas:", err);
         } finally {
             setLoadingFacturas(false);
         }
