@@ -15,14 +15,17 @@ import MoneyInput from "../../components/ui/MoneyInput";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
+import { useAuthListener } from "../../hooks/useAuthListener";
+import { obtenerUsuarioPorId, obtenerUsuarios } from "../../api/usuario";
+import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
 import { useEditFactura } from "../../hooks/useEditFactura";
+import { crearFacturaEnEspacio, editarFactura, subirImagenFactura, FacturaPayload } from "../../api/factura";
+import { Alert } from "react-native";
 
 const { hp } = HELPERS;
-
-const CURRENT_USER = { id: "0", name: "Yo" };
 
 const CreateFactura: React.FC = () => {
     const navigation = useNavigation<any>();
@@ -58,18 +61,144 @@ const CreateFactura: React.FC = () => {
         }
     }, [route.params]);
 
+    const user = useAuthListener();
+    const [availableUsers, setAvailableUsers] = useState<any[]>([]);
+    const [loadingUsers, setLoadingUsers] = useState(false);
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
 
-    const [availableUsers] = useState([
-        { id: "1", name: "Juan Pérez" },
-        { id: "2", name: "María García" },
-        { id: "3", name: "Lucía Fernández" },
-    ]);
+    const currentUserData = useMemo(() => {
+        return {
+            id: user?.uid || "0",
+            name: user?.displayName || user?.email?.split("@")[0] || "Yo"
+        };
+    }, [user]);
 
-    function handleToggleTask(id: any) {
-        setAssignPopupVisible(true);
-    }
+    useEffect(() => {
+        const fetchMembers = async () => {
+            if (!user?.uid) return;
+            setLoadingUsers(true);
+            try {
+                const relacion = await obtenerEspacioPorUsuarioId(user.uid);
+                if (relacion?.espacioId) {
+                    const eId = relacion.espacioId;
+                    const [todasRelaciones, todosUsuarios] = await Promise.all([
+                        obtenerUsuarioEspacios(),
+                        obtenerUsuarios()
+                    ]);
+
+                    const userMap: Record<string, string> = {};
+                    if (Array.isArray(todosUsuarios)) {
+                        todosUsuarios.forEach((u: any) => {
+                            userMap[u.id] = u.nombre || u.Nombre || u.email || u.id;
+                        });
+                    }
+
+                    if (Array.isArray(todasRelaciones)) {
+                        const misMiembros = todasRelaciones
+                            .filter((r: any) => r.espacioId === eId)
+                            .map((r: any) => ({
+                                id: r.usuarioId,
+                                relacionId: r.id || r.id_UsuarioEspacio,
+                                name: userMap[r.usuarioId] || "Miembro"
+                            }));
+                        setAvailableUsers(misMiembros);
+
+                        // Si estamos creando una nueva factura y aún no hay usuarios, pre-asignar a todos los miembros
+                        if (!isEditing && assignedUsers.length === 0) {
+                            setAssignedUsers(misMiembros);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching space members:", err);
+            } finally {
+                setLoadingUsers(false);
+            }
+        };
+        fetchMembers();
+    }, [user]);
+
+    useEffect(() => {
+        if (assignedUsers.some(u => u.id === currentUserData.id)) {
+            setcheckedAutoasign(true);
+        } else {
+            setcheckedAutoasign(false);
+        }
+    }, [assignedUsers, currentUserData.id]);
+
+    const [saving, setSaving] = useState(false);
+
+    const handleSave = async () => {
+        if (!name || !amount) {
+            Alert.alert("Error", "El nombre y el precio son obligatorios.");
+            return;
+        }
+
+        if (assignedUsers.length === 0) {
+            Alert.alert("Error", "Debes asignar al menos un usuario a la factura.");
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const relacion = await obtenerEspacioPorUsuarioId(user?.uid || "");
+            const eId = relacion?.espacioId;
+            if (!eId) throw new Error("No se encontró el espacio del usuario.");
+
+            // Mapear los assignedUsers (que tienen el id de usuario) a sus relacionId
+            const usuariosAsignacionRaw = assignedUsers.map(u => {
+                const found = availableUsers.find(au => au.id === u.id);
+                return found ? found.relacionId : u.relacionId;
+            }).filter(id => !!id);
+
+            const eIdToUse = eId; // Usar el ID tal cual viene (con guiones si los tiene)
+            const creadorId = relacion.id || relacion.id_UsuarioEspacio;
+            const deudoresDict: Record<string, boolean> = {};
+
+            usuariosAsignacionRaw.forEach(id => {
+                deudoresDict[id] = true; // true = Pendiente de pago
+            });
+
+            const numDeudores = Object.keys(deudoresDict).length || 1;
+            const precioTotal = parseFloat(amount);
+
+            const payload: FacturaPayload = {
+                nombre: name,
+                precio: precioTotal,
+                pagoMediano: precioTotal / numDeudores,
+                pagado: false,
+                creadorFactura: creadorId,
+                deudores: deudoresDict
+            };
+
+            console.log("📤 Enviando Factura Payload:", JSON.stringify(payload, null, 2));
+
+            let result;
+            const facturaIdToEdit = route.params?.facturaToEdit?.IdFactura || route.params?.facturaToEdit?.id;
+
+            if (isEditing && facturaIdToEdit) {
+                result = await editarFactura(eIdToUse, facturaIdToEdit, payload);
+            } else {
+                result = await crearFacturaEnEspacio(eIdToUse, payload);
+            }
+
+            const newFacturaId = result?.id || result?.IdFactura;
+
+            Alert.alert("Éxito", isEditing ? "Factura actualizada correctamente." : "Factura creada correctamente.");
+
+            if (route.params?.onSave) {
+                route.params.onSave();
+            }
+
+            navigation.goBack();
+        } catch (err) {
+            console.error("Error al guardar factura:", err);
+            Alert.alert("Error", "No se pudo guardar la factura. Inténtalo de nuevo.");
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <KeyboardAvoidingView
@@ -121,7 +250,7 @@ const CreateFactura: React.FC = () => {
                     >
                         <Button
                             style={[GLOBAL_STYLES.buttonSecondaryGrey]}
-                            onPress={() => handleToggleTask(1)}
+                            onPress={() => setAssignPopupVisible(true)}
                         >
                             <Text style={GLOBAL_STYLES.textoBoton}>
                                 Asignar usuario a la factura
@@ -145,11 +274,11 @@ const CreateFactura: React.FC = () => {
                                     const newValue = !checkedAutoasign;
                                     setcheckedAutoasign(newValue);
                                     if (newValue) {
-                                        if (!assignedUsers.find(u => u.id === CURRENT_USER.id)) {
-                                            setAssignedUsers(prev => [...prev, CURRENT_USER]);
+                                        if (!assignedUsers.find((u: any) => u.id === currentUserData.id)) {
+                                            setAssignedUsers((prev: any[]) => [...prev, currentUserData]);
                                         }
                                     } else {
-                                        setAssignedUsers(prev => prev.filter(u => u.id !== CURRENT_USER.id));
+                                        setAssignedUsers((prev: any[]) => prev.filter((u: any) => u.id !== currentUserData.id));
                                     }
                                 }}
                             >
@@ -170,40 +299,22 @@ const CreateFactura: React.FC = () => {
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
                     {assignedUsers.length > 0 && (
                         <LargeTextField
-                            value={assignedUsers.map((u) => u.name).join("\n")}
+                            value={assignedUsers
+                                .map((u: any) => u.name || u.Nombre || `Usuario (${(u.id || u.relacionId || "").slice(0, 8)})`)
+                                .join("\n")}
                             editable={false}
                             onChangeText={() => { }}
                             placeholder="Usuarios asignados"
                         />
                     )}
 
-                    <Desplegable
-                        title="Foto (opcional)"
-                        fontSize={SIZES.text16}
-                        fontWeight="bold"
-                        collapsible={false}
-                        showIcon={false}
-                    >
-                        <UploadImage
-                            label="Subir imagen"
-                            onImageSelected={(uri) => {
-                                setImageUri(uri || undefined);
-                            }}
-                        />
-                    </Desplegable>
-
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
-                        onPress={() => {
-                            console.log("Factura creada:", {
-                                nombre: name,
-                                descripcion: description,
-                                usuarios: assignedUsers,
-                            });
-                        }}
+                        onPress={handleSave}
+                        disabled={saving}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
-                            {isEditing ? "Guardar cambios" : "Crear factura"}
+                            {saving ? "Guardando..." : (isEditing ? "Guardar cambios" : "Crear factura")}
                         </Text>
                     </Button>
                 </View>
@@ -213,18 +324,17 @@ const CreateFactura: React.FC = () => {
                 visible={assignPopupVisible}
                 onClose={() => setAssignPopupVisible(false)}
                 users={availableUsers}
+                loadingUsers={loadingUsers}
                 multiSelect={true}
-                initialSelectedIds={assignedUsers.map(u => u.id)}
+                initialSelectedIds={assignedUsers.map((u: any) => u.id)}
                 onConfirm={(selected) => {
                     console.log("Usuarios asignados:", selected);
                     setAssignedUsers(selected);
-                    const isCurrentUserSelected = selected.some(u => u.id === CURRENT_USER.id);
-                    setcheckedAutoasign(isCurrentUserSelected);
                 }}
             />
 
             <BottomBar />
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingView >
     );
 };
 

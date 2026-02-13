@@ -6,6 +6,7 @@ import { obtenerEspacioPorId } from "../api/espacio";
 import { obtenerTareasPorEspacio, obtenerDetalleTareaInstancia } from "../api/tarea";
 import TaskModel from "../types/Task";
 import FacturaModel from "../types/Factura";
+import { obtenerFacturasPorEspacio } from "../api/factura";
 
 export const useDashboardData = (newSpaceName?: string) => {
     const user = useAuthListener();
@@ -19,34 +20,8 @@ export const useDashboardData = (newSpaceName?: string) => {
     const [tareas, setTareas] = useState<TaskModel[]>([]);
     const [loadingTareas, setLoadingTareas] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [facturas, setFacturas] = useState<FacturaModel[]>([
-        new FacturaModel({
-            IdFactura: "f1",
-            Nombre: "Electricidad",
-            Precio: 120,
-            UsuariosAsignados: [
-                { id: "u1", name: "Juan", completed: true },
-                { id: "u2", name: "María", completed: false },
-                { id: "u3", name: "Pedro", completed: true },
-            ],
-            Pagado: false,
-            FechaCreacion: new Date(),
-            Descripcion: "Factura mensual",
-        }),
-        new FacturaModel({
-            IdFactura: "f2",
-            Nombre: "Internet",
-            Precio: 45,
-            UsuariosAsignados: [
-                { id: "u1", name: "Juan", completed: true },
-                { id: "u2", name: "María", completed: true },
-            ],
-            Pagado: true,
-            FechaCreacion: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-            FechaCompletada: new Date(Date.now() - 24 * 60 * 60 * 1000),
-            Descripcion: "Fibra 300Mb",
-        }),
-    ]);
+    const [facturas, setFacturas] = useState<FacturaModel[]>([]);
+    const [loadingFacturas, setLoadingFacturas] = useState(false);
 
     // Cargar información del espacio del usuario
     useEffect(() => {
@@ -121,10 +96,48 @@ export const useDashboardData = (newSpaceName?: string) => {
         cargarNombresUsuario();
     }, [espacioId]);
 
+    const cargarFacturas = async (showLoading = true) => {
+        if (!espacioId) return;
+        if (showLoading) setLoadingFacturas(true);
+        try {
+            const facturasRaw = await obtenerFacturasPorEspacio(espacioId);
+            if (Array.isArray(facturasRaw)) {
+                const mapped = facturasRaw.map((f: any) => {
+                    // Mapear IDs de relación a objetos finales
+                    const userNames = Array.isArray(f.usuariosAsignacion)
+                        ? f.usuariosAsignacion.map((relId: string) => ({
+                            id: relId, // Original REL ID 
+                            name: userNamesMap[relId] || relId,
+                            completed: f.usuariosCompletados?.includes(relId) || false
+                        }))
+                        : [];
+
+                    return new FacturaModel({
+                        IdFactura: f.id || f.IdFactura,
+                        Nombre: f.nombre || f.Nombre || f.titulo || f.Titulo,
+                        Descripcion: f.descripcion || f.Descripcion,
+                        Precio: f.precio || f.Precio,
+                        Pagado: f.pagado || f.Pagado || false,
+                        FechaCreacion: f.fechaCreacion || f.FechaCreacion || new Date(),
+                        UsuariosAsignados: userNames
+                    });
+                });
+                setFacturas(mapped);
+            }
+        } catch (err) {
+            console.error("Error cargando facturas:", err);
+        } finally {
+            setLoadingFacturas(false);
+        }
+    };
+
     const cargarTareas = async (showLoading = true) => {
         if (!espacioId) return;
         if (showLoading) setLoadingTareas(true);
         try {
+            // Paralelizar carga de tareas y facturas
+            cargarFacturas(showLoading);
+
             const tareasRaw = await obtenerTareasPorEspacio(espacioId);
             if (Array.isArray(tareasRaw)) {
                 const mappedTasks = tareasRaw.map((t: any) => {
