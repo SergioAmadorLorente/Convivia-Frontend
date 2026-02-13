@@ -6,6 +6,7 @@ import { obtenerEspacioPorId } from "../api/espacio";
 import { obtenerTareasPorEspacio, obtenerDetalleTareaInstancia } from "../api/tarea";
 import TaskModel from "../types/Task";
 import FacturaModel from "../types/Factura";
+import { obtenerFacturasPorEspacio } from "../api/factura";
 
 export const useDashboardData = (newSpaceName?: string) => {
     const user = useAuthListener();
@@ -19,34 +20,8 @@ export const useDashboardData = (newSpaceName?: string) => {
     const [tareas, setTareas] = useState<TaskModel[]>([]);
     const [loadingTareas, setLoadingTareas] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const [facturas, setFacturas] = useState<FacturaModel[]>([
-        new FacturaModel({
-            IdFactura: "f1",
-            Nombre: "Electricidad",
-            Precio: 120,
-            UsuariosAsignados: [
-                { id: "u1", name: "Juan", completed: true },
-                { id: "u2", name: "María", completed: false },
-                { id: "u3", name: "Pedro", completed: true },
-            ],
-            Pagado: false,
-            FechaCreacion: new Date(),
-            Descripcion: "Factura mensual",
-        }),
-        new FacturaModel({
-            IdFactura: "f2",
-            Nombre: "Internet",
-            Precio: 45,
-            UsuariosAsignados: [
-                { id: "u1", name: "Juan", completed: true },
-                { id: "u2", name: "María", completed: true },
-            ],
-            Pagado: true,
-            FechaCreacion: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-            FechaCompletada: new Date(Date.now() - 24 * 60 * 60 * 1000),
-            Descripcion: "Fibra 300Mb",
-        }),
-    ]);
+    const [facturas, setFacturas] = useState<FacturaModel[]>([]);
+    const [loadingFacturas, setLoadingFacturas] = useState(false);
 
     // Cargar información del espacio del usuario
     useEffect(() => {
@@ -121,10 +96,66 @@ export const useDashboardData = (newSpaceName?: string) => {
         cargarNombresUsuario();
     }, [espacioId]);
 
+    const cargarFacturas = async (showLoading = true) => {
+        if (!espacioId) return;
+        if (showLoading) setLoadingFacturas(true);
+        try {
+            const result = await obtenerFacturasPorEspacio(espacioId);
+            console.log("📡 Facturas Recibidas (raw):", JSON.stringify(result, null, 2));
+
+            // Manejar tanto array directo como objeto con $values (común en .NET)
+            const facturasRaw = Array.isArray(result) ? result : (result?.$values || []);
+
+            if (Array.isArray(facturasRaw)) {
+                // Función para limpiar GUIDs y comparar sin guiones
+                const cleanId = (id: string) => id?.replace(/-/g, '').toLowerCase() || "";
+
+                const mapped = facturasRaw.map((f: any) => {
+                    // El nuevo backend usa un diccionario 'deudores'
+                    const deudoresDict = f.deudores || f.Deudores || {};
+                    const relIds = Object.keys(deudoresDict);
+
+                    const userNames = relIds.map((relId: string) => {
+                        const cleanedRelId = cleanId(relId);
+                        // Buscar en el mapa usando el ID limpio
+                        const nameKey = Object.keys(userNamesMap).find(k => cleanId(k) === cleanedRelId);
+
+                        return {
+                            id: relId,
+                            name: nameKey ? userNamesMap[nameKey] : (f.nombresDeudores?.[relId] || `Usuario (${relId.slice(0, 4)})`),
+                            // en deudores: true = pendiente (no pagado), false = pagado
+                            completed: deudoresDict[relId] === false
+                        };
+                    });
+
+                    return new FacturaModel({
+                        IdFactura: f.id || f.Id || f.IdFactura || "",
+                        Nombre: f.nombre || f.Nombre || "Factura sin nombre",
+                        Descripcion: f.descripcion || f.Descripcion || "",
+                        Precio: f.precio || f.Precio || 0,
+                        Pagado: f.pagado || f.Pagado || false,
+                        FechaCreacion: f.fechaCreacion || f.FechaCreacion || new Date(),
+                        UsuariosAsignados: userNames
+                    });
+                });
+
+                console.log("✅ Facturas mapeadas:", mapped.length);
+                setFacturas(mapped);
+            }
+        } catch (err) {
+            console.error("❌ Error cargando facturas:", err);
+        } finally {
+            setLoadingFacturas(false);
+        }
+    };
+
     const cargarTareas = async (showLoading = true) => {
         if (!espacioId) return;
         if (showLoading) setLoadingTareas(true);
         try {
+            // Paralelizar carga de tareas y facturas
+            cargarFacturas(showLoading);
+
             const tareasRaw = await obtenerTareasPorEspacio(espacioId);
             if (Array.isArray(tareasRaw)) {
                 const mappedTasks = tareasRaw.map((t: any) => {

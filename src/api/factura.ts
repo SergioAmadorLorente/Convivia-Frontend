@@ -1,10 +1,12 @@
 import api from "./client";
 
 export interface FacturaPayload {
-    Titulo: string;
-    Precio: number;
-    Reparto: string;
-    Pagado: boolean;
+    nombre: string;
+    precio: number;
+    pagoMediano: number;
+    pagado: boolean;
+    creadorFactura: string;
+    deudores: Record<string, boolean>;
 }
 
 export const crearFactura = async (data: FacturaPayload) => {
@@ -17,22 +19,20 @@ export const crearFactura = async (data: FacturaPayload) => {
     }
 };
 
-export const editarFactura = async (id: number, data: FacturaPayload) => {
+export const editarFactura = async (espacioId: string, id: string | number, data: FacturaPayload) => {
     try {
-        const response = await api.put(`/Factura/${id}`, data);
+        const response = await api.put(`/espacio/${espacioId}/factura/${id}`, data);
         return response.data;
     } catch (error) {
-        console.error("Error al editar factura:", error);
         throw error;
     }
 };
 
-export const eliminarFactura = async (id: number) => {
+export const eliminarFactura = async (espacioId: string, id: string | number) => {
     try {
-        const response = await api.delete(`/Factura/${id}`);
+        const response = await api.delete(`/espacio/${espacioId}/factura/${id}`);
         return response.data;
     } catch (error) {
-        console.error("Error al eliminar factura:", error);
         throw error;
     }
 };
@@ -43,6 +43,26 @@ export const obtenerFacturas = async () => {
         return response.data;
     } catch (error) {
         console.error("Error al obtener facturas:", error);
+        throw error;
+    }
+};
+
+export const obtenerFacturasPorEspacio = async (espacioId: string) => {
+    try {
+        const response = await api.get(`/espacio/${espacioId}/factura`);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener facturas por espacio:", error);
+        throw error;
+    }
+};
+
+export const crearFacturaEnEspacio = async (espacioId: string, data: FacturaPayload) => {
+    try {
+        const response = await api.post(`/espacio/${espacioId}/factura`, data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al crear factura en espacio:", error);
         throw error;
     }
 };
@@ -63,23 +83,18 @@ export const obtenerImagenFactura = async (espacioId: string, facturaId: string)
 
 export const subirImagenFactura = async (espacioId: string, facturaId: string, imageUri: string) => {
     try {
-        const formData = new FormData();
-        const filename = imageUri.split('/').pop() || 'image.jpg';
-        const match = /\.([\w]+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : 'image/jpeg';
+        console.log("📸 Intentando subir imagen desde:", imageUri);
 
-        formData.append('imagen', {
-            uri: imageUri,
-            name: filename,
-            type: type,
-        } as any);
+        // En React Native, para enviar 'string($binary)', a veces es mejor usar fetch para obtener el blob
+        const responseImage = await fetch(imageUri);
+        const blob = await responseImage.blob();
 
         const response = await api.post(
             `/espacio/${espacioId}/factura/${facturaId}/imagen`,
-            formData,
+            blob,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'application/octet-stream',
                 },
             }
         );
@@ -92,23 +107,17 @@ export const subirImagenFactura = async (espacioId: string, facturaId: string, i
 
 export const actualizarImagenFactura = async (espacioId: string, facturaId: string, imageUri: string) => {
     try {
-        const formData = new FormData();
-        const filename = imageUri.split('/').pop() || 'image.jpg';
-        const match = /\.([\w]+)$/.exec(filename);
-        const type = match ? `image/${match[1]}` : 'image/jpeg';
+        console.log("📸 Intentando actualizar imagen desde:", imageUri);
 
-        formData.append('imagen', {
-            uri: imageUri,
-            name: filename,
-            type: type,
-        } as any);
+        const responseImage = await fetch(imageUri);
+        const blob = await responseImage.blob();
 
         const response = await api.put(
             `/espacio/${espacioId}/factura/${facturaId}/imagen`,
-            formData,
+            blob,
             {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'application/octet-stream',
                 },
             }
         );

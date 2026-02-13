@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { Feather } from "@expo/vector-icons"; // 👈 NUEVO: Feather para checkbox
+import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { auth } from "../../configs/firebaseConfig";
 import {
@@ -22,12 +22,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { moderateScale } from "react-native-size-matters";
+
 import useLoadFonts from "../../hooks/useLoadFonts";
 import { useEmailValidation } from "../../hooks/useEmailValidation";
 import { useKeyboardAware } from "../../hooks";
 import TextField from "../../components/ui/TextField";
-import Button from "../../components/ui/Button";
+
 import Popup from "../../components/ui/Popup";
 import { COLORS, CHECKBOX } from "../../styles/theme";
 import ConfettiButton from "../../components/ui/ConfettiButton";

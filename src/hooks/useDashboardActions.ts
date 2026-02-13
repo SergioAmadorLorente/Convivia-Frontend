@@ -139,7 +139,7 @@ export const useDashboardActions = ({
                 return;
             }
 
-            const yo = factura.UsuariosAsignados?.find((u) => u.id === CURRENT_USER_ID);
+            const yo = factura.UsuariosAsignados?.find((u) => u.id === userRelacionId);
             if (!yo) {
                 showPopup({ imageType: "error", title: "No estás asignado a esta factura", buttons: [{ text: "Aceptar" }] });
                 return;
@@ -147,7 +147,7 @@ export const useDashboardActions = ({
 
             let facturaActualizada = factura;
             if (!yo.completed) {
-                facturaActualizada = facturaActualizada.withUserCompleted(CURRENT_USER_ID, true);
+                facturaActualizada = facturaActualizada.withUserCompleted(userRelacionId!, true);
                 setFacturas(prev => prev.map(f => f.IdFactura === id ? facturaActualizada : f));
             }
 
