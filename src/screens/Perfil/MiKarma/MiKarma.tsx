@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -6,9 +6,9 @@ import {
     ScrollView,
     TouchableOpacity,
     Dimensions,
+    ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import Svg, { Circle, Line, Text as SvgText } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -20,7 +20,14 @@ import {
 import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../../styles/theme";
 import GLOBAL_STYLES from "../../../styles/styles";
 import BottomBar from "../../../components/ui/BottomBar";
+import TasksDonutChart from "../../../components/ui/TasksDonutChart";
 import LogoKarma from "../../../assets/logo_karma.svg";
+import { useAuthListener } from "../../../hooks/useAuthListener";
+import { obtenerEspacioPorUsuarioId } from "../../../api/usuarioEspacio";
+import { obtenerKarmaUsuario, obtenerRankingKarma } from "../../../api/karma";
+import { obtenerEstadisticasTareas } from "../../../api/espacio";
+import { obtenerUsuarios } from "../../../api/usuario";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const { width } = Dimensions.get("window");
 
@@ -30,32 +37,104 @@ interface KarmaData {
     monthPoints: number;
     weekPoints: number;
     completedTasks: number;
+    pendingTasks: number;
     lateTasks: number;
     participants: Array<{ name: string; points: number }>;
 }
 
 const MiKarma: React.FC = () => {
     const navigation = useNavigation();
+    const user = useAuthListener();
 
-    // Estado para simular datos (en producción vendría de API/contexto)
-    const [karmaData, setKarmaData] = useState<KarmaData | null>({
-        totalPoints: 290,
-        monthPoints: 100,
-        weekPoints: 25,
-        completedTasks: 18,
-        lateTasks: 4,
-        participants: [
-            { name: "Pepito228", points: 75 },
-            { name: "Pupu Gaga", points: 290 },
-            { name: "Destroyer", points: 150 },
-        ],
-    });
+    // Estado para los datos de karma
+    const [karmaData, setKarmaData] = useState<KarmaData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Estado para el tipo de ranking y modo de vista
+    const [rankingType, setRankingType] = useState<'total' | 'mensual' | 'semanal'>('total');
+    const [viewMode, setViewMode] = useState<'podio' | 'lista'>('podio');
+    const [allParticipants, setAllParticipants] = useState<Array<{ name: string; points: number }>>([]);
 
     const [fontsLoaded] = useFonts({
         DMSerifDisplay_400Regular,
         Montserrat_400Regular,
         Montserrat_700Bold,
     });
+
+    // Cargar datos del backend
+    useEffect(() => {
+        const fetchKarmaData = async () => {
+            if (!user?.uid) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                setLoading(true);
+                setError(null);
+
+                // 1. Obtener el espacio del usuario
+                const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
+                if (!usuarioEspacio?.espacioId) {
+                    throw new Error("No se encontró un espacio asignado");
+                }
+
+                const espacioId = usuarioEspacio.espacioId;
+
+                // 2. Obtener datos en paralelo
+                const limit = viewMode === 'podio' ? 3 : 100; // Top 3 para podio, todos para lista
+                const [karmaUsuario, ranking, estadisticas, usuarios] = await Promise.all([
+                    obtenerKarmaUsuario(espacioId, user.uid),
+                    obtenerRankingKarma(espacioId, rankingType, limit),
+                    obtenerEstadisticasTareas(espacioId, user.uid),
+                    obtenerUsuarios(),
+                ]);
+
+                // 3. Crear un mapa de usuarios para obtener nombres
+                const usuariosMap = new Map<string, string>(
+                    usuarios.map((u: any) => [u.id, u.nombre || u.email || "Usuario"])
+                );
+
+                // 4. Mapear datos del ranking al formato del componente
+                const getPoints = (r: any) => {
+                    switch (rankingType) {
+                        case 'mensual':
+                            return r.karmaMensual;
+                        case 'semanal':
+                            return r.karmaSemanal;
+                        default:
+                            return r.karmaTotal;
+                    }
+                };
+
+                const participants = ranking.ranking.map((r: any) => ({
+                    name: usuariosMap.get(r.usuarioId) ?? "Usuario",
+                    points: getPoints(r),
+                }));
+
+                // 5. Actualizar estado
+                setKarmaData({
+                    totalPoints: karmaUsuario.karmaTotal,
+                    monthPoints: karmaUsuario.karmaMensual,
+                    weekPoints: karmaUsuario.karmaSemanal,
+                    completedTasks: estadisticas.completadas,
+                    pendingTasks: estadisticas.pendientes,
+                    lateTasks: estadisticas.tardes,
+                    participants: participants.slice(0, 3), // Top 3 para el podio
+                });
+                setAllParticipants(participants); // Todos para la lista
+            } catch (err: any) {
+                console.error("Error al cargar datos de karma:", err);
+                setError(err.message || "Error al cargar los datos");
+                setKarmaData(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchKarmaData();
+    }, [user, rankingType, viewMode]);
 
     if (!fontsLoaded) return null;
 
@@ -73,29 +152,13 @@ const MiKarma: React.FC = () => {
                     <Text style={GLOBAL_STYLES.titulo}>Mi Karma</Text>
                 </View>
 
-                {/* Debug button - remove in production */}
-                <TouchableOpacity
-                    style={styles.debugButton}
-                    onPress={() => setKarmaData(hasData ? null : {
-                        totalPoints: 290,
-                        monthPoints: 100,
-                        weekPoints: 25,
-                        completedTasks: 18,
-                        lateTasks: 4,
-                        participants: [
-                            { name: "Pepito228", points: 75 },
-                            { name: "Pupu Gaga", points: 290 },
-                            { name: "Destroyer", points: 150 },
-                        ],
-                    })}
-                >
-                    <Text style={styles.debugButtonText}>
-                        {hasData ? "Simular sin datos" : "Simular con datos"}
-                    </Text>
-                </TouchableOpacity>
-
-                {/* Conditional rendering: Empty state or data */}
-                {!hasData ? (
+                {/* Loading State */}
+                {loading ? (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color={COLORS.primary} />
+                        <Text style={styles.loadingText}>Cargando estadísticas...</Text>
+                    </View>
+                ) : !hasData ? (
                     // Empty State
                     <View style={styles.emptyStateContainer}>
                         <View style={styles.emptyIconContainer}>
@@ -135,50 +198,160 @@ const MiKarma: React.FC = () => {
                         {/* Statistics Section */}
                         <View style={styles.sectionContainer}>
                             <Text style={styles.sectionTitle}>Estadísticas</Text>
+
+                            {/* Header con título y selector de tipo */}
                             <View style={styles.subsectionHeader}>
-                                <Text style={styles.subsectionTitle}>Rey de Karma</Text>
+                                <View style={styles.headerRow}>
+                                    <Text style={styles.subsectionTitle}>Rey de Karma</Text>
+                                </View>
                                 <View style={styles.underline} />
+
                             </View>
 
-                            {/* Podium */}
-                            <View style={styles.podiumContainer}>
-                                {/* Position 2 - Left */}
-                                <View style={styles.podiumColumn}>
-                                    <View style={styles.avatarContainer}>
-                                        <Ionicons name="person-outline" size={24} color="#999" />
-                                    </View>
-                                    <Text style={styles.podiumName}>Pepito228</Text>
-                                    <View style={[styles.podiumBar, styles.podiumBar2]}>
-                                        <Text style={styles.podiumPoints}>¡75 puntos!</Text>
-                                    </View>
+                            {/* Podio o Lista según viewMode */}
+                            {viewMode === 'podio' ? (
+                                /* Podium */
+                                <View style={styles.podiumContainer}>
+                                    {/* Position 2 - Left */}
+                                    {karmaData.participants[1] && (
+                                        <View style={styles.podiumColumn}>
+                                            <View style={styles.avatarContainer}>
+                                                <Ionicons name="person-outline" size={24} color="#999" />
+                                            </View>
+                                            <Text style={styles.podiumName} numberOfLines={1}>
+                                                {karmaData.participants[1].name}
+                                            </Text>
+                                            <View style={[styles.podiumBar, styles.podiumBar2]}>
+                                                <Text style={styles.podiumPoints}>
+                                                    ¡{karmaData.participants[1].points} puntos!
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )}
+
+                                    {/* Position 1 - Center (Winner) */}
+                                    {karmaData.participants[0] && (
+                                        <View style={styles.podiumColumn}>
+                                            <View style={styles.winnerAvatarWrapper}>
+                                                <View style={[styles.avatarContainer, styles.winnerAvatar]}>
+                                                    <Ionicons name="person-outline" size={28} color="#999" />
+                                                </View>
+                                                <View style={styles.karmaBadge}>
+                                                    <LogoKarma width={16} height={16} />
+                                                </View>
+                                            </View>
+                                            <Text style={styles.podiumName} numberOfLines={1}>
+                                                {karmaData.participants[0].name}
+                                            </Text>
+                                            <View style={[styles.podiumBar, styles.podiumBar1]}>
+                                                <Text style={styles.podiumPoints}>
+                                                    ¡{karmaData.participants[0].points} puntos!
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )}
+
+                                    {/* Position 3 - Right */}
+                                    {karmaData.participants[2] && (
+                                        <View style={styles.podiumColumn}>
+                                            <View style={styles.avatarContainer}>
+                                                <Ionicons name="person-outline" size={24} color="#999" />
+                                            </View>
+                                            <Text style={styles.podiumName} numberOfLines={1}>
+                                                {karmaData.participants[2].name}
+                                            </Text>
+                                            <View style={[styles.podiumBar, styles.podiumBar3]}>
+                                                <Text style={styles.podiumPoints}>
+                                                    ¡{karmaData.participants[2].points} puntos!
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    )}
+                                </View>
+                            ) : (
+                                /* Lista completa */
+                                <View style={styles.listContainer}>
+                                    {allParticipants.map((participant, index) => (
+                                        <View key={index} style={styles.listItem}>
+                                            <View style={styles.listRankContainer}>
+                                                <Text style={[
+                                                    styles.listRank,
+                                                    index === 0 && styles.listRankFirst,
+                                                    index === 1 && styles.listRankSecond,
+                                                    index === 2 && styles.listRankThird
+                                                ]}>
+                                                    {index + 1}
+                                                </Text>
+                                            </View>
+                                            <View style={styles.listAvatarContainer}>
+                                                <Ionicons name="person-outline" size={20} color="#999" />
+                                            </View>
+                                            <Text style={styles.listName} numberOfLines={1}>
+                                                {participant.name}
+                                            </Text>
+                                            <View style={styles.listPointsContainer}>
+                                                <Text style={styles.listPoints}>
+                                                    {participant.points}
+                                                </Text>
+                                                <Text style={styles.listPointsLabel}> pts</Text>
+                                            </View>
+                                            {index === 0 && (
+                                                <View style={styles.listKarmaBadge}>
+                                                    <LogoKarma width={14} height={14} />
+                                                </View>
+                                            )}
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
+
+                            {/* View Mode Selector - Debajo del podio/lista */}
+                            <View style={styles.viewModeContainerBottom}>
+                            </View>
+                            {/* Combined Switch and Button */}
+                            <View style={styles.switchAndButtonContainer}>
+                                {/* Ranking Type Selector */}
+                                <View style={styles.selectorContainerInline}>
+                                    <TouchableOpacity
+                                        style={[styles.selectorButtonInline, rankingType === 'total' && styles.selectorButtonActiveInline]}
+                                        onPress={() => setRankingType('total')}
+                                    >
+                                        <Text style={[styles.selectorButtonTextInline, rankingType === 'total' && styles.selectorButtonTextActiveInline]}>
+                                            Total
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.selectorButtonInline, rankingType === 'mensual' && styles.selectorButtonActiveInline]}
+                                        onPress={() => setRankingType('mensual')}
+                                    >
+                                        <Text style={[styles.selectorButtonTextInline, rankingType === 'mensual' && styles.selectorButtonTextActiveInline]}>
+                                            Mensual
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.selectorButtonInline, rankingType === 'semanal' && styles.selectorButtonActiveInline]}
+                                        onPress={() => setRankingType('semanal')}
+                                    >
+                                        <Text style={[styles.selectorButtonTextInline, rankingType === 'semanal' && styles.selectorButtonTextActiveInline]}>
+                                            Semanal
+                                        </Text>
+                                    </TouchableOpacity>
                                 </View>
 
-                                {/* Position 1 - Center (Winner) */}
-                                <View style={styles.podiumColumn}>
-                                    <View style={styles.winnerAvatarWrapper}>
-                                        <View style={[styles.avatarContainer, styles.winnerAvatar]}>
-                                            <Ionicons name="person-outline" size={28} color="#999" />
-                                        </View>
-                                        <View style={styles.karmaBadge}>
-                                            <LogoKarma width={16} height={16} />
-                                        </View>
-                                    </View>
-                                    <Text style={styles.podiumName}>Pupu Gaga</Text>
-                                    <View style={[styles.podiumBar, styles.podiumBar1]}>
-                                        <Text style={styles.podiumPoints}>¡290 puntos!</Text>
-                                    </View>
-                                </View>
-
-                                {/* Position 3 - Right */}
-                                <View style={styles.podiumColumn}>
-                                    <View style={styles.avatarContainer}>
-                                        <Ionicons name="person-outline" size={24} color="#999" />
-                                    </View>
-                                    <Text style={styles.podiumName}>Destroyer</Text>
-                                    <View style={[styles.podiumBar, styles.podiumBar3]}>
-                                        <Text style={styles.podiumPoints}>¡150 puntos!</Text>
-                                    </View>
-                                </View>
+                                {/* View Mode Button */}
+                                <TouchableOpacity
+                                    style={styles.viewModeButton}
+                                    onPress={() => setViewMode(viewMode === 'podio' ? 'lista' : 'podio')}
+                                >
+                                    <Ionicons
+                                        name={viewMode === 'podio' ? 'list' : 'podium'}
+                                        size={20}
+                                        color={COLORS.accent}
+                                    />
+                                    <Text style={styles.viewModeButtonText}>
+                                        {viewMode === 'podio' ? 'Ver lista' : 'Ver podio'}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
 
@@ -186,99 +359,16 @@ const MiKarma: React.FC = () => {
                         <View style={styles.sectionContainer}>
                             <View style={styles.subsectionHeader}>
                                 <Text style={styles.subsectionTitle}>
-                                    Tareas completas y fuera de plazo
+                                    Estado de las tareas
                                 </Text>
                                 <View style={styles.underline} />
                             </View>
 
-                            {/* Donut Chart */}
-                            <View style={styles.chartContainer}>
-                                <Svg height="280" width="280" viewBox="0 0 120 120">
-                                    {/* Background circle (completed tasks - light green) */}
-                                    <Circle
-                                        cx="60"
-                                        cy="60"
-                                        r="30"
-                                        stroke="#E6ECDC"
-                                        strokeWidth="18"
-                                        fill="none"
-                                    />
-
-                                    {/* Late tasks segment (dark) - approximately 18% */}
-                                    <Circle
-                                        cx="60"
-                                        cy="60"
-                                        r="30"
-                                        stroke="#4B4741"
-                                        strokeWidth="18"
-                                        fill="none"
-                                        strokeDasharray="34 188"
-                                        strokeDashoffset="0"
-                                        rotation="-90"
-                                        origin="60, 60"
-                                    />
-
-                                    {/* Label line and text for "Fuera del plazo" */}
-                                    <Line
-                                        x1="40"
-                                        y1="35"
-                                        x2="20"
-                                        y2="20"
-                                        stroke="#4B4741"
-                                        strokeWidth="0.8"
-                                    />
-                                    <SvgText
-                                        x="15"
-                                        y="15"
-                                        fontSize="5"
-                                        fill="#4B4741"
-                                        textAnchor="middle"
-                                        fontFamily={FONTS.regular}
-                                    >
-                                        Fuera del plazo
-                                    </SvgText>
-                                    <SvgText
-                                        x="15"
-                                        y="22"
-                                        fontSize="5"
-                                        fill="#4B4741"
-                                        textAnchor="middle"
-                                        fontFamily={FONTS.bold}
-                                    >
-                                        4
-                                    </SvgText>
-
-                                    {/* Label line and text for "Completadas" */}
-                                    <Line
-                                        x1="80"
-                                        y1="75"
-                                        x2="100"
-                                        y2="95"
-                                        stroke="#4B4741"
-                                        strokeWidth="0.8"
-                                    />
-                                    <SvgText
-                                        x="105"
-                                        y="100"
-                                        fontSize="5"
-                                        fill="#4B4741"
-                                        textAnchor="middle"
-                                        fontFamily={FONTS.regular}
-                                    >
-                                        Completadas
-                                    </SvgText>
-                                    <SvgText
-                                        x="105"
-                                        y="107"
-                                        fontSize="5"
-                                        fill="#4B4741"
-                                        textAnchor="middle"
-                                        fontFamily={FONTS.bold}
-                                    >
-                                        18
-                                    </SvgText>
-                                </Svg>
-                            </View>
+                            {/* Donut Chart Component */}
+                            <TasksDonutChart
+                                completedTasks={karmaData?.completedTasks || 0}
+                                lateTasks={karmaData?.lateTasks || 0}
+                            />
                         </View>
                     </>
                 )}
@@ -352,14 +442,63 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
         marginBottom: 10,
     },
+    viewModeContainerBottom: {
+        alignItems: "center",
+        marginTop: 20,
+    },
+    viewModeButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: COLORS.background,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+        ...COMMON.SHADOW,
+    },
+    viewModeButtonText: {
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.text14,
+        color: COLORS.accent,
+        marginLeft: 6,
+    },
     subsectionHeader: {
         marginBottom: 20,
+    },
+    headerRow: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 5,
+        marginTop: 10,
+        flexWrap: "wrap",
     },
     subsectionTitle: {
         fontFamily: FONTS.regular,
         fontSize: SIZES.text16,
         color: COLORS.accent,
-        marginBottom: 5,
+    },
+    selectorContainerInline: {
+        flexDirection: "row",
+        backgroundColor: COLORS.background,
+        borderRadius: 8,
+        padding: 2,
+        ...COMMON.SHADOW,
+    },
+    selectorButtonInline: {
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        borderRadius: 6,
+    },
+    selectorButtonActiveInline: {
+        backgroundColor: COLORS.accent,
+    },
+    selectorButtonTextInline: {
+        fontFamily: FONTS.bold,
+        fontSize: 11,
+        color: "#999",
+    },
+    selectorButtonTextActiveInline: {
+        color: COLORS.background,
     },
     underline: {
         height: 1,
@@ -444,10 +583,71 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
         textAlign: "center",
     },
-    chartContainer: {
-        alignItems: "center",
-        justifyContent: "center",
+    listContainer: {
         marginTop: 20,
+    },
+    listItem: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: COLORS.background,
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 10,
+        ...COMMON.SHADOW,
+    },
+    listRankContainer: {
+        width: 30,
+        alignItems: "center",
+    },
+    listRank: {
+        fontFamily: FONTS.bold,
+        fontSize: 16,
+        color: "#999",
+    },
+    listRankFirst: {
+        color: "#FFD700",
+        fontSize: 18,
+    },
+    listRankSecond: {
+        color: "#C0C0C0",
+        fontSize: 17,
+    },
+    listRankThird: {
+        color: "#CD7F32",
+        fontSize: 17,
+    },
+    listAvatarContainer: {
+        width: 35,
+        height: 35,
+        borderRadius: 17.5,
+        backgroundColor: "#E0E0E0",
+        justifyContent: "center",
+        alignItems: "center",
+        marginHorizontal: 10,
+    },
+    listName: {
+        flex: 1,
+        fontFamily: FONTS.regular,
+        fontSize: SIZES.text14,
+        color: COLORS.secondary,
+    },
+    listPointsContainer: {
+        flexDirection: "row",
+        alignItems: "baseline",
+        marginRight: 5,
+    },
+    listPoints: {
+        fontFamily: FONTS.bold,
+        fontSize: 16,
+        color: COLORS.primary,
+    },
+    listPointsLabel: {
+        fontFamily: FONTS.regular,
+        fontSize: 12,
+        color: "#999",
+    },
+    listKarmaBadge: {
+        marginLeft: 5,
     },
     // Empty State Styles
     emptyStateContainer: {
@@ -488,21 +688,25 @@ const styles = StyleSheet.create({
         fontSize: SIZES.text16,
         color: COLORS.primary,
     },
-    // Debug Button Styles (remove in production)
-    debugButton: {
-        backgroundColor: "#FFE5B4",
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-        marginBottom: 15,
-        borderWidth: 1,
-        borderColor: "#FFA500",
+    // Loading State Styles
+    loadingContainer: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 60,
+        minHeight: 400,
     },
-    debugButtonText: {
-        fontFamily: FONTS.bold,
-        fontSize: 12,
-        color: "#FF8C00",
-        textAlign: "center",
+    loadingText: {
+        marginTop: 20,
+        fontFamily: FONTS.regular,
+        fontSize: SIZES.text16,
+        color: "#666",
+    },
+    switchAndButtonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 10,
     },
 });
 

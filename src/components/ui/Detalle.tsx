@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Modal,
   View,
@@ -14,7 +14,8 @@ import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../styles/theme";
 import { Feather } from "@expo/vector-icons";
 import TaskModel from "../../types/Task"; // export default
 import FacturaModel, { IFacturaUser } from "../../types/Factura";
-
+import TasksDonutChart from "./TasksDonutChart";
+import { obtenerEstadisticasTareas } from "../../api/espacio";
 type Props =
   | {
     visible: boolean;
@@ -53,10 +54,36 @@ const Detalle: React.FC<Props> = (props) => {
   if (props.kind === "participante") {
     const { participant, participantRelacion, residenciaName, onEliminar, isCurrentUser = false } = props;
 
-    // Obtener karma real de la relación usuarioEspacio
-    const karmaPoints = participantRelacion?.karma ?? 0;
-    const tareasCompletadas = 65; // porcentaje
-    const tareasFueraPlazo = 35; // porcentaje
+    // Obtener karma del participante (viene del hook actualizado)
+    const karmaPoints = participant?.karmaTotal ?? 0;
+    const [estadisticas, setEstadisticas] = useState<any>(null);
+    const [loadingStats, setLoadingStats] = useState(false);
+
+    // Cargar estadísticas del participante
+    useEffect(() => {
+      const cargarEstadisticas = async () => {
+        if (participantRelacion?.espacioId && participant?.id) {
+          try {
+            setLoadingStats(true);
+            const stats = await obtenerEstadisticasTareas(participantRelacion.espacioId, participant.id);
+            setEstadisticas(stats);
+          } catch (error) {
+            console.error("Error al cargar estadísticas del participante:", error);
+            setEstadisticas(null);
+          } finally {
+            setLoadingStats(false);
+            console.log(`Estadísticas cargadas del usuario ${participant?.id}  en el espacio ${participantRelacion?.espacioId}:`, estadisticas);
+          }
+        }
+      };
+      
+      if (visible) {
+        cargarEstadisticas();
+      }
+    }, [visible, participantRelacion?.espacioId, participant?.id]);
+
+    const tareasCompletadas = estadisticas?.completadas ?? 0;
+    const tareasFueraPlazo = estadisticas?.tardes ?? 0;
 
     return (
       <Modal
@@ -92,28 +119,12 @@ const Detalle: React.FC<Props> = (props) => {
             {/* Gráfico de Tareas */}
             <View style={styles.section}>
               <Text style={[styles.sectionLabel, { color: '#6B705C' }]}>
-                Tareas completas y fuera de plazo
+                Estado de las tareas
               </Text>
-
-              <View style={[styles.chartContainer, { marginTop: HELPERS.verticalScale(5) }]}>
-                <View style={styles.donutChart}>
-                  <View style={styles.donutSegment} />
-                  <View style={styles.donutHole} />
-                </View>
-
-                <View style={styles.legendContainer}>
-                  <View style={styles.legendItem}>
-                    <View
-                      style={[styles.legendDot, { backgroundColor: "#4A5942" }]} />
-                    <Text style={styles.legendText}>Fuera de plazo</Text>
-                  </View>
-                  <View style={styles.legendItem}>
-                    <View
-                      style={[styles.legendDot, { backgroundColor: "#E6ECDC" }]} />
-                    <Text style={styles.legendText}>Completadas</Text>
-                  </View>
-                </View>
-              </View>
+              <TasksDonutChart
+                completedTasks={tareasCompletadas || 0}
+                lateTasks={tareasFueraPlazo || 0}
+              />
             </View>
 
             {/* Botón Eliminar */}

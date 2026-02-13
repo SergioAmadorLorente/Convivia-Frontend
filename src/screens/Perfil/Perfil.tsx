@@ -21,6 +21,8 @@ import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerUsuarioPorId } from "../../api/usuario";
+import { obtenerKarmaUsuario } from "../../api/karma";
+import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
@@ -68,7 +70,18 @@ const Perfil: React.FC = () => {
           if (userData) {
             const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
             setUserName(realName);
-            // setUserKarma(userData.karma || 0); // Activate when karma is available
+          }
+          
+          // Obtener karma del usuario
+          try {
+            const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
+            if (usuarioEspacio?.espacioId) {
+              const karmaData = await obtenerKarmaUsuario(usuarioEspacio.espacioId, usuarioEspacio.usuarioId);
+              setUserKarma(karmaData.karmaTotal || 0);
+            }
+          } catch (karmaError) {
+            console.error("Error al cargar karma:", karmaError);
+            setUserKarma(0);
           }
         }
       } catch (error) {

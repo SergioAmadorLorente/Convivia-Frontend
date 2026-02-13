@@ -217,3 +217,24 @@ export const crearEspacioConUsuario = async (
     throw error;
   }
 };
+
+// Interface para estadísticas de tareas
+export interface EstadisticasTareas {
+  completadas: number;
+  pendientes: number;
+  tardes: number;
+}
+
+// Obtener estadísticas de tareas de un usuario
+export const obtenerEstadisticasTareas = async (
+  espacioId: string,
+  usuarioId: string
+): Promise<EstadisticasTareas> => {
+  try {
+    const response = await api.get(`/espacios/${espacioId}/tareas/estadisticas/${usuarioId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener estadísticas de tareas:", error);
+    throw error;
+  }
+};

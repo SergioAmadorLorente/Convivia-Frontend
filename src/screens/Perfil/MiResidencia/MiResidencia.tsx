@@ -290,12 +290,27 @@ const MiResidencia: React.FC = () => {
                         onPress={() => handleParticipantPress(participant)}
                         activeOpacity={0.7}
                       >
+                        <View style={styles.participantRankContainer}>
+                          <Text style={[
+                            styles.participantRank,
+                            index === 0 && styles.participantRankFirst,
+                            index === 1 && styles.participantRankSecond,
+                            index === 2 && styles.participantRankThird
+                          ]}>
+                            {index + 1}
+                          </Text>
+                        </View>
                         <View style={styles.participantIcon}>
                           <Ionicons name="person" size={20} color={COLORS.primary} />
                         </View>
-                        <Text style={styles.participantName}>
-                          {participant.nombre || participant.email || "Usuario sin nombre"}
-                        </Text>
+                        <View style={styles.participantInfo}>
+                          <Text style={styles.participantName}>
+                            {participant?.nombre || participant?.email || "Usuario sin nombre"}
+                          </Text>
+                          <Text style={styles.participantKarma}>
+                            {participant?.karmaTotal || 0} puntos de karma
+                          </Text>
+                        </View>
                       </TouchableOpacity>
                     ))
                   ) : (
@@ -525,6 +540,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  participantRankContainer: {
+    width: 30,
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  participantRank: {
+    fontFamily: FONTS.bold,
+    fontSize: 16,
+    color: '#999',
+  },
+  participantRankFirst: {
+    color: '#FFD700',
+    fontSize: 18,
+  },
+  participantRankSecond: {
+    color: '#C0C0C0',
+    fontSize: 17,
+  },
+  participantRankThird: {
+    color: '#CD7F32',
+    fontSize: 17,
+  },
   participantIcon: {
     width: 40,
     height: 40,
@@ -534,10 +571,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 15
   },
+  participantInfo: {
+    flex: 1,
+  },
   participantName: {
     fontFamily: FONTS.bold,
     fontSize: 16,
     color: "#333",
+    marginBottom: 4,
+  },
+  participantKarma: {
+    fontFamily: FONTS.regular,
+    fontSize: 13,
+    color: COLORS.primary,
   },
   buttonsContainer: {
     gap: 15,
