@@ -22,7 +22,7 @@ import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerUsuarioPorId, obtenerUsuarios } from "../../api/usuario";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
 import { useEditFactura } from "../../hooks/useEditFactura";
-import { crearFacturaEnEspacio, editarFactura, subirImagenFactura, FacturaPayload } from "../../api/factura";
+import { crearFacturaEnEspacio, editarFactura, subirImagenFactura, actualizarImagenFactura, eliminarImagenFactura, obtenerImagenFactura, FacturaPayload } from "../../api/factura";
 import { Alert } from "react-native";
 
 const { hp } = HELPERS;
@@ -51,15 +51,17 @@ const CreateFactura: React.FC = () => {
             console.log("Editing factura:", route.params.facturaToEdit);
             const f = route.params.facturaToEdit;
             loadFactura({
-                id: f.id,
-                name: f.title,
-                description: f.subtitle || "",
-                amount: f.subtitle ? f.subtitle.replace("€", "") : "", // Simple parsing assumption
-                assignedUsers: [],
+                id: f.IdFactura || f.id,
+                name: f.Nombre || f.name || "",
+                description: f.Descripcion || f.description || "",
+                amount: f.Precio != null ? String(f.Precio) : (f.amount || ""),
+                assignedUsers: f.UsuariosAsignados || f.assignedUsers || [],
                 imageUri: undefined,
             });
         }
     }, [route.params]);
+
+    const [imagenOriginal, setImagenOriginal] = useState<string | null>(null);
 
     const user = useAuthListener();
     const [availableUsers, setAvailableUsers] = useState<any[]>([]);
@@ -119,21 +121,42 @@ const CreateFactura: React.FC = () => {
         fetchMembers();
     }, [user]);
 
-    const [saving, setSaving] = useState(false);
-
-    // Obtener la relación del usuario actual una vez que los miembros estén cargados
-    const currentUserWithRelacion = useMemo(() => {
-        const found = availableUsers.find(au => au.id === user?.uid);
-        return found || { ...currentUserData, relacionId: undefined };
-    }, [availableUsers, currentUserData, user]);
-
     useEffect(() => {
-        if (currentUserWithRelacion.relacionId && assignedUsers.some(u => u.id === currentUserData.id)) {
+        if (assignedUsers.some(u => u.id === currentUserData.id)) {
             setcheckedAutoasign(true);
         } else {
             setcheckedAutoasign(false);
         }
-    }, [assignedUsers, currentUserData.id, currentUserWithRelacion]);
+    }, [assignedUsers, currentUserData.id]);
+
+    const [saving, setSaving] = useState(false);
+
+    // Cargar imagen existente cuando estamos editando
+    useEffect(() => {
+        const cargarImagenFactura = async () => {
+            if (!isEditing || !user?.uid) return;
+            const facturaId = route.params?.facturaToEdit?.IdFactura || route.params?.facturaToEdit?.id;
+            if (!facturaId) return;
+            try {
+                const relacion = await obtenerEspacioPorUsuarioId(user.uid);
+                const eId = relacion?.espacioId;
+                if (!eId) return;
+                const blob = await obtenerImagenFactura(eId, facturaId);
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    const base64data = reader.result as string;
+                    setImageUri(base64data);
+                    setImagenOriginal(base64data);
+                };
+            } catch (error) {
+                console.log('No hay imagen previa para esta factura o error al cargarla:', error);
+                setImageUri(undefined);
+                setImagenOriginal(null);
+            }
+        };
+        cargarImagenFactura();
+    }, [isEditing, user]);
 
     const handleSave = async () => {
         if (!name || !amount) {
@@ -158,23 +181,12 @@ const CreateFactura: React.FC = () => {
                 return found ? found.relacionId : u.relacionId;
             }).filter(id => !!id);
 
-            const formatGuid = (id: string) => {
-                if (!id || typeof id !== 'string') return id;
-                // Si ya tiene guiones, lo dejamos igual
-                if (id.includes("-")) return id;
-                // Si tiene 32 caracteres (hex sin guiones), los añadimos
-                if (id.length === 32) {
-                    return `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`;
-                }
-                return id;
-            };
-
-            const eIdFormatted = formatGuid(eId);
-            const creadorId = formatGuid(relacion.id || relacion.id_UsuarioEspacio);
+            const eIdToUse = eId; // Usar el ID tal cual viene (con guiones si los tiene)
+            const creadorId = relacion.id || relacion.id_UsuarioEspacio;
             const deudoresDict: Record<string, boolean> = {};
 
             usuariosAsignacionRaw.forEach(id => {
-                deudoresDict[formatGuid(id)] = true; // true = Pendiente de pago
+                deudoresDict[id] = true; // true = Pendiente de pago
             });
 
             const numDeudores = Object.keys(deudoresDict).length || 1;
@@ -195,12 +207,30 @@ const CreateFactura: React.FC = () => {
             const facturaIdToEdit = route.params?.facturaToEdit?.IdFactura || route.params?.facturaToEdit?.id;
 
             if (isEditing && facturaIdToEdit) {
-                result = await editarFactura(eIdFormatted, facturaIdToEdit, payload);
+                result = await editarFactura(eIdToUse, facturaIdToEdit, payload);
             } else {
-                result = await crearFacturaEnEspacio(eIdFormatted, payload);
+                result = await crearFacturaEnEspacio(eIdToUse, payload);
             }
 
             const newFacturaId = result?.id || result?.IdFactura;
+
+            // Gestión de imagen
+            const targetFacturaId = (isEditing && facturaIdToEdit) ? facturaIdToEdit : newFacturaId;
+            if (targetFacturaId) {
+                if (imageUri && imageUri !== imagenOriginal) {
+                    // Hay imagen nueva o cambiada
+                    if (imagenOriginal) {
+                        await actualizarImagenFactura(eIdToUse, targetFacturaId, imageUri);
+                    } else {
+                        await subirImagenFactura(eIdToUse, targetFacturaId, imageUri);
+                    }
+                    setImagenOriginal(imageUri);
+                } else if (!imageUri && imagenOriginal) {
+                    // Se eliminó la imagen
+                    await eliminarImagenFactura(eIdToUse, targetFacturaId);
+                    setImagenOriginal(null);
+                }
+            }
 
             Alert.alert("Éxito", isEditing ? "Factura actualizada correctamente." : "Factura creada correctamente.");
 
@@ -292,8 +322,7 @@ const CreateFactura: React.FC = () => {
                                     setcheckedAutoasign(newValue);
                                     if (newValue) {
                                         if (!assignedUsers.find((u: any) => u.id === currentUserData.id)) {
-                                            // Usar los datos con relacionId si están disponibles
-                                            setAssignedUsers((prev: any[]) => [...prev, currentUserWithRelacion]);
+                                            setAssignedUsers((prev: any[]) => [...prev, currentUserData]);
                                         }
                                     } else {
                                         setAssignedUsers((prev: any[]) => prev.filter((u: any) => u.id !== currentUserData.id));
@@ -311,20 +340,37 @@ const CreateFactura: React.FC = () => {
                                 />
                             </TouchableOpacity>
                         </View>
+                        {assignedUsers.length > 0 && (
+                            <LargeTextField
+                                value={assignedUsers
+                                    .map((u: any) => u.name || u.Nombre || `Usuario (${(u.id || u.relacionId || "").slice(0, 8)})`)
+                                    .join("\n")}
+                                editable={false}
+                                onChangeText={() => { }}
+                                placeholder="Usuarios asignados"
+                            />
+                        )}
+                    </Desplegable>
+
+                    <Desplegable
+                        title="Foto (opcional)"
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+
+                        <UploadImage
+                            label="Imagen de la factura"
+                            initialImageUri={imageUri}
+                            editable={true}
+                            onImageSelected={(uri) => setImageUri(uri ?? undefined)}
+                        />
                     </Desplegable>
                 </View>
 
                 <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
-                    {assignedUsers.length > 0 && (
-                        <LargeTextField
-                            value={assignedUsers
-                                .map((u: any) => u.name || u.Nombre || `Usuario (${(u.id || u.relacionId || "").slice(0, 8)})`)
-                                .join("\n")}
-                            editable={false}
-                            onChangeText={() => { }}
-                            placeholder="Usuarios asignados"
-                        />
-                    )}
+
 
                     <Button
                         style={GLOBAL_STYLES.buttonPrimaryGreen}
