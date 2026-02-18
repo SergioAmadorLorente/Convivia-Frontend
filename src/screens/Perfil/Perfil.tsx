@@ -44,7 +44,7 @@ const Perfil: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   const handleLogout = () => {
-    navigation.navigate('Main');
+    navigation.replace('Main');
   };
 
   const [fontsLoaded] = useFonts({
