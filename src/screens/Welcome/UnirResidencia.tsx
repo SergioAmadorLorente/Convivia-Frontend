@@ -110,7 +110,7 @@ const UnirResidencia: React.FC = () => {
             showCode: false,
             buttons: [{
               text: 'Ir al inicio',
-              onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioData.nombre })
+              onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioData.nombre })
             }],
           });
           return;
@@ -140,7 +140,7 @@ const UnirResidencia: React.FC = () => {
         showCode: false,
         buttons: [{
           text: 'Aceptar',
-          onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioData.nombre })
+          onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioData.nombre })
         }],
       });
     } catch (error: any) {

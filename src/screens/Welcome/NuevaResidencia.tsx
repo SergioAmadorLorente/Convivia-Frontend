@@ -129,7 +129,7 @@ const NuevaResidencia: React.FC = () => {
                 text: 'Ir al Dashboard',
                 onPress: () => {
                   setPopupVisible(false);
-                  navigation.navigate('DashBoardPersonal');
+                  navigation.replace('DashBoardPersonal');
                 }
               }
             ],
@@ -209,7 +209,7 @@ const NuevaResidencia: React.FC = () => {
           buttons: [
             {
               text: 'Entendido',
-              onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
+              onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
             },
           ],
         });
@@ -222,7 +222,7 @@ const NuevaResidencia: React.FC = () => {
           buttons: [
             {
               text: '¡Empieza!',
-              onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
+              onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
             },
           ],
         });

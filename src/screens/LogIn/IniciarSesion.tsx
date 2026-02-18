@@ -104,7 +104,7 @@ const IniciarSesion: React.FC = () => {
             description: "Redirigiendo a tu residencia...",
             imageType: "success",
             buttons: [
-              { text: "Continuar", onPress: () => navigation.navigate("DashBoardPersonal") },
+              { text: "Continuar", onPress: () => navigation.replace("DashBoardPersonal") },
             ],
           });
         } else {
@@ -114,7 +114,7 @@ const IniciarSesion: React.FC = () => {
             description: "Login exitoso. Crea o únete a una residencia para continuar.",
             imageType: "success",
             buttons: [
-              { text: "Continuar", onPress: () => navigation.navigate("Bienvenida") },
+              { text: "Continuar", onPress: () => navigation.replace("Bienvenida") },
             ],
           });
         }
