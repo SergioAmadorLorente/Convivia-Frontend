@@ -16,6 +16,10 @@ import TaskModel from "../../types/Task"; // export default
 import FacturaModel, { IFacturaUser } from "../../types/Factura";
 import TasksDonutChart from "./TasksDonutChart";
 import { obtenerEstadisticasTareas } from "../../api/espacio";
+import UploadImage from "./UploadImage";
+import { obtenerImagenFactura } from "../../api/factura";
+import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
+import { useAuthListener } from "../../hooks/useAuthListener";
 type Props =
   | {
     visible: boolean;
@@ -345,6 +349,27 @@ const Detalle: React.FC<Props> = (props) => {
   // ---- FACTURA ----
   const { factura, onComplete, onEdit, onDelete, onDownloadImage } = props;
 
+  const facturaUser = useAuthListener();
+  const [facturaImageUri, setFacturaImageUri] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!visible || !facturaUser?.uid) return;
+    const cargar = async () => {
+      try {
+        const relacion = await obtenerEspacioPorUsuarioId(facturaUser.uid);
+        const eId = relacion?.espacioId;
+        if (!eId) return;
+        const blob = await obtenerImagenFactura(eId, factura.IdFactura);
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => setFacturaImageUri(reader.result as string);
+      } catch {
+        setFacturaImageUri(null);
+      }
+    };
+    cargar();
+  }, [visible, factura.IdFactura, facturaUser?.uid]);
+
   const totalImporte = factura.Precio ?? 0;
   const usuarios: IFacturaUser[] = Array.isArray(factura.UsuariosAsignados)
     ? factura.UsuariosAsignados
@@ -412,19 +437,16 @@ const Detalle: React.FC<Props> = (props) => {
           </View>
 
           {/* Fotos */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Fotos</Text>
-            <TouchableOpacity
-              style={styles.downloadRow}
-              activeOpacity={0.85}
-              onPress={onDownloadImage ?? (() => { })}
-            >
-              <Text style={styles.downloadText}>Descargar imagen</Text>
-              <View style={styles.downloadBtn}>
-                <Feather name="download" size={16} color={COLORS.secondary} />
-              </View>
-            </TouchableOpacity>
-          </View>
+          {facturaImageUri ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Fotos</Text>
+              <UploadImage
+                label="Imagen de la factura"
+                initialImageUri={facturaImageUri}
+                editable={false}
+              />
+            </View>
+          ) : null}
 
           {/* Usuarios asignados */}
           <View style={styles.section}>

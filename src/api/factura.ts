@@ -21,7 +21,7 @@ export const crearFactura = async (data: FacturaPayload) => {
 
 export const editarFactura = async (espacioId: string, id: string | number, data: FacturaPayload) => {
     try {
-        const response = await api.put(`/espacio/${espacioId}/factura/${id}`, data);
+        const response = await api.put(`/espacio/${espacioId}/factura/${id}/merge`, data);
         return response.data;
     } catch (error) {
         throw error;
@@ -83,18 +83,23 @@ export const obtenerImagenFactura = async (espacioId: string, facturaId: string)
 
 export const subirImagenFactura = async (espacioId: string, facturaId: string, imageUri: string) => {
     try {
-        console.log("📸 Intentando subir imagen desde:", imageUri);
+        const formData = new FormData();
+        const filename = imageUri.split('/').pop() || 'image.jpg';
+        const match = /\.([\w]+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : 'image/jpeg';
 
-        // En React Native, para enviar 'string($binary)', a veces es mejor usar fetch para obtener el blob
-        const responseImage = await fetch(imageUri);
-        const blob = await responseImage.blob();
+        formData.append('imagen', {
+            uri: imageUri,
+            name: filename,
+            type: type,
+        } as any);
 
         const response = await api.post(
             `/espacio/${espacioId}/factura/${facturaId}/imagen`,
-            blob,
+            formData,
             {
                 headers: {
-                    'Content-Type': 'application/octet-stream',
+                    'Content-Type': 'multipart/form-data',
                 },
             }
         );
@@ -107,17 +112,23 @@ export const subirImagenFactura = async (espacioId: string, facturaId: string, i
 
 export const actualizarImagenFactura = async (espacioId: string, facturaId: string, imageUri: string) => {
     try {
-        console.log("📸 Intentando actualizar imagen desde:", imageUri);
+        const formData = new FormData();
+        const filename = imageUri.split('/').pop() || 'image.jpg';
+        const match = /\.([\w]+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : 'image/jpeg';
 
-        const responseImage = await fetch(imageUri);
-        const blob = await responseImage.blob();
+        formData.append('imagen', {
+            uri: imageUri,
+            name: filename,
+            type: type,
+        } as any);
 
         const response = await api.put(
             `/espacio/${espacioId}/factura/${facturaId}/imagen`,
-            blob,
+            formData,
             {
                 headers: {
-                    'Content-Type': 'application/octet-stream',
+                    'Content-Type': 'multipart/form-data',
                 },
             }
         );

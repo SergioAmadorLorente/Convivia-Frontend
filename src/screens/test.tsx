@@ -1,4 +1,3 @@
-/*
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import Button from '../components/ui/Button';
@@ -21,7 +20,7 @@ const TestScreen = () => {
   const [imagenOriginal, setImagenOriginal] = useState<string | null>(null);
   const [modoEdicion, setModoEdicion] = useState(true);
   const ESPACIO_ID = '0cb192af91b4451da20c642d212539f0';
-  const FACTURA_ID = '';
+  const FACTURA_ID = 'b2b44608be3b4bbeb0294e9a02fc66e1';
 
   const cargarImagenFactura = async () => {
     try {
@@ -137,7 +136,24 @@ const TestScreen = () => {
           Guardar Imagen
         </Button>
       </View>
-      
+      {/* --- Botones de los popups existentes --- */}
+      <Button
+        style={GLOBAL_STYLES.buttonPrimaryGreen}
+        onPress={() => setShowFelicidades(true)}
+      >
+        Mostrar Felicidades
+      </Button>
+
+      <View style={{ height: 20 }} />
+
+      <Button
+        style={GLOBAL_STYLES.buttonSecondaryGrey}
+        onPress={() => setShowCasiLoLogras(true)}
+      >
+        Mostrar Casi Lo Logras
+      </Button>
+
+      {/* --- Demo: selección de usuarios (para tareas/facturas) --- */}
       <View style={{ height: 30 }} />
       <Text style={GLOBAL_STYLES.subtitle}>
         {assignedUsers.length
@@ -152,12 +168,30 @@ const TestScreen = () => {
         Abrir selector (Usuarios)
       </Button>
 
+
+
+      {/* --- Popups existentes --- */}
+      {showFelicidades && (
+        <Felicidades
+          visible={showFelicidades}
+          onClose={() => setShowFelicidades(false)}
+        />
+      )}
+
+      {showCasiLoLogras && (
+        <CasiLoLogras
+          visible={showCasiLoLogras}
+          onClose={() => setShowCasiLoLogras(false)}
+        />
+      )}
+
+      {/* --- Popup de asignación de usuarios (convivia fijo) --- */}
       <AssignUsersPopup
         visible={showAssignUsers}
         onClose={() => setShowAssignUsers(false)}
-        title="Asignación de usuarios"
+        title="Asignación de usuarios"   // cámbialo por “Asignación para factura” si quieres
         users={users}
-        multiSelect={true}
+        multiSelect={true}               // pon false si la asignación debe ser única
         initialSelectedIds={assignedUsers.map(u => u.id)}
         confirmLabel="¡Asigna!"
         onConfirm={(selected) => setAssignedUsers(selected)}
@@ -176,17 +210,5 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 });
-
-export default TestScreen;
-*/
-
-import React from 'react';
-import { View, Text } from 'react-native';
-
-const TestScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Test Screen (Disabled)</Text>
-  </View>
-);
 
 export default TestScreen;
