@@ -310,35 +310,7 @@ const CreateFactura: React.FC = () => {
                                 { marginLeft: "40%", marginTop: 20 },
                             ]}
                         >
-                            <Text
-                                style={[GLOBAL_STYLES.labelCheckbox, { color: COLORS.accent }]}
-                            >
-                                Autoasignarse a la factura
-                            </Text>
-                            <TouchableOpacity
-                                style={CHECKBOX.touchArea}
-                                onPress={() => {
-                                    const newValue = !checkedAutoasign;
-                                    setcheckedAutoasign(newValue);
-                                    if (newValue) {
-                                        if (!assignedUsers.find((u: any) => u.id === currentUserData.id)) {
-                                            setAssignedUsers((prev: any[]) => [...prev, currentUserData]);
-                                        }
-                                    } else {
-                                        setAssignedUsers((prev: any[]) => prev.filter((u: any) => u.id !== currentUserData.id));
-                                    }
-                                }}
-                            >
-                                <Feather
-                                    name={checkedAutoasign ? "check-square" : "square"}
-                                    size={CHECKBOX.iconSize}
-                                    color={
-                                        checkedAutoasign
-                                            ? CHECKBOX.colors.checked
-                                            : CHECKBOX.colors.unchecked
-                                    }
-                                />
-                            </TouchableOpacity>
+
                         </View>
                         {assignedUsers.length > 0 && (
                             <LargeTextField
