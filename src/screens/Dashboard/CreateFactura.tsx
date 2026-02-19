@@ -24,6 +24,7 @@ import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../api/us
 import { useEditFactura } from "../../hooks/useEditFactura";
 import { crearFacturaEnEspacio, editarFactura, subirImagenFactura, actualizarImagenFactura, eliminarImagenFactura, obtenerImagenFactura, FacturaPayload } from "../../api/factura";
 import { Alert } from "react-native";
+import UserList from "../../components/ui/UserList";
 
 const { hp } = HELPERS;
 
@@ -58,10 +59,23 @@ const CreateFactura: React.FC = () => {
                 assignedUsers: f.UsuariosAsignados || f.assignedUsers || [],
                 imageUri: undefined,
             });
+            if (f.deudores && typeof f.deudores === "object") {
+                setDeudoresRaw(f.deudores as Record<string, boolean>);
+            } else if (Array.isArray(f.UsuariosAsignados) && f.UsuariosAsignados.length > 0) {
+                // Reconstruir deudoresRaw desde UsuariosAsignados:
+                // completed=true → pagado (false en el dict), completed=false/undefined → pendiente (true)
+                const rebuilt: Record<string, boolean> = {};
+                f.UsuariosAsignados.forEach((u: any) => {
+                    if (u.id) rebuilt[u.id] = !u.completed;
+                });
+                setDeudoresRaw(rebuilt);
+            }
         }
     }, [route.params]);
 
     const [imagenOriginal, setImagenOriginal] = useState<string | null>(null);
+    // deudores: relacionId -> true (pendiente) | false (pagado)
+    const [deudoresRaw, setDeudoresRaw] = useState<Record<string, boolean>>({});
 
     const user = useAuthListener();
     const [availableUsers, setAvailableUsers] = useState<any[]>([]);
@@ -175,17 +189,14 @@ const CreateFactura: React.FC = () => {
             const eId = relacion?.espacioId;
             if (!eId) throw new Error("No se encontró el espacio del usuario.");
 
-            // Mapear los assignedUsers (que tienen el id de usuario) a sus relacionId
-            const usuariosAsignacionRaw = assignedUsers.map(u => {
-                const found = availableUsers.find(au => au.id === u.id);
-                return found ? found.relacionId : u.relacionId;
-            }).filter(id => !!id);
+            // Usar directamente los IDs de usuario para el dict de deudores
+            const usuariosAsignacionRaw = assignedUsers.map((u: any) => u.id).filter((id: any) => !!id);
 
-            const eIdToUse = eId; // Usar el ID tal cual viene (con guiones si los tiene)
+            const eIdToUse = eId;
             const creadorId = relacion.id || relacion.id_UsuarioEspacio;
             const deudoresDict: Record<string, boolean> = {};
 
-            usuariosAsignacionRaw.forEach(id => {
+            usuariosAsignacionRaw.forEach((id: string) => {
                 deudoresDict[id] = true; // true = Pendiente de pago
             });
 
@@ -296,7 +307,7 @@ const CreateFactura: React.FC = () => {
                         showIcon={false}
                     >
                         <Button
-                            style={[GLOBAL_STYLES.buttonSecondaryGrey]}
+                            style={[GLOBAL_STYLES.buttonSecondaryGrey, { marginBottom: 15 }]}
                             onPress={() => setAssignPopupVisible(true)}
                         >
                             <Text style={GLOBAL_STYLES.textoBoton}>
@@ -304,22 +315,38 @@ const CreateFactura: React.FC = () => {
                             </Text>
                         </Button>
 
-                        <View
-                            style={[
-                                GLOBAL_STYLES.checkboxContainer,
-                                { marginLeft: "40%", marginTop: 20 },
-                            ]}
-                        >
 
-                        </View>
                         {assignedUsers.length > 0 && (
-                            <LargeTextField
-                                value={assignedUsers
-                                    .map((u: any) => u.name || u.Nombre || `Usuario (${(u.id || u.relacionId || "").slice(0, 8)})`)
-                                    .join("\n")}
-                                editable={false}
-                                onChangeText={() => { }}
-                                placeholder="Usuarios asignados"
+                            <UserList
+                                users={assignedUsers.map((u: any) => ({
+                                    id: u.id || u.relacionId || "",
+                                    name: u.name || u.Nombre || `Usuario (${(u.id || u.relacionId || "").slice(0, 8)})`,
+                                }))}
+                                renderExtra={({ userId }) => {
+                                    if (!(userId in deudoresRaw)) return null;
+                                    const pendiente = deudoresRaw[userId];
+                                
+                                    return (
+                                        <View
+                                            style={{
+                                                paddingHorizontal: 10,
+                                                paddingVertical: 3,
+                                                borderRadius: 12,
+                                                backgroundColor: pendiente ? "#FFF3CD" : "#E6ECDC",
+                                            }}
+                                        >
+                                            <Text
+                                                style={{
+                                                    fontFamily: "Montserrat_700Bold",
+                                                    fontSize: 11,
+                                                    color: pendiente ? "#856404" : "#4B4741",
+                                                }}
+                                            >
+                                                {pendiente ? "Pendiente" : "Pagado"}
+                                            </Text>
+                                        </View>
+                                    );
+                                }}
                             />
                         )}
                     </Desplegable>
