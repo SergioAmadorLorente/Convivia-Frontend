@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
   Pressable,
   Platform,
 } from "react-native";
@@ -20,6 +19,7 @@ import UploadImage from "./UploadImage";
 import { obtenerImagenFactura } from "../../api/factura";
 import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 import { useAuthListener } from "../../hooks/useAuthListener";
+import UserList from "./UserList";
 type Props =
   | {
     visible: boolean;
@@ -301,15 +301,24 @@ const Detalle: React.FC<Props> = (props) => {
             {/* Usuario asignado */}
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>Usuario asignado</Text>
-              <TextInput
-                editable={false}
-                value={selectedDayIndex !== null && isDaySelected(selectedDayIndex)
-                  ? getAssignedUserForDay(selectedDayIndex) || "Sin asignar"
-                  : (task.usuarioAsignado ?? "")}
-                placeholder="Usuarios asignados"
-                placeholderTextColor={COLORS.border}
-                style={styles.input}
-              />
+              {(() => {
+                const assignedName =
+                  selectedDayIndex !== null && isDaySelected(selectedDayIndex)
+                    ? getAssignedUserForDay(selectedDayIndex) || null
+                    : task.usuarioAsignado || null;
+                const assignedId =
+                  selectedDayIndex !== null && isDaySelected(selectedDayIndex)
+                    ? String(selectedDayIndex)
+                    : task.usuarioAsignadoId || task.usuarioAsignado || "";
+                const users = assignedName
+                  ? [{ id: assignedId, name: assignedName }]
+                  : [];
+                return users.length > 0 ? (
+                  <UserList users={users} />
+                ) : (
+                  <Text style={styles.emptyUsers}>Sin asignar</Text>
+                );
+              })()}
             </View>
 
             {/* Botones: Editar + Completar */}
@@ -351,6 +360,7 @@ const Detalle: React.FC<Props> = (props) => {
 
   const facturaUser = useAuthListener();
   const [facturaImageUri, setFacturaImageUri] = useState<string | null>(null);
+  const [userRelacionId, setUserRelacionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!visible || !facturaUser?.uid) return;
@@ -358,6 +368,7 @@ const Detalle: React.FC<Props> = (props) => {
       try {
         const relacion = await obtenerEspacioPorUsuarioId(facturaUser.uid);
         const eId = relacion?.espacioId;
+        setUserRelacionId(relacion?.id || null);
         if (!eId) return;
         const blob = await obtenerImagenFactura(eId, factura.IdFactura);
         const reader = new FileReader();
@@ -396,7 +407,17 @@ const Detalle: React.FC<Props> = (props) => {
       });
     }
   }, [factura]);
-
+  // Helper: la factura se considera "completada por mí" si está Pagada globalmente
+  // o si este usuario ya marcó su parte
+  const isFacturaPaidByMe = (item: FacturaModel): boolean => {
+    if (item.Pagado) return true;
+    const relId = (userRelacionId || "").replace(/-/g, "").toLowerCase();
+    return (
+      item.UsuariosAsignados?.some(
+        (u) => u.id.replace(/-/g, "").toLowerCase() === relId && u.completed
+      ) ?? false
+    );
+  };
   return (
     <Modal
       visible={visible}
@@ -451,13 +472,38 @@ const Detalle: React.FC<Props> = (props) => {
           {/* Usuarios asignados */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Usuarios asignados</Text>
-            <TextInput
-              editable={false}
-              value={usuarios.map((u) => u.name).join(", ")}
-              placeholder="Usuarios asignados"
-              placeholderTextColor={COLORS.border}
-              style={styles.input}
-            />
+            {usuarios.length > 0 ? (
+              <UserList
+                users={usuarios.map((u) => ({ id: u.id, name: u.name }))}
+                maxHeight={160}
+                renderExtra={({ userId }) => {
+                  const u = usuarios.find((x) => x.id === userId);
+                  const pagado = u?.completed ?? false;
+                  return (
+                    <View
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 3,
+                        borderRadius: 12,
+                        backgroundColor: pagado ? "#E6ECDC" : "#FFF3CD",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: FONTS.bold,
+                          fontSize: 11,
+                          color: pagado ? "#4B4741" : "#856404",
+                        }}
+                      >
+                        {pagado ? "Pagado" : "Pendiente"}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+            ) : (
+              <Text style={styles.emptyUsers}>Sin usuarios asignados</Text>
+            )}
           </View>
 
           {/* Meta: contador y fecha */}
@@ -494,7 +540,7 @@ const Detalle: React.FC<Props> = (props) => {
               onPress={onComplete}
             >
               <Text style={GLOBAL_STYLES.textoBoton}>
-                {factura.Pagado ? "Desmarcar" : "Completar"}
+                {isFacturaPaidByMe(factura) ? "Desmarcar" : "Completar"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -698,6 +744,13 @@ const styles = StyleSheet.create({
   input: {
     ...(COMMON.INPUT_BASE as any),
     width: "100%",
+  },
+
+  emptyUsers: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text14,
+    color: COLORS.border,
+    paddingVertical: HELPERS.verticalScale(8),
   },
 
   metaRow: {

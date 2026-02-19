@@ -148,6 +148,18 @@ const DashBoardPersonal: React.FC = () => {
     );
   }
 
+  // Helper: la factura se considera "completada por mí" si está Pagada globalmente
+  // o si este usuario ya marcó su parte
+  const isFacturaPaidByMe = (item: FacturaModel): boolean => {
+    if (item.Pagado) return true;
+    const relId = (userRelacionId || "").replace(/-/g, "").toLowerCase();
+    return (
+      item.UsuariosAsignados?.some(
+        (u) => u.id.replace(/-/g, "").toLowerCase() === relId && u.completed
+      ) ?? false
+    );
+  };
+
   // Filtrado de items para la UI
   let pendingItems: any[] = [];
   let completedItems: any[] = [];
@@ -216,7 +228,7 @@ const DashBoardPersonal: React.FC = () => {
                   key={activeTab === "tareas" ? item.id : item.IdFactura}
                   variant={activeTab === "tareas" ? "tarea" : "factura"}
                   title={item.Nombre}
-                  isCompleted={activeTab === "tareas" ? item.isCompleted : item.Pagado}
+                  isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
                   onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
                   onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                   time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
@@ -254,7 +266,7 @@ const DashBoardPersonal: React.FC = () => {
                   key={activeTab === "tareas" ? item.id : item.IdFactura}
                   variant={activeTab === "tareas" ? "tarea" : "factura"}
                   title={item.Nombre}
-                  isCompleted={activeTab === "tareas" ? item.isCompleted : item.Pagado}
+                  isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
                   onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
                   onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                   time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
