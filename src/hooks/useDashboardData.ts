@@ -135,7 +135,8 @@ export const useDashboardData = (newSpaceName?: string) => {
                         Precio: f.precio || f.Precio || 0,
                         Pagado: f.pagado || f.Pagado || false,
                         FechaCreacion: f.fechaCreacion || f.FechaCreacion || new Date(),
-                        UsuariosAsignados: userNames
+                        UsuariosAsignados: userNames,
+                        creadorFactura: f.creadorFactura || f.CreadorFactura || "",
                     });
                 });
 
