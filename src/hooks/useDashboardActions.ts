@@ -133,46 +133,18 @@ export const useDashboardActions = ({
             const factura = facturas.find((f) => f.IdFactura === id);
             if (!factura) return;
 
-            if (factura.Pagado) {
-                showPopup({
-                    imageType: "goback",
-                    title: "¿Estás seguro de que quieres marcar la factura como pendiente?",
-                    buttons: [
-                        { text: "Cancelar" },
-                        {
-                            text: "Aceptar",
-                            onPress: async () => {
-                                const revertida = factura.togglePaid();
-                                setFacturas(prev => prev.map(f => f.IdFactura === id ? revertida : f));
-                                if (espacioId) {
-                                    editarFactura(espacioId, id, {
-                                        nombre: revertida.Nombre,
-                                        precio: revertida.Precio,
-                                        pagoMediano: revertida.perPersonPrice(),
-                                        pagado: false,
-                                        creadorFactura: CURRENT_USER_ID,
-                                        deudores: Object.fromEntries(revertida.UsuariosAsignados.map(u => [u.id, !u.completed])),
-                                    }).catch(e => console.error("Error actualizando factura:", e));
-                                }
-                            },
-                        },
-                    ],
-                });
-                return;
-            }
-
-            const yo = factura.UsuariosAsignados?.find((u) => cleanId(u.id) === cleanId(userRelacionId || ""));
+            const yo = factura.UsuariosAsignados?.find((u) => cleanId(u.id) === cleanId(CURRENT_USER_ID || ""));
             if (!yo) {
                 showPopup({ imageType: "error", title: "No estás asignado a esta factura", buttons: [{ text: "Aceptar" }] });
                 return;
             }
 
-            // Si el usuario ya marcó su parte, dar opción a deshacerlo
             if (yo.completed) {
+                // DESMARCAR PAGO
                 showPopup({
                     imageType: "goback",
-                    title: "¿Desmarcar tu aportación?",
-                    description: "Tu parte volverá a aparecer como pendiente de pago.",
+                    title: "¿Desmarcar tu pago?",
+                    description: "Confirmar que revertirá su pago y que la factura podría volver a “Pendientes”.",
                     buttons: [
                         { text: "Cancelar" },
                         {
@@ -180,63 +152,80 @@ export const useDashboardActions = ({
                             onPress: async () => {
                                 const desmarcada = factura.withUserCompleted(yo.id, false);
                                 setFacturas(prev => prev.map(f => f.IdFactura === id ? desmarcada : f));
+
                                 if (espacioId) {
-                                    editarFactura(espacioId, id, {
-                                        nombre: desmarcada.Nombre,
-                                        precio: desmarcada.Precio,
-                                        pagoMediano: desmarcada.perPersonPrice(),
-                                        pagado: false,
-                                        creadorFactura: CURRENT_USER_ID,
-                                        deudores: Object.fromEntries(desmarcada.UsuariosAsignados.map(u => [u.id, !u.completed])),
-                                    }).catch(e => console.error("Error actualizando factura:", e));
+                                    try {
+                                        await editarFactura(espacioId, id, {
+                                            nombre: desmarcada.Nombre,
+                                            precio: desmarcada.Precio,
+                                            pagoMediano: desmarcada.perPersonPrice(),
+                                            pagado: desmarcada.Pagado,
+                                            creadorFactura: desmarcada.creadorFactura || CURRENT_USER_ID,
+                                            deudores: Object.fromEntries(desmarcada.UsuariosAsignados.map(u => [u.id, !u.completed])),
+                                        });
+                                    } catch (e) {
+                                        console.error("Error actualizando factura:", e);
+                                        Alert.alert("Error", "No se pudo actualizar el pago en el servidor.");
+                                    }
                                 }
                             },
                         },
                     ],
                 });
-                return;
-            }
-
-            let facturaActualizada = factura;
-            if (!yo.completed) {
-                facturaActualizada = facturaActualizada.withUserCompleted(yo.id, true);
-                setFacturas(prev => prev.map(f => f.IdFactura === id ? facturaActualizada : f));
-            }
-
-            if (!facturaActualizada.canMarkPaid()) {
-                const restantes = (facturaActualizada.UsuariosAsignados ?? []).filter((u) => !u.completed);
+            } else {
+                // MARCAR COMO PAGADO
                 showPopup({
                     imageType: "success",
-                    title: "Has marcado tu parte como pagada",
-                    description: restantes.length > 0 ? `Faltan por pagar: ${restantes.map((u) => u.name).join(", ")}.` : undefined,
-                    buttons: [{ text: "Aceptar" }],
-                });
-                if (espacioId && !yo.completed) {
-                    editarFactura(espacioId, id, {
-                        nombre: facturaActualizada.Nombre,
-                        precio: facturaActualizada.Precio,
-                        pagoMediano: facturaActualizada.perPersonPrice(),
-                        pagado: false,
-                        creadorFactura: CURRENT_USER_ID,
-                        deudores: Object.fromEntries(facturaActualizada.UsuariosAsignados.map(u => [u.id, !u.completed])),
-                    }).catch(e => console.error("Error actualizando factura:", e));
-                }
-                return;
-            }
+                    title: "¿Confirmar acción de pago?",
+                    description: "Se marcará tu parte como pagada. Esta acción no otorga puntos de karma.",
+                    buttons: [
+                        { text: "Cancelar" },
+                        {
+                            text: "Aceptar",
+                            onPress: async () => {
+                                const marcada = factura.withUserCompleted(yo.id, true);
+                                setFacturas(prev => prev.map(f => f.IdFactura === id ? marcada : f));
 
-            const facturaFinal = facturaActualizada.togglePaid();
-            setFacturas(prev => prev.map(f => f.IdFactura === id ? facturaFinal : f));
-            if (espacioId) {
-                editarFactura(espacioId, id, {
-                    nombre: facturaFinal.Nombre,
-                    precio: facturaFinal.Precio,
-                    pagoMediano: facturaFinal.perPersonPrice(),
-                    pagado: true,
-                    creadorFactura: CURRENT_USER_ID,
-                    deudores: Object.fromEntries(facturaFinal.UsuariosAsignados.map(u => [u.id, !u.completed])),
-                }).catch(e => console.error("Error actualizando factura:", e));
+                                if (espacioId) {
+                                    try {
+                                        await editarFactura(espacioId, id, {
+                                            nombre: marcada.Nombre,
+                                            precio: marcada.Precio,
+                                            pagoMediano: marcada.perPersonPrice(),
+                                            pagado: marcada.Pagado,
+                                            creadorFactura: marcada.creadorFactura || CURRENT_USER_ID,
+                                            deudores: Object.fromEntries(marcada.UsuariosAsignados.map(u => [u.id, !u.completed])),
+                                        });
+                                    } catch (e) {
+                                        console.error("Error actualizando factura:", e);
+                                        Alert.alert("Error", "No se pudo actualizar el pago en el servidor.");
+                                        return;
+                                    }
+                                }
+
+                                if (marcada.Pagado) {
+                                    showPopup({
+                                        imageType: "happy",
+                                        title: "¡Factura completada!",
+                                        description: "Todos los participantes han pagado su parte.",
+                                        buttons: [{ text: "Aceptar" }]
+                                    });
+                                } else {
+                                    const restantes = marcada.UsuariosAsignados.filter(u => !u.completed);
+                                    showPopup({
+                                        imageType: "success",
+                                        title: "Has marcado tu parte como pagada",
+                                        description: restantes.length > 0
+                                            ? `Faltan por pagar: ${restantes.map(u => u.name).join(", ")}.`
+                                            : undefined,
+                                        buttons: [{ text: "Aceptar" }],
+                                    });
+                                }
+                            },
+                        },
+                    ],
+                });
             }
-            showPopup({ imageType: "happy", title: "Has gestionado correctamente una factura.", buttons: [{ text: "Aceptar" }] });
         }
     };
 

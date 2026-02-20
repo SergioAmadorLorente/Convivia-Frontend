@@ -197,17 +197,20 @@ const CreateFactura: React.FC = () => {
             const deudoresDict: Record<string, boolean> = {};
 
             usuariosAsignacionRaw.forEach((id: string) => {
-                deudoresDict[id] = true; // true = Pendiente de pago
+                // Preservar el estado si ya existía, sino inicializar a true (pendiente)
+                deudoresDict[id] = deudoresRaw[id] !== undefined ? deudoresRaw[id] : true;
             });
 
             const numDeudores = Object.keys(deudoresDict).length || 1;
             const precioTotal = parseFloat(amount);
+            // La factura está pagada globalmente solo si todos los deudores están en false (pagado)
+            const esPagadoGlobal = Object.values(deudoresDict).every(val => val === false);
 
             const payload: FacturaPayload = {
                 nombre: name,
                 precio: precioTotal,
                 pagoMediano: precioTotal / numDeudores,
-                pagado: false,
+                pagado: esPagadoGlobal,
                 creadorFactura: creadorId,
                 deudores: deudoresDict
             };
@@ -325,7 +328,7 @@ const CreateFactura: React.FC = () => {
                                 renderExtra={({ userId }) => {
                                     if (!(userId in deudoresRaw)) return null;
                                     const pendiente = deudoresRaw[userId];
-                                
+
                                     return (
                                         <View
                                             style={{

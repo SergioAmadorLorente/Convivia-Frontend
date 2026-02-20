@@ -193,7 +193,7 @@ const DashBoardPersonal: React.FC = () => {
     completedItems = tareas.filter(i => i.isCompleted && i.isCompletedWithinDays(7));
   } else {
     pendingItems = facturas.filter(i => !i.Pagado);
-    completedItems = facturas.filter(i => i.Pagado);
+    completedItems = facturas.filter(i => i.Pagado && i.isCompletedWithinDays(21));
   }
 
   const fmtEUR = (n: number) => new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n || 0);
