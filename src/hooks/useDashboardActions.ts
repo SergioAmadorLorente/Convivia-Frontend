@@ -258,3 +258,27 @@ export const useDashboardActions = ({
 
     return { handleToggleTask, handleDeleteTask, handleDeleteFactura };
 };
+
+/**
+ * Hook separado para manejar toggle rápido de facturas sin popups
+ * (solo actualiza estado local, sin confirmaciones)
+ */
+export const useQuickToggleFactura = (
+    facturas: FacturaModel[],
+    setFacturas: React.Dispatch<React.SetStateAction<FacturaModel[]>>,
+    userRelacionId: string | null
+) => {
+    const handleQuickToggleFactura = (facturaId: string) => {
+        const factura = facturas.find((f) => f.IdFactura === facturaId);
+        if (!factura || !userRelacionId) return;
+
+        const yo = factura.UsuariosAsignados?.find((u) => u.id === userRelacionId);
+        if (!yo) return;
+
+        // Toggle del estado completed del usuario actual
+        const facturaActualizada = factura.withUserCompleted(userRelacionId, !yo.completed);
+        setFacturas(prev => prev.map(f => f.IdFactura === facturaId ? facturaActualizada : f));
+    };
+
+    return { handleQuickToggleFactura };
+};
