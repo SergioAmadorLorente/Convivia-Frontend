@@ -111,6 +111,27 @@ export class FacturaModel implements IFactura {
     }
   }
 
+  /** 
+   * Devuelve true si la factura está completada (Pagado=true) y FechaCompletada está dentro de 3 semanas (21 días)
+   * desde hoy. Si no tiene FechaCompletada, devuelve false.
+   * Útil para la retención: completadas que superen 21 días se ocultan del listado.
+   */
+  isCompletedWithinRetention(): boolean {
+    if (!this.Pagado || !this.FechaCompletada) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const completed = new Date(this.FechaCompletada);
+    completed.setHours(0, 0, 0, 0);
+
+    const diffTime = today.getTime() - completed.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // Completada hace 21 días o menos
+    return diffDays <= 21;
+  }
+
   /**
    * Marca/desmarca Pagado respetando la regla:
    * - Si está Pagado=true -> al desmarcar, se pone Pagado=false y FechaCompletada=null.

@@ -6,6 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
+  Text,
 } from "react-native";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -19,7 +20,7 @@ import TaskModel from "../../types/Task";
 import FacturaModel from "../../types/Factura";
 
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
-import { HELPERS, SIZES } from "../../styles/theme";
+import { HELPERS, SIZES, COLORS, FONTS } from "../../styles/theme";
 
 import BottomBar from "../../components/ui/BottomBar";
 import Header from "../../components/ui/Header";
@@ -30,7 +31,7 @@ import TasksFilter from "../../components/ui/TasksFilter";
 import Popup from "../../components/ui/Popup";
 import Detalle from "../../components/ui/Detalle";
 import { useDashboardData } from "../../hooks/useDashboardData";
-import { useDashboardActions } from "../../hooks/useDashboardActions";
+import { useDashboardActions, useQuickToggleFactura } from "../../hooks/useDashboardActions";
 
 const { hp } = HELPERS;
 
@@ -58,6 +59,7 @@ const DashBoardPersonal: React.FC = () => {
   } = useDashboardData(route.params?.newSpaceName);
 
   const CURRENT_USER_ID = user?.uid || "u2";
+  const CURRENT_USER_RELACION_ID = userRelacionId;
 
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
   const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
@@ -96,6 +98,8 @@ const DashBoardPersonal: React.FC = () => {
     activeTab,
     openDetalleTarea,
   });
+
+  const { handleQuickToggleFactura } = useQuickToggleFactura(facturas, setFacturas, userRelacionId);
 
   const onRefresh = React.useCallback(() => { setRefreshing(true); cargarTareas(false); }, [cargarTareas, setRefreshing]);
 
@@ -180,8 +184,22 @@ const DashBoardPersonal: React.FC = () => {
     }
     completedItems = tareas.filter(i => i.isCompleted && i.isCompletedWithinDays(7));
   } else {
-    pendingItems = facturas.filter(i => !i.Pagado);
-    completedItems = facturas.filter(i => i.Pagado);
+    // Filtrar facturas para mostrar solo las asignadas al usuario actual
+    const facturasDelUsuario = facturas.filter(f =>
+      f.UsuariosAsignados?.some(u => u.id === CURRENT_USER_RELACION_ID)
+    );
+
+    // Pendientes: sin pagos completos, ordenadas por fecha de creación descendente
+    pendingItems = facturasDelUsuario
+      .filter(i => !i.Pagado)
+      .sort((a, b) => b.FechaCreacion.getTime() - a.FechaCreacion.getTime());
+
+    // Completadas: pagadas y dentro de retención de 3 semanas, ordenadas por FechaCompletada descendente
+    completedItems = facturasDelUsuario
+      .filter(i => i.isCompletedWithinRetention())
+      .sort((a, b) =>
+        (b.FechaCompletada?.getTime() || 0) - (a.FechaCompletada?.getTime() || 0)
+      );
   }
 
   const fmtEUR = (n: number) => new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n || 0);
@@ -209,8 +227,16 @@ const DashBoardPersonal: React.FC = () => {
         )}
 
         <View style={GLOBAL_STYLES.container}>
+          {activeTab === "facturas" && pendingItems.length === 0 && completedItems.length === 0 && (
+            <View style={[{ paddingVertical: 40 }]}>
+              <Text style={{ fontSize: 16, color: COLORS.secondary, fontFamily: FONTS.regular, textAlign: "center" }}>
+                No hay facturas asignadas a tu usuario
+              </Text>
+            </View>
+          )}
+
           {pendingItems.length > 0 && (
-            <Desplegable title="Pendientes" fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+            <Desplegable title={activeTab === "tareas" ? "Pendientes" : "Pendientes de pago"} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
               {pendingItems.map((item: any) => (
                 <TaskItem
                   key={activeTab === "tareas" ? item.id : item.IdFactura}
@@ -218,6 +244,7 @@ const DashBoardPersonal: React.FC = () => {
                   title={item.Nombre}
                   isCompleted={activeTab === "tareas" ? item.isCompleted : item.Pagado}
                   onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
+                  onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
                   onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                   time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
                   fechaLimite={activeTab === "tareas" ? new Date(item.FechaLimite).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" }) : undefined}
@@ -256,8 +283,13 @@ const DashBoardPersonal: React.FC = () => {
                   title={item.Nombre}
                   isCompleted={activeTab === "tareas" ? item.isCompleted : item.Pagado}
                   onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
+                  onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
                   onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                   time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
+                  dateLabel={activeTab === "facturas" ? item.formattedDate?.("es-ES") : undefined}
+                  perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
+                  paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
+                  totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
                 />
               ))}
             </Desplegable>

@@ -28,7 +28,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       const data = await obtenerUsuarioPorId(uid);
       setUserData(data);
     } catch (error) {
-      console.error('Error al cargar datos del usuario:', error);
+      console.log('Usuario no encontrado en la BD. Debe registrarse primero.', error);
+      // No intentar crear automáticamente - el usuario debe completar el registro
       setUserData(null);
     }
   };
@@ -45,15 +46,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setLoading(true);
       setFirebaseUser(user);
-      
+
       if (user?.uid) {
-        // Usuario autenticado: cargar datos completos
+        // Usuario autenticado: cargar datos si existen
         await loadUserData(user.uid);
       } else {
         // Usuario no autenticado: limpiar datos
         setUserData(null);
       }
-      
+
       setLoading(false);
     });
 

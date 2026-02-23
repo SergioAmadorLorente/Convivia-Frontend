@@ -52,7 +52,7 @@ const CrearCuenta: React.FC = () => {
   const { seconds, isCounting, startCountdown } = useCountdown(60);
   const scrollRef = useRef<any>(null);
   const appState = useRef(AppState.currentState);
-  
+
   useKeyboardAware({
     containerRef: scrollRef,
     padding: 12,
@@ -82,7 +82,7 @@ const CrearCuenta: React.FC = () => {
         try {
           // Recargar el usuario actual de Firebase
           await auth.currentUser?.reload();
-          
+
           // Verificar si el email fue verificado
           if (auth.currentUser?.emailVerified) {
             // Email verificado, redirigir a inicio de sesión
@@ -100,24 +100,27 @@ const CrearCuenta: React.FC = () => {
       subscription.remove();
     };
   }, [verificacionEnviada, navigation]);
-  
+
   const validarBBDD = async () => {
     try {
       setEmailUsedError("");
+      // 1. Crear en Firebase
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      // 2. Usamos el UID generado por Firebase para crear el registro en tu BBDD
-      await crearUsuarioConId(userCredential.user.uid, { // <--- Pasamos el UID aquí
-        id: userCredential.user.uid, // <--- Y lo asignamos explícitamente en el cuerpo
+
+      // 2. Crear en la BD con los datos completos
+      await crearUsuarioConId(userCredential.user.uid, {
+        id: userCredential.user.uid,
         nombre: nombre,
         email: email,
         password: password,
         premium: false,
       });
 
+      // 3. Enviar verificación de email
       await sendEmailVerification(userCredential.user);
       setModalVisible(true);
       setVerificacionEnviada(true);
