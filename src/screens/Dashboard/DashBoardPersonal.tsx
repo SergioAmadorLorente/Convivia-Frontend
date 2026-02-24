@@ -198,7 +198,7 @@ const DashBoardPersonal: React.FC = () => {
   } else {
     // Filtrar facturas para mostrar solo las asignadas al usuario actual
     const facturasDelUsuario = facturas.filter(f =>
-      f.UsuariosAsignados?.some(u => u.id === CURRENT_USER_RELACION_ID)
+      f.UsuariosAsignados?.some(u => u.id === CURRENT_USER_ID)
     );
 
     // Pendientes: sin pagos completos, ordenadas por fecha de creación descendente
