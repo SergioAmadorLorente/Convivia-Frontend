@@ -183,102 +183,88 @@ const EditarPerfil = () => {
 	};
 
 	return (
-		<>
-			<Text style={[styles.titulo, { fontSize: 28, marginTop: 0, marginBottom: hp('3%') }]}>Editar Mi Perfil</Text>
+		<View>
+			<ScrollView
 
-			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-				<KeyboardAvoidingView
-					behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-					style={{ flex: 1 }}
-					keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}
+				contentContainerStyle={[
+					GLOBAL_STYLES.scrollContainer2,
+
+					Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
+					{ alignItems: "center" },
+				]}
+				showsVerticalScrollIndicator={false}
+				nestedScrollEnabled
+				keyboardShouldPersistTaps="handled"
+			>
+
+				{/* Avatar Container */}
+				<TouchableOpacity style={editarPerfilStyles.avatarWrapper} onPress={pickImage}>
+					{foto ? (
+						<Image source={{ uri: foto }} style={editarPerfilStyles.foto} />
+					) : (
+						<View style={editarPerfilStyles.fotoPlaceholder}>
+							<Perfilicono width={100} height={100} />
+						</View>
+					)}
+				</TouchableOpacity>
+
+				{/* Form Fields */}
+				<TextField
+					value={nombre}
+					onChangeText={setNombre}
+					placeholder="Nombre"
+				/>
+
+				<TextField
+					value={telefono}
+					onChangeText={setTelefono}
+					placeholder="Teléfono"
+					keyboardType="phone-pad"
+				/>
+
+				<TextField
+					value={correo}
+					onChangeText={setCorreo}
+					placeholder="Correo electrónico"
+					keyboardType="email-address"
+				/>
+
+				<Text style={editarPerfilStyles.sectionTitle}>Cambiar Contraseña</Text>
+
+				<Text style={editarPerfilStyles.fieldLabel}>Contraseña Actual</Text>
+				<TextField
+					value={contrasenaActual}
+					onChangeText={setContrasenaActual}
+					placeholder="• • • • • • • •"
+					secureTextEntry
+				/>
+
+				<Text style={editarPerfilStyles.fieldLabel}>Nueva Contraseña</Text>
+				<TextField
+					value={nuevaContrasena}
+					onChangeText={setNuevaContrasena}
+					placeholder="• • • • • • • •"
+					secureTextEntry
+				/>
+				<Text style={[GLOBAL_STYLES.helperText, { marginTop: 5, paddingLeft: 5 }]}>
+					* Mínimo 8 caracteres y al menos un número.
+				</Text>
+
+				<Text style={editarPerfilStyles.fieldLabel}>Confirma la Contraseña</Text>
+				<TextField
+					value={repetirContrasena}
+					onChangeText={setRepetirContrasena}
+					placeholder="• • • • • • • •"
+					secureTextEntry
+				/>
+
+				<Button
+					onPress={handleSubmit}
+					style={editarPerfilStyles.submitButton}
 				>
-					<View
-						ref={containerRef}
-						style={[
-							styles.container,
-							Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {},
-							{ alignItems: 'center' },
-						]}
-					>
-
-
-						<ScrollView
-							showsVerticalScrollIndicator={false}
-							style={{ width: '100%' }}
-							contentContainerStyle={{ alignItems: 'center', paddingBottom: hp('5%') }}
-						>
-
-							{/* Avatar Container */}
-							<TouchableOpacity style={editarPerfilStyles.avatarWrapper} onPress={pickImage}>
-								{foto ? (
-									<Image source={{ uri: foto }} style={editarPerfilStyles.foto} />
-								) : (
-									<View style={editarPerfilStyles.fotoPlaceholder}>
-										<Perfilicono width={100} height={100} />
-									</View>
-								)}
-							</TouchableOpacity>
-
-							{/* Form Fields */}
-							<TextField
-								value={nombre}
-								onChangeText={setNombre}
-								placeholder="Nombre"
-							/>
-
-							<TextField
-								value={telefono}
-								onChangeText={setTelefono}
-								placeholder="Teléfono"
-								keyboardType="phone-pad"
-							/>
-
-							<TextField
-								value={correo}
-								onChangeText={setCorreo}
-								placeholder="Correo electrónico"
-								keyboardType="email-address"
-							/>
-
-							<Text style={editarPerfilStyles.sectionTitle}>Cambiar Contraseña</Text>
-
-							<Text style={editarPerfilStyles.fieldLabel}>Contraseña Actual</Text>
-							<TextField
-								value={contrasenaActual}
-								onChangeText={setContrasenaActual}
-								placeholder="• • • • • • • •"
-								secureTextEntry
-							/>
-
-							<Text style={editarPerfilStyles.fieldLabel}>Nueva Contraseña</Text>
-							<TextField
-								value={nuevaContrasena}
-								onChangeText={setNuevaContrasena}
-								placeholder="• • • • • • • •"
-								secureTextEntry
-							/>
-							<Text style={[GLOBAL_STYLES.helperText, { marginTop: 5, paddingLeft: 5 }]}>
-								* Mínimo 8 caracteres y al menos un número.
-							</Text>
-
-							<Text style={editarPerfilStyles.fieldLabel}>Confirma la Contraseña</Text>
-							<TextField
-								value={repetirContrasena}
-								onChangeText={setRepetirContrasena}
-								placeholder="• • • • • • • •"
-								secureTextEntry
-							/>
-
-							<Button
-								onPress={handleSubmit}
-								style={editarPerfilStyles.submitButton}
-							>
-								Guardar cambios
-							</Button>
-						</ScrollView>
-					</View>
-				</KeyboardAvoidingView>
-			</TouchableWithoutFeedback>
+					Guardar cambios
+				</Button>
+			</ScrollView>
 
 			<Popup
 				visible={popupVisible}
@@ -288,7 +274,7 @@ const EditarPerfil = () => {
 				imageType={popupOptions.imageType}
 				buttons={popupOptions.buttons}
 			/>
-		</>
+		</View >
 	);
 };
 
