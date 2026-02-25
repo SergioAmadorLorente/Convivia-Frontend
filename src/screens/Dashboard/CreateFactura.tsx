@@ -120,9 +120,12 @@ const CreateFactura: React.FC = () => {
                             }));
                         setAvailableUsers(misMiembros);
 
-                        // Si estamos creando una nueva factura y aún no hay usuarios, pre-asignar a todos los miembros
+                        // Si estamos creando una nueva factura y aún no hay usuarios, pre-asignar solo al usuario actual
                         if (!isEditing && assignedUsers.length === 0) {
-                            setAssignedUsers(misMiembros);
+                            const currentUser = misMiembros.find((u: any) => u.id === user?.uid);
+                            if (currentUser) {
+                                setAssignedUsers([currentUser]);
+                            }
                         }
                     }
                 }
