@@ -28,7 +28,7 @@ export const crearEspacio = async (
     const response = await api.post("/Espacio", data);
     return response.data;
   } catch (error) {
-    console.error("Error al crear espacio:", error);
+    // console.error("Error al crear espacio:", error);
     throw error;
   }
 };
@@ -39,7 +39,7 @@ export const obtenerEspacios = async () => {
     const response = await api.get("/Espacio");
     return response.data;
   } catch (error) {
-    console.error("Error al obtener espacios:", error);
+    // console.error("Error al obtener espacios:", error);
     throw error;
   }
 };
@@ -50,7 +50,7 @@ export const obtenerEspacioPorId = async (id: string) => {
     const response = await api.get(`/Espacio/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener espacio:", error);
+    // console.error("Error al obtener espacio:", error);
     throw error;
   }
 };
@@ -61,7 +61,7 @@ export const obtenerCodigoEspacio = async (id: string) => {
     const response = await api.get(`/Espacio/${id}/getCode`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener código de espacio:", error);
+    // console.error("Error al obtener código de espacio:", error);
     throw error;
   }
 };
@@ -75,7 +75,7 @@ export const actualizarEspacio = async (
     const response = await api.put(`/Espacio/${id}`, data);
     return response.data;
   } catch (error) {
-    console.error("Error al actualizar espacio:", error);
+    // console.error("Error al actualizar espacio:", error);
     throw error;
   }
 };
@@ -86,7 +86,7 @@ export const eliminarEspacio = async (id: string) => {
     const response = await api.delete(`/Espacio/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al eliminar espacio:", error);
+    // console.error("Error al eliminar espacio:", error);
     throw error;
   }
 };
@@ -154,10 +154,10 @@ export const buscarEspacioPorCodigo = async (codigo: string): Promise<EspacioRes
       }
     }
 
-    console.error(`❌ No se encontró ningún espacio con el código: ${inputCode}`);
+    // console.error(`❌ No se encontró ningún espacio con el código: ${inputCode}`);
     return null;
   } catch (error) {
-    console.error("Error al buscar espacio por código:", error);
+    // console.error("Error al buscar espacio por código:", error);
     throw error;
   }
 };
@@ -213,7 +213,7 @@ export const crearEspacioConUsuario = async (
       joinError: null
     };
   } catch (error) {
-    console.error("Error al crear espacio con usuario:", error);
+    // console.error("Error al crear espacio con usuario:", error);
     throw error;
   }
 };
@@ -234,7 +234,7 @@ export const obtenerEstadisticasTareas = async (
     const response = await api.get(`/espacios/${espacioId}/tareas/estadisticas/${usuarioId}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener estadísticas de tareas:", error);
+    // console.error("Error al obtener estadísticas de tareas:", error);
     throw error;
   }
 };

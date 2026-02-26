@@ -231,7 +231,7 @@ const NuevaResidencia: React.FC = () => {
       // Limpiar campos después de crear
       setNombreResidencia('');
     } catch (error) {
-      console.error('Error al crear residencia:', error);
+      // console.error('Error al crear residencia:', error);
       showPopup({
         title: 'Error',
         description: 'Error al crear la residencia. Intenta de nuevo.',

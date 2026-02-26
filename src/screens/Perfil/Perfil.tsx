@@ -79,12 +79,12 @@ const Perfil: React.FC = () => {
               setUserKarma(karmaData.karmaTotal || 0);
             }
           } catch (karmaError) {
-            console.error("Error al cargar karma:", karmaError);
+            // console.error("Error al cargar karma:", karmaError);
             setUserKarma(0);
           }
         }
       } catch (error) {
-        console.error("Error al cargar los datos del usuario:", error);
+        // console.error("Error al cargar los datos del usuario:", error);
       } finally {
         setLoading(false);
       }

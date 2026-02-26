@@ -16,7 +16,7 @@ export const crearUsuario = async (data: UsuarioPayload) => {
         const response = await api.post("/Usuario", data);
         return response.data;
     } catch (error) {
-        console.error("Error al crear usuario:", error);
+        // console.error("Error al crear usuario:", error);
         throw error;
     }
 };
@@ -29,7 +29,7 @@ export const crearUsuarioConId = async (id: string, data: UsuarioPayload) => {
         const response = await api.post("/Usuario", { ...data, id });
         return response.data;
     } catch (error) {
-        console.error("Error al crear usuario con ID (POST):", error);
+        // console.error("Error al crear usuario con ID (POST):", error);
         throw error;
     }
 };
@@ -40,7 +40,7 @@ export const obtenerUsuarios = async () => {
         const response = await api.get("/Usuario");
         return response.data;
     } catch (error) {
-        console.error("Error al obtener usuarios:", error);
+        // console.error("Error al obtener usuarios:", error);
         throw error;
     }
 };
@@ -51,7 +51,7 @@ export const obtenerUsuarioPorId = async (id: string) => {
         const response = await api.get(`/Usuario/${id}`);
         return response.data;
     } catch (error) {
-        console.error("Error al obtener usuario:", error);
+        // console.error("Error al obtener usuario:", error);
         throw error;
     }
 };
@@ -62,7 +62,7 @@ export const actualizarUsuario = async (id: string, data: Partial<UsuarioPayload
         const response = await api.put(`/Usuario/${id}`, data);
         return response.data;
     } catch (error) {
-        console.error("Error al actualizar usuario:", error);
+        // console.error("Error al actualizar usuario:", error);
         throw error;
     }
 };
@@ -73,7 +73,7 @@ export const eliminarUsuario = async (id: string) => {
         const response = await api.delete(`/Usuario/${id}`);
         return response.data;
     } catch (error) {
-        console.error("Error al eliminar usuario:", error);
+        // console.error("Error al eliminar usuario:", error);
         throw error;
     }
 };

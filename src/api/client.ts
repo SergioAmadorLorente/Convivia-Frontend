@@ -36,12 +36,12 @@ api.interceptors.response.use(
         message: error.message,
       });
     } else {
-      console.error("Axios Error:", {
+      /*/ console.error("Axios Error:", {
         message: error.message,
         code: error.code,
         status: status,
         data: error.response?.data,
-      });
+      });*/
     }
     return Promise.reject(error);
   },

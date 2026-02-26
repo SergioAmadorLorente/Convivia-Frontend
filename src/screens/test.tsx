@@ -36,7 +36,7 @@ const TestScreen = () => {
         console.log('Imagen cargada exitosamente');
       };
     } catch (error) {
-      console.error('Error al cargar imagen:', error);
+      // console.error('Error al cargar imagen:', error);
       setFacturaImageUri(null);
       setImagenOriginal(null);
     }
@@ -77,7 +77,7 @@ const TestScreen = () => {
         return;
       }
     } catch (error) {
-      console.error('Error al guardar imagen:', error);
+      // console.error('Error al guardar imagen:', error);
     }
   };
 

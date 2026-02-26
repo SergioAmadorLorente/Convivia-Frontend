@@ -56,12 +56,12 @@ export const crearTarea = async (data: TareaPayload) => {
     console.log("✅ Plantilla creada:");
     return response.data;
   } catch (error: any) {
-    console.error("❌ Error al crear tarea:", error);
+    // console.error("❌ Error al crear tarea:", error);
     if (error?.response?.data) {
-      console.error(
+      /*/ console.error(
         "📋 Detalles del error:",
         JSON.stringify(error.response.data, null, 2),
-      );
+      );*/
     }
     throw error;
   }
@@ -123,7 +123,7 @@ export const editarTarea = async (
     console.log("✅ PlantillaTarea actualizada exitosamente");
     return { success: true };
   } catch (error) {
-    console.error("❌ Error al editar tarea:", error);
+    // console.error("❌ Error al editar tarea:", error);
     throw error;
   }
 };
@@ -133,7 +133,7 @@ export const eliminarTarea = async (espacioId: string, id: string | number) => {
     const response = await api.delete(`/espacios/${espacioId}/tareas/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al eliminar tarea:", error);
+    // console.error("Error al eliminar tarea:", error);
     throw error;
   }
 };
@@ -168,7 +168,7 @@ export const obtenerTareasPorEspacio = async (espacioId: string) => {
         return [];
       }
     }
-    console.error("Error al obtener tareas por espacio:", error);
+    // console.error("Error al obtener tareas por espacio:", error);
     throw error;
   }
 };
@@ -179,7 +179,7 @@ export const obtenerTareas = async () => {
     const response = await api.get("/Tareas");
     return response.data;
   } catch (error) {
-    console.error("Error al obtener tareas:", error);
+    // console.error("Error al obtener tareas:", error);
     throw error;
   }
 };
@@ -282,9 +282,9 @@ export const completarTareaInstancia = async (
     const response = await api.post(url, data);
     return response.data;
   } catch (error: any) {
-    console.error("❌ Error al completar instancia de tarea:", error);
+    // console.error("❌ Error al completar instancia de tarea:", error);
     if (error.response?.data) {
-      console.error("Detalles:", JSON.stringify(error.response.data));
+      // console.error("Detalles:", JSON.stringify(error.response.data));
     }
     throw error;
   }

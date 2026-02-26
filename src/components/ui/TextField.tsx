@@ -62,7 +62,7 @@ const TextField: React.FC<TextFieldProps> = ({
         }, 0);
       }
     } catch (error) {
-      console.error("Error al pegar del portapapeles:", error);
+      // console.error("Error al pegar del portapapeles:", error);
     }
   };
 

@@ -131,7 +131,7 @@ const CreateFactura: React.FC = () => {
                     }
                 }
             } catch (err) {
-                console.error("Error fetching space members:", err);
+                // console.error("Error fetching space members:", err);
             } finally {
                 setLoadingUsers(false);
             }
@@ -248,7 +248,7 @@ const CreateFactura: React.FC = () => {
 
             navigation.goBack();
         } catch (err) {
-            console.error("Error al guardar factura:", err);
+            // console.error("Error al guardar factura:", err);
             showToast({
                 entity: "factura",
                 name: "No se pudo guardar la factura",

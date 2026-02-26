@@ -144,7 +144,7 @@ const UnirResidencia: React.FC = () => {
         }],
       });
     } catch (error: any) {
-      console.error('Error al unirse a la residencia:', error);
+      // console.error('Error al unirse a la residencia:', error);
 
       const is404 = error.message?.includes('404') || error.response?.status === 404;
 

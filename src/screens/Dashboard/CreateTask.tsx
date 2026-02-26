@@ -195,7 +195,7 @@ const CreateTask: React.FC = () => {
                 setAvailableUsers(usersInSpace);
 
             } catch (error) {
-                console.error("❌ Error fetching users in space:", error);
+                // console.error("❌ Error fetching users in space:", error);
             }
         };
 
@@ -418,7 +418,7 @@ const CreateTask: React.FC = () => {
             });
 
         } catch (error: any) {
-            console.error('Error al crear tarea:', error);
+            // console.error('Error al crear tarea:', error);
             showPopup({
                 title: 'Error',
                 description: error?.response?.data?.message || 'Error al crear la tarea. Intenta de nuevo.',

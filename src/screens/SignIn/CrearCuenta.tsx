@@ -90,7 +90,7 @@ const CrearCuenta: React.FC = () => {
             navigation.navigate("IniciarSesion");
           }
         } catch (error) {
-          console.error("Error al verificar el estado del email:", error);
+          // console.error("Error al verificar el estado del email:", error);
         }
       }
       appState.current = nextAppState;
@@ -129,7 +129,7 @@ const CrearCuenta: React.FC = () => {
       if (error.code === "auth/email-already-in-use") {
         setEmailUsedError("Este correo ya está registrado.");
       } else {
-        console.error("Error creating account:", error);
+        // console.error("Error creating account:", error);
         setEmailUsedError("Error al crear la cuenta.");
       }
     }

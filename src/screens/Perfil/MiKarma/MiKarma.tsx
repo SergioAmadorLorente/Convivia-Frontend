@@ -125,7 +125,7 @@ const MiKarma: React.FC = () => {
                 });
                 setAllParticipants(participants); // Todos para la lista
             } catch (err: any) {
-                console.error("Error al cargar datos de karma:", err);
+                // console.error("Error al cargar datos de karma:", err);
                 setError(err.message || "Error al cargar los datos");
                 setKarmaData(null);
             } finally {
