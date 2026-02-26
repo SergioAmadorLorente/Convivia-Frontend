@@ -25,6 +25,7 @@ import { useEditFactura } from "../../hooks/useEditFactura";
 import { crearFacturaEnEspacio, editarFactura, subirImagenFactura, actualizarImagenFactura, eliminarImagenFactura, obtenerImagenFactura, FacturaPayload } from "../../api/factura";
 import { Alert } from "react-native";
 import UserList from "../../components/ui/UserList";
+import { useToast } from "../../hooks/useToast";
 
 const { hp } = HELPERS;
 
@@ -148,41 +149,26 @@ const CreateFactura: React.FC = () => {
 
     const [saving, setSaving] = useState(false);
 
-    // Cargar imagen existente cuando estamos editando
-    useEffect(() => {
-        const cargarImagenFactura = async () => {
-            if (!isEditing || !user?.uid) return;
-            const facturaId = route.params?.facturaToEdit?.IdFactura || route.params?.facturaToEdit?.id;
-            if (!facturaId) return;
-            try {
-                const relacion = await obtenerEspacioPorUsuarioId(user.uid);
-                const eId = relacion?.espacioId;
-                if (!eId) return;
-                const blob = await obtenerImagenFactura(eId, facturaId);
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => {
-                    const base64data = reader.result as string;
-                    setImageUri(base64data);
-                    setImagenOriginal(base64data);
-                };
-            } catch (error) {
-                console.log('No hay imagen previa para esta factura o error al cargarla:', error);
-                setImageUri(undefined);
-                setImagenOriginal(null);
-            }
-        };
-        cargarImagenFactura();
-    }, [isEditing, user]);
+    const { show: showToast } = useToast();
 
     const handleSave = async () => {
         if (!name || !amount) {
-            Alert.alert("Error", "El nombre y el precio son obligatorios.");
+            showToast({
+                entity: "factura",
+                name: name || "Sin nombre",
+                tone: "error",
+                autoHideMs: 3000
+            });
             return;
         }
 
         if (assignedUsers.length === 0) {
-            Alert.alert("Error", "Debes asignar al menos un usuario a la factura.");
+            showToast({
+                entity: "factura",
+                name: "Debes asignar al menos un usuario",
+                tone: "error",
+                autoHideMs: 3000
+            });
             return;
         }
 
@@ -249,7 +235,12 @@ const CreateFactura: React.FC = () => {
                 }
             }
 
-            Alert.alert("Éxito", isEditing ? "Factura actualizada correctamente." : "Factura creada correctamente.");
+            showToast({
+                entity: "factura",
+                name: isEditing ? "Actualizada correctamente" : "Creada correctamente",
+                tone: "success",
+                autoHideMs: 3000
+            });
 
             if (route.params?.onSave) {
                 route.params.onSave();
@@ -258,11 +249,41 @@ const CreateFactura: React.FC = () => {
             navigation.goBack();
         } catch (err) {
             console.error("Error al guardar factura:", err);
-            Alert.alert("Error", "No se pudo guardar la factura. Inténtalo de nuevo.");
+            showToast({
+                entity: "factura",
+                name: "No se pudo guardar la factura",
+                tone: "error",
+                autoHideMs: 3000
+            });
         } finally {
             setSaving(false);
         }
     };
+    useEffect(() => {
+        const cargarImagenFactura = async () => {
+            if (!isEditing || !user?.uid) return;
+            const facturaId = route.params?.facturaToEdit?.IdFactura || route.params?.facturaToEdit?.id;
+            if (!facturaId) return;
+            try {
+                const relacion = await obtenerEspacioPorUsuarioId(user.uid);
+                const eId = relacion?.espacioId;
+                if (!eId) return;
+                const blob = await obtenerImagenFactura(eId, facturaId);
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    const base64data = reader.result as string;
+                    setImageUri(base64data);
+                    setImagenOriginal(base64data);
+                };
+            } catch (error) {
+                console.log('No hay imagen previa para esta factura o error al cargarla:', error);
+                setImageUri(undefined);
+                setImagenOriginal(null);
+            }
+        };
+        cargarImagenFactura();
+    }, [isEditing, user]);
 
     return (
         <KeyboardAvoidingView
@@ -285,7 +306,7 @@ const CreateFactura: React.FC = () => {
                     <TextField
                         value={name}
                         onChangeText={(text: string) => setName(text)}
-                        placeholder="Nombre"
+                        placeholder="Nombr"
                     />
                     <LargeTextField
                         value={description}
