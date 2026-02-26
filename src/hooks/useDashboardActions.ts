@@ -109,7 +109,7 @@ export const useDashboardActions = ({
                     const nuevoEstado = wasOverdue ? "Completada Fuera de Plazo" : "Completada";
                     await completarTareaInstancia(espacioId, task.id, task.tareasId[task.tareasId.length - 1], true);
                 }
-            } catch (error) { console.error("Error al completar tarea:", error); }
+            } catch (error) { /*/ console.error("Error al completar tarea:", error);*/ }
 
             if (!wasOverdue && userRelacionId) {
                 try {
@@ -164,7 +164,7 @@ export const useDashboardActions = ({
                                             deudores: Object.fromEntries(desmarcada.UsuariosAsignados.map(u => [u.id, !u.completed])),
                                         });
                                     } catch (e) {
-                                        console.error("Error actualizando factura:", e);
+                                        // console.error("Error actualizando factura:", e);
                                         Alert.alert("Error", "No se pudo actualizar el pago en el servidor.");
                                     }
                                 }
@@ -197,7 +197,7 @@ export const useDashboardActions = ({
                                             deudores: Object.fromEntries(marcada.UsuariosAsignados.map(u => [u.id, !u.completed])),
                                         });
                                     } catch (e) {
-                                        console.error("Error actualizando factura:", e);
+                                        // console.error("Error actualizando factura:", e);
                                         Alert.alert("Error", "No se pudo actualizar el pago en el servidor.");
                                         return;
                                     }

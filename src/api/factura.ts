@@ -14,7 +14,7 @@ export const crearFactura = async (data: FacturaPayload) => {
     const response = await api.post("/Factura", data);
     return response.data;
   } catch (error) {
-    console.error("Error al crear factura:", error);
+    // console.error("Error al crear factura:", error);
     throw error;
   }
 };
@@ -52,7 +52,7 @@ export const obtenerFacturas = async () => {
     const response = await api.get("/Factura");
     return response.data;
   } catch (error) {
-    console.error("Error al obtener facturas:", error);
+    // console.error("Error al obtener facturas:", error);
     throw error;
   }
 };
@@ -62,7 +62,7 @@ export const obtenerFacturasPorEspacio = async (espacioId: string) => {
     const response = await api.get(`/espacio/${espacioId}/factura`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener facturas por espacio:", error);
+    // console.error("Error al obtener facturas por espacio:", error);
     throw error;
   }
 };
@@ -75,7 +75,7 @@ export const crearFacturaEnEspacio = async (
     const response = await api.post(`/espacio/${espacioId}/factura`, data);
     return response.data;
   } catch (error) {
-    console.error("Error al crear factura en espacio:", error);
+    // console.error("Error al crear factura en espacio:", error);
     throw error;
   }
 };
@@ -90,7 +90,7 @@ export const obtenerFacturasPorDeudor = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error al obtener factura por deudor: ", error);
+    // console.error("Error al obtener factura por deudor: ", error);
     throw error;
   }
 };
@@ -110,7 +110,7 @@ export const obtenerImagenFactura = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error al obtener imagen de factura:", error);
+    // console.error("Error al obtener imagen de factura:", error);
     throw error;
   }
 };
@@ -143,7 +143,7 @@ export const subirImagenFactura = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error al subir imagen de factura:", error);
+    // console.error("Error al subir imagen de factura:", error);
     throw error;
   }
 };
@@ -176,7 +176,7 @@ export const actualizarImagenFactura = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error al actualizar imagen de factura:", error);
+    // console.error("Error al actualizar imagen de factura:", error);
     throw error;
   }
 };
@@ -191,7 +191,7 @@ export const eliminarImagenFactura = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error al eliminar imagen de factura:", error);
+    // console.error("Error al eliminar imagen de factura:", error);
     throw error;
   }
 };

@@ -72,7 +72,7 @@ const Detalle: React.FC<Props> = (props) => {
             const stats = await obtenerEstadisticasTareas(participantRelacion.espacioId, participant.id);
             setEstadisticas(stats);
           } catch (error) {
-            console.error("Error al cargar estadísticas del participante:", error);
+            // console.error("Error al cargar estadísticas del participante:", error);
             setEstadisticas(null);
           } finally {
             setLoadingStats(false);

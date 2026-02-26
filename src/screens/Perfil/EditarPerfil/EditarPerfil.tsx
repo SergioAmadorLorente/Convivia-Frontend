@@ -71,7 +71,7 @@ const EditarPerfil = () => {
 						// Si tienes lógica para la foto, añádela aquí
 					}
 				} catch (error) {
-					console.error("Error cargando perfil:", error);
+					// console.error("Error cargando perfil:", error);
 				} finally {
 					setIsLoading(false);
 				}
@@ -170,7 +170,7 @@ const EditarPerfil = () => {
 				buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
 			});
 		} catch (error) {
-			console.error("Error actualizando perfil:", error);
+			// console.error("Error actualizando perfil:", error);
 			showPopup({
 				title: 'Error',
 				description: 'No se pudo actualizar el perfil',

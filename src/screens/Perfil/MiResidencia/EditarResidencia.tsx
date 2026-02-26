@@ -75,7 +75,7 @@ const EditarResidencia: React.FC = () => {
 
           // Verificar si la respuesta es exitosa
           if (!response.ok) {
-            console.error(`Error HTTP: ${response.status}`);
+            // console.error(`Error HTTP: ${response.status}`);
             setCoordinates(null);
             setLoadingMap(false);
             return;
@@ -84,7 +84,7 @@ const EditarResidencia: React.FC = () => {
           // Verificar que la respuesta sea JSON
           const contentType = response.headers.get('content-type');
           if (!contentType || !contentType.includes('application/json')) {
-            console.error('La respuesta no es JSON:', contentType);
+            // console.error('La respuesta no es JSON:', contentType);
             setCoordinates(null);
             setLoadingMap(false);
             return;
@@ -101,7 +101,7 @@ const EditarResidencia: React.FC = () => {
             setCoordinates(null);
           }
         } catch (error) {
-          console.error("Error en geocodificación:", error);
+          // console.error("Error en geocodificación:", error);
           setCoordinates(null);
         } finally {
           setLoadingMap(false);
@@ -134,7 +134,7 @@ const EditarResidencia: React.FC = () => {
       console.log("Espacio actualizado exitosamente");
       navigation.goBack();
     } catch (error) {
-      console.error("Error al actualizar el espacio:", error);
+      // console.error("Error al actualizar el espacio:", error);
       Alert.alert("Error", "Hubo un error al actualizar la residencia");
     } finally {
       setLoading(false);

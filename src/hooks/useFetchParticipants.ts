@@ -80,7 +80,7 @@ const useFetchParticipants = () => {
       
       setParticipants(participantesValidos);
     } catch (e) {
-      console.error("Error fetching participants", e);
+      // console.error("Error fetching participants", e);
       setParticipants([]);
     } finally {
       setLoading(false);

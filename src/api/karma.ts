@@ -31,7 +31,7 @@ export const obtenerKarmaUsuario = async (
     const response = await api.get(`/espacio/${espacioId}/Karma/${usuarioId}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener karma del usuario:", error);
+    // console.error("Error al obtener karma del usuario:", error);
     throw error;
   }
 };
@@ -53,7 +53,7 @@ export const obtenerRankingKarma = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error al obtener ranking de karma:", error);
+    // console.error("Error al obtener ranking de karma:", error);
     throw error;
   }
 };

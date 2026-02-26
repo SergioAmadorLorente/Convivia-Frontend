@@ -84,7 +84,7 @@ export default function useCodigoResidencia() {
       setGeneratedCode(codeStr);
       return codeStr;
     } catch (error: any) {
-      console.error("Error generating code:", error);
+      // console.error("Error generating code:", error);
       setErrorCode(error.message || "Error al generar código");
     } finally {
       setLoadingCode(false);

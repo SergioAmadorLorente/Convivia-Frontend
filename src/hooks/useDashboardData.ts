@@ -67,7 +67,7 @@ export const useDashboardData = (newSpaceName?: string) => {
           }
         }
       } catch (error) {
-        console.error("Error al cargar espacio:", error);
+        // console.error("Error al cargar espacio:", error);
         setEspacioNombre("Mi espacio");
       } finally {
         setLoadingEspacio(false);
@@ -101,7 +101,7 @@ export const useDashboardData = (newSpaceName?: string) => {
           setUserNamesMap(map);
         }
       } catch (error) {
-        console.error("Error cargando nombres de usuario:", error);
+        // console.error("Error cargando nombres de usuario:", error);
       }
     };
     cargarNombresUsuario();
@@ -166,7 +166,7 @@ export const useDashboardData = (newSpaceName?: string) => {
         setFacturas(mapped);
       }
     } catch (err) {
-      console.error("❌ Error cargando facturas:", err);
+      // console.error("❌ Error cargando facturas:", err);
     } finally {
       setLoadingFacturas(false);
     }
@@ -253,7 +253,7 @@ export const useDashboardData = (newSpaceName?: string) => {
         });
       }
     } catch (error) {
-      console.error("Error cargando tareas:", error);
+      // console.error("Error cargando tareas:", error);
     } finally {
       if (showLoading) setLoadingTareas(false);
       setRefreshing(false);

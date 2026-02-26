@@ -4,5 +4,5 @@ try {
   console.log('Transformer:', !!config.transformer);
   console.log('Resolver:', !!config.resolver);
 } catch (error) {
-  console.error('Failed to load config:', error);
+  // console.error('Failed to load config:', error);
 }

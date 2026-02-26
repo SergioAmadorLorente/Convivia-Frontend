@@ -75,7 +75,7 @@ const MiResidencia: React.FC = () => {
         Alert.alert("Error", "No se encontró tu información de miembro.");
       }
     } catch (error) {
-      console.error("Error al abandonar residencia:", error);
+      // console.error("Error al abandonar residencia:", error);
       Alert.alert("Error", "Ocurrió un error al intentar abandonar la residencia.");
     }
   };
@@ -96,7 +96,7 @@ const MiResidencia: React.FC = () => {
         routes: [{ name: "Bienvenida" }],
       });
     } catch (error) {
-      console.error("Error al eliminar residencia:", error);
+      // console.error("Error al eliminar residencia:", error);
       Alert.alert("Error", "Ocurrió un error al intentar eliminar la residencia.");
     }
   };
@@ -115,7 +115,7 @@ const MiResidencia: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching residencia:", error);
+      // console.error("Error fetching residencia:", error);
     }
   };
 
@@ -153,7 +153,7 @@ const MiResidencia: React.FC = () => {
         const relacion = await obtenerRelacionUsuarioEspacio(participant.id, residenciaData.id);
         setSelectedParticipantRelacion(relacion);
       } catch (error) {
-        console.error("Error al obtener relación usuarioEspacio:", error);
+        // console.error("Error al obtener relación usuarioEspacio:", error);
         setSelectedParticipantRelacion(null);
       }
     }
@@ -191,7 +191,7 @@ const MiResidencia: React.FC = () => {
       setSelectedParticipant(null);
       setSelectedParticipantRelacion(null);
     } catch (error) {
-      console.error("Error al eliminar participante:", error);
+      // console.error("Error al eliminar participante:", error);
       showToast({
         entity: "tarea",
         name: "Error al eliminar el participante",
