@@ -306,7 +306,7 @@ const CreateFactura: React.FC = () => {
                     <TextField
                         value={name}
                         onChangeText={(text: string) => setName(text)}
-                        placeholder="Nombr"
+                        placeholder="Nombre"
                     />
                     <LargeTextField
                         value={description}
