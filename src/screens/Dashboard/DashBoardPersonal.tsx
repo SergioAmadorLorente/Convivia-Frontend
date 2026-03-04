@@ -99,7 +99,7 @@ const DashBoardPersonal: React.FC = () => {
     openDetalleTarea,
   });
 
-  const { handleQuickToggleFactura } = useQuickToggleFactura(facturas, setFacturas, userRelacionId);
+  const { handleQuickToggleFactura } = useQuickToggleFactura(facturas, setFacturas, userRelacionId, espacioId, CURRENT_USER_ID);
 
   const onRefresh = React.useCallback(() => { setRefreshing(true); cargarTareas(false); }, [cargarTareas, setRefreshing]);
 
@@ -196,19 +196,16 @@ const DashBoardPersonal: React.FC = () => {
     }
     completedItems = tareas.filter(i => i.isCompleted && i.isCompletedWithinDays(7));
   } else {
-    // Filtrar facturas para mostrar solo las asignadas al usuario actual
-    const facturasDelUsuario = facturas.filter(f =>
-      f.UsuariosAsignados?.some(u => u.id === CURRENT_USER_ID)
-    );
+    // Mostrar todas las facturas (tanto pendientes como completadas)
 
     // Pendientes: sin pagos completos, ordenadas por fecha de creación descendente
-    pendingItems = facturasDelUsuario
+    pendingItems = facturas
       .filter(i => !i.Pagado)
       .sort((a, b) => b.FechaCreacion.getTime() - a.FechaCreacion.getTime());
 
-    // Completadas: pagadas y dentro de retención de 3 semanas, ordenadas por FechaCompletada descendente
-    completedItems = facturasDelUsuario
-      .filter(i => i.isCompletedWithinRetention())
+    // Completadas: todas las pagadas, ordenadas por FechaCompletada descendente
+    completedItems = facturas
+      .filter(i => i.Pagado)
       .sort((a, b) =>
         (b.FechaCompletada?.getTime() || 0) - (a.FechaCompletada?.getTime() || 0)
       );

@@ -7,6 +7,7 @@ export interface FacturaPayload {
   pagado: boolean;
   creadorFactura: string;
   deudores: Record<string, boolean>;
+  fechaCompletada?: string | null;
 }
 
 export const crearFactura = async (data: FacturaPayload) => {
@@ -14,7 +15,6 @@ export const crearFactura = async (data: FacturaPayload) => {
     const response = await api.post("/Factura", data);
     return response.data;
   } catch (error) {
-    // console.error("Error al crear factura:", error);
     throw error;
   }
 };
