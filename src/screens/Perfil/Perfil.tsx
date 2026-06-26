@@ -146,13 +146,24 @@ const Perfil: React.FC = () => {
               )}
             </View>
 
-            {/* Edit Icon */}
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => navigation.navigate('EditarPerfil')}
-            >
-              <FontAwesome5 name="edit" size={18} color="#ACBF8A" />
-            </TouchableOpacity>
+            {/* Action Buttons */}
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              {/* Language Icon */}
+              <TouchableOpacity
+                style={[styles.editButton, { marginRight: 5 }]}
+                onPress={() => { /* TODO: Selector de idioma en el futuro */ }}
+              >
+                <Ionicons name="flag-outline" size={20} color="#ACBF8A" />
+              </TouchableOpacity>
+
+              {/* Edit Icon */}
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => navigation.navigate('EditarPerfil')}
+              >
+                <FontAwesome5 name="edit" size={18} color="#ACBF8A" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -258,7 +269,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   userDetails: {
-    marginRight: HELPERS.wp("15%"),
+    flex: 1,
+    marginRight: 10,
   },
   userName: {
     fontFamily: FONTS.bold,

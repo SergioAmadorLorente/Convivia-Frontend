@@ -49,6 +49,7 @@ secret.properties
 
 # API Configuration (local)
 src/configs/apiConfig.ts
+src/api/configs/apiConfig.ts
 
 # macOS
 .AppleDouble

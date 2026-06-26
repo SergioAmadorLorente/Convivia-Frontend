@@ -1,12 +1,9 @@
 import axios from "axios";
 import { Platform } from "react-native";
-import { API_CONFIG } from "../configs/apiConfig";
+import { API_CONFIG } from "./configs/apiConfig";
 
 const getBaseUrl = () => {
-  if (Platform.OS === "android") {
-    return API_CONFIG.ANDROID_URL;
-  }
-  return API_CONFIG.IOS_WEB_URL;
+  return API_CONFIG.BASE_URL;
 };
 
 // Centralized Axios instance

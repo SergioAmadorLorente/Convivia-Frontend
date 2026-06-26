@@ -28,7 +28,7 @@ import { obtenerEspacioPorUsuarioId } from '../../api/usuarioEspacio';
 // Lista de palabras prohibidas (insultos en español e inglés)
 const PALABRAS_PROHIBIDAS = [
   // Español
-  'puta', 'puto', 'mierda', 'cono', 'joder', 'cabron', 'cabrón', 'gilipollas', 
+  'puta', 'puto', 'mierda', 'cono', 'joder', 'cabron', 'cabrón', 'gilipollas',
   'idiota', 'tonto', 'estupido', 'estúpido', 'imbecil', 'imbécil', 'pendejo',
   'carajo', 'verga', 'chingar', 'marica', 'maricon', 'maricón', 'gay',
   // Inglés
@@ -231,7 +231,7 @@ const NuevaResidencia: React.FC = () => {
       // Limpiar campos después de crear
       setNombreResidencia('');
     } catch (error) {
-      // console.error('Error al crear residencia:', error);
+      console.error('Error al crear residencia:', error);
       showPopup({
         title: 'Error',
         description: 'Error al crear la residencia. Intenta de nuevo.',
