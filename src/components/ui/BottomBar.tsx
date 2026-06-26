@@ -1,12 +1,14 @@
 import React, { useState, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Animated, TouchableWithoutFeedback, Dimensions } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../styles/theme";
 import { useTabColor } from "../../hooks/useTabColor";
 const BottomBar = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute();
   const [open, setOpen] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const toggleMenu = () => {
@@ -27,6 +29,28 @@ const BottomBar = () => {
   };
   const homeColor = useTabColor("DashBoardPersonal");
   const profileColor = useTabColor("Perfil");
+
+  // Pantallas que pertenecen a la sección de Perfil
+  const profileScreens = ["Perfil", "EditarPerfil", "MiResidencia", "EditarResidencia", "MiKarma", "InfoLegal", "FAQ"];
+  const isInProfileSection = profileScreens.includes(route.name);
+
+  const navigateTo = (screenName: "DashBoardPersonal" | "Perfil") => {
+    if (screenName === "Perfil") {
+      // Si ya estamos en la sección de Perfil, solo volvemos atrás
+      if (isInProfileSection) {
+        navigation.goBack();
+      } else {
+        // Si venimos de Dashboard, reemplazamos
+        navigation.replace("Perfil");
+      }
+    } else if (screenName === "DashBoardPersonal") {
+      // Si no estamos en Dashboard, navegamos a él
+      if (route.name !== "DashBoardPersonal") {
+        navigation.replace("DashBoardPersonal");
+      }
+    }
+  };
+
   return (
     <>
       {open && (
@@ -73,7 +97,7 @@ const BottomBar = () => {
       </Animated.View>
       {/** BOTTOM BAR */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate("DashBoardPersonal")}>
+        <TouchableOpacity style={styles.tab} onPress={() => navigateTo("DashBoardPersonal")}>
           <Ionicons name="home-outline" size={28} color={homeColor} />
           <Text style={styles.label}>Inicio</Text>
         </TouchableOpacity>
@@ -83,7 +107,7 @@ const BottomBar = () => {
           </TouchableOpacity>
           <Text style={[styles.label, styles.createLabel]}>Crear</Text>
         </View>
-        <TouchableOpacity style={styles.tab} onPress={() => navigation.navigate("Perfil")}>
+        <TouchableOpacity style={styles.tab} onPress={() => navigateTo("Perfil")}>
           <Ionicons name="person-outline" size={28} color={profileColor} />
           <Text style={styles.label}>Perfil</Text>
         </TouchableOpacity>
@@ -136,7 +160,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "#ECECEB",
+    backgroundColor: COLORS.inputBackground,
     zIndex: 3,
   },
   tab: { alignItems: "center" },

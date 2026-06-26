@@ -24,8 +24,11 @@ interface TaskItemProps {
   /** Estado: completado/pagado */
   isCompleted: boolean;
 
-  /** Toggle checkbox */
+  /** Toggle checkbox (para tareas, o toggle rápido en facturas si onQuickToggle no está definido) */
   onToggle: () => void;
+
+  /** (Opcional) Callback para toggle rápido sin abrir detalle (principalmente para facturas) */
+  onQuickToggle?: () => void;
 
   /** Tarea: si está sin asignar, muestra icono + tooltip */
   unassigned?: boolean;
@@ -48,6 +51,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   subtitle,
   isCompleted,
   onToggle,
+  onQuickToggle,
   unassigned = false,
   onPressRow,
   paidCount,
@@ -64,7 +68,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[
+        styles.container,
+        isFactura && isCompleted && styles.completedContainer
+      ]}
       activeOpacity={0.9}
       onPress={onPressRow}
     >
@@ -135,7 +142,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
       {/* Checkbox (tarea o factura) */}
       <TouchableOpacity
-        onPress={onToggle}
+        onPress={isFactura && onQuickToggle ? onQuickToggle : onToggle}
         activeOpacity={0.8}
         style={CHECKBOX.touchArea}
       >
@@ -166,6 +173,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+  },
+  completedContainer: {
+    backgroundColor: "#F5F5F5",
+    opacity: 0.7,
   },
 
   // --- IZQUIERDA TAREA ---

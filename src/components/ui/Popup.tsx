@@ -32,7 +32,8 @@ type ButtonDef = {
 type PopupProps = {
   visible: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
+  titleComponent?: React.ReactNode;
   description?: string;
   imageType?: "error" | "logout" | "success" | "happy" | "convivia" | "delete" | "goback";
   buttons?: ButtonDef[];
@@ -68,9 +69,10 @@ const Popup: React.FC<PopupProps> = ({
   visible,
   onClose,
   title,
+  titleComponent,
   description,
   imageType = "success",
-  buttons = [{ text: "Aceptar", onPress: () => {} }],
+  buttons = [{ text: "Aceptar", onPress: () => { } }],
   containerStyle,
   popupStyle,
   imageStyle,
@@ -97,7 +99,7 @@ const Popup: React.FC<PopupProps> = ({
   // ¿Tenemos code y queremos mostrarlo?
   const hasCode = showCode && code !== undefined && code !== null && String(code).length > 0;
 
-  // Normaliza el código a 6 dígitos SOLO si hay code
+  // Normaliza el código a 6 dígitos (extrayendo los primeros 6 números del UUID)
   const codeDigits = useMemo(() => {
     if (!hasCode) return [];
     const raw =
@@ -130,7 +132,7 @@ const Popup: React.FC<PopupProps> = ({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={() => {}}
+      onRequestClose={() => { }}
     >
       <View style={[styles.overlay, containerStyle]}>
         <View style={[styles.popup, popupStyle]}>
@@ -144,7 +146,7 @@ const Popup: React.FC<PopupProps> = ({
 
           {/* Título con estilo base (fontFamily ya en styles.title) */}
           <Text style={[styles.title, titleStyle]}>
-            {title}
+            {titleComponent || title}
           </Text>
 
           {/* Bloque de código: SOLO si imageType='convivia' y hasCode=true */}
@@ -268,6 +270,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
   },
+
   codeRow: {
     flexDirection: "row",
     alignItems: "center",

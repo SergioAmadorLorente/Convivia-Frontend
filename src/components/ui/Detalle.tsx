@@ -1,11 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Modal,
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
   Pressable,
   Platform,
 } from "react-native";
@@ -14,7 +13,13 @@ import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../styles/theme";
 import { Feather } from "@expo/vector-icons";
 import TaskModel from "../../types/Task"; // export default
 import FacturaModel, { IFacturaUser } from "../../types/Factura";
-
+import TasksDonutChart from "./TasksDonutChart";
+import { obtenerEstadisticasTareas } from "../../api/espacio";
+import UploadImage from "./UploadImage";
+import { obtenerImagenFactura } from "../../api/factura";
+import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
+import { useAuthListener } from "../../hooks/useAuthListener";
+import UserList from "./UserList";
 type Props =
   | {
     visible: boolean;
@@ -23,6 +28,7 @@ type Props =
     onClose: () => void;
     onComplete: () => void; // misma lógica que en dashboard
     onEdit: () => void;
+    onDelete: () => void;
   }
   | {
     visible: boolean;
@@ -31,15 +37,133 @@ type Props =
     onClose: () => void;
     onComplete: () => void; // marcar como pagada (dashboard valida)
     onEdit: () => void;
+    onDelete: () => void;
     onDownloadImage?: () => void;
+  }
+  | {
+    visible: boolean;
+    kind: "participante";
+    participant: any;
+    participantRelacion?: any;
+    residenciaName: string;
+    onClose: () => void;
+    onEliminar: () => void;
+    isCurrentUser?: boolean;
   };
 
 const Detalle: React.FC<Props> = (props) => {
-  const { visible, onClose, onComplete, onEdit } = props;
+  const { visible, onClose } = props;
+
+  // ---- PARTICIPANTE ----
+  if (props.kind === "participante") {
+    const { participant, participantRelacion, residenciaName, onEliminar, isCurrentUser = false } = props;
+
+    // Obtener karma del participante (viene del hook actualizado)
+    const karmaPoints = participant?.karmaTotal ?? 0;
+    const [estadisticas, setEstadisticas] = useState<any>(null);
+    const [loadingStats, setLoadingStats] = useState(false);
+
+    // Cargar estadísticas del participante
+    useEffect(() => {
+      const cargarEstadisticas = async () => {
+        if (participantRelacion?.espacioId && participant?.id) {
+          try {
+            setLoadingStats(true);
+            const stats = await obtenerEstadisticasTareas(participantRelacion.espacioId, participant.id);
+            setEstadisticas(stats);
+          } catch (error) {
+            // console.error("Error al cargar estadísticas del participante:", error);
+            setEstadisticas(null);
+          } finally {
+            setLoadingStats(false);
+            console.log(`Estadísticas cargadas del usuario ${participant?.id}  en el espacio ${participantRelacion?.espacioId}:`, estadisticas);
+          }
+        }
+      };
+      
+      if (visible) {
+        cargarEstadisticas();
+      }
+    }, [visible, participantRelacion?.espacioId, participant?.id]);
+
+    const tareasCompletadas = estadisticas?.completadas ?? 0;
+    const tareasFueraPlazo = estadisticas?.tardes ?? 0;
+
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View style={styles.overlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+
+          <View style={styles.sheet}>
+            <View style={styles.handle} />
+
+            {/* Header */}
+            <View style={styles.headerBlock}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.title, { color: '#6B705C' }]}>
+                  {participant?.nombre || participant?.email || "Usuario"}
+                </Text>
+                <Text style={[styles.subtitle, { color: '#ACBF8A' }]}>{residenciaName}</Text>
+              </View>
+            </View>
+
+            {/* Puntos de Karma */}
+            <View style={styles.section}>
+              <View style={[styles.karmaContainer, { paddingVertical: HELPERS.verticalScale(8) }]}>
+                <Text style={styles.karmaPoints}>¡{karmaPoints} puntos!</Text>
+                <Text style={styles.karmaLabel}>de karma</Text>
+              </View>
+            </View>
+
+            {/* Gráfico de Tareas */}
+            <View style={styles.section}>
+              <Text style={[styles.sectionLabel, { color: '#6B705C' }]}>
+                Estado de las tareas
+              </Text>
+              <TasksDonutChart
+                completedTasks={tareasCompletadas || 0}
+                lateTasks={tareasFueraPlazo || 0}
+              />
+            </View>
+
+            {/* Botón Eliminar */}
+            <TouchableOpacity
+              style={[
+                GLOBAL_STYLES.buttonSecondaryGrey,
+                styles.deleteButtonFull,
+                {
+                  backgroundColor: isCurrentUser ? '#E5E5E5' : '#D9D9D9',
+                  marginTop: HELPERS.hp("1%"),
+                  opacity: isCurrentUser ? 0.5 : 1
+                }
+              ]}
+              activeOpacity={0.85}
+              onPress={onEliminar}
+              disabled={isCurrentUser}
+            >
+              <Text
+                style={[
+                  GLOBAL_STYLES.textoBoton,
+                  { color: isCurrentUser ? '#999' : COLORS.error }
+                ]}
+              >
+                {isCurrentUser ? 'No puedes eliminarte a ti mismo' : 'Eliminar de la residencia'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   if (props.kind === "tarea") {
-    const { task } = props;
-    console.log("🔍 Detalle recibiendo tarea:", JSON.stringify(task, null, 2));
+    const { task, onComplete, onEdit, onDelete } = props;
+    const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
 
     const fechaStr = useMemo(() => {
       if (!task.FechaLimite) return "-";
@@ -65,11 +189,26 @@ const Detalle: React.FC<Props> = (props) => {
       return `${hh}:${mm}`;
     }, [task.HoraLimite, task.FechaLimite]);
 
-    // ✅ DiasRepeticion es number[] con 1=Lunes .. 7=Domingo
+    // ✅ DiasRepeticion es number[] con Lunes=0 .. Domingo=6
     const weekLabels = ["L", "M", "X", "J", "V", "S", "D"];
-    const isDaySelected = (idx0: number) =>
-      Array.isArray(task.DiasRepeticion) &&
-      task.DiasRepeticion.includes(idx0 + 1);
+    const weekFullNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+    const isDaySelected = (idx0: number) => {
+      // Backend: Lunes=0 ... Domingo=6
+      return Array.isArray(task.DiasRepeticion) && task.DiasRepeticion.includes(idx0);
+    };
+
+    // Obtener usuario asignado para el día seleccionado
+    const getAssignedUserForDay = (dayIndex: number | null): string => {
+      if (dayIndex === null) {
+        return task.usuarioAsignado ?? "";
+      }
+      // Si hay mapa de usuarios por día, usar ese
+      if (task.usuariosPorDia && task.usuariosPorDia[dayIndex]) {
+        return task.usuariosPorDia[dayIndex];
+      }
+      // Sino, usar el usuario general
+      return task.usuarioAsignado ?? "";
+    };
 
     return (
       <Modal
@@ -94,9 +233,18 @@ const Detalle: React.FC<Props> = (props) => {
                 ) : null}
               </View>
 
-              {/* Puntos de karma */}
-              <View style={styles.pointsPill}>
-                <Text style={styles.pointsText}>{task.karma ?? 0} Puntos</Text>
+              {/* Puntos de karma y Botón Eliminar */}
+              <View style={{ alignItems: "flex-end", gap: 10 }}>
+                <View style={styles.pointsPill}>
+                  <Text style={styles.pointsText}>{task.karma ?? 0} Puntos</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={onDelete}
+                  activeOpacity={0.7}
+                  style={styles.deleteButton}
+                >
+                  <Feather name="trash-2" size={20} color={COLORS.error} />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -115,14 +263,22 @@ const Detalle: React.FC<Props> = (props) => {
               <View style={styles.weekRow}>
                 {weekLabels.map((l, idx) => {
                   const selected = isDaySelected(idx);
+                  const isSelected = selectedDayIndex === idx;
                   return (
-                    <View
+                    <TouchableOpacity
                       key={l}
+                      onPress={() => {
+                        if (selected) {
+                          setSelectedDayIndex(isSelected ? null : idx);
+                        }
+                      }}
+                      activeOpacity={selected ? 0.7 : 1}
                       style={[
                         styles.dayChip,
                         selected
                           ? styles.dayChipSelected
                           : styles.dayChipUnselected,
+                        isSelected && selected && styles.dayChipFocused,
                       ]}
                     >
                       <Text
@@ -135,22 +291,34 @@ const Detalle: React.FC<Props> = (props) => {
                       >
                         {l}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   );
                 })}
               </View>
+
             </View>
 
             {/* Usuario asignado */}
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>Usuario asignado</Text>
-              <TextInput
-                editable={false}
-                value={task.usuarioAsignado ?? ""}
-                placeholder="Usuarios asignados"
-                placeholderTextColor={COLORS.border}
-                style={styles.input}
-              />
+              {(() => {
+                const assignedName =
+                  selectedDayIndex !== null && isDaySelected(selectedDayIndex)
+                    ? getAssignedUserForDay(selectedDayIndex) || null
+                    : task.usuarioAsignado || null;
+                const assignedId =
+                  selectedDayIndex !== null && isDaySelected(selectedDayIndex)
+                    ? String(selectedDayIndex)
+                    : task.usuarioAsignadoId || task.usuarioAsignado || "";
+                const users = assignedName
+                  ? [{ id: assignedId, name: assignedName }]
+                  : [];
+                return users.length > 0 ? (
+                  <UserList users={users} />
+                ) : (
+                  <Text style={styles.emptyUsers}>Sin asignar</Text>
+                );
+              })()}
             </View>
 
             {/* Botones: Editar + Completar */}
@@ -188,7 +356,30 @@ const Detalle: React.FC<Props> = (props) => {
   }
 
   // ---- FACTURA ----
-  const { factura, onDownloadImage } = props;
+  const { factura, onComplete, onEdit, onDelete, onDownloadImage } = props;
+
+  const facturaUser = useAuthListener();
+  const [facturaImageUri, setFacturaImageUri] = useState<string | null>(null);
+  const [userRelacionId, setUserRelacionId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!visible || !facturaUser?.uid) return;
+    const cargar = async () => {
+      try {
+        const relacion = await obtenerEspacioPorUsuarioId(facturaUser.uid);
+        const eId = relacion?.espacioId;
+        setUserRelacionId(relacion?.id || null);
+        if (!eId) return;
+        const blob = await obtenerImagenFactura(eId, factura.IdFactura);
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => setFacturaImageUri(reader.result as string);
+      } catch {
+        setFacturaImageUri(null);
+      }
+    };
+    cargar();
+  }, [visible, factura.IdFactura, facturaUser?.uid]);
 
   const totalImporte = factura.Precio ?? 0;
   const usuarios: IFacturaUser[] = Array.isArray(factura.UsuariosAsignados)
@@ -216,7 +407,17 @@ const Detalle: React.FC<Props> = (props) => {
       });
     }
   }, [factura]);
-
+  // Helper: la factura se considera "completada por mí" si está Pagada globalmente
+  // o si este usuario ya marcó su parte
+  const isFacturaPaidByMe = (item: FacturaModel): boolean => {
+    if (item.Pagado) return true;
+    const relId = (userRelacionId || "").replace(/-/g, "").toLowerCase();
+    return (
+      item.UsuariosAsignados?.some(
+        (u) => u.id.replace(/-/g, "").toLowerCase() === relId && u.completed
+      ) ?? false
+    );
+  };
   return (
     <Modal
       visible={visible}
@@ -257,30 +458,52 @@ const Detalle: React.FC<Props> = (props) => {
           </View>
 
           {/* Fotos */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Fotos</Text>
-            <TouchableOpacity
-              style={styles.downloadRow}
-              activeOpacity={0.85}
-              onPress={onDownloadImage ?? (() => { })}
-            >
-              <Text style={styles.downloadText}>Descargar imagen</Text>
-              <View style={styles.downloadBtn}>
-                <Feather name="download" size={16} color={COLORS.secondary} />
-              </View>
-            </TouchableOpacity>
-          </View>
+          {facturaImageUri ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Fotos</Text>
+              <UploadImage
+                label="Imagen de la factura"
+                initialImageUri={facturaImageUri}
+                editable={false}
+              />
+            </View>
+          ) : null}
 
           {/* Usuarios asignados */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Usuarios asignados</Text>
-            <TextInput
-              editable={false}
-              value={usuarios.map((u) => u.name).join(", ")}
-              placeholder="Usuarios asignados"
-              placeholderTextColor={COLORS.border}
-              style={styles.input}
-            />
+            {usuarios.length > 0 ? (
+              <UserList
+                users={usuarios.map((u) => ({ id: u.id, name: u.name }))}
+                maxHeight={160}
+                renderExtra={({ userId }) => {
+                  const u = usuarios.find((x) => x.id === userId);
+                  const pagado = u?.completed ?? false;
+                  return (
+                    <View
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 3,
+                        borderRadius: 12,
+                        backgroundColor: pagado ? "#E6ECDC" : "#FFF3CD",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: FONTS.bold,
+                          fontSize: 11,
+                          color: pagado ? "#4B4741" : "#856404",
+                        }}
+                      >
+                        {pagado ? "Pagado" : "Pendiente"}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+            ) : (
+              <Text style={styles.emptyUsers}>Sin usuarios asignados</Text>
+            )}
           </View>
 
           {/* Meta: contador y fecha */}
@@ -317,7 +540,7 @@ const Detalle: React.FC<Props> = (props) => {
               onPress={onComplete}
             >
               <Text style={GLOBAL_STYLES.textoBoton}>
-                {factura.Pagado ? "Desmarcar" : "Completar"}
+                {isFacturaPaidByMe(factura) ? "Desmarcar" : "Completar"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -339,7 +562,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderTopLeftRadius: HELPERS.moderateScale(25),
     borderTopRightRadius: HELPERS.moderateScale(25),
-    paddingHorizontal: HELPERS.wp("5%"),
+    paddingHorizontal: HELPERS.wp("8%"),
     paddingBottom: HELPERS.verticalScale(18),
     paddingTop: HELPERS.verticalScale(10),
   },
@@ -349,17 +572,18 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: COLORS.border,
     alignSelf: "center",
-    marginBottom: HELPERS.verticalScale(8),
+    marginBottom: HELPERS.verticalScale(4),
   },
   headerBlock: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: HELPERS.verticalScale(6),
+    marginBottom: HELPERS.verticalScale(0),
   },
   title: {
     fontSize: SIZES.welcomeTitle,
     color: COLORS.secondary,
     fontFamily: FONTS.title,
+    paddingHorizontal: HELPERS.wp("2%"),
   },
   subtitle: {
     marginTop: HELPERS.verticalScale(4),
@@ -367,10 +591,11 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     opacity: 0.7,
     fontFamily: FONTS.regular,
+    paddingHorizontal: HELPERS.wp("2%"),
   },
 
   section: {
-    marginTop: HELPERS.hp("2%"),
+    marginTop: 0,
     width: "100%",
   },
   sectionLabel: {
@@ -380,8 +605,9 @@ const styles = StyleSheet.create({
     opacity: 1,
     marginBottom: HELPERS.hp("1%"),
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: "#6B705C",
     paddingBottom: HELPERS.verticalScale(4),
+    paddingHorizontal: HELPERS.wp("2%"),
   },
 
   // ---- Tarea: fecha/hora ----
@@ -452,6 +678,25 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     opacity: 0.65,
   },
+  dayChipFocused: {
+    borderWidth: 2,
+    borderColor: COLORS.accent,
+    shadowColor: COLORS.accent,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  daySelectionNote: {
+    marginTop: HELPERS.verticalScale(8),
+    alignItems: "center",
+  },
+  daySelectionNoteText: {
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
+    fontFamily: FONTS.regular,
+    opacity: 0.7,
+  },
 
   // ---- Factura: precios ----
   priceDisplay: {
@@ -501,6 +746,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
 
+  emptyUsers: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text14,
+    color: COLORS.border,
+    paddingVertical: HELPERS.verticalScale(8),
+  },
+
   metaRow: {
     marginTop: HELPERS.hp("1.5%"),
     flexDirection: "row",
@@ -535,6 +787,83 @@ const styles = StyleSheet.create({
     width: "48%",
     alignSelf: "auto",
     marginTop: 0,
+  },
+  deleteButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: "#FFEBEE",
+  },
+
+  // Estilos para participante
+  karmaContainer: {
+    alignItems: "center",
+    paddingVertical: HELPERS.verticalScale(2),
+  },
+  karmaPoints: {
+    fontFamily: FONTS.bold,
+    fontSize: HELPERS.moderateScale(32),
+    color: "#4A5942",
+  },
+  karmaLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text16,
+    color: COLORS.secondary,
+    opacity: 0.7,
+  },
+  chartContainer: {
+    alignItems: "center",
+    marginTop: HELPERS.verticalScale(4),
+    paddingHorizontal: HELPERS.wp("2%"),
+  },
+  donutChart: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    marginBottom: HELPERS.verticalScale(12),
+    position: "relative",
+    backgroundColor: "#E6ECDC",
+  },
+  donutSegment: {
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    position: "absolute",
+    backgroundColor: "#4A5942",
+  },
+  donutHole: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: COLORS.background,
+    position: "absolute",
+    top: 35,
+    left: 35,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingHorizontal: HELPERS.wp("2%"),
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  legendText: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
+  },
+  deleteButtonFull: {
+    marginTop: HELPERS.hp("2%"),
+    width: "85%",
+    alignSelf: "center",
   },
 });
 

@@ -7,13 +7,22 @@ interface CalendarProps {
     onDateSelect?: (date: Date) => void;
     time?: string;
     onTimeClick?: () => void;
+    selectedDate?: Date | null;
 }
 
-export const Calendar: React.FC<CalendarProps> = ({ onDateSelect, time, onTimeClick }) => {
+export const Calendar: React.FC<CalendarProps> = ({ onDateSelect, time, onTimeClick, selectedDate }) => {
     const [fechaActual, setFechaActual] = useState(new Date());
     const [diaSeleccionado, setDiaSeleccionado] = useState<number | null>(null);
     const [hora, setHora] = useState<string>("00");
     const [minuto, setMinuto] = useState<string>("00");
+
+    // Sync with external selectedDate prop
+    useEffect(() => {
+        if (selectedDate) {
+            setFechaActual(selectedDate);
+            setDiaSeleccionado(selectedDate.getDate());
+        }
+    }, [selectedDate]);
 
     // Sync with external time prop
     useEffect(() => {
@@ -81,15 +90,21 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect, time, onTimeCl
     };
 
     const handleSeleccionarDia = (dia: number) => {
-        if (diaSeleccionado === dia) {
-            // Si el día ya está seleccionado, lo deseleccionamos
+        const matchesCurrent =
+            selectedDate &&
+            selectedDate.getDate() === dia &&
+            selectedDate.getMonth() === fechaActual.getMonth() &&
+            selectedDate.getFullYear() === fechaActual.getFullYear();
+
+        if (matchesCurrent) {
+            // Si es exactamente el mismo día, deseleccionamos
             setDiaSeleccionado(null);
             onDateSelect?.(null as unknown as Date);
         } else {
-            // Si es un día diferente, lo seleccionamos
+            // Seleccionamos el nuevo día en el mes actual que estamos viendo
             setDiaSeleccionado(dia);
-            const selectedDate = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), dia);
-            onDateSelect?.(selectedDate);
+            const newDate = new Date(fechaActual.getFullYear(), fechaActual.getMonth(), dia);
+            onDateSelect?.(newDate);
         }
     };
 
@@ -126,7 +141,12 @@ export const Calendar: React.FC<CalendarProps> = ({ onDateSelect, time, onTimeCl
                 ))}
                 {dias.map((dia) => {
                     const isFinderSemana = findes.includes(dia);
-                    const isSeleccionado = diaSeleccionado === dia;
+                    const isSeleccionado =
+                        selectedDate &&
+                        selectedDate.getDate() === dia &&
+                        selectedDate.getMonth() === fechaActual.getMonth() &&
+                        selectedDate.getFullYear() === fechaActual.getFullYear();
+
                     return (
                         <Pressable
                             key={dia}

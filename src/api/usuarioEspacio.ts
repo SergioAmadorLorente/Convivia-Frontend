@@ -18,7 +18,7 @@ export const crearUsuarioEspacio = async (data: UsuarioEspacioPayload) => {
     const response = await api.post("/UsuarioEspacio", data);
     return response.data;
   } catch (error) {
-    console.error("Error al crear UsuarioEspacio:", error);
+    // console.error("Error al crear UsuarioEspacio:", error);
     throw error;
   }
 };
@@ -29,7 +29,7 @@ export const obtenerUsuarioEspacios = async () => {
     const response = await api.get("/UsuarioEspacio");
     return response.data;
   } catch (error) {
-    console.error("Error al obtener UsuarioEspacios:", error);
+    // console.error("Error al obtener UsuarioEspacios:", error);
     throw error;
   }
 };
@@ -40,22 +40,38 @@ export const obtenerUsuarioEspacioPorId = async (id: string) => {
     const response = await api.get(`/UsuarioEspacio/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al obtener UsuarioEspacio:", error);
+    // console.error("Error al obtener UsuarioEspacio:", error);
     throw error;
   }
 };
 
-// Actualizar una relación UsuarioEspacio
+// Actualizar una relación UsuarioEspacio (Usa PATCH como indica el backend)
 export const actualizarUsuarioEspacio = async (
   id: string,
   data: Partial<UsuarioEspacioPayload>
 ) => {
   try {
-    const response = await api.put(`/UsuarioEspacio/${id}`, data);
+    const response = await api.patch(`/UsuarioEspacio/${id}`, data);
     return response.data;
   } catch (error) {
-    console.error("Error al actualizar UsuarioEspacio:", error);
+    // console.error("Error al actualizar UsuarioEspacio:", error);
     throw error;
+  }
+};
+
+/**
+ * Obtener la relación específica entre un usuario y un espacio
+ */
+export const obtenerRelacionUsuarioEspacio = async (usuarioId: string, espacioId: string) => {
+  try {
+    const response = await api.get("/UsuarioEspacio");
+    const relaciones = Array.isArray(response.data) ? response.data : [];
+    return relaciones.find((r: any) => 
+      r.usuarioId === usuarioId && r.espacioId === espacioId
+    );
+  } catch (error) {
+    // console.error("Error al obtener relación específica:", error);
+    return null;
   }
 };
 
@@ -65,7 +81,7 @@ export const eliminarUsuarioEspacio = async (id: string) => {
     const response = await api.delete(`/UsuarioEspacio/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error al eliminar UsuarioEspacio:", error);
+    // console.error("Error al eliminar UsuarioEspacio:", error);
     throw error;
   }
 };
@@ -145,7 +161,7 @@ export const obtenerEspacioPorUsuarioId = async (usuarioId: string) => {
 
     return relacionUsuario;
   } catch (error) {
-    console.error("❌ Error al obtener espacio por usuario:", error);
+    // console.error("❌ Error al obtener espacio por usuario:", error);
     throw error;
   }
 };

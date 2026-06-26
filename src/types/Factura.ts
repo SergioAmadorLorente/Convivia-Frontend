@@ -27,6 +27,9 @@ export interface IFactura {
   /** Fecha de completada (cuando Pagado = true) */
   FechaCompletada?: Date | string | null;
 
+  /** Usuario que creó la factura */
+  creadorFactura?: string;
+
   /** (Opcional, legacy) Reparto viejo, por compatibilidad si tu código lo referencia */
   Reparto?: Record<string, number>;
 }
@@ -47,6 +50,7 @@ export class FacturaModel implements IFactura {
   Pagado: boolean;
   FechaCreacion: Date;
   FechaCompletada?: Date | null;
+  creadorFactura?: string;
   Reparto?: Record<string, number>;
 
   constructor(props: IFactura) {
@@ -58,6 +62,7 @@ export class FacturaModel implements IFactura {
       ? props.UsuariosAsignados.map(u => ({ ...u }))
       : [];
     this.Pagado = !!props.Pagado;
+    this.creadorFactura = props.creadorFactura;
 
     // Normaliza fechas
     this.FechaCreacion =
@@ -111,6 +116,27 @@ export class FacturaModel implements IFactura {
     }
   }
 
+  /** 
+   * Devuelve true si la factura está completada (Pagado=true) y FechaCompletada está dentro de 3 semanas (21 días)
+   * desde hoy. Si no tiene FechaCompletada, devuelve false.
+   * Útil para la retención: completadas que superen 21 días se ocultan del listado.
+   */
+  isCompletedWithinRetention(): boolean {
+    if (!this.Pagado || !this.FechaCompletada) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const completed = new Date(this.FechaCompletada);
+    completed.setHours(0, 0, 0, 0);
+
+    const diffTime = today.getTime() - completed.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // Completada hace 21 días o menos
+    return diffDays <= 21;
+  }
+
   /**
    * Marca/desmarca Pagado respetando la regla:
    * - Si está Pagado=true -> al desmarcar, se pone Pagado=false y FechaCompletada=null.
@@ -148,12 +174,36 @@ export class FacturaModel implements IFactura {
     });
   }
 
+  /**
+   * Comprueba si la factura se completó hace menos de X días.
+   * Útil para filtrar facturas en el Dashboard.
+   */
+  isCompletedWithinDays(days: number): boolean {
+    if (!this.Pagado || !this.FechaCompletada) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const done = new Date(this.FechaCompletada);
+    done.setHours(0, 0, 0, 0);
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const diff = Math.ceil((today.getTime() - done.getTime()) / msPerDay);
+    return diff >= 0 && diff <= days;
+  }
+
   /** Marca/unmarca completed para un usuario concreto (por id) */
   withUserCompleted(userId: string, completed: boolean = true): FacturaModel {
     const users = this.UsuariosAsignados.map(u =>
       u.id === userId ? { ...u, completed } : u
     );
-    return this.withUpdatedUsers(users);
+
+    // Regla: si todos están completed, la factura pasa a Pagado = true
+    const allDone = users.length > 0 && users.every(u => !!u.completed);
+
+    return new FacturaModel({
+      ...this.toProps(),
+      UsuariosAsignados: users,
+      Pagado: allDone,
+      FechaCompletada: allDone ? (this.FechaCompletada || new Date()) : null,
+    });
   }
 
   /** Añade un usuario asignado */
@@ -182,6 +232,7 @@ export class FacturaModel implements IFactura {
       Pagado: this.Pagado,
       FechaCreacion: this.FechaCreacion,
       FechaCompletada: this.FechaCompletada ?? null,
+      creadorFactura: this.creadorFactura,
       Reparto: this.Reparto,
     };
   }

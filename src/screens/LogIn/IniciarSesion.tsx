@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { Feather } from "@expo/vector-icons"; // 👈 NUEVO: Feather para checkbox
+import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { auth } from "../../configs/firebaseConfig";
 import {
@@ -22,12 +22,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { moderateScale } from "react-native-size-matters";
+
 import useLoadFonts from "../../hooks/useLoadFonts";
 import { useEmailValidation } from "../../hooks/useEmailValidation";
 import { useKeyboardAware } from "../../hooks";
 import TextField from "../../components/ui/TextField";
-import Button from "../../components/ui/Button";
+
 import Popup from "../../components/ui/Popup";
 import { COLORS, CHECKBOX } from "../../styles/theme";
 import ConfettiButton from "../../components/ui/ConfettiButton";
@@ -87,16 +87,49 @@ const IniciarSesion: React.FC = () => {
         navigation.navigate("VerificacionCuentaNueva");
         return;
       }
-      // OK login
+
+      // OK login - Verificar si el usuario tiene una residencia
       setShowConfetti(true);
-      showPopup({
-        title: "Éxito",
-        description: "Login exitoso",
-        imageType: "success",
-        buttons: [
-          { text: "Aceptar", onPress: () => navigation.navigate("Bienvenida") },
-        ],
-      });
+
+      // Importar la función para verificar residencia
+      const { obtenerEspacioPorUsuarioId } = require("../../api/usuarioEspacio");
+
+      try {
+        const espacioExistente = await obtenerEspacioPorUsuarioId(userCredential.user.uid);
+
+        if (espacioExistente && espacioExistente.espacioId && espacioExistente.espacioId !== "string") {
+          // Usuario tiene residencia -> ir al Dashboard
+          showPopup({
+            title: "¡Bienvenido de nuevo!",
+            description: "Redirigiendo a tu residencia...",
+            imageType: "success",
+            buttons: [
+              { text: "Continuar", onPress: () => navigation.replace("DashBoardPersonal") },
+            ],
+          });
+        } else {
+          // Usuario NO tiene residencia -> ir a Bienvenida para crear/unirse
+          showPopup({
+            title: "Éxito",
+            description: "Login exitoso. Crea o únete a una residencia para continuar.",
+            imageType: "success",
+            buttons: [
+              { text: "Continuar", onPress: () => navigation.replace("Bienvenida") },
+            ],
+          });
+        }
+      } catch (espacioError) {
+        console.log("Error verificando residencia, redirigiendo a Bienvenida:", espacioError);
+        // Si hay error verificando, ir a Bienvenida por seguridad
+        showPopup({
+          title: "Éxito",
+          description: "Login exitoso",
+          imageType: "success",
+          buttons: [
+            { text: "Aceptar", onPress: () => navigation.navigate("Bienvenida") },
+          ],
+        });
+      }
     } catch (error) {
       showPopup({
         title: "Error",

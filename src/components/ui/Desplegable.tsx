@@ -51,6 +51,7 @@ const Desplegable: React.FC<DesplegableProps> = ({
         <Text
           style={[
             GLOBAL_STYLES.labelBase,
+            styles.titleText,
             {
               fontFamily: appliedFont,
               fontSize,
@@ -62,11 +63,13 @@ const Desplegable: React.FC<DesplegableProps> = ({
         </Text>
 
         {showIcon && (
-          <Ionicons
-            name={isOpen ? "chevron-up" : "chevron-down"}
-            size={20}
-            color={COMPONENTS?.DESPLEGABLE?.leftColor ?? "#ACBF8A"}
-          />
+          <View style={styles.iconWrapper}>
+            <Ionicons
+              name={isOpen ? "chevron-up" : "chevron-down"}
+              size={20}
+              color={COMPONENTS?.DESPLEGABLE?.leftColor ?? "#ACBF8A"}
+            />
+          </View>
         )}
       </TouchableOpacity>
 
@@ -82,13 +85,29 @@ const Desplegable: React.FC<DesplegableProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
+    paddingHorizontal: 5,
     marginTop: COMPONENTS?.DESPLEGABLE?.marginTop ?? 8,
     marginBottom: COMPONENTS?.DESPLEGABLE?.marginBottom ?? 6,
   },
   headerRow: {
     flexDirection: "row",
+    alignItems: "flex-start",
+    minHeight: 24,
+    position: "relative",
+    paddingRight: 35,
+  },
+  titleText: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  iconWrapper: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    justifyContent: "center",
     alignItems: "center",
-    justifyContent: "space-between",
+    width: 30,
+    height: 24,
   },
   lineFull: {
     alignSelf: "stretch",

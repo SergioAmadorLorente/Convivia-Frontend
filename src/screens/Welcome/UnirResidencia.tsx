@@ -21,7 +21,14 @@ import useCodigoResidencia from '../../hooks/useCodigoResidencia';
 import ConfettiButton from '../../components/ui/ConfettiButton';
 import { useAuthListener } from '../../hooks/useAuthListener';
 import { crearUsuarioEspacio, obtenerUsuarioEspacios } from '../../api/usuarioEspacio';
-import { obtenerEspacioPorId } from '../../api/espacio';
+import { obtenerEspacioPorId, obtenerEspacios, obtenerCodigoEspacio, buscarEspacioPorCodigo } from '../../api/espacio';
+
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 const UnirResidencia: React.FC = () => {
   const { codigo, handleChange } = useCodigoResidencia();
@@ -48,7 +55,7 @@ const UnirResidencia: React.FC = () => {
   const handleClosePopup = () => setPopupVisible(false);
 
   // Simplificado para aceptar cualquier ID por ahora
-  const formatoValido = codigo.length > 0;
+  const formatoValido = codigo.length > 0 && codigo.match(/^[a-zA-Z0-9\-]+$/);
   const isValidCode = formatoValido;
   const user = useAuthListener();
 
@@ -75,20 +82,23 @@ const UnirResidencia: React.FC = () => {
 
     setLoading(true);
     try {
-      // 1. Verificar si el espacio existe
-      const espacioData = await obtenerEspacioPorId(codigo);
+      // 1. Buscar el espacio por código usando la nueva función
+      const espacioEncontrado = await buscarEspacioPorCodigo(codigo);
 
-      if (!espacioData) {
-        throw new Error("Espacio no encontrado");
+      if (!espacioEncontrado) {
+        throw new Error("Espacio no encontrado (404)");
       }
+
+      const realId = espacioEncontrado.id;
+      const espacioData = espacioEncontrado;
 
       console.log("✅ Espacio encontrado:", espacioData.nombre);
 
-      // 1.5 Verificar si ya es miembro
+      // 2. Verificar si ya es miembro
       try {
         const relaciones = await obtenerUsuarioEspacios();
         const yaEsMiembro = Array.isArray(relaciones) && relaciones.some((r: any) =>
-          r.usuarioId === user.uid && r.espacioId === codigo
+          r.usuarioId === user.uid && r.espacioId === realId
         );
 
         if (yaEsMiembro) {
@@ -100,7 +110,7 @@ const UnirResidencia: React.FC = () => {
             showCode: false,
             buttons: [{
               text: 'Ir al inicio',
-              onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioData.nombre })
+              onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioData.nombre })
             }],
           });
           return;
@@ -109,13 +119,16 @@ const UnirResidencia: React.FC = () => {
         console.warn("No se pudo verificar membresía previa, intentando unir de todos modos...", checkError);
       }
 
-      // 2. Crear la relación UsuarioEspacio
+      // 3. Crear la relación UsuarioEspacio
       await crearUsuarioEspacio({
         usuarioId: user.uid,
-        espacioId: codigo,
+        espacioId: realId,
         rol: 'miembro',
         ausente: false,
-        karma: 0
+        karma: 0,
+        permisoId: generateUUID(),
+        tareasId: [],
+        facturasId: []
       });
 
       console.log("✅ Usuario unido al espacio exitosamente");
@@ -127,11 +140,11 @@ const UnirResidencia: React.FC = () => {
         showCode: false,
         buttons: [{
           text: 'Aceptar',
-          onPress: () => navigation.navigate('DashBoardPersonal', { newSpaceName: espacioData.nombre })
+          onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioData.nombre })
         }],
       });
     } catch (error: any) {
-      console.error('Error al unirse a la residencia:', error);
+      // console.error('Error al unirse a la residencia:', error);
 
       const is404 = error.message?.includes('404') || error.response?.status === 404;
 
@@ -183,9 +196,11 @@ const UnirResidencia: React.FC = () => {
               label="Código de la residencia"
               value={codigo}
               onChangeText={handleChange}
-              placeholder="Pegar código aquí..."
+              placeholder="- - - - -"
+              keyboardType="numeric"
               error={undefined}
-            />
+              textAlign="center"
+              caretHidden={true} showClipboard={true} />
 
             <ConfettiButton
               style={[
@@ -195,6 +210,7 @@ const UnirResidencia: React.FC = () => {
               disabled={!isValidCode || loading}
               onPress={handleUnirse}
               loading={loading}
+
             >
               Unirse
             </ConfettiButton>

@@ -10,7 +10,19 @@ export type RootStackParamList = {
   PoliticaCookiesPrivacidad: undefined;
   TerminosCondiciones: undefined;
   Perfil: undefined;
+  EditarPerfil: undefined;
   test: undefined;
+  ConviviaPro: undefined;
   CreateTask: { taskToEdit: any } | undefined;
   CreateFactura: { facturaToEdit: any } | undefined;
+  InfoLegal: undefined;
+  MiResidencia: undefined;
+  MiKarma: undefined;
+  EditarResidencia: {
+    espacioId: string;
+    nombreInicial?: string;
+    ubicacionInicial?: string;
+  };
+  FAQ: undefined;
+ 
 };
