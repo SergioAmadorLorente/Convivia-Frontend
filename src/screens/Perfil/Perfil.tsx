@@ -70,7 +70,7 @@ const Perfil: React.FC = () => {
             const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
             setUserName(realName);
           }
-          
+
           // Obtener karma del usuario
           try {
             const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
@@ -119,7 +119,7 @@ const Perfil: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View 
+      <View
         style={styles.scrollContent}
       >
         {/* Header Title */}
@@ -151,7 +151,7 @@ const Perfil: React.FC = () => {
               {/* Language Icon */}
               <TouchableOpacity
                 style={[styles.editButton, { marginRight: 5 }]}
-                onPress={() => { /* TODO: Selector de idioma en el futuro */ }}
+                onPress={() => { /* Mirar cual es la forma profesional de implementar idiomas */ }}
               >
                 <Ionicons name="flag-outline" size={20} color="#ACBF8A" />
               </TouchableOpacity>
@@ -219,7 +219,7 @@ const Perfil: React.FC = () => {
 
         </View>
       </View>
-      
+
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
