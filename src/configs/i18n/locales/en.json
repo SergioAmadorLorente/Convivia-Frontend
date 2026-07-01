@@ -203,6 +203,7 @@
     }
   },
   "dashboard": {
+    "greeting": "Hello, {{username}}, today is",
     "tabs": {
       "tasks": "Tasks",
       "invoices": "Invoices"
@@ -323,6 +324,7 @@
     "points": "pts",
     "noData": "No data available",
     "loading": "Loading statistics...",
+    "noTasks": "No tasks registered",
     "emptyDescription": "Start completing tasks to earn karma points and view your stats here.",
     "backProfile": "Back to profile",
     "pointsCount": "{{points}} points!",
@@ -342,11 +344,12 @@
     "settings": "Settings",
     "leaveResidence": "Leave Residence",
     "deleteResidence": "Delete Residence",
-    "removeParticipant": "Remove participant",
+    "removeParticipant": "Remove from residence",
     "errors": {
       "memberNotFound": "Your member info could not be found.",
       "leaveError": "An error occurred while trying to leave the residence.",
-      "deleteError": "An error occurred while trying to delete the residence."
+      "deleteError": "An error occurred while trying to delete the residence.",
+      "cannotRemoveSelf": "You cannot remove yourself"
     },
     "toasts": {
       "getMemberError": "Error fetching member details",
@@ -435,5 +438,25 @@
     "trialInfo": "Start your 7-day free trial.",
     "trialCancel": "Cancel anytime.",
     "subscribeButton": "Try it free and subscribe"
+  },
+  "taskDetail": {
+    "pointsPill": "{{points}} Points",
+    "assignedUser": "Assigned user",
+    "unassigned": "Unassigned",
+    "edit": "Edit",
+    "unmark": "Unmark",
+    "complete": "Complete"
+  },
+  "facturaDetail": {
+    "totalPrice": "Total price",
+    "pricePerPerson": "Price per person",
+    "photos": "Photos",
+    "invoiceImage": "Invoice image",
+    "assignedUsers": "Assigned users",
+    "paid": "Paid",
+    "pending": "Pending",
+    "noAssignedUsers": "No assigned users",
+    "paidCounter": "{{pagados}}/{{total}} paid",
+    "createdDate": "Created: {{date}}"
   }
 }

@@ -20,6 +20,7 @@ import { obtenerImagenFactura } from "../../api/factura";
 import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import UserList from "./UserList";
+import { useTranslation } from "react-i18next";
 type Props =
   | {
     visible: boolean;
@@ -53,6 +54,7 @@ type Props =
 
 const Detalle: React.FC<Props> = (props) => {
   const { visible, onClose } = props;
+  const { t, i18n } = useTranslation();
 
   // ---- PARTICIPANTE ----
   if (props.kind === "participante") {
@@ -80,7 +82,7 @@ const Detalle: React.FC<Props> = (props) => {
           }
         }
       };
-      
+
       if (visible) {
         cargarEstadisticas();
       }
@@ -106,7 +108,7 @@ const Detalle: React.FC<Props> = (props) => {
             <View style={styles.headerBlock}>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.title, { color: '#6B705C' }]}>
-                  {participant?.nombre || participant?.email || "Usuario"}
+                  {participant?.nombre || participant?.email || t('common.user', 'Usuario')}
                 </Text>
                 <Text style={[styles.subtitle, { color: '#ACBF8A' }]}>{residenciaName}</Text>
               </View>
@@ -115,15 +117,15 @@ const Detalle: React.FC<Props> = (props) => {
             {/* Puntos de Karma */}
             <View style={styles.section}>
               <View style={[styles.karmaContainer, { paddingVertical: HELPERS.verticalScale(8) }]}>
-                <Text style={styles.karmaPoints}>¡{karmaPoints} puntos!</Text>
-                <Text style={styles.karmaLabel}>de karma</Text>
+                <Text style={styles.karmaPoints}>{t('myKarma.pointsCount', { points: karmaPoints })}</Text>
+                <Text style={styles.karmaLabel}>{t('myKarma.ofKarma')}</Text>
               </View>
             </View>
 
             {/* Gráfico de Tareas */}
             <View style={styles.section}>
               <Text style={[styles.sectionLabel, { color: '#6B705C' }]}>
-                Estado de las tareas
+                {t('myKarma.taskStatus')}
               </Text>
               <TasksDonutChart
                 completedTasks={tareasCompletadas || 0}
@@ -152,7 +154,7 @@ const Detalle: React.FC<Props> = (props) => {
                   { color: isCurrentUser ? '#999' : COLORS.error }
                 ]}
               >
-                {isCurrentUser ? 'No puedes eliminarte a ti mismo' : 'Eliminar de la residencia'}
+                {isCurrentUser ? t('myResidence.errors.cannotRemoveSelf') : t('myResidence.removeParticipant')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -169,7 +171,7 @@ const Detalle: React.FC<Props> = (props) => {
       if (!task.FechaLimite) return "-";
       try {
         const d = new Date(task.FechaLimite);
-        const base = d.toLocaleDateString("es-ES", {
+        const base = d.toLocaleDateString(i18n.language === "es" ? "es-ES" : "en-US", {
           weekday: "long",
           day: "numeric",
           month: "long",
@@ -189,7 +191,7 @@ const Detalle: React.FC<Props> = (props) => {
       return `${hh}:${mm}`;
     }, [task.HoraLimite, task.FechaLimite]);
 
-    // ✅ DiasRepeticion es number[] con Lunes=0 .. Domingo=6
+    // DiasRepeticion es number[] con Lunes=0 .. Domingo=6
     const weekLabels = ["L", "M", "X", "J", "V", "S", "D"];
     const weekFullNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
     const isDaySelected = (idx0: number) => {
@@ -236,7 +238,7 @@ const Detalle: React.FC<Props> = (props) => {
               {/* Puntos de karma y Botón Eliminar */}
               <View style={{ alignItems: "flex-end", gap: 10 }}>
                 <View style={styles.pointsPill}>
-                  <Text style={styles.pointsText}>{task.karma ?? 0} Puntos</Text>
+                  <Text style={styles.pointsText}>{t('taskDetail.pointsPill', { points: task.karma ?? 0 })}</Text>
                 </View>
                 <TouchableOpacity
                   onPress={onDelete}
@@ -250,7 +252,7 @@ const Detalle: React.FC<Props> = (props) => {
 
             {/* Fecha/Hora */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Fecha y hora límite</Text>
+              <Text style={styles.sectionLabel}>{t('createTask.dateTimeLimit')}</Text>
               <View style={styles.dateRow}>
                 <Text style={styles.dateText}>{fechaStr}</Text>
                 <Text style={styles.timeText}>{horaStr}</Text>
@@ -259,7 +261,7 @@ const Detalle: React.FC<Props> = (props) => {
 
             {/* Repetición de la tarea */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Repetición de la tarea</Text>
+              <Text style={styles.sectionLabel}>{t('createTask.repeat')}</Text>
               <View style={styles.weekRow}>
                 {weekLabels.map((l, idx) => {
                   const selected = isDaySelected(idx);
@@ -300,7 +302,7 @@ const Detalle: React.FC<Props> = (props) => {
 
             {/* Usuario asignado */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Usuario asignado</Text>
+              <Text style={styles.sectionLabel}>{t('taskDetail.assignedUser')}</Text>
               {(() => {
                 const assignedName =
                   selectedDayIndex !== null && isDaySelected(selectedDayIndex)
@@ -316,7 +318,7 @@ const Detalle: React.FC<Props> = (props) => {
                 return users.length > 0 ? (
                   <UserList users={users} />
                 ) : (
-                  <Text style={styles.emptyUsers}>Sin asignar</Text>
+                  <Text style={styles.emptyUsers}>{t('taskDetail.unassigned')}</Text>
                 );
               })()}
             </View>
@@ -332,7 +334,7 @@ const Detalle: React.FC<Props> = (props) => {
                 activeOpacity={0.85}
                 onPress={onEdit}
               >
-                <Text style={GLOBAL_STYLES.textoBoton}>Editar</Text>
+                <Text style={GLOBAL_STYLES.textoBoton}>{t('taskDetail.edit')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -345,7 +347,7 @@ const Detalle: React.FC<Props> = (props) => {
                 onPress={onComplete}
               >
                 <Text style={GLOBAL_STYLES.textoBoton}>
-                  {task.isCompleted ? "Desmarcar" : "Completar"}
+                  {task.isCompleted ? t('taskDetail.unmark') : t('taskDetail.complete')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -389,7 +391,7 @@ const Detalle: React.FC<Props> = (props) => {
 
   const perPerson =
     usuarios.length > 0 ? totalImporte / usuarios.length : totalImporte;
-  const fmt = new Intl.NumberFormat("es-ES", {
+  const fmt = new Intl.NumberFormat(i18n.language === "es" ? "es-ES" : "en-US", {
     style: "currency",
     currency: "EUR",
   });
@@ -398,10 +400,10 @@ const Detalle: React.FC<Props> = (props) => {
 
   const fechaCreacionStr = useMemo(() => {
     try {
-      return factura.formattedDate("es-ES");
+      return factura.formattedDate(i18n.language === "es" ? "es-ES" : "en-US");
     } catch {
       const d = new Date(factura.FechaCreacion);
-      return d.toLocaleDateString("es-ES", {
+      return d.toLocaleDateString(i18n.language === "es" ? "es-ES" : "en-US", {
         day: "2-digit",
         month: "2-digit",
       });
@@ -443,7 +445,7 @@ const Detalle: React.FC<Props> = (props) => {
 
           {/* Precio total */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Precio total</Text>
+            <Text style={styles.sectionLabel}>{t('facturaDetail.totalPrice')}</Text>
             <View style={styles.priceDisplay}>
               <Text style={styles.priceBig}>{totalStr}</Text>
             </View>
@@ -451,7 +453,7 @@ const Detalle: React.FC<Props> = (props) => {
 
           {/* Precio por persona */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Precio por persona</Text>
+            <Text style={styles.sectionLabel}>{t('facturaDetail.pricePerPerson')}</Text>
             <View style={styles.priceDisplay}>
               <Text style={styles.priceBig}>{perPersonStr}</Text>
             </View>
@@ -460,9 +462,9 @@ const Detalle: React.FC<Props> = (props) => {
           {/* Fotos */}
           {facturaImageUri ? (
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Fotos</Text>
+              <Text style={styles.sectionLabel}>{t('facturaDetail.photos')}</Text>
               <UploadImage
-                label="Imagen de la factura"
+                label={t('facturaDetail.invoiceImage')}
                 initialImageUri={facturaImageUri}
                 editable={false}
               />
@@ -471,7 +473,7 @@ const Detalle: React.FC<Props> = (props) => {
 
           {/* Usuarios asignados */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Usuarios asignados</Text>
+            <Text style={styles.sectionLabel}>{t('facturaDetail.assignedUsers')}</Text>
             {usuarios.length > 0 ? (
               <UserList
                 users={usuarios.map((u) => ({ id: u.id, name: u.name }))}
@@ -495,14 +497,14 @@ const Detalle: React.FC<Props> = (props) => {
                           color: pagado ? "#4B4741" : "#856404",
                         }}
                       >
-                        {pagado ? "Pagado" : "Pendiente"}
+                        {pagado ? t('facturaDetail.paid') : t('facturaDetail.pending')}
                       </Text>
                     </View>
                   );
                 }}
               />
             ) : (
-              <Text style={styles.emptyUsers}>Sin usuarios asignados</Text>
+              <Text style={styles.emptyUsers}>{t('facturaDetail.noAssignedUsers')}</Text>
             )}
           </View>
 
@@ -510,10 +512,10 @@ const Detalle: React.FC<Props> = (props) => {
           <View style={styles.metaRow}>
             <View style={styles.counterPill}>
               <Text style={styles.counterPillText}>
-                {pagados}/{usuarios.length} pagados
+                {t('facturaDetail.paidCounter', { pagados, total: usuarios.length })}
               </Text>
             </View>
-            <Text style={styles.metaDate}>Creada: {fechaCreacionStr}</Text>
+            <Text style={styles.metaDate}>{t('facturaDetail.createdDate', { date: fechaCreacionStr })}</Text>
           </View>
 
           {/* Botones: Editar + Completar */}
@@ -527,7 +529,7 @@ const Detalle: React.FC<Props> = (props) => {
               activeOpacity={0.85}
               onPress={onEdit}
             >
-              <Text style={GLOBAL_STYLES.textoBoton}>Editar</Text>
+              <Text style={GLOBAL_STYLES.textoBoton}>{t('taskDetail.edit')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -540,7 +542,7 @@ const Detalle: React.FC<Props> = (props) => {
               onPress={onComplete}
             >
               <Text style={GLOBAL_STYLES.textoBoton}>
-                {isFacturaPaidByMe(factura) ? "Desmarcar" : "Completar"}
+                {isFacturaPaidByMe(factura) ? t('taskDetail.unmark') : t('taskDetail.complete')}
               </Text>
             </TouchableOpacity>
           </View>

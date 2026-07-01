@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES, COMMON } from '../../styles/theme';
+import { useTranslation } from 'react-i18next';
 
 interface TasksDonutChartProps {
   completedTasks: number;
@@ -15,6 +16,7 @@ const TasksDonutChart: React.FC<TasksDonutChartProps> = ({
   lateTasks,
   size = 200,
 }) => {
+  const { t } = useTranslation();
   const totalTasks = completedTasks + lateTasks;
   const radius = 30;
   const circumference = 2 * Math.PI * radius;
@@ -90,12 +92,12 @@ const TasksDonutChart: React.FC<TasksDonutChartProps> = ({
           <View style={styles.legendContainer}>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: COLORS.accent }]} />
-              <Text style={styles.legendText}>Completadas</Text>
+              <Text style={styles.legendText}>{t('myKarma.completedTasks')}</Text>
               <Text style={styles.legendValue}>{completedTasks}</Text>
             </View>
             <View style={styles.legendItem}>
               <View style={[styles.legendDot, { backgroundColor: COLORS.primary }]} />
-              <Text style={styles.legendText}>Fuera de plazo</Text>
+              <Text style={styles.legendText}>{t('myKarma.lateTasks')}</Text>
               <Text style={styles.legendValue}>{lateTasks}</Text>
             </View>
           </View>
@@ -103,7 +105,7 @@ const TasksDonutChart: React.FC<TasksDonutChartProps> = ({
       ) : (
         <View style={styles.emptyChartContainer}>
           <Ionicons name="pie-chart-outline" size={60} color="#CCC" />
-          <Text style={styles.emptyChartText}>No hay tareas registradas</Text>
+          <Text style={styles.emptyChartText}>{t('myKarma.noTasks')}</Text>
         </View>
       )}
     </View>

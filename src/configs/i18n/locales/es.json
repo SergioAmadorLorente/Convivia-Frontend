@@ -203,6 +203,7 @@
     }
   },
   "dashboard": {
+    "greeting": "Hola, {{username}}, hoy es",
     "tabs": {
       "tasks": "Tareas",
       "invoices": "Facturas"
@@ -323,6 +324,7 @@
     "points": "pts",
     "noData": "No hay datos disponibles",
     "loading": "Cargando estadísticas...",
+    "noTasks": "No hay tareas registradas",
     "emptyDescription": "Comienza a completar tareas para acumular puntos de karma y ver tus estadísticas aquí.",
     "backProfile": "Volver al perfil",
     "pointsCount": "¡{{points}} puntos!",
@@ -342,11 +344,12 @@
     "settings": "Ajustes",
     "leaveResidence": "Abandonar Residencia",
     "deleteResidence": "Eliminar Residencia",
-    "removeParticipant": "Eliminar participante",
+    "removeParticipant": "Eliminar de la residencia",
     "errors": {
       "memberNotFound": "No se encontró tu información de miembro.",
       "leaveError": "Ocurrió un error al intentar abandonar la residencia.",
-      "deleteError": "Ocurrió un error al intentar eliminar la residencia."
+      "deleteError": "Ocurrió un error al intentar eliminar la residencia.",
+      "cannotRemoveSelf": "No puedes eliminarte a ti mismo"
     },
     "toasts": {
       "getMemberError": "Error al obtener datos del participante",
@@ -435,5 +438,25 @@
     "trialInfo": "Empieza tu periodo de prueba de 7 días gratis.",
     "trialCancel": "Cancela en cualquier momento.",
     "subscribeButton": "Pruébalo gratis y subscríbete"
+  },
+  "taskDetail": {
+    "pointsPill": "{{points}} Puntos",
+    "assignedUser": "Usuario asignado",
+    "unassigned": "Sin asignar",
+    "edit": "Editar",
+    "unmark": "Desmarcar",
+    "complete": "Completar"
+  },
+  "facturaDetail": {
+    "totalPrice": "Precio total",
+    "pricePerPerson": "Precio por persona",
+    "photos": "Fotos",
+    "invoiceImage": "Imagen de la factura",
+    "assignedUsers": "Usuarios asignados",
+    "paid": "Pagado",
+    "pending": "Pendiente",
+    "noAssignedUsers": "Sin usuarios asignados",
+    "paidCounter": "{{pagados}}/{{total}} pagados",
+    "createdDate": "Creada: {{date}}"
   }
 }
