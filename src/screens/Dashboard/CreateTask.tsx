@@ -18,6 +18,7 @@ import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useTranslation } from 'react-i18next';
 import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
 import { useEditTask } from "../../hooks/useEditTask";
@@ -40,10 +41,11 @@ const CreateTask: React.FC = () => {
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
     const user = useAuthListener();
+    const { t } = useTranslation();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions({ title: route.params?.taskToEdit ? "Editar Tarea" : "Crear Tarea" });
-    }, [navigation, route.params]);
+        navigation.setOptions({ title: route.params?.taskToEdit ? t('createTask.titleEdit') : t('createTask.titleCreate') });
+    }, [navigation, route.params, t]);
 
     const {
         name, setName,
@@ -143,7 +145,7 @@ const CreateTask: React.FC = () => {
 
         // Validar error de nombre solo si el campo ha sido tocado
         if (nameTouched && !hasName) {
-            setNameError('El nombre no puede estar vacío');
+            setNameError(t('createTask.errorEmptyName'));
         } else {
             setNameError('');
         }
@@ -207,10 +209,10 @@ const CreateTask: React.FC = () => {
         // Validaciones iniciales (nombre y autenticación)
         if (!name.trim()) {
             showPopup({
-                title: 'Campo requerido',
-                description: 'Por favor, ingresa un nombre para la tarea.',
+                title: t('createTask.popups.requiredName.title'),
+                description: t('createTask.popups.requiredName.description'),
                 imageType: 'error',
-                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+                buttons: [{ text: t('common.accept'), onPress: () => setPopupVisible(false) }],
             });
             return;
         }
@@ -218,20 +220,20 @@ const CreateTask: React.FC = () => {
         if (!selectedDate && repeatDays.length === 0) {
             // Si es tarea puntual (sin repetición), requerir fecha
             showPopup({
-                title: 'Fecha requerida',
-                description: 'Por favor, selecciona una fecha límite o días de repetición.',
+                title: t('createTask.popups.requiredDate.title'),
+                description: t('createTask.popups.requiredDate.description'),
                 imageType: 'error',
-                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+                buttons: [{ text: t('common.accept'), onPress: () => setPopupVisible(false) }],
             });
             return;
         }
 
         if (!user) {
             showPopup({
-                title: 'Error de autenticación',
-                description: 'Debes estar autenticado para crear una tarea.',
+                title: t('createTask.popups.authError.title'),
+                description: t('createTask.popups.authError.description'),
                 imageType: 'error',
-                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+                buttons: [{ text: t('common.accept'), onPress: () => setPopupVisible(false) }],
             });
             return;
         }
@@ -405,11 +407,11 @@ const CreateTask: React.FC = () => {
             }
 
             showPopup({
-                title: isEditing ? 'Tarea actualizada' : 'Tarea creada',
-                description: isEditing ? 'La tarea se ha actualizado exitosamente.' : 'La tarea se ha creado exitosamente.',
+                title: isEditing ? t('createTask.popups.successUpdated.title') : t('createTask.popups.successCreated.title'),
+                description: isEditing ? t('createTask.popups.successUpdated.description') : t('createTask.popups.successCreated.description'),
                 imageType: 'convivia',
                 buttons: [{
-                    text: 'Aceptar',
+                    text: t('common.accept'),
                     onPress: () => {
                         setPopupVisible(false);
                         navigation.goBack();
@@ -420,10 +422,10 @@ const CreateTask: React.FC = () => {
         } catch (error: any) {
             // console.error('Error al crear tarea:', error);
             showPopup({
-                title: 'Error',
-                description: error?.response?.data?.message || 'Error al crear la tarea. Intenta de nuevo.',
+                title: t('createTask.popups.error.title'),
+                description: error?.response?.data?.message || t('createTask.popups.error.description'),
                 imageType: 'error',
-                buttons: [{ text: 'Aceptar', onPress: () => setPopupVisible(false) }],
+                buttons: [{ text: t('common.accept'), onPress: () => setPopupVisible(false) }],
             });
         } finally {
             setLoading(false);
@@ -465,20 +467,20 @@ const CreateTask: React.FC = () => {
                             setName(text);
                             if (!nameTouched) setNameTouched(true);
                         }}
-                        placeholder="Nombre"
+                        placeholder={t('createTask.namePlaceholder')}
                         error={nameError}
                         onBlur={() => setNameTouched(true)}
                     />
                     <LargeTextField
                         value={description}
                         onChangeText={(text: string) => setDescription(text)}
-                        placeholder="Descripción (opcional) "
+                        placeholder={t('createTask.descriptionPlaceholder')}
                     />
                 </View>
 
                 <View style={{ width: "100%", gap: 20 }}>
                     <Desplegable
-                        title="Fecha y hora límite"
+                        title={t('createTask.dateTimeLimit')}
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
@@ -496,7 +498,7 @@ const CreateTask: React.FC = () => {
                     </Desplegable>
 
                     <Desplegable
-                        title="Repetición de la tarea"
+                        title={t('createTask.repeat')}
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
@@ -520,7 +522,7 @@ const CreateTask: React.FC = () => {
                     {/* Se eliminó el desplegable de Asignación ya que ahora es parte del flujo de clic en 'Crear tarea' */}
 
                     <Desplegable
-                        title="Puntos de karma"
+                        title={t('createTask.karma')}
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
@@ -543,7 +545,7 @@ const CreateTask: React.FC = () => {
                         disabled={loading || !isButtonEnabled}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
-                            {loading ? "Guardando..." : (isEditing ? "Assignar Usuarios y Guardar" : "Assignar Usuarios y Crear")}
+                            {loading ? t('createTask.saving') : (isEditing ? t('createTask.buttonSave') : t('createTask.buttonCreate'))}
                         </Text>
                     </Button>
                 </View>

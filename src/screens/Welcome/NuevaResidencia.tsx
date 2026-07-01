@@ -15,6 +15,7 @@ import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
@@ -85,6 +86,7 @@ const NuevaResidencia: React.FC = () => {
   const [touched, setTouched] = useState<boolean>(false);
   const navigation = useNavigation<any>();
   const user = useAuthListener();
+  const { t } = useTranslation();
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupOptions, setPopupOptions] = useState<any>({});
@@ -121,12 +123,12 @@ const NuevaResidencia: React.FC = () => {
         if (espacioExistente && espacioExistente.espacioId && espacioExistente.espacioId !== "string") {
           // El usuario ya tiene una residencia
           showPopup({
-            title: 'Ya tienes una residencia',
-            description: 'Solo puedes crear una residencia por cuenta. Serás redirigido a tu dashboard.',
+            title: t('newResidence.popups.alreadyHasResidence.title'),
+            description: t('newResidence.popups.alreadyHasResidence.description'),
             imageType: 'error',
             buttons: [
               {
-                text: 'Ir al Dashboard',
+                text: t('newResidence.popups.alreadyHasResidence.goToDashboard'),
                 onPress: () => {
                   setPopupVisible(false);
                   navigation.replace('DashBoardPersonal');
@@ -155,10 +157,10 @@ const NuevaResidencia: React.FC = () => {
   const handleCrear = async () => {
     if (!hasText) {
       showPopup({
-        title: 'Campo requerido',
-        description: 'Por favor, ingresa un nombre válido para la residencia.',
+        title: t('newResidence.popups.requiredField.title'),
+        description: t('newResidence.popups.requiredField.description'),
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: t('common.accept'), onPress: () => { } }],
       });
       return;
     }
@@ -167,20 +169,20 @@ const NuevaResidencia: React.FC = () => {
     const validacion = validarNombreResidencia(nombreResidencia);
     if (!validacion.valido) {
       showPopup({
-        title: 'Nombre no válido',
+        title: t('newResidence.popups.invalidName'),
         description: validacion.mensaje,
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: t('common.accept'), onPress: () => { } }],
       });
       return;
     }
 
     if (!user) {
       showPopup({
-        title: 'Error de autenticación',
-        description: 'Debes estar autenticado para crear una residencia.',
+        title: t('newResidence.popups.authError.title'),
+        description: t('newResidence.popups.authError.description'),
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: t('common.accept'), onPress: () => { } }],
       });
       return;
     }
@@ -202,26 +204,26 @@ const NuevaResidencia: React.FC = () => {
 
       if (joinError) {
         showPopup({
-          title: 'Residencia creada con aviso',
+          title: t('newResidence.popups.createdWithWarning.title'),
           description: `La residencia se creó, pero hubo un problema al unirte automáticamente. Error: ${JSON.stringify(joinError.response?.data || joinError.message)}`,
           imageType: 'error',
           code: codigoResidencia,
           buttons: [
             {
-              text: 'Entendido',
+              text: t('newResidence.popups.createdWithWarning.understood'),
               onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
             },
           ],
         });
       } else {
         showPopup({
-          title: 'Residencia creada',
-          description: 'Puedes encontrarlo de nuevo en Perfil > Mi residencia',
+          title: t('newResidence.popups.created.title'),
+          description: t('newResidence.popups.created.description'),
           imageType: 'convivia',
           code: codigoResidencia,
           buttons: [
             {
-              text: '¡Empieza!',
+              text: t('newResidence.popups.created.start'),
               onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioCreado.nombre })
             },
           ],
@@ -233,10 +235,10 @@ const NuevaResidencia: React.FC = () => {
     } catch (error) {
       console.error('Error al crear residencia:', error);
       showPopup({
-        title: 'Error',
-        description: 'Error al crear la residencia. Intenta de nuevo.',
+        title: t('newResidence.popups.genericError.title'),
+        description: t('newResidence.popups.genericError.description'),
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: t('common.accept'), onPress: () => { } }],
       });
     } finally {
       setLoading(false);
@@ -252,29 +254,29 @@ const NuevaResidencia: React.FC = () => {
           keyboardVerticalOffset={Platform.OS === 'ios' ? hp('8%') : 0}
         >
           <View ref={containerRef} style={[styles.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-            <Text style={[styles.titulo, { fontSize: 40, textAlign: 'center' }]}>Crea una nueva residencia</Text>
+            <Text style={[styles.titulo, { fontSize: 40, textAlign: 'center' }]}>{t('newResidence.title')}</Text>
 
             <Text style={GLOBAL_STYLES.subtitle}>
-              <Text>Obtén el código de tu residencia en el apartado </Text>
-              <Text>Perfil - Mi residencia</Text>
+              <Text>{t('newResidence.subtitle')}</Text>
+              <Text>{t('newResidence.subtitleLink')}</Text>
             </Text>
 
             {/* Nombre */}
             <TextField
-              label="Nombre de la residencia"
+              label={t('newResidence.nameLabel')}
               value={nombreResidencia}
               onChangeText={setNombreResidencia}
-              placeholder="Piso Tarragona"
+              placeholder={t('newResidence.namePlaceholder')}
               onBlur={() => setTouched(true)}
             />
             {touched && nombreResidencia.trim().length < 2 && nombreResidencia.trim().length > 0 && (
-              <Text style={styles.errorText}>El nombre debe tener al menos 2 caracteres</Text>
+              <Text style={styles.errorText}>{t('newResidence.errorMinChars')}</Text>
             )}
             {touched && nombreResidencia.trim().length === 0 && (
-              <Text style={styles.errorText}>Ingresa un nombre válido</Text>
+              <Text style={styles.errorText}>{t('newResidence.errorEmpty')}</Text>
             )}
             {touched && nombreResidencia.trim().length > 80 && (
-              <Text style={styles.errorText}>El nombre no puede superar 80 caracteres</Text>
+              <Text style={styles.errorText}>{t('newResidence.errorMaxChars')}</Text>
             )}
             {touched && nombreResidencia.trim().length >= 2 && nombreResidencia.trim().length <= 80 && !validarNombreResidencia(nombreResidencia).valido && (
               <Text style={styles.errorText}>{validarNombreResidencia(nombreResidencia).mensaje}</Text>
@@ -288,7 +290,7 @@ const NuevaResidencia: React.FC = () => {
               onPress={handleCrear}
               loading={loading}
             >
-              Crear
+              {t('newResidence.createButton')}
             </ConfettiButton>
           </View>
         </KeyboardAvoidingView>

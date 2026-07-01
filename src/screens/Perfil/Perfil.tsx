@@ -7,7 +7,10 @@ import {
   Dimensions,
   Platform,
   ActivityIndicator,
+  Modal,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
 import {
@@ -37,7 +40,9 @@ const { width } = Dimensions.get("window");
 
 const Perfil: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { t, i18n } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [langModalVisible, setLangModalVisible] = useState(false);
   const user = useAuthListener();
   const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
   const [userKarma, setUserKarma] = useState<number>(0);
@@ -123,7 +128,7 @@ const Perfil: React.FC = () => {
         style={styles.scrollContent}
       >
         {/* Header Title */}
-        <Text style={GLOBAL_STYLES.title}>Mi Perfil</Text>
+        <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
 
         {/* User Card */}
         <View style={styles.userCard}>
@@ -140,7 +145,7 @@ const Perfil: React.FC = () => {
                 <ActivityIndicator size="small" color={COLORS.primary} />
               ) : (
                 <Text style={styles.userKarma}>
-                  Puntos Karma: {userKarma}
+                  {t("profile.karmaPoints", { points: userKarma })}
                   <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
                 </Text>
               )}
@@ -151,7 +156,7 @@ const Perfil: React.FC = () => {
               {/* Language Icon */}
               <TouchableOpacity
                 style={[styles.editButton, { marginRight: 5 }]}
-                onPress={() => { /* Mirar cual es la forma profesional de implementar idiomas */ }}
+                onPress={() => setLangModalVisible(true)}
               >
                 <Ionicons name="flag-outline" size={20} color="#ACBF8A" />
               </TouchableOpacity>
@@ -172,7 +177,7 @@ const Perfil: React.FC = () => {
 
           {/* Mi Karma */}
           <MenuItem
-            label="Mi Karma"
+            label={t("profile.menu.karma")}
             onPress={() => navigation.navigate("MiKarma")}
             icon={<LogoKarma width={30} height={30} />}
           />
@@ -180,7 +185,7 @@ const Perfil: React.FC = () => {
 
           {/* Mis Residencias */}
           <MenuItem
-            label="Mis Residencias"
+            label={t("profile.menu.residences")}
             onPress={() => navigation.navigate("MiResidencia")}
             icon={<Miresidencia width={24} height={24} />}
           />
@@ -188,7 +193,7 @@ const Perfil: React.FC = () => {
 
           {/* Preguntas frecuentes */}
           <MenuItem
-            label="Preguntas frecuentes"
+            label={t("profile.menu.faq")}
             onPress={() => navigation.navigate("FAQ")}
             icon={<IconoFAQ width={24} height={24} />}
           />
@@ -196,7 +201,7 @@ const Perfil: React.FC = () => {
 
           {/* Información Legal */}
           <MenuItem
-            label="Información Legal"
+            label={t("profile.menu.legal")}
             onPress={() => navigation.navigate("InfoLegal")}
             icon={<Infolegal width={24} height={24} />}
           />
@@ -204,7 +209,7 @@ const Perfil: React.FC = () => {
 
           {/* Convivia PRO */}
           <MenuItem
-            label="Convivia PRO"
+            label={t("profile.menu.pro")}
             onPress={() => navigation.navigate('ConviviaPro')}
             icon={<IconoConviviaPRO width={24} height={24} />}
           />
@@ -212,7 +217,7 @@ const Perfil: React.FC = () => {
 
           {/* Cerrar Sesión */}
           <MenuItem
-            label="Cerrar Sesión"
+            label={t("profile.menu.logout")}
             onPress={() => setModalVisible(true)}
             icon={<LogoutSinFondo width={24} height={24} />}
           />
@@ -223,14 +228,74 @@ const Perfil: React.FC = () => {
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        title="¿Estás seguro de que quieres cerrar la sesión?"
+        title={t("profile.logoutPopup.title")}
         description=""
         imageType="logout"
         buttons={[
-          { text: 'Cancelar', onPress: () => { } },
-          { text: 'Cerrar sesión', onPress: handleLogout },
+          { text: t("profile.logoutPopup.cancel"), onPress: () => { } },
+          { text: t("profile.logoutPopup.confirm"), onPress: handleLogout },
         ]}
       />
+
+      {/* Language Selector Modal */}
+      <Modal
+        visible={langModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLangModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setLangModalVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t("profile.language.select")}</Text>
+              <TouchableOpacity onPress={() => setLangModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Español Option */}
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                i18n.language.startsWith("es") && styles.langOptionSelected
+              ]}
+              onPress={async () => {
+                await i18n.changeLanguage("es");
+                await AsyncStorage.setItem("user-language", "es");
+                setLangModalVisible(false);
+              }}
+            >
+              <Text style={styles.langOptionText}>Español 🇪🇸</Text>
+              {i18n.language.startsWith("es") && (
+                <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            {/* English Option */}
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                i18n.language.startsWith("en") && styles.langOptionSelected
+              ]}
+              onPress={async () => {
+                await i18n.changeLanguage("en");
+                await AsyncStorage.setItem("user-language", "en");
+                setLangModalVisible(false);
+              }}
+            >
+              <Text style={styles.langOptionText}>English 🇬🇧</Text>
+              {i18n.language.startsWith("en") && (
+                <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       <BottomBar />
     </View>
   );
@@ -315,6 +380,52 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#E0E0E0",
     marginLeft: 55,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: COLORS.background || "#FFF",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    padding: 24,
+    paddingBottom: Platform.OS === "ios" ? 40 : 24,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -4 },
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 18,
+    color: COLORS.primary || "#333",
+  },
+  langOption: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    backgroundColor: "#F5F4F2",
+  },
+  langOptionSelected: {
+    backgroundColor: "#E6ECDC",
+  },
+  langOptionText: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text16,
+    color: "#4B4741",
   },
 });
 

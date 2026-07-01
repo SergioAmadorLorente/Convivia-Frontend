@@ -24,6 +24,7 @@ import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspa
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useToast } from "../../../hooks/useToast";
 
 const { width } = Dimensions.get("window");
@@ -37,6 +38,7 @@ const MiResidencia: React.FC = () => {
   const [isParticipantsOpen, setIsParticipantsOpen] = useState(true);
   const user = useAuthListener();
   const { userData } = useUser();
+  const { t } = useTranslation();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
   const [residenciaData, setResidenciaData] = useState<any>(null);
 
@@ -72,11 +74,11 @@ const MiResidencia: React.FC = () => {
           routes: [{ name: "Bienvenida" }],
         });
       } else {
-        Alert.alert("Error", "No se encontró tu información de miembro.");
+        Alert.alert(t('common.error'), t('myResidence.errors.memberNotFound'));
       }
     } catch (error) {
       // console.error("Error al abandonar residencia:", error);
-      Alert.alert("Error", "Ocurrió un error al intentar abandonar la residencia.");
+      Alert.alert(t('common.error'), t('myResidence.errors.leaveError'));
     }
   };
 
@@ -97,7 +99,7 @@ const MiResidencia: React.FC = () => {
       });
     } catch (error) {
       // console.error("Error al eliminar residencia:", error);
-      Alert.alert("Error", "Ocurrió un error al intentar eliminar la residencia.");
+      Alert.alert(t('common.error'), t('myResidence.errors.deleteError'));
     }
   };
 
@@ -169,7 +171,7 @@ const MiResidencia: React.FC = () => {
     if (!selectedParticipantRelacion?.id) {
       showToast({
         entity: "tarea",
-        name: "Error al obtener datos del participante",
+        name: t('myResidence.toasts.getMemberError'),
         tone: "error",
       });
       return;
@@ -181,7 +183,7 @@ const MiResidencia: React.FC = () => {
       setIsEliminarParticipantePopupOpen(false);
       showToast({
         entity: "tarea",
-        name: "Participante eliminado de la residencia",
+        name: t('myResidence.toasts.memberRemoved'),
         tone: "success",
       });
       // Refrescar la lista de participantes
@@ -194,7 +196,7 @@ const MiResidencia: React.FC = () => {
       // console.error("Error al eliminar participante:", error);
       showToast({
         entity: "tarea",
-        name: "Error al eliminar el participante",
+        name: t('myResidence.toasts.removeMemberError'),
         tone: "error",
       });
     } finally {
@@ -211,7 +213,7 @@ const MiResidencia: React.FC = () => {
         <View style={GLOBAL_STYLES.container}>
           {/* Back Button */}
 
-          <Text style={GLOBAL_STYLES.title}>Mis Residencias</Text>
+          <Text style={GLOBAL_STYLES.title}>{t('myResidence.title')}</Text>
 
           <View style={{ width: "85%", marginTop: 20 }}>
             {/* Residence Card */}
@@ -236,7 +238,7 @@ const MiResidencia: React.FC = () => {
 
             {/* Code Section */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Código de tu Residencia</Text>
+              <Text style={styles.sectionTitle}>{t('myResidence.codeLabel')}</Text>
               <View style={styles.divider} />
 
               {generatedCode ? (
@@ -248,7 +250,7 @@ const MiResidencia: React.FC = () => {
                   </View>
                   {copied && (
                     <Text style={{ marginTop: 10, color: COLORS.primary, fontFamily: FONTS.bold, fontSize: 14 }}>
-                      ¡Copiado!
+                      {t('myResidence.codeCopied')}
                     </Text>
                   )}
                 </TouchableOpacity>
@@ -259,7 +261,7 @@ const MiResidencia: React.FC = () => {
                   disabled={loadingCode}
                 >
                   <Text style={styles.generateButtonText}>
-                    {loadingCode ? "Generando..." : "Generar Código"}
+                    {loadingCode ? t('common.loading') : t('myResidence.generateCode')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -271,7 +273,7 @@ const MiResidencia: React.FC = () => {
                 style={styles.sectionHeaderClickable}
                 onPress={() => setIsParticipantsOpen(!isParticipantsOpen)}
               >
-                <Text style={styles.sectionTitle}>Participantes</Text>
+                <Text style={styles.sectionTitle}>{t('myResidence.participants')}</Text>
                 <Ionicons
                   name={isParticipantsOpen ? "chevron-up" : "chevron-down"}
                   size={24}
@@ -308,14 +310,14 @@ const MiResidencia: React.FC = () => {
                             {participant?.nombre || participant?.email || "Usuario sin nombre"}
                           </Text>
                           <Text style={styles.participantKarma}>
-                            {participant?.karmaTotal || 0} puntos de karma
+                            {t('myResidence.karmaPointsCount', { points: participant?.karmaTotal || 0 })}
                           </Text>
                         </View>
                       </TouchableOpacity>
                     ))
                   ) : (
                     <Text style={{ fontFamily: FONTS.regular, color: "#666", marginTop: 5 }}>
-                      Cargando participantes...
+                      {t('myResidence.loadingParticipants')}
                     </Text>
                   )}
                 </View>
@@ -324,7 +326,7 @@ const MiResidencia: React.FC = () => {
 
             {/* Settings Section */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Ajustes</Text>
+              <Text style={styles.sectionTitle}>{t('myResidence.settings')}</Text>
               <View style={styles.divider} />
 
               <View style={styles.buttonsContainer}>
@@ -335,7 +337,7 @@ const MiResidencia: React.FC = () => {
                   <Text
                     style={[styles.actionButtonText, { color: COLORS.error }]}
                   >
-                    Abandonar Residencia
+                    {t('myResidence.leaveResidence')}
                   </Text>
                 </TouchableOpacity>
 
@@ -346,7 +348,7 @@ const MiResidencia: React.FC = () => {
                   <Text
                     style={[styles.actionButtonText, { color: COLORS.error }]}
                   >
-                    Eliminar Residencia
+                    {t('myResidence.deleteResidence')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -361,21 +363,17 @@ const MiResidencia: React.FC = () => {
         visible={isAbandonPopupOpen}
         onClose={() => setIsAbandonPopupOpen(false)}
         imageType="delete"
-        titleComponent={
-          <Text>
-            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>abandonar</Text> esta residencia?
-          </Text>
-        }
-        description="Perderas todos tus puntos de karma"
+        title={t('myResidence.popups.leaveTitle')}
+        description={t('myResidence.popups.leaveDescription')}
         buttons={[
           {
-            text: "Cancelar",
+            text: t('common.cancel'),
             onPress: () => setIsAbandonPopupOpen(false),
             style: GLOBAL_STYLES.buttonSecondaryGrey,
             textStyle: { color: COLORS.primary }
           },
           {
-            text: "Abandonar",
+            text: t('myResidence.popups.leaveConfirm'),
             onPress: confirmAbandonarResidencia,
             style: [GLOBAL_STYLES.buttonPrimaryGreen,],
             textStyle: { color: COLORS.primary }
@@ -397,21 +395,17 @@ const MiResidencia: React.FC = () => {
         visible={isDeletePopupOpen}
         onClose={() => setIsDeletePopupOpen(false)}
         imageType="delete"
-        titleComponent={
-          <Text>
-            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>eliminar</Text> esta residencia?
-          </Text>
-        }
-        description="Se eliminarán todos los datos, tareas y facturas de esta residencia. Esta acción no se puede deshacer."
+        title={t('myResidence.popups.deleteTitle')}
+        description={t('myResidence.popups.deleteDescription')}
         buttons={[
           {
-            text: "Cancelar",
+            text: t('common.cancel'),
             onPress: () => setIsDeletePopupOpen(false),
             style: GLOBAL_STYLES.buttonSecondaryGrey,
             textStyle: { color: COLORS.primary }
           },
           {
-            text: "Eliminar",
+            text: t('myResidence.popups.deleteConfirm'),
             onPress: confirmEliminarResidencia,
             style: [GLOBAL_STYLES.buttonPrimaryGreen,],
             textStyle: { color: COLORS.primary }
@@ -423,21 +417,17 @@ const MiResidencia: React.FC = () => {
         visible={isEliminarParticipantePopupOpen}
         onClose={() => setIsEliminarParticipantePopupOpen(false)}
         imageType="delete"
-        titleComponent={
-          <Text>
-            ¿Estás seguro de que quieres <Text style={{ color: COLORS.error }}>eliminar</Text> a {selectedParticipant?.nombre || "este usuario"}?
-          </Text>
-        }
-        description="Se eliminará de la residencia y perderá acceso a todos los datos compartidos."
+        title={t('myResidence.popups.removeTitleWithName', { name: selectedParticipant?.nombre || "este usuario" })}
+        description={t('myResidence.popups.removeDescription')}
         buttons={[
           {
-            text: "Cancelar",
+            text: t('common.cancel'),
             onPress: () => setIsEliminarParticipantePopupOpen(false),
             style: GLOBAL_STYLES.buttonSecondaryGrey,
             textStyle: { color: COLORS.primary }
           },
           {
-            text: "Eliminar",
+            text: t('myResidence.popups.removeConfirm'),
             onPress: confirmEliminarParticipante,
             style: GLOBAL_STYLES.buttonPrimaryGreen,
             textStyle: { color: COLORS.primary },

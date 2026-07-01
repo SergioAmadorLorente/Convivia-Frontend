@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from 'react-i18next';
 import { auth } from "../../configs/firebaseConfig";
 import {
   signInWithEmailAndPassword,
@@ -38,6 +39,7 @@ const IniciarSesion: React.FC = () => {
     emailError,
     isValidEmail,
   } = useEmailValidation();
+  const { t } = useTranslation();
   const [password, setPassword] = useState<string>("");
   const [isChecked, setIsChecked] = useState<boolean>(false); // visual
   const [loading, setLoading] = useState<boolean>(false);
@@ -72,13 +74,12 @@ const IniciarSesion: React.FC = () => {
       );
       if (!userCredential.user.emailVerified) {
         showPopup({
-          title: "Error",
-          description:
-            "El correo no esta verificada. Por favor, verifica tu correo.",
+          title: t('login.popups.emailNotVerified.title'),
+          description: t('login.popups.emailNotVerified.description'),
           imageType: "error",
           buttons: [
             {
-              text: "Aceptar",
+              text: t('common.accept'),
               onPress: () => navigation.navigate("Bienvenida"),
             },
           ],
@@ -100,21 +101,21 @@ const IniciarSesion: React.FC = () => {
         if (espacioExistente && espacioExistente.espacioId && espacioExistente.espacioId !== "string") {
           // Usuario tiene residencia -> ir al Dashboard
           showPopup({
-            title: "¡Bienvenido de nuevo!",
-            description: "Redirigiendo a tu residencia...",
+            title: t('login.popups.welcomeBack.title'),
+            description: t('login.popups.welcomeBack.description'),
             imageType: "success",
             buttons: [
-              { text: "Continuar", onPress: () => navigation.replace("DashBoardPersonal") },
+              { text: t('common.continue'), onPress: () => navigation.replace("DashBoardPersonal") },
             ],
           });
         } else {
           // Usuario NO tiene residencia -> ir a Bienvenida para crear/unirse
           showPopup({
-            title: "Éxito",
-            description: "Login exitoso. Crea o únete a una residencia para continuar.",
+            title: t('login.popups.loginOk.title'),
+            description: t('login.popups.loginOk.description'),
             imageType: "success",
             buttons: [
-              { text: "Continuar", onPress: () => navigation.replace("Bienvenida") },
+              { text: t('common.continue'), onPress: () => navigation.replace("Bienvenida") },
             ],
           });
         }
@@ -122,20 +123,20 @@ const IniciarSesion: React.FC = () => {
         console.log("Error verificando residencia, redirigiendo a Bienvenida:", espacioError);
         // Si hay error verificando, ir a Bienvenida por seguridad
         showPopup({
-          title: "Éxito",
-          description: "Login exitoso",
+          title: t('login.popups.loginOkSimple.title'),
+          description: t('login.popups.loginOkSimple.description'),
           imageType: "success",
           buttons: [
-            { text: "Aceptar", onPress: () => navigation.navigate("Bienvenida") },
+            { text: t('common.accept'), onPress: () => navigation.navigate("Bienvenida") },
           ],
         });
       }
     } catch (error) {
       showPopup({
-        title: "Error",
-        description: "Credenciales incorrectas o usuario no existe",
+        title: t('login.popups.wrongCredentials.title'),
+        description: t('login.popups.wrongCredentials.description'),
         imageType: "error",
-        buttons: [{ text: "Aceptar" }],
+        buttons: [{ text: t('common.accept') }],
       });
     }
     setLoading(false);
@@ -155,22 +156,22 @@ const IniciarSesion: React.FC = () => {
               Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
             ]}
           >
-            <Text style={styles.titulo}>Iniciar sesión</Text>
+            <Text style={styles.titulo}>{t('login.title')}</Text>
             <Text style={GLOBAL_STYLES.subtitle}>
-              ¡Ya estás a punto de poder utilizar la aplicación de Convivia!
+              {t('login.subtitle')}
             </Text>
             {/* EMAIL */}
             <TextField
-              label="Correo electrónico"
+              label={t('login.emailLabel')}
               value={email}
               onChangeText={validateEmail}
-              placeholder="usuario@dominio"
+              placeholder={t('login.emailPlaceholder')}
               keyboardType="email-address"
               error={emailError}
             />
             {/* PASSWORD */}
             <TextField
-              label="Contraseña"
+              label={t('login.passwordLabel')}
               value={password}
               onChangeText={setPassword}
               placeholder="• • • • • • • •"
@@ -181,7 +182,7 @@ const IniciarSesion: React.FC = () => {
               style={GLOBAL_STYLES.checkboxContainer}
               onPress={() => navigation.navigate("RecuperarPassword")}
             >
-              <Text style={GLOBAL_STYLES.link}>Recuperar contraseña</Text>
+              <Text style={GLOBAL_STYLES.link}>{t('login.recoverPassword')}</Text>
             </TouchableOpacity>
             {/* CHECKBOX RECUÉRDAME */}
             <View style={GLOBAL_STYLES.checkboxContainer}>
@@ -199,7 +200,7 @@ const IniciarSesion: React.FC = () => {
                   }
                 />
               </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.labelCheckbox}>Recuérdame</Text>
+              <Text style={GLOBAL_STYLES.labelCheckbox}>{t('login.rememberMe')}</Text>
             </View>
             {/* BOTÓN LOGIN */}
             <ConfettiButton
@@ -213,7 +214,7 @@ const IniciarSesion: React.FC = () => {
               disableAutoConfetti={true}
               trigger={showConfetti}
             >
-              Entrar
+              {t('login.loginButton')}
             </ConfettiButton>
           </View>
         </KeyboardAvoidingView>

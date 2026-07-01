@@ -15,6 +15,7 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 
 import TaskModel from "../../types/Task";
 import FacturaModel from "../../types/Factura";
@@ -38,6 +39,7 @@ const { hp } = HELPERS;
 const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
+  const { t, i18n } = useTranslation();
 
   const {
     user,
@@ -239,13 +241,13 @@ const DashBoardPersonal: React.FC = () => {
           {activeTab === "facturas" && pendingItems.length === 0 && completedItems.length === 0 && (
             <View style={[{ paddingVertical: 40 }]}>
               <Text style={{ fontSize: 16, color: COLORS.secondary, fontFamily: FONTS.regular, textAlign: "center" }}>
-                No hay facturas asignadas a tu usuario
+                {t('dashboard.noInvoices')}
               </Text>
             </View>
           )}
 
           {pendingItems.length > 0 && (
-            <Desplegable title={activeTab === "tareas" ? "Pendientes" : "Pendientes de pago"} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+            <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.pending') : t('dashboard.sections.pendingPayment')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
               {pendingItems.map((item: any) => (
                 <TaskItem
                   key={activeTab === "tareas" ? item.id : item.IdFactura}
@@ -256,8 +258,8 @@ const DashBoardPersonal: React.FC = () => {
                   onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
                   onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                   time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
-                  fechaLimite={activeTab === "tareas" ? new Date(item.FechaLimite).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" }) : undefined}
-                  dateLabel={activeTab === "facturas" ? item.formattedDate?.("es-ES") : undefined}
+                  fechaLimite={activeTab === "tareas" ? new Date(item.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" }) : undefined}
+                  dateLabel={activeTab === "facturas" ? item.formattedDate?.(i18n.language === 'en' ? 'en-US' : 'es-ES') : undefined}
                   perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
                   paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
                   totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
@@ -267,7 +269,7 @@ const DashBoardPersonal: React.FC = () => {
           )}
 
           {activeTab === "tareas" && visibility.showOverdue && overdueItems.length > 0 && (
-            <Desplegable title="Fuera de plazo" fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+            <Desplegable title={t('dashboard.sections.overdue')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
               {overdueItems.map((task: TaskModel) => (
                 <TaskItem
                   key={task.id}
@@ -277,14 +279,14 @@ const DashBoardPersonal: React.FC = () => {
                   onToggle={() => handleToggleTask(task.id)}
                   onPressRow={() => openDetalleTarea(task)}
                   time={task.formattedTime()}
-                  fechaLimite={new Date(task.FechaLimite).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" })}
+                  fechaLimite={new Date(task.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" })}
                 />
               ))}
             </Desplegable>
           )}
 
           {visibility.showCompleted && completedItems.length > 0 && (
-            <Desplegable title={activeTab === "tareas" ? "Completadas" : "Pagadas"} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+            <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.completed') : t('dashboard.sections.paid')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
               {completedItems.map((item: any) => (
                 <TaskItem
                   key={activeTab === "tareas" ? item.id : item.IdFactura}
@@ -295,7 +297,7 @@ const DashBoardPersonal: React.FC = () => {
                   onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
                   onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                   time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
-                  dateLabel={activeTab === "facturas" ? item.formattedDate?.("es-ES") : undefined}
+                  dateLabel={activeTab === "facturas" ? item.formattedDate?.(i18n.language === 'en' ? 'en-US' : 'es-ES') : undefined}
                   perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
                   paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
                   totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
@@ -312,7 +314,7 @@ const DashBoardPersonal: React.FC = () => {
         title={popupOptions.title || ""}
         description={popupOptions.description}
         imageType={popupOptions.imageType}
-        buttons={popupOptions.buttons ?? [{ text: "Aceptar", onPress: handleClosePopup }]}
+        buttons={popupOptions.buttons ?? [{ text: t('common.accept'), onPress: handleClosePopup }]}
       />
 
       {selectedTask && (

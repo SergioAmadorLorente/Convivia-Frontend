@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { COLORS, FONTS } from "../../styles/theme";
 
 interface TasksFilterProps {
@@ -22,18 +23,13 @@ interface TasksFilterProps {
   }) => void;
 }
 
-const FILTER_OPTIONS = [
-  { key: "today", label: "Hoy" },
-  { key: "week", label: "Esta semana" },
-  { key: "all", label: "Todas" },
-] as const;
-
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 const TasksFilter: React.FC<TasksFilterProps> = ({
   onFilterChange,
   onVisibilityChange,
 }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [headerY, setHeaderY] = useState(0);
@@ -42,6 +38,12 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
   const [showUnassigned, setShowUnassigned] = useState(true);
   const [showOverdue, setShowOverdue] = useState(true);
   const [showCompleted, setShowCompleted] = useState(true);
+
+  const filterOptions = [
+    { key: "today", label: t('dashboard.filter.today') },
+    { key: "week", label: t('dashboard.filter.week') },
+    { key: "all", label: t('dashboard.filter.all') },
+  ] as const;
 
   const handleHeaderLayout = (e: LayoutChangeEvent) => {
     setHeaderHeight(e.nativeEvent.layout.height);
@@ -83,9 +85,9 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
         onPress={() => setIsOpen(!isOpen)}
         onLayout={handleHeaderLayout}
         accessibilityRole="button"
-        accessibilityLabel="Abrir filtros"
+        accessibilityLabel={t('dashboard.filter.accessibilityOpen')}
       >
-        <Text style={styles.dropdownTitle}>Filtrar</Text>
+        <Text style={styles.dropdownTitle}>{t('dashboard.filter.title')}</Text>
         <Feather
           name={isOpen ? "chevron-up" : "chevron-down"}
           size={20}
@@ -106,9 +108,9 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
               <View style={[styles.dropdownContent, { top: headerY + headerHeight, marginHorizontal: 15 }]}>
                 {/* CUÁNDO — 3 botones compactos */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Cuándo</Text>
+                  <Text style={styles.sectionLabel}>{t('dashboard.filter.when')}</Text>
                   <View style={styles.filterRow}>
-                    {FILTER_OPTIONS.map((item, idx) => {
+                    {filterOptions.map((item, idx) => {
                       const active = item.key === selectedFilter;
                       return (
                         <TouchableOpacity
@@ -117,7 +119,7 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
                           style={[
                             styles.filterButton,
                             active && styles.filterButtonActive,
-                            idx < FILTER_OPTIONS.length - 1 && styles.filterButtonGap,
+                            idx < filterOptions.length - 1 && styles.filterButtonGap,
                           ]}
                           accessibilityRole="button"
                           accessibilityState={{ selected: active }}
@@ -142,12 +144,12 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
 
                 {/* MOSTRAR — checkboxes compactos */}
                 <View style={styles.section}>
-                  <Text style={styles.sectionLabel}>Mostrar</Text>
+                  <Text style={styles.sectionLabel}>{t('dashboard.filter.show')}</Text>
                   <View style={styles.checkboxGroup}>
                     {[
-                      { key: "unassigned", label: "Tareas sin asignar", value: showUnassigned },
-                      { key: "overdue", label: "Fuera de plazo", value: showOverdue },
-                      { key: "completed", label: "Completadas", value: showCompleted },
+                      { key: "unassigned", label: t('dashboard.filter.unassigned'), value: showUnassigned },
+                      { key: "overdue", label: t('dashboard.filter.overdue'), value: showOverdue },
+                      { key: "completed", label: t('dashboard.filter.completed'), value: showCompleted },
                     ].map((option) => (
                       <TouchableOpacity
                         key={option.key}

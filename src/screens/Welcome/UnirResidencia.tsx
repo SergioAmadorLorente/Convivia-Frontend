@@ -13,6 +13,7 @@ import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Popup from '../../components/ui/Popup';
 import { useKeyboardAware } from '../../hooks';
@@ -34,6 +35,7 @@ const UnirResidencia: React.FC = () => {
   const { codigo, handleChange } = useCodigoResidencia();
   const [loading, setLoading] = useState<boolean>(false);
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
 
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
@@ -62,20 +64,20 @@ const UnirResidencia: React.FC = () => {
   const handleUnirse = async () => {
     if (!isValidCode) {
       showPopup({
-        title: 'Código inválido',
-        description: 'Por favor, ingresa un código válido.',
+        title: t('joinResidence.popups.invalidCode.title'),
+        description: t('joinResidence.popups.invalidCode.description'),
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: t('common.accept'), onPress: () => { } }],
       });
       return;
     }
 
     if (!user) {
       showPopup({
-        title: 'Error de sesión',
-        description: 'No se detectó un usuario autenticado.',
+        title: t('joinResidence.popups.sessionError.title'),
+        description: t('joinResidence.popups.sessionError.description'),
         imageType: 'error',
-        buttons: [{ text: 'Aceptar', onPress: () => { } }],
+        buttons: [{ text: t('common.accept'), onPress: () => { } }],
       });
       return;
     }
@@ -104,12 +106,12 @@ const UnirResidencia: React.FC = () => {
         if (yaEsMiembro) {
           console.log("⚠️ El usuario ya es miembro de este espacio.");
           showPopup({
-            title: '¡Ya estás dentro!',
+            title: t('joinResidence.popups.alreadyMember.title'),
             description: `Ya eres miembro de ${espacioData.nombre}`,
             imageType: 'convivia',
             showCode: false,
             buttons: [{
-              text: 'Ir al inicio',
+              text: t('joinResidence.popups.alreadyMember.goHome'),
               onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioData.nombre })
             }],
           });
@@ -134,12 +136,12 @@ const UnirResidencia: React.FC = () => {
       console.log("✅ Usuario unido al espacio exitosamente");
 
       showPopup({
-        title: 'Éxito',
+        title: t('joinResidence.popups.joinSuccess.title'),
         description: `Te has unido exitosamente a ${espacioData.nombre}`,
         imageType: 'convivia',
         showCode: false,
         buttons: [{
-          text: 'Aceptar',
+          text: t('common.accept'),
           onPress: () => navigation.replace('DashBoardPersonal', { newSpaceName: espacioData.nombre })
         }],
       });
@@ -150,17 +152,17 @@ const UnirResidencia: React.FC = () => {
 
       if (is404) {
         showPopup({
-          title: 'Residencia no encontrada',
-          description: 'El código ingresado no corresponde a ninguna residencia existente. Verifícalo e intenta de nuevo.',
+          title: t('joinResidence.popups.notFound.title'),
+          description: t('joinResidence.popups.notFound.description'),
           imageType: 'error',
-          buttons: [{ text: 'Aceptar', onPress: () => { } }],
+          buttons: [{ text: t('common.accept'), onPress: () => { } }],
         });
       } else {
         showPopup({
-          title: 'Error',
-          description: 'No se pudo unir a la residencia. Intenta de nuevo más tarde.',
+          title: t('joinResidence.popups.genericError.title'),
+          description: t('joinResidence.popups.genericError.description'),
           imageType: 'error',
-          buttons: [{ text: 'Aceptar', onPress: () => { } }],
+          buttons: [{ text: t('common.accept'), onPress: () => { } }],
         });
       }
     } finally {
@@ -185,15 +187,15 @@ const UnirResidencia: React.FC = () => {
           keyboardVerticalOffset={Platform.OS === 'android' ? hp('8%') : 0}
         >
           <View ref={containerRef} style={[GLOBAL_STYLES.container, Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {}]}>
-            <Text style={GLOBAL_STYLES.title}>Únete a una residencia</Text>
+            <Text style={GLOBAL_STYLES.title}>{t('joinResidence.title')}</Text>
 
             <Text style={GLOBAL_STYLES.subtitle}>
-              <Text>Obtén el código de la residencia a la que quieres unirte en el apartado </Text>
-              <Text>Perfil - Mi residencia</Text>
+              <Text>{t('joinResidence.subtitle')}</Text>
+              <Text>{t('joinResidence.subtitleLink')}</Text>
             </Text>
 
             <TextField
-              label="Código de la residencia"
+              label={t('joinResidence.codeLabel')}
               value={codigo}
               onChangeText={handleChange}
               placeholder="- - - - -"
@@ -212,7 +214,7 @@ const UnirResidencia: React.FC = () => {
               loading={loading}
 
             >
-              Unirse
+              {t('joinResidence.joinButton')}
             </ConfettiButton>
           </View>
         </KeyboardAvoidingView>

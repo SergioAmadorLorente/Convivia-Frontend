@@ -19,6 +19,7 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
+import { useTranslation } from 'react-i18next';
 import { moderateScale } from "react-native-size-matters";
 import {
   createUserWithEmailAndPassword,
@@ -38,6 +39,7 @@ import { crearUsuario, crearUsuarioConId } from "../../api/usuario";
 
 const CrearCuenta: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
   const { password, setPassword, validations, isValidPassword } =
     usePasswordValidation();
@@ -67,7 +69,7 @@ const CrearCuenta: React.FC = () => {
   useEffect(() => {
     if (password === password2) setErrorMatch("");
     else if (password2.length > 0)
-      setErrorMatch("Las contraseñas no coinciden");
+      setErrorMatch(t('createAccount.passwordMismatch'));
   }, [password, password2]);
 
   // Detectar cuando la app vuelve al primer plano y verificar email
@@ -127,17 +129,17 @@ const CrearCuenta: React.FC = () => {
       startCountdown();
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
-        setEmailUsedError("Este correo ya está registrado.");
+        setEmailUsedError(t('createAccount.emailUsed'));
       } else {
         // console.error("Error creating account:", error);
-        setEmailUsedError("Error al crear la cuenta.");
+        setEmailUsedError(t('createAccount.genericError'));
       }
     }
   };
   const handleEnviarVerificacion = async () => {
     if (!isValidEmail || !isValidPassword) return;
     if (password !== password2) {
-      setErrorMatch("Las contraseñas no coinciden");
+      setErrorMatch(t('createAccount.passwordMismatch'));
       return;
     }
     if (!checkedPolitica || !checkedTerminos) return;
@@ -145,11 +147,11 @@ const CrearCuenta: React.FC = () => {
   };
   // Validaciones password
   const unmetPasswordRequirements: string[] = [];
-  if (!validations.length) unmetPasswordRequirements.push("Al menos 8 caracteres");
+  if (!validations.length) unmetPasswordRequirements.push(t('createAccount.reqLength'));
   if (!validations.uppercase)
-    unmetPasswordRequirements.push("Al menos una letra mayúscula");
+    unmetPasswordRequirements.push(t('createAccount.reqUppercase'));
   if (!validations.number)
-    unmetPasswordRequirements.push("Al menos un número");
+    unmetPasswordRequirements.push(t('createAccount.reqNumber'));
   if (!fontsLoaded) {
     return (
       <View style={[GLOBAL_STYLES.container, { justifyContent: "center" }]}>
@@ -169,33 +171,33 @@ const CrearCuenta: React.FC = () => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={GLOBAL_STYLES.container}>
-            <Text style={GLOBAL_STYLES.title}>Crea tu cuenta</Text>
+            <Text style={GLOBAL_STYLES.title}>{t('createAccount.title')}</Text>
             <Text style={GLOBAL_STYLES.subtitle}>
-              ¿Quieres empezar tu experiencia con Convivia?
+              {t('createAccount.subtitle')}
             </Text>
             {/* NOMBRE */}
             <TextField
-              label="Nombre"
+              label={t('createAccount.nameLabel')}
               value={nombre}
               onChangeText={setNombre}
-              placeholder="Tu nombre"
+              placeholder={t('createAccount.namePlaceholder')}
               keyboardType="default"
             />
             {/* EMAIL */}
             <TextField
-              label="Correo electrónico"
+              label={t('createAccount.emailLabel')}
               value={email}
               onChangeText={(text) => {
                 setEmail(text);
                 setEmailUsedError("");
               }}
-              placeholder="usuario@dominio.com"
+              placeholder={t('createAccount.emailPlaceholder')}
               keyboardType="email-address"
               error={emailError || emailUsedError}
             />
             {/* CONTRASEÑA */}
             <TextField
-              label="Contraseña"
+              label={t('createAccount.passwordLabel')}
               value={password}
               onChangeText={setPassword}
               placeholder="• • • • • • • •"
@@ -204,7 +206,7 @@ const CrearCuenta: React.FC = () => {
             {/* VALIDACIONES */}
             <View style={{ marginVertical: 5 }}>
               <Text style={GLOBAL_STYLES.helperText}>
-                Requisitos de la contraseña:
+                {t('createAccount.passwordRequirements')}
               </Text>
               {unmetPasswordRequirements.length === 0 ? (
                 <Text
@@ -213,7 +215,7 @@ const CrearCuenta: React.FC = () => {
                     { color: GLOBAL_STYLES.subtitulo.color },
                   ]}
                 >
-                  ✓ Contraseña válida
+                  {t('createAccount.validPassword')}
                 </Text>
               ) : (
                 unmetPasswordRequirements.map((msg) => (
@@ -231,13 +233,13 @@ const CrearCuenta: React.FC = () => {
             </View>
             {/* CONFIRMAR CONTRASEÑA */}
             <TextField
-              label="Confirma la Contraseña"
+              label={t('createAccount.confirmPasswordLabel')}
               value={password2}
               onChangeText={(text) => {
                 setPassword2(text);
                 if (password === text) setErrorMatch("");
                 else if (text.length > 0)
-                  setErrorMatch("Las contraseñas no coinciden");
+                  setErrorMatch(t('createAccount.passwordMismatch'));
               }}
               placeholder="• • • • • • • •"
               secureTextEntry
@@ -268,7 +270,7 @@ const CrearCuenta: React.FC = () => {
                   navigation.navigate("PoliticaCookiesPrivacidad")
                 }
               >
-                Política de Privacidad y Cookies
+                {t('createAccount.privacyLabel')}
               </Text>
             </View>
             {/* CHECKBOX TÉRMINOS Y CONDICIONES */}
@@ -294,7 +296,7 @@ const CrearCuenta: React.FC = () => {
                 ]}
                 onPress={() => navigation.navigate("TerminosCondiciones")}
               >
-                Términos y Condiciones
+                {t('createAccount.termsLabel')}
               </Text>
             </View>
             {/* BOTÓN */}
@@ -329,17 +331,17 @@ const CrearCuenta: React.FC = () => {
               }
               onPress={handleEnviarVerificacion}
             >
-              {isCounting ? `Reenviando en ${seconds}s` : "Enviar verificación"}
+              {isCounting ? t('createAccount.resendText', { seconds }) : t('createAccount.sendVerification')}
             </Button>
             {/* POPUP */}
             <Popup
               visible={modalVisible}
               onClose={() => setModalVisible(false)}
-              title="¡Verificación enviada!"
-              description="Revisa tu correo y la carpeta de spam."
+              title={t('createAccount.popups.verificationSent.title')}
+              description={t('createAccount.popups.verificationSent.description')}
               imageType="success"
               buttons={[
-                { text: "Cerrar", onPress: () => setModalVisible(false) },
+                { text: t('common.close'), onPress: () => setModalVisible(false) },
               ]}
             />
           </View>

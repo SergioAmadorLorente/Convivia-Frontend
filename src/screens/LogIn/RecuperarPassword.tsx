@@ -14,6 +14,7 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from 'react-i18next';
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
 import { COLORS } from "../../styles/theme";
 import { sendPasswordResetEmail } from "firebase/auth";
@@ -25,6 +26,7 @@ import { useKeyboardAware } from "../../hooks";
 import { useEmailValidation } from "../../hooks/useEmailValidation";
 const RecuperarPassword: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   // Hook de validación de email
   const { email, setEmail, isValidEmail, emailError } = useEmailValidation();
   // Carga de fuentes
@@ -55,29 +57,28 @@ const RecuperarPassword: React.FC = () => {
     try {
       await sendPasswordResetEmail(auth, email);
       showPopup({
-        title: "Correo enviado",
-        description:
-          "Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.",
+        title: t('recoverPassword.popups.sent.title'),
+        description: t('recoverPassword.popups.sent.description'),
         imageType: "success",
         buttons: [
           {
-            text: "Aceptar",
+            text: t('common.accept'),
             onPress: () => navigation.navigate("IniciarSesion"),
           },
         ],
       });
     } catch (err: any) {
       console.log(err);
-      let message = "No se pudo enviar el correo.";
+      let message = t('recoverPassword.popups.cantSend');
       if (err.code === "auth/user-not-found")
-        message = "No existe ninguna cuenta con este correo.";
+        message = t('recoverPassword.popups.userNotFound');
       if (err.code === "auth/invalid-email")
-        message = "El correo ingresado no es válido.";
+        message = t('recoverPassword.popups.invalidEmail');
       showPopup({
-        title: "Error",
+        title: t('recoverPassword.popups.errorTitle'),
         description: message,
         imageType: "error",
-        buttons: [{ text: "Aceptar", onPress: () => {} }],
+        buttons: [{ text: t('common.accept'), onPress: () => {} }],
       });
     }
   };
@@ -91,14 +92,14 @@ const RecuperarPassword: React.FC = () => {
             Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
           ]}
         >
-          <Text style={GLOBAL_STYLES.titulo}>Recuperar contraseña</Text>
+          <Text style={GLOBAL_STYLES.titulo}>{t('recoverPassword.title')}</Text>
           <Text style={[GLOBAL_STYLES.subtitle, { marginBottom: 18 }]}>
-            ¿Has olvidado tu contraseña?
+            {t('recoverPassword.subtitle')}
           </Text>
           {/* BLOQUE PRINCIPAL */}
           <View style={[GLOBAL_STYLES.recuperarBloque, { marginTop: 0 }]}>
             <TextField
-              label="Correo electrónico"
+              label={t('recoverPassword.emailLabel')}
               placeholder="usuario@dominio.com"
               keyboardType="email-address"
               value={email}
@@ -106,7 +107,7 @@ const RecuperarPassword: React.FC = () => {
               error={emailError}
             />
             <Text style={[GLOBAL_STYLES.helperText, { marginTop: 10 }]}>
-              {`Ingresa tu correo electrónico y te enviaremos un enlace para crear una nueva contraseña.\n\nDebe tener un formato válido, por ejemplo: usuario@dominio.com`}
+              {t('recoverPassword.helperText')}
             </Text>
             <Button
               style={[
@@ -120,7 +121,7 @@ const RecuperarPassword: React.FC = () => {
               disabled={!isValidEmail}
               onPress={handleResetPassword}
             >
-              Enviar correo
+              {t('recoverPassword.sendButton')}
             </Button>
           </View>
         </View>
