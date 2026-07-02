@@ -6,9 +6,11 @@ import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "../../styles/theme";
 import { useTabColor } from "../../hooks/useTabColor";
+import { useTranslation } from "react-i18next";
 const BottomBar = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const toggleMenu = () => {
@@ -80,7 +82,7 @@ const BottomBar = () => {
           <View style={styles.circleIcon}>
             <Text style={styles.circleIconText}>€</Text>
           </View>
-          <Text style={styles.menuText}>Crear nueva factura</Text>
+          <Text style={styles.menuText}>{t('bottomBar.createInvoice')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
@@ -92,24 +94,24 @@ const BottomBar = () => {
           <View style={styles.circleIcon}>
             <Text style={styles.circleIconText}>T</Text>
           </View>
-          <Text style={styles.menuText}>Crear nueva tarea</Text>
+          <Text style={styles.menuText}>{t('bottomBar.createTask')}</Text>
         </TouchableOpacity>
       </Animated.View>
       {/** BOTTOM BAR */}
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.tab} onPress={() => navigateTo("DashBoardPersonal")}>
           <Ionicons name="home-outline" size={28} color={homeColor} />
-          <Text style={styles.label}>Inicio</Text>
+          <Text style={styles.label}>{t('bottomBar.home')}</Text>
         </TouchableOpacity>
         <View style={styles.plusContainer}>
           <TouchableOpacity style={styles.plusButton} onPress={toggleMenu}>
             <Ionicons name="add-outline" size={40} color={COLORS.primary} />
           </TouchableOpacity>
-          <Text style={[styles.label, styles.createLabel]}>Crear</Text>
+          <Text style={[styles.label, styles.createLabel]}>{t('bottomBar.create')}</Text>
         </View>
         <TouchableOpacity style={styles.tab} onPress={() => navigateTo("Perfil")}>
           <Ionicons name="person-outline" size={28} color={profileColor} />
-          <Text style={styles.label}>Perfil</Text>
+          <Text style={styles.label}>{t('bottomBar.profile')}</Text>
         </TouchableOpacity>
       </View>
     </>

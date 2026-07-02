@@ -18,6 +18,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useAuthListener } from '../../../hooks/useAuthListener';
 import { obtenerUsuarioPorId, actualizarUsuario } from '../../../api/usuario';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import useLoadFonts from '../../../hooks/useLoadFonts';
 import { useKeyboardAware } from '../../../hooks';
 import TextField from '../../../components/ui/TextField';
@@ -33,6 +34,7 @@ const { width } = Dimensions.get('window');
 
 const EditarPerfil = () => {
 	const currentUser = useAuthListener();
+	const { t } = useTranslation();
 	const [dbPassword, setDbPassword] = useState('');
 	const [foto, setFoto] = useState<string | null>(null);
 	const [nombre, setNombre] = useState('');
@@ -99,10 +101,10 @@ const EditarPerfil = () => {
 	const handleSubmit = async () => {
 		if (!currentUser?.uid) {
 			showPopup({
-				title: 'Error',
-				description: 'Usuario no identificado',
+				title: t('editProfile.popups.userNotFound.title'),
+				description: t('editProfile.popups.userNotFound.description'),
 				imageType: 'error',
-				buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+				buttons: [{ text: t('common.accept'), onPress: handleClosePopup }],
 			});
 			return;
 		}
@@ -113,30 +115,30 @@ const EditarPerfil = () => {
 		if (nuevaContrasena) {
 			if (nuevaContrasena.length < 8 || !/\d/.test(nuevaContrasena)) {
 				showPopup({
-					title: 'Error',
-					description: 'La contraseña debe tener al menos 8 caracteres y un número.',
+					title: t('editProfile.popups.invalidPassword.title'),
+					description: t('editProfile.popups.invalidPassword.description'),
 					imageType: 'error',
-					buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+					buttons: [{ text: t('common.accept'), onPress: handleClosePopup }],
 				});
 				return;
 			}
 
 			if (nuevaContrasena !== repetirContrasena) {
 				showPopup({
-					title: 'Error',
-					description: 'Las contraseñas nuevas no coinciden',
+					title: t('editProfile.popups.passwordMismatch.title'),
+					description: t('editProfile.popups.passwordMismatch.description'),
 					imageType: 'error',
-					buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+					buttons: [{ text: t('common.accept'), onPress: handleClosePopup }],
 				});
 				return;
 			}
 
 			if (contrasenaActual !== dbPassword) {
 				showPopup({
-					title: 'Error',
-					description: 'La contraseña actual no es correcta',
+					title: t('editProfile.popups.wrongCurrentPassword.title'),
+					description: t('editProfile.popups.wrongCurrentPassword.description'),
 					imageType: 'error',
-					buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+					buttons: [{ text: t('common.accept'), onPress: handleClosePopup }],
 				});
 				return;
 			}
@@ -164,18 +166,18 @@ const EditarPerfil = () => {
 			if (nuevaContrasena) setDbPassword(nuevaContrasena);
 
 			showPopup({
-				title: 'Éxito',
-				description: 'Perfil actualizado correctamente',
+				title: t('editProfile.popups.success.title'),
+				description: t('editProfile.popups.success.description'),
 				imageType: 'success',
-				buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+				buttons: [{ text: t('common.accept'), onPress: handleClosePopup }],
 			});
 		} catch (error) {
 			// console.error("Error actualizando perfil:", error);
 			showPopup({
-				title: 'Error',
-				description: 'No se pudo actualizar el perfil',
+				title: t('editProfile.popups.updateError.title'),
+				description: t('editProfile.popups.updateError.description'),
 				imageType: 'error',
-				buttons: [{ text: 'Aceptar', onPress: handleClosePopup }],
+				buttons: [{ text: t('common.accept'), onPress: handleClosePopup }],
 			});
 		} finally {
 			setIsLoading(false);
@@ -212,26 +214,26 @@ const EditarPerfil = () => {
 				<TextField
 					value={nombre}
 					onChangeText={setNombre}
-					placeholder="Nombre"
+					placeholder={t('editProfile.namePlaceholder')}
 				/>
 
 				<TextField
 					value={telefono}
 					onChangeText={setTelefono}
-					placeholder="Teléfono"
+					placeholder={t('editProfile.phonePlaceholder')}
 					keyboardType="phone-pad"
 				/>
 
 				<TextField
 					value={correo}
 					onChangeText={setCorreo}
-					placeholder="Correo electrónico"
+					placeholder={t('editProfile.emailPlaceholder')}
 					keyboardType="email-address"
 				/>
 
-				<Text style={editarPerfilStyles.sectionTitle}>Cambiar Contraseña</Text>
+				<Text style={editarPerfilStyles.sectionTitle}>{t('editProfile.changePassword')}</Text>
 
-				<Text style={editarPerfilStyles.fieldLabel}>Contraseña Actual</Text>
+				<Text style={editarPerfilStyles.fieldLabel}>{t('editProfile.currentPassword')}</Text>
 				<TextField
 					value={contrasenaActual}
 					onChangeText={setContrasenaActual}
@@ -239,7 +241,7 @@ const EditarPerfil = () => {
 					secureTextEntry
 				/>
 
-				<Text style={editarPerfilStyles.fieldLabel}>Nueva Contraseña</Text>
+				<Text style={editarPerfilStyles.fieldLabel}>{t('editProfile.newPassword')}</Text>
 				<TextField
 					value={nuevaContrasena}
 					onChangeText={setNuevaContrasena}
@@ -247,10 +249,10 @@ const EditarPerfil = () => {
 					secureTextEntry
 				/>
 				<Text style={[GLOBAL_STYLES.helperText, { marginTop: 5, paddingLeft: 5 }]}>
-					* Mínimo 8 caracteres y al menos un número.
+					{t('editProfile.passwordHint')}
 				</Text>
 
-				<Text style={editarPerfilStyles.fieldLabel}>Confirma la Contraseña</Text>
+				<Text style={editarPerfilStyles.fieldLabel}>{t('editProfile.confirmPassword')}</Text>
 				<TextField
 					value={repetirContrasena}
 					onChangeText={setRepetirContrasena}
@@ -262,7 +264,7 @@ const EditarPerfil = () => {
 					onPress={handleSubmit}
 					style={editarPerfilStyles.submitButton}
 				>
-					Guardar cambios
+					{t('editProfile.saveButton')}
 				</Button>
 			</ScrollView>
 

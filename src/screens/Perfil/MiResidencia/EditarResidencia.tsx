@@ -20,6 +20,7 @@ import { COLORS, FONTS } from "../../../styles/theme";
 import { WebView } from "react-native-webview";
 
 import { useRoute, RouteProp } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import { actualizarEspacio } from "../../../api/espacio";
 
 type EditarResidenciaNavigationProp = StackNavigationProp<
@@ -41,6 +42,7 @@ const EditarResidencia: React.FC = () => {
   const navigation = useNavigation<EditarResidenciaNavigationProp>();
   const route = useRoute<EditarResidenciaRouteProp>();
   const { espacioId, nombreInicial, ubicacionInicial } = route.params;
+  const { t } = useTranslation();
 
   // Estados para los campos
   const [nombre, setNombre] = useState(nombreInicial || "");
@@ -121,7 +123,7 @@ const EditarResidencia: React.FC = () => {
 
   const handleGuardar = async () => {
     if (!nombre.trim()) {
-      Alert.alert("Error", "Por favor, ingresa un nombre para la residencia");
+      Alert.alert(t('common.error'), t('editResidence.errors.emptyName'));
       return;
     }
 
@@ -135,7 +137,7 @@ const EditarResidencia: React.FC = () => {
       navigation.goBack();
     } catch (error) {
       // console.error("Error al actualizar el espacio:", error);
-      Alert.alert("Error", "Hubo un error al actualizar la residencia");
+      Alert.alert(t('common.error'), t('editResidence.errors.updateError'));
     } finally {
       setLoading(false);
     }
@@ -152,7 +154,7 @@ const EditarResidencia: React.FC = () => {
           <Ionicons name="chevron-back" size={30} color={COLORS.accent} />
         </TouchableOpacity>
 
-        <Text style={localStyles.screenTitle}>Editar Mi Residencia</Text>
+        <Text style={localStyles.screenTitle}>{t('editResidence.title')}</Text>
       </View>
 
       {/* Content Card */}
@@ -163,17 +165,17 @@ const EditarResidencia: React.FC = () => {
         >
           <View style={localStyles.formContainer}>
             <TextField
-              label="Nombre de la Residencia"
+              label={t('editResidence.nameLabel')}
               value={nombre}
               onChangeText={setNombre}
-              placeholder="Piso Tarragona"
+              placeholder={t('newResidence.namePlaceholder')}
             />
 
             <TextField
-              label="Ubicación"
+              label={t('editResidence.locationLabel')}
               value={ubicacion}
               onChangeText={setUbicacion}
-              placeholder="Calle Falsa 123 (opcional)"
+              placeholder={t('editResidence.locationPlaceholder')}
               rightIcon={
                 <Ionicons
                   name="location-outline"
@@ -188,7 +190,7 @@ const EditarResidencia: React.FC = () => {
               <View style={localStyles.mapLoadingContainer}>
                 <ActivityIndicator size="small" color={COLORS.primary} />
                 <Text style={localStyles.mapLoadingText}>
-                  Buscando ubicación...
+                  {t('editResidence.searchingLocation')}
                 </Text>
               </View>
             )}
@@ -196,7 +198,7 @@ const EditarResidencia: React.FC = () => {
             {/* Mapa */}
             {coordinates && !loadingMap && (
               <View style={localStyles.mapContainer}>
-                <Text style={localStyles.mapLabel}>Ubicación en el mapa</Text>
+                <Text style={localStyles.mapLabel}>{t('editResidence.mapLabel')}</Text>
                 <WebView
                   style={localStyles.map}
                   source={{
@@ -239,7 +241,7 @@ const EditarResidencia: React.FC = () => {
               loading={loading}
               variant="custom" // We will override styles manually
             >
-              <Text style={localStyles.saveButtonText}>¡Guardar!</Text>
+              <Text style={localStyles.saveButtonText}>{t('editResidence.saveButton')}</Text>
             </Button>
           </View>
         </ScrollView>

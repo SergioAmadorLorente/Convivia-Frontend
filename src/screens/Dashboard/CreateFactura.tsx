@@ -17,6 +17,7 @@ import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useTranslation } from 'react-i18next';
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerUsuarioPorId, obtenerUsuarios } from "../../api/usuario";
@@ -32,6 +33,7 @@ const { hp } = HELPERS;
 const CreateFactura: React.FC = () => {
     const navigation = useNavigation<any>();
     const route = useRoute<any>();
+    const { t } = useTranslation();
 
     const {
         name, setName,
@@ -44,8 +46,8 @@ const CreateFactura: React.FC = () => {
     } = useEditFactura();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions({ title: isEditing ? "Editar Factura" : "Crear Factura" });
-    }, [navigation, isEditing]);
+        navigation.setOptions({ title: isEditing ? t('createInvoice.titleEdit') : t('createInvoice.titleCreate') });
+    }, [navigation, isEditing, t]);
 
     useEffect(() => {
         console.log("CreateFactura mounted. Params:", route.params);
@@ -155,7 +157,7 @@ const CreateFactura: React.FC = () => {
         if (!name || !amount) {
             showToast({
                 entity: "factura",
-                name: name || "Sin nombre",
+                name: name || t('createInvoice.namePlaceholder'),
                 tone: "error",
                 autoHideMs: 3000
             });
@@ -165,7 +167,7 @@ const CreateFactura: React.FC = () => {
         if (assignedUsers.length === 0) {
             showToast({
                 entity: "factura",
-                name: "Debes asignar al menos un usuario",
+                name: t('createInvoice.toasts.mustAssignUser'),
                 tone: "error",
                 autoHideMs: 3000
             });
@@ -237,7 +239,7 @@ const CreateFactura: React.FC = () => {
 
             showToast({
                 entity: "factura",
-                name: isEditing ? "Actualizada correctamente" : "Creada correctamente",
+                name: isEditing ? t('createInvoice.toasts.updatedSuccess') : t('createInvoice.toasts.createdSuccess'),
                 tone: "success",
                 autoHideMs: 3000
             });
@@ -251,7 +253,7 @@ const CreateFactura: React.FC = () => {
             // console.error("Error al guardar factura:", err);
             showToast({
                 entity: "factura",
-                name: "No se pudo guardar la factura",
+                name: t('createInvoice.toasts.saveError'),
                 tone: "error",
                 autoHideMs: 3000
             });
@@ -306,18 +308,18 @@ const CreateFactura: React.FC = () => {
                     <TextField
                         value={name}
                         onChangeText={(text: string) => setName(text)}
-                        placeholder="Nombre"
+                        placeholder={t('createInvoice.namePlaceholder')}
                     />
                     <LargeTextField
                         value={description}
                         onChangeText={(text: string) => setDescription(text)}
-                        placeholder="Descripcion"
+                        placeholder={t('createInvoice.descriptionPlaceholder')}
                     />
                 </View>
 
                 <View style={{ width: "100%", gap: 20 }}>
                     <Desplegable
-                        title="Precio"
+                        title={t('createInvoice.price')}
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
@@ -327,7 +329,7 @@ const CreateFactura: React.FC = () => {
                     </Desplegable>
 
                     <Desplegable
-                        title="Asigna a compañeros"
+                        title={t('createInvoice.assignToCompanions')}
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
@@ -338,7 +340,7 @@ const CreateFactura: React.FC = () => {
                             onPress={() => setAssignPopupVisible(true)}
                         >
                             <Text style={GLOBAL_STYLES.textoBoton}>
-                                Asignar usuario a la factura
+                                {t('createInvoice.assignButton')}
                             </Text>
                         </Button>
 
@@ -369,7 +371,7 @@ const CreateFactura: React.FC = () => {
                                                     color: pendiente ? "#856404" : "#4B4741",
                                                 }}
                                             >
-                                                {pendiente ? "Pendiente" : "Pagado"}
+                                                {pendiente ? t('createInvoice.statusPending') : t('createInvoice.statusPaid')}
                                             </Text>
                                         </View>
                                     );
@@ -379,7 +381,7 @@ const CreateFactura: React.FC = () => {
                     </Desplegable>
 
                     <Desplegable
-                        title="Foto (opcional)"
+                        title={t('createInvoice.photoOptional')}
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
@@ -387,7 +389,7 @@ const CreateFactura: React.FC = () => {
                     >
 
                         <UploadImage
-                            label="Imagen de la factura"
+                            label={t('createInvoice.photoLabel')}
                             initialImageUri={imageUri}
                             editable={true}
                             onImageSelected={(uri) => setImageUri(uri ?? undefined)}
@@ -404,7 +406,7 @@ const CreateFactura: React.FC = () => {
                         disabled={saving}
                     >
                         <Text style={GLOBAL_STYLES.textoBoton}>
-                            {saving ? "Guardando..." : (isEditing ? "Guardar cambios" : "Crear factura")}
+                            {saving ? t('common.loading') : (isEditing ? t('common.save') : t('createInvoice.createButton'))}
                         </Text>
                     </Button>
                 </View>

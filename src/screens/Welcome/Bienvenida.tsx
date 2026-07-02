@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { DMSerifDisplay_400Regular } from '@expo-google-fonts/dm-serif-display';
 import { Montserrat_400Regular, Montserrat_700Bold } from '@expo-google-fonts/montserrat';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import GLOBAL_STYLES from '../../styles/styles';
 import Popup from '../../components/ui/Popup';
 import Button from '../../components/ui/Button';
@@ -13,6 +14,7 @@ import { obtenerEspacioPorUsuarioId } from '../../api/usuarioEspacio';
 
 const Bienvenida: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   const user = useAuthListener();
   const [activo, setActivo] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -72,23 +74,21 @@ const Bienvenida: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={GLOBAL_STYLES.container} keyboardShouldPersistTaps="handled">
-      <Text style={[GLOBAL_STYLES.title, { fontSize: 28 }]}>Tu espacio compartido comienza aquí. {'\n'}¿Cómo quieres unirte?</Text>
+      <Text style={[GLOBAL_STYLES.title, { fontSize: 28 }]}>{t('welcome.title')}</Text>
 
-      <Button style={GLOBAL_STYLES.buttonPrimaryGreen} onPress={() => navigation.navigate('NuevaResidencia')}>Crea una residencia nueva</Button>
+      <Button style={GLOBAL_STYLES.buttonPrimaryGreen} onPress={() => navigation.navigate('NuevaResidencia')}>{t('welcome.createButton')}</Button>
 
-      <Button style={GLOBAL_STYLES.buttonSecondaryGrey} onPress={() => navigation.navigate('UnirResidencia')}>Únete a una residencia</Button>
-
-
+      <Button style={GLOBAL_STYLES.buttonSecondaryGrey} onPress={() => navigation.navigate('UnirResidencia')}>{t('welcome.joinButton')}</Button>
 
       <Popup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        title={'¿Estás seguro de que quieres cerrar la sesión?'}
+        title={t('welcome.logoutPopup.title')}
         description={''}
         imageType={'logout'}
         buttons={[
-          { text: 'Cancelar', onPress: () => { } },
-          { text: 'Cerrar sesión', onPress: () => { handleLogout(); } },
+          { text: t('welcome.logoutPopup.cancel'), onPress: () => { } },
+          { text: t('welcome.logoutPopup.confirm'), onPress: () => { handleLogout(); } },
         ]}
       />
     </ScrollView>

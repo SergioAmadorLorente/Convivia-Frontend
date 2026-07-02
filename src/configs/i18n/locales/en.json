@@ -1,0 +1,469 @@
+{
+  "main": {
+    "hello": "Hello!",
+    "welcome": "Welcome to Convivia",
+    "description": "Organize, collaborate and meet your goals together with your companions.\nHere productivity is shared and ideas flow in sync!",
+    "createAccount": "Create an account",
+    "login": "Log in"
+  },
+  "bottomBar": {
+    "home": "Home",
+    "create": "Create",
+    "profile": "Profile",
+    "createInvoice": "Create new invoice",
+    "createTask": "Create new task"
+  },
+  "common": {
+    "accept": "Accept",
+    "cancel": "Cancel",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save changes",
+    "loading": "Loading...",
+    "continue": "Continue",
+    "back": "Back",
+    "close": "Close"
+  },
+  "profile": {
+    "title": "My Profile",
+    "karmaPoints": "Karma Points: {{points}}",
+    "menu": {
+      "karma": "My Karma",
+      "residences": "My Residences",
+      "faq": "Frequently Asked Questions",
+      "legal": "Legal Information",
+      "pro": "Convivia PRO",
+      "logout": "Log Out"
+    },
+    "logoutPopup": {
+      "title": "Are you sure you want to log out?",
+      "cancel": "Cancel",
+      "confirm": "Log Out"
+    },
+    "language": {
+      "select": "Select Language",
+      "spanish": "Spanish",
+      "english": "English"
+    }
+  },
+  "welcome": {
+    "title": "Your shared space starts here. \nHow do you want to join?",
+    "createButton": "Create a new residence",
+    "joinButton": "Join a residence",
+    "logoutPopup": {
+      "title": "Are you sure you want to log out?",
+      "cancel": "Cancel",
+      "confirm": "Log Out"
+    }
+  },
+  "newResidence": {
+    "title": "Create a new residence",
+    "subtitle": "Get your residence code in the section ",
+    "subtitleLink": "Profile - My residence",
+    "nameLabel": "Residence name",
+    "namePlaceholder": "Tarragona Flat",
+    "createButton": "Create",
+    "errorMinChars": "Name must be at least 2 characters",
+    "errorEmpty": "Enter a valid name",
+    "errorMaxChars": "Name cannot exceed 80 characters",
+    "popups": {
+      "alreadyHasResidence": {
+        "title": "You already have a residence",
+        "description": "You can only create one residence per account. You will be redirected to your dashboard.",
+        "goToDashboard": "Go to Dashboard"
+      },
+      "requiredField": {
+        "title": "Required field",
+        "description": "Please enter a valid name for the residence."
+      },
+      "invalidName": "Invalid name",
+      "authError": {
+        "title": "Authentication error",
+        "description": "You must be authenticated to create a residence."
+      },
+      "createdWithWarning": {
+        "title": "Residence created with warning",
+        "understood": "Understood"
+      },
+      "created": {
+        "title": "Residence created",
+        "description": "You can find it again in Profile > My residence",
+        "start": "Get started!"
+      },
+      "genericError": {
+        "title": "Error",
+        "description": "Error creating the residence. Please try again."
+      }
+    }
+  },
+  "joinResidence": {
+    "title": "Join a residence",
+    "subtitle": "Get the code of the residence you want to join in the section ",
+    "subtitleLink": "Profile - My residence",
+    "codeLabel": "Residence code",
+    "joinButton": "Join",
+    "popups": {
+      "invalidCode": {
+        "title": "Invalid code",
+        "description": "Please enter a valid code."
+      },
+      "sessionError": {
+        "title": "Session error",
+        "description": "No authenticated user detected."
+      },
+      "alreadyMember": {
+        "title": "You're already in!",
+        "goHome": "Go to home"
+      },
+      "joinSuccess": {
+        "title": "Success"
+      },
+      "notFound": {
+        "title": "Residence not found",
+        "description": "The entered code does not correspond to any existing residence. Please verify it and try again."
+      },
+      "genericError": {
+        "title": "Error",
+        "description": "Could not join the residence. Please try again later."
+      }
+    }
+  },
+  "login": {
+    "title": "Log In",
+    "subtitle": "You're about to be able to use the Convivia app!",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "user@domain",
+    "passwordLabel": "Password",
+    "recoverPassword": "Recover password",
+    "rememberMe": "Remember me",
+    "loginButton": "Enter",
+    "popups": {
+      "emailNotVerified": {
+        "title": "Error",
+        "description": "Email is not verified. Please verify your email."
+      },
+      "welcomeBack": {
+        "title": "Welcome back!",
+        "description": "Redirecting to your residence..."
+      },
+      "loginOk": {
+        "title": "Success",
+        "description": "Login successful. Create or join a residence to continue."
+      },
+      "loginOkSimple": {
+        "title": "Success",
+        "description": "Login successful"
+      },
+      "wrongCredentials": {
+        "title": "Error",
+        "description": "Incorrect credentials or user does not exist"
+      }
+    }
+  },
+  "recoverPassword": {
+    "title": "Recover password",
+    "subtitle": "Forgotten your password?",
+    "emailLabel": "Email address",
+    "helperText": "Enter your email address and we will send you a link to create a new password.\n\nIt must have a valid format, for example: user@domain.com",
+    "sendButton": "Send email",
+    "popups": {
+      "sent": {
+        "title": "Email sent",
+        "description": "We have sent you a link to reset your password. Check your inbox."
+      },
+      "userNotFound": "No account found with this email.",
+      "invalidEmail": "The entered email is not valid.",
+      "cantSend": "Could not send the email.",
+      "errorTitle": "Error"
+    }
+  },
+  "createAccount": {
+    "title": "Create account",
+    "subtitle": "Do you want to start your experience with Convivia?",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "user@domain.com",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm password",
+    "passwordMismatch": "Passwords do not match",
+    "passwordRequirements": "Password requirements:",
+    "validPassword": "✓ Valid password",
+    "reqLength": "At least 8 characters",
+    "reqUppercase": "At least one uppercase letter",
+    "reqNumber": "At least one number",
+    "termsLabel": "Terms and Conditions",
+    "privacyLabel": "Privacy Policy and Cookies",
+    "createButton": "Create account",
+    "resendButton": "Resend verification",
+    "resendText": "Resending in {{seconds}}s",
+    "sendVerification": "Send verification",
+    "emailUsed": "This email is already registered.",
+    "genericError": "Error creating account.",
+    "verificationTitle": "Verify your email",
+    "verificationDescription": "We have sent you a verification link. Please check your inbox and click the link.",
+    "popups": {
+      "verificationSent": {
+        "title": "Verification sent!",
+        "description": "Check your email and spam folder."
+      }
+    }
+  },
+  "dashboard": {
+    "greeting": "Hello, {{username}}, today is",
+    "tabs": {
+      "tasks": "Tasks",
+      "invoices": "Invoices"
+    },
+    "sections": {
+      "pending": "Pending",
+      "pendingPayment": "Pending payment",
+      "overdue": "Overdue",
+      "completed": "Completed",
+      "paid": "Paid"
+    },
+    "noInvoices": "No invoices assigned to your user",
+    "filter": {
+      "title": "Filter",
+      "accessibilityOpen": "Open filters",
+      "when": "When",
+      "show": "Show",
+      "today": "Today",
+      "week": "This week",
+      "all": "All",
+      "unassigned": "Unassigned tasks",
+      "overdue": "Overdue",
+      "completed": "Completed"
+    }
+  },
+  "createTask": {
+    "titleCreate": "Create Task",
+    "titleEdit": "Edit Task",
+    "namePlaceholder": "Name",
+    "descriptionPlaceholder": "Description (optional)",
+    "dateTimeLimit": "Due date and time",
+    "repeat": "Task repetition",
+    "karma": "Karma points",
+    "buttonSave": "Assign Users and Save",
+    "buttonCreate": "Assign Users and Create",
+    "saving": "Saving...",
+    "errorEmptyName": "Name cannot be empty",
+    "popups": {
+      "requiredName": {
+        "title": "Required field",
+        "description": "Please enter a name for the task."
+      },
+      "requiredDate": {
+        "title": "Date required",
+        "description": "Please select a due date or repeat days."
+      },
+      "authError": {
+        "title": "Authentication error",
+        "description": "You must be authenticated to create a task."
+      },
+      "successCreated": {
+        "title": "Task created",
+        "description": "The task has been created successfully."
+      },
+      "successUpdated": {
+        "title": "Task updated",
+        "description": "The task has been updated successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Error creating task. Try again."
+      }
+    }
+  },
+  "createInvoice": {
+    "titleCreate": "Create Invoice",
+    "titleEdit": "Edit Invoice",
+    "namePlaceholder": "Name",
+    "descriptionPlaceholder": "Description",
+    "price": "Price",
+    "assignToCompanions": "Assign to flatmates",
+    "assignButton": "Assign user to invoice",
+    "statusPending": "Pending",
+    "statusPaid": "Paid",
+    "photoOptional": "Photo (optional)",
+    "photoLabel": "Invoice image",
+    "createButton": "Create invoice",
+    "toasts": {
+      "mustAssignUser": "You must assign at least one user",
+      "updatedSuccess": "Updated successfully",
+      "createdSuccess": "Created successfully",
+      "saveError": "Could not save the invoice"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Here you will find answers to the most common questions.",
+    "q1": "How can members be added to a residence?",
+    "a1": "To add members to a residence, the interested member must enter the randomly generated code by the administrator in the join residence screen.",
+    "q2": "How can I manage an invoice?",
+    "a2": "To manage an invoice, you just need to access the \"My Invoices\" screen in the \"My Profile\" section.",
+    "q3": "How do I remove a member from a residence?",
+    "a3": "The administrator can remove a member from the \"My Residence\" screen. The member can also leave the residence from the \"My Residence\" screen.",
+    "q4": "How can I create a residence?",
+    "a4": "Once registered as a user, you can create a residence by pressing the \"Create Residence\" option.",
+    "q5": "How can I manage a task?",
+    "a5": "From \"My Profile\", you can manage tasks; a dropdown will open where you can manage the date, assigned members and other parameters."
+  },
+  "infoLegal": {
+    "title": "Legal Information",
+    "termsButton": "Terms and Conditions of Use",
+    "privacyButton": "Privacy Policy and Cookies"
+  },
+  "myKarma": {
+    "title": "My Karma",
+    "totalPoints": "Total points",
+    "monthPoints": "this month",
+    "weekPoints": "this week",
+    "completedTasks": "Completed",
+    "pendingTasks": "Pending",
+    "lateTasks": "Overdue",
+    "rankingTitle": "Ranking",
+    "rankingTotal": "Total",
+    "rankingMonthly": "Monthly",
+    "rankingWeekly": "Weekly",
+    "viewPodium": "View podium",
+    "viewList": "View list",
+    "points": "pts",
+    "noData": "No data available",
+    "loading": "Loading statistics...",
+    "noTasks": "No tasks registered",
+    "emptyDescription": "Start completing tasks to earn karma points and view your stats here.",
+    "backProfile": "Back to profile",
+    "pointsCount": "{{points}} points!",
+    "ofKarma": "of karma",
+    "statsTitle": "Statistics",
+    "karmaKing": "Karma King",
+    "taskStatus": "Task status"
+  },
+  "myResidence": {
+    "title": "My Residences",
+    "codeLabel": "Residence Code",
+    "codeCopied": "Copied!",
+    "generateCode": "Generate Code",
+    "participants": "Participants",
+    "loadingParticipants": "Loading participants...",
+    "karmaPointsCount": "{{points}} karma points",
+    "settings": "Settings",
+    "leaveResidence": "Leave Residence",
+    "deleteResidence": "Delete Residence",
+    "removeParticipant": "Remove from residence",
+    "errors": {
+      "memberNotFound": "Your member info could not be found.",
+      "leaveError": "An error occurred while trying to leave the residence.",
+      "deleteError": "An error occurred while trying to delete the residence.",
+      "cannotRemoveSelf": "You cannot remove yourself"
+    },
+    "toasts": {
+      "getMemberError": "Error fetching member details",
+      "memberRemoved": "Member removed from residence",
+      "removeMemberError": "Error removing member"
+    },
+    "popups": {
+      "leaveTitle": "Are you sure you want to leave this residence?",
+      "leaveDescription": "You will lose all your karma points",
+      "leaveConfirm": "Leave",
+      "deleteTitle": "Are you sure you want to delete this residence?",
+      "deleteDescription": "All data, tasks and invoices of this residence will be deleted. This action cannot be undone.",
+      "deleteConfirm": "Delete",
+      "removeTitle": "Remove this participant?",
+      "removeTitleWithName": "Are you sure you want to remove {{name}}?",
+      "removeDescription": "They will be removed from the residence and lose access to all shared data.",
+      "removeConfirm": "Remove"
+    }
+  },
+  "editResidence": {
+    "title": "Edit My Residence",
+    "nameLabel": "Residence Name",
+    "locationLabel": "Location",
+    "locationPlaceholder": "123 Fake Street (optional)",
+    "searchingLocation": "Searching location...",
+    "mapLabel": "Location on the map",
+    "saveButton": "Save!",
+    "errors": {
+      "emptyName": "Please enter a name for the residence",
+      "updateError": "There was an error updating the residence"
+    },
+    "popups": {
+      "success": {
+        "title": "Success",
+        "description": "Residence updated successfully."
+      },
+      "error": {
+        "title": "Error",
+        "description": "Could not update the residence."
+      }
+    }
+  },
+  "editProfile": {
+    "title": "Edit Profile",
+    "namePlaceholder": "Name",
+    "phonePlaceholder": "Phone",
+    "emailPlaceholder": "Email address",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordHint": "* Minimum 8 characters and at least one number.",
+    "saveButton": "Save changes",
+    "popups": {
+      "userNotFound": {
+        "title": "Error",
+        "description": "User not identified"
+      },
+      "invalidPassword": {
+        "title": "Error",
+        "description": "Password must be at least 8 characters and contain a number."
+      },
+      "passwordMismatch": {
+        "title": "Error",
+        "description": "New passwords do not match"
+      },
+      "wrongCurrentPassword": {
+        "title": "Error",
+        "description": "Current password is incorrect"
+      },
+      "success": {
+        "title": "Success",
+        "description": "Profile updated successfully"
+      },
+      "updateError": {
+        "title": "Error",
+        "description": "Could not update the profile"
+      }
+    }
+  },
+  "conviviaPro": {
+    "feature1": "PRO Benefit: Unlimited residences",
+    "feature2": "PRO Benefit: 24/7 Support",
+    "plan1Month": "1 Month",
+    "plan12Months": "12 Months",
+    "trialInfo": "Start your 7-day free trial.",
+    "trialCancel": "Cancel anytime.",
+    "subscribeButton": "Try it free and subscribe"
+  },
+  "taskDetail": {
+    "pointsPill": "{{points}} Points",
+    "assignedUser": "Assigned user",
+    "unassigned": "Unassigned",
+    "edit": "Edit",
+    "unmark": "Unmark",
+    "complete": "Complete"
+  },
+  "facturaDetail": {
+    "totalPrice": "Total price",
+    "pricePerPerson": "Price per person",
+    "photos": "Photos",
+    "invoiceImage": "Invoice image",
+    "assignedUsers": "Assigned users",
+    "paid": "Paid",
+    "pending": "Pending",
+    "noAssignedUsers": "No assigned users",
+    "paidCounter": "{{pagados}}/{{total}} paid",
+    "createdDate": "Created: {{date}}"
+  }
+}

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 import GLOBAL_STYLES from "../../styles/styles";
 interface TabSwitcherProps {
@@ -7,6 +8,7 @@ interface TabSwitcherProps {
     onTabChange: (tab: "tareas" | "facturas") => void;
 }
 const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange }) => {
+    const { t } = useTranslation();
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -22,7 +24,7 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange }) => 
                         activeTab === "tareas" && styles.tabTextActive,
                     ]}
                 >
-                    Tareas
+                    {t('dashboard.tabs.tasks')}
                 </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -38,7 +40,7 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange }) => 
                         activeTab === "facturas" && styles.tabTextActive,
                     ]}
                 >
-                    Facturas
+                    {t('dashboard.tabs.invoices')}
                 </Text>
             </TouchableOpacity>
         </View>

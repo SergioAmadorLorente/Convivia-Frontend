@@ -2,6 +2,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { COLORS, FONTS, SIZES } from "../../styles/theme";
+import { useTranslation } from "react-i18next";
 
 interface HeaderProps {
   username: string;
@@ -9,8 +10,9 @@ interface HeaderProps {
   location: string;
 }
 
-function formatLongDateEs(date: Date): string {
-  const fmt = new Intl.DateTimeFormat("es-ES", {
+function formatLongDate(date: Date, locale: string): string {
+  const isEs = locale.startsWith("es");
+  const fmt = new Intl.DateTimeFormat(isEs ? "es-ES" : "en-US", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -24,11 +26,12 @@ function formatLongDateEs(date: Date): string {
 }
 
 const Header: React.FC<HeaderProps> = ({ username, date, location }) => {
-  const displayDate = typeof date === "string" ? date : formatLongDateEs(date);
+  const { t, i18n } = useTranslation();
+  const displayDate = typeof date === "string" ? date : formatLongDate(date, i18n.language);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>Hola, {username}, hoy es</Text>
+      <Text style={styles.greeting}>{t('dashboard.greeting', { username })}</Text>
       <Text style={styles.date}>{displayDate}</Text>
       <Text style={styles.location}>{location}</Text>
     </View>
@@ -38,8 +41,8 @@ const Header: React.FC<HeaderProps> = ({ username, date, location }) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    // ⬇️ Bajamos ligeramente el contenido del header
-    paddingTop: SIZES.paddingVertical * 7.5,   // antes: 4
+
+    paddingTop: SIZES.paddingVertical * 7.5,
     paddingBottom: SIZES.paddingVertical * 0.6,
     paddingHorizontal: SIZES.paddingHorizontal,
     backgroundColor: COLORS.inputBackground,

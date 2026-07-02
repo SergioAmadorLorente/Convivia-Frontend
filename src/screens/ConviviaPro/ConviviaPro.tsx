@@ -15,6 +15,7 @@ import {
   Montserrat_600SemiBold,
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from 'react-i18next';
 import { Ionicons } from "@expo/vector-icons";
 import BottomBar from "../../components/ui/BottomBar";
 import SubscriptionCard from "../../components/ui/SubscriptionCard";
@@ -27,6 +28,7 @@ const { width } = Dimensions.get("window");
 
 const ConviviaPro: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("yearly");
 
   const [fontsLoaded] = useFonts({
@@ -41,9 +43,8 @@ const ConviviaPro: React.FC = () => {
   }
 
   const features = [
-    "Ventaja PRO: Residencias ilimitadas",
-    "Ventaja PRO: Soporte 24/7",
-   
+    t('conviviaPro.feature1'),
+    t('conviviaPro.feature2'),
   ];
 
   return (
@@ -88,14 +89,14 @@ const ConviviaPro: React.FC = () => {
 
           {/* Trial Info */}
           <Text style={styles.trialInfo}>
-            Empieza tu periodo de prueba de 7 días gratis.
-            <Text style={styles.trialInfoBold}>Cancela en cualquier momento.</Text>
+            {t('conviviaPro.trialInfo')}
+            <Text style={styles.trialInfoBold}>{t('conviviaPro.trialCancel')}</Text>
           </Text>
 
           {/* Subscribe Button */}
           <View style={styles.buttonContainer}>
             <Button onPress={() => console.log("Suscribirse")}>
-              Pruébalo gratis y subscríbete
+              {t('conviviaPro.subscribeButton')}
             </Button>
           </View>
         </View>

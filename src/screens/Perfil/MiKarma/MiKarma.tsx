@@ -9,6 +9,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -45,6 +46,7 @@ interface KarmaData {
 const MiKarma: React.FC = () => {
     const navigation = useNavigation();
     const user = useAuthListener();
+    const { t } = useTranslation();
 
     // Estado para los datos de karma
     const [karmaData, setKarmaData] = useState<KarmaData | null>(null);
@@ -149,14 +151,14 @@ const MiKarma: React.FC = () => {
             >
                 {/* Header Title */}
                 <View style={{ width: "100%" }}>
-                    <Text style={GLOBAL_STYLES.titulo}>Mi Karma</Text>
+                    <Text style={GLOBAL_STYLES.titulo}>{t('myKarma.title')}</Text>
                 </View>
-
+ 
                 {/* Loading State */}
                 {loading ? (
                     <View style={styles.loadingContainer}>
                         <ActivityIndicator size="large" color={COLORS.primary} />
-                        <Text style={styles.loadingText}>Cargando estadísticas...</Text>
+                        <Text style={styles.loadingText}>{t('myKarma.loading')}</Text>
                     </View>
                 ) : !hasData ? (
                     // Empty State
@@ -164,48 +166,48 @@ const MiKarma: React.FC = () => {
                         <View style={styles.emptyIconContainer}>
                             <Ionicons name="stats-chart-outline" size={80} color={COLORS.accent} />
                         </View>
-                        <Text style={styles.emptyStateTitle}>No hay datos disponibles</Text>
+                        <Text style={styles.emptyStateTitle}>{t('myKarma.noData')}</Text>
                         <Text style={styles.emptyStateDescription}>
-                            Comienza a completar tareas para acumular puntos de karma y ver tus estadísticas aquí.
+                            {t('myKarma.emptyDescription')}
                         </Text>
                         <TouchableOpacity
                             style={styles.emptyStateButton}
                             onPress={() => navigation.goBack()}
                         >
-                            <Text style={styles.emptyStateButtonText}>Volver al perfil</Text>
+                            <Text style={styles.emptyStateButtonText}>{t('myKarma.backProfile')}</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (
                     <>
                         {/* Main Points Card */}
                         <View style={styles.mainPointsCard}>
-                            <Text style={styles.mainPoints}>¡{karmaData.totalPoints} puntos!</Text>
-                            <Text style={styles.subPoints}>de karma</Text>
+                            <Text style={styles.mainPoints}>{t('myKarma.pointsCount', { points: karmaData.totalPoints })}</Text>
+                            <Text style={styles.subPoints}>{t('myKarma.ofKarma')}</Text>
                         </View>
-
+ 
                         {/* Period Cards Row */}
                         <View style={styles.periodCardsRow}>
                             <View style={styles.periodCard}>
-                                <Text style={styles.cardValue}>¡{karmaData.monthPoints} puntos!</Text>
-                                <Text style={styles.cardLabel}>este mes</Text>
+                                <Text style={styles.cardValue}>{t('myKarma.pointsCount', { points: karmaData.monthPoints })}</Text>
+                                <Text style={styles.cardLabel}>{t('myKarma.monthPoints')}</Text>
                             </View>
                             <View style={styles.periodCard}>
-                                <Text style={styles.cardValue}>¡{karmaData.weekPoints} puntos!</Text>
-                                <Text style={styles.cardLabel}>esta semana</Text>
+                                <Text style={styles.cardValue}>{t('myKarma.pointsCount', { points: karmaData.weekPoints })}</Text>
+                                <Text style={styles.cardLabel}>{t('myKarma.weekPoints')}</Text>
                             </View>
                         </View>
 
                         {/* Statistics Section */}
                         <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>Estadísticas</Text>
-
+                            <Text style={styles.sectionTitle}>{t('myKarma.statsTitle')}</Text>
+ 
                             {/* Header con título y selector de tipo */}
                             <View style={styles.subsectionHeader}>
                                 <View style={styles.headerRow}>
-                                    <Text style={styles.subsectionTitle}>Rey de Karma</Text>
+                                    <Text style={styles.subsectionTitle}>{t('myKarma.karmaKing')}</Text>
                                 </View>
                                 <View style={styles.underline} />
-
+ 
                             </View>
 
                             {/* Podio o Lista según viewMode */}
@@ -223,7 +225,7 @@ const MiKarma: React.FC = () => {
                                             </Text>
                                             <View style={[styles.podiumBar, styles.podiumBar2]}>
                                                 <Text style={styles.podiumPoints}>
-                                                    ¡{karmaData.participants[1].points} puntos!
+                                                    {t('myKarma.pointsCount', { points: karmaData.participants[1].points })}
                                                 </Text>
                                             </View>
                                         </View>
@@ -245,7 +247,7 @@ const MiKarma: React.FC = () => {
                                             </Text>
                                             <View style={[styles.podiumBar, styles.podiumBar1]}>
                                                 <Text style={styles.podiumPoints}>
-                                                    ¡{karmaData.participants[0].points} puntos!
+                                                    {t('myKarma.pointsCount', { points: karmaData.participants[0].points })}
                                                 </Text>
                                             </View>
                                         </View>
@@ -262,7 +264,7 @@ const MiKarma: React.FC = () => {
                                             </Text>
                                             <View style={[styles.podiumBar, styles.podiumBar3]}>
                                                 <Text style={styles.podiumPoints}>
-                                                    ¡{karmaData.participants[2].points} puntos!
+                                                    {t('myKarma.pointsCount', { points: karmaData.participants[2].points })}
                                                 </Text>
                                             </View>
                                         </View>
@@ -293,7 +295,7 @@ const MiKarma: React.FC = () => {
                                                 <Text style={styles.listPoints}>
                                                     {participant.points}
                                                 </Text>
-                                                <Text style={styles.listPointsLabel}> pts</Text>
+                                                <Text style={styles.listPointsLabel}> {t('myKarma.points')}</Text>
                                             </View>
                                             {index === 0 && (
                                                 <View style={styles.listKarmaBadge}>
@@ -307,9 +309,6 @@ const MiKarma: React.FC = () => {
 
                             {/* View Mode Selector - Debajo del podio/lista */}
                             <View style={styles.viewModeContainerBottom}>
-                            </View>
-                            {/* Combined Switch and Button */}
-                            <View style={styles.switchAndButtonContainer}>
                                 {/* Ranking Type Selector */}
                                 <View style={styles.selectorContainerInline}>
                                     <TouchableOpacity
@@ -317,7 +316,7 @@ const MiKarma: React.FC = () => {
                                         onPress={() => setRankingType('total')}
                                     >
                                         <Text style={[styles.selectorButtonTextInline, rankingType === 'total' && styles.selectorButtonTextActiveInline]}>
-                                            Total
+                                            {t('myKarma.rankingTotal')}
                                         </Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
@@ -325,7 +324,7 @@ const MiKarma: React.FC = () => {
                                         onPress={() => setRankingType('mensual')}
                                     >
                                         <Text style={[styles.selectorButtonTextInline, rankingType === 'mensual' && styles.selectorButtonTextActiveInline]}>
-                                            Mensual
+                                            {t('myKarma.rankingMonthly')}
                                         </Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
@@ -333,11 +332,11 @@ const MiKarma: React.FC = () => {
                                         onPress={() => setRankingType('semanal')}
                                     >
                                         <Text style={[styles.selectorButtonTextInline, rankingType === 'semanal' && styles.selectorButtonTextActiveInline]}>
-                                            Semanal
+                                            {t('myKarma.rankingWeekly')}
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
-
+ 
                                 {/* View Mode Button */}
                                 <TouchableOpacity
                                     style={styles.viewModeButton}
@@ -349,7 +348,7 @@ const MiKarma: React.FC = () => {
                                         color={COLORS.accent}
                                     />
                                     <Text style={styles.viewModeButtonText}>
-                                        {viewMode === 'podio' ? 'Ver lista' : 'Ver podio'}
+                                        {viewMode === 'podio' ? t('myKarma.viewList') : t('myKarma.viewPodium')}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -359,7 +358,7 @@ const MiKarma: React.FC = () => {
                         <View style={styles.sectionContainer}>
                             <View style={styles.subsectionHeader}>
                                 <Text style={styles.subsectionTitle}>
-                                    Estado de las tareas
+                                    {t('myKarma.taskStatus')}
                                 </Text>
                                 <View style={styles.underline} />
                             </View>
