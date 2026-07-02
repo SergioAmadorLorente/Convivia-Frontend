@@ -5,23 +5,24 @@ import useLoadFonts from "../hooks/useLoadFonts";
 import Logo from "../components/ui/Logo";
 import Button from "../components/ui/Button";
 import GLOBAL_STYLES from "../styles/styles";
+import { useTranslation } from "react-i18next";
 
 const Main: React.FC = () => {
   const navigation = useNavigation<any>();
   const fontsLoaded = useLoadFonts();
+  const { t, i18n } = useTranslation();
 
   return (
     <ScrollView
       contentContainerStyle={GLOBAL_STYLES.scrollContainer}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={GLOBAL_STYLES.titulo}>¡Hola!</Text>
-      <Text style={GLOBAL_STYLES.subtitulo}>Bienvenido a Convivia</Text>
+      <Text style={GLOBAL_STYLES.titulo}>{t('main.hello')}</Text>
+      <Text style={GLOBAL_STYLES.subtitulo}>{t('main.welcome')}</Text>
 
       <View>
         <Text style={GLOBAL_STYLES.parrafo}>
-          Organiza, colabora y cumple tus metas junto a tus compañeros.{"\n"}
-          ¡Aquí la productividad es compartida y las ideas fluyen en sintonía!
+          {t('main.description')}
         </Text>
       </View>
 
@@ -31,13 +32,13 @@ const Main: React.FC = () => {
         style={GLOBAL_STYLES.buttonPrimaryGreen}
         onPress={() => navigation.navigate("CrearCuenta")}
       >
-        Crea una cuenta
+        {t('main.createAccount')}
       </Button>
       <Button
         style={GLOBAL_STYLES.buttonSecondaryGrey}
         onPress={() => navigation.navigate("IniciarSesion")}
       >
-        Inicia sesión
+        {t('main.login')}
       </Button>
 
     </ScrollView>
