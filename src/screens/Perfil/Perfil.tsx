@@ -158,7 +158,9 @@ const Perfil: React.FC = () => {
                 style={[styles.editButton, { marginRight: 5 }]}
                 onPress={() => setLangModalVisible(true)}
               >
-                <Ionicons name="flag-outline" size={20} color="#ACBF8A" />
+                <Text style={{ fontSize: 20 }}>
+                  {i18n.language.startsWith("es") ? "🇪🇸" : "🇬🇧"}
+                </Text>
               </TouchableOpacity>
 
               {/* Edit Icon */}
