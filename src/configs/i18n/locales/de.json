@@ -1,0 +1,515 @@
+{
+    "main": {
+        "hello": "Hallo!",
+        "welcome": "Willkommen bei Convivia",
+        "description": "Organisiere, arbeite zusammen und erreiche deine Ziele gemeinsam mit deinen Mitbewohnern.\nHier wird Produktivität geteilt und Ideen fließen harmonisch zusammen!",
+        "createAccount": "Konto erstellen",
+        "login": "Anmelden"
+    },
+    "bottomBar": {
+        "home": "Startseite",
+        "create": "Erstellen",
+        "profile": "Profil",
+        "createInvoice": "Neue Rechnung erstellen",
+        "createTask": "Neue Aufgabe erstellen"
+    },
+    "common": {
+        "accept": "Akzeptieren",
+        "cancel": "Abbrechen",
+        "error": "Fehler",
+        "success": "Erfolg",
+        "save": "Änderungen speichern",
+        "loading": "Wird geladen...",
+        "continue": "Weiter",
+        "back": "Zurück",
+        "close": "Schließen"
+    },
+    "profile": {
+        "title": "Mein Profil",
+        "karmaPoints": "Karma-Punkte: {{points}}",
+        "menu": {
+            "karma": "Mein Karma",
+            "residences": "Meine Wohnungen",
+            "faq": "Häufig gestellte Fragen",
+            "legal": "Rechtliche Informationen",
+            "pro": "Convivia PRO",
+            "logout": "Abmelden"
+        },
+        "logoutPopup": {
+            "title": "Möchtest du dich wirklich abmelden?",
+            "cancel": "Abbrechen",
+            "confirm": "Abmelden"
+        },
+        "language": {
+            "select": "Sprache auswählen",
+            "spanish": "Spanisch",
+            "english": "Englisch"
+        }
+    },
+    "welcome": {
+        "title": "Dein gemeinsamer Wohnraum beginnt hier.\nWie möchtest du teilnehmen?",
+        "createButton": "Neue Wohnung erstellen",
+        "joinButton": "Einer Wohnung beitreten",
+        "logoutPopup": {
+            "title": "Möchtest du dich wirklich abmelden?",
+            "cancel": "Abbrechen",
+            "confirm": "Abmelden"
+        }
+    },
+    "newResidence": {
+        "title": "Neue Wohnung erstellen",
+        "subtitle": "Den Code deiner Wohnung findest du im Bereich ",
+        "subtitleLink": "Profil – Meine Wohnung",
+        "nameLabel": "Name der Wohnung",
+        "namePlaceholder": "Wohnung Berlin",
+        "createButton": "Erstellen",
+        "errorMinChars": "Der Name muss mindestens 2 Zeichen enthalten.",
+        "errorEmpty": "Bitte gib einen gültigen Namen ein.",
+        "errorMaxChars": "Der Name darf höchstens 80 Zeichen lang sein.",
+        "popups": {
+            "alreadyHasResidence": {
+                "title": "Du hast bereits eine Wohnung",
+                "description": "Pro Konto kann nur eine Wohnung erstellt werden. Du wirst zum Dashboard weitergeleitet.",
+                "goToDashboard": "Zum Dashboard"
+            },
+            "requiredField": {
+                "title": "Pflichtfeld",
+                "description": "Bitte gib einen gültigen Namen für die Wohnung ein."
+            },
+            "invalidName": "Ungültiger Name",
+            "authError": {
+                "title": "Authentifizierungsfehler",
+                "description": "Du musst angemeldet sein, um eine Wohnung zu erstellen."
+            },
+            "createdWithWarning": {
+                "title": "Wohnung mit Hinweis erstellt",
+                "understood": "Verstanden"
+            },
+            "created": {
+                "title": "Wohnung erstellt",
+                "description": "Du findest sie später unter Profil > Meine Wohnung.",
+                "start": "Los geht's!"
+            },
+            "genericError": {
+                "title": "Fehler",
+                "description": "Die Wohnung konnte nicht erstellt werden. Bitte versuche es erneut."
+            }
+        }
+    },
+    "joinResidence": {
+        "title": "Einer Wohnung beitreten",
+        "subtitle": "Den Code der Wohnung erhältst du im Bereich ",
+        "subtitleLink": "Profil – Meine Wohnung",
+        "codeLabel": "Wohnungscode",
+        "joinButton": "Beitreten",
+        "popups": {
+            "invalidCode": {
+                "title": "Ungültiger Code",
+                "description": "Bitte gib einen gültigen Code ein."
+            },
+            "sessionError": {
+                "title": "Sitzungsfehler",
+                "description": "Kein angemeldeter Benutzer wurde erkannt."
+            },
+            "alreadyMember": {
+                "title": "Du bist bereits Mitglied!",
+                "goHome": "Zur Startseite"
+            },
+            "joinSuccess": {
+                "title": "Erfolg"
+            },
+            "notFound": {
+                "title": "Wohnung nicht gefunden",
+                "description": "Der eingegebene Code gehört zu keiner bestehenden Wohnung. Bitte überprüfe ihn und versuche es erneut."
+            },
+            "genericError": {
+                "title": "Fehler",
+                "description": "Der Beitritt zur Wohnung war nicht möglich. Bitte versuche es später erneut."
+            }
+        }
+    },
+    "login": {
+        "title": "Anmelden",
+        "subtitle": "Du bist nur noch einen Schritt davon entfernt, Convivia zu nutzen!",
+        "emailLabel": "E-Mail-Adresse",
+        "emailPlaceholder": "benutzer@domain.de",
+        "passwordLabel": "Passwort",
+        "recoverPassword": "Passwort vergessen",
+        "rememberMe": "Angemeldet bleiben",
+        "loginButton": "Anmelden",
+        "popups": {
+            "emailNotVerified": {
+                "title": "Fehler",
+                "description": "Deine E-Mail-Adresse wurde noch nicht bestätigt. Bitte überprüfe dein Postfach."
+            },
+            "welcomeBack": {
+                "title": "Willkommen zurück!",
+                "description": "Weiterleitung zu deiner Wohnung..."
+            },
+            "loginOk": {
+                "title": "Erfolg",
+                "description": "Anmeldung erfolgreich. Erstelle eine Wohnung oder tritt einer bei, um fortzufahren."
+            },
+            "loginOkSimple": {
+                "title": "Erfolg",
+                "description": "Anmeldung erfolgreich"
+            },
+            "wrongCredentials": {
+                "title": "Fehler",
+                "description": "Falsche Zugangsdaten oder Benutzer existiert nicht."
+            }
+        }
+    },
+    "recoverPassword": {
+        "title": "Passwort zurücksetzen",
+        "subtitle": "Hast du dein Passwort vergessen?",
+        "emailLabel": "E-Mail-Adresse",
+        "helperText": "Gib deine E-Mail-Adresse ein. Wir senden dir einen Link zum Erstellen eines neuen Passworts.\n\nDie E-Mail-Adresse muss gültig sein, z. B.: benutzer@domain.de",
+        "sendButton": "E-Mail senden",
+        "popups": {
+            "sent": {
+                "title": "E-Mail gesendet",
+                "description": "Wir haben dir einen Link zum Zurücksetzen deines Passworts geschickt. Bitte überprüfe deinen Posteingang."
+            },
+            "userNotFound": "Für diese E-Mail-Adresse wurde kein Konto gefunden.",
+            "invalidEmail": "Die eingegebene E-Mail-Adresse ist ungültig.",
+            "cantSend": "Die E-Mail konnte nicht gesendet werden.",
+            "errorTitle": "Fehler"
+        }
+    },
+    "createAccount": {
+        "title": "Konto erstellen",
+        "subtitle": "Möchtest du deine Erfahrung mit Convivia beginnen?",
+        "nameLabel": "Name",
+        "namePlaceholder": "Dein Name",
+        "emailLabel": "E-Mail-Adresse",
+        "emailPlaceholder": "benutzer@domain.de",
+        "passwordLabel": "Passwort",
+        "confirmPasswordLabel": "Passwort bestätigen",
+        "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+        "passwordRequirements": "Passwortanforderungen:",
+        "validPassword": "✓ Gültiges Passwort",
+        "reqLength": "Mindestens 8 Zeichen",
+        "reqUppercase": "Mindestens ein Großbuchstabe",
+        "reqNumber": "Mindestens eine Zahl",
+        "termsLabel": "Allgemeine Geschäftsbedingungen",
+        "privacyLabel": "Datenschutz- und Cookie-Richtlinie",
+        "createButton": "Konto erstellen",
+        "resendButton": "Bestätigung erneut senden",
+        "resendText": "Erneut senden in {{seconds}} Sek.",
+        "sendVerification": "Bestätigung senden",
+        "emailUsed": "Diese E-Mail-Adresse wird bereits verwendet.",
+        "genericError": "Fehler beim Erstellen des Kontos.",
+        "verificationTitle": "Bestätige deine E-Mail-Adresse",
+        "verificationDescription": "Wir haben dir einen Bestätigungslink geschickt. Bitte überprüfe deinen Posteingang und klicke auf den Link.",
+        "popups": {
+            "verificationSent": {
+                "title": "Bestätigung gesendet!",
+                "description": "Bitte überprüfe deinen Posteingang sowie den Spam-Ordner."
+            }
+        }
+    },
+    "dashboard": {
+        "greeting": "Hallo {{username}}, heute ist",
+        "tabs": {
+            "tasks": "Aufgaben",
+            "invoices": "Rechnungen"
+        },
+        "sections": {
+            "pending": "Ausstehend",
+            "pendingPayment": "Ausstehende Zahlungen",
+            "overdue": "Überfällig",
+            "completed": "Abgeschlossen",
+            "paid": "Bezahlt"
+        },
+        "noInvoices": "Deinem Benutzer sind keine Rechnungen zugewiesen.",
+        "filter": {
+            "title": "Filtern",
+            "accessibilityOpen": "Filter öffnen",
+            "when": "Wann",
+            "show": "Anzeigen",
+            "today": "Heute",
+            "week": "Diese Woche",
+            "all": "Alle",
+            "unassigned": "Nicht zugewiesene Aufgaben",
+            "overdue": "Überfällig",
+            "completed": "Abgeschlossen"
+        }
+    },
+    "createTask": {
+        "titleCreate": "Aufgabe erstellen",
+        "titleEdit": "Aufgabe bearbeiten",
+        "namePlaceholder": "Name",
+        "descriptionPlaceholder": "Beschreibung (optional)",
+        "dateTimeLimit": "Fälligkeitsdatum und Uhrzeit",
+        "repeat": "Aufgabenwiederholung",
+        "karma": "Karma-Punkte",
+        "buttonSave": "Benutzer zuweisen und speichern",
+        "buttonCreate": "Benutzer zuweisen und erstellen",
+        "saving": "Wird gespeichert...",
+        "errorEmptyName": "Der Name darf nicht leer sein.",
+        "popups": {
+            "requiredName": {
+                "title": "Pflichtfeld",
+                "description": "Bitte gib einen Namen für die Aufgabe ein."
+            },
+            "requiredDate": {
+                "title": "Datum erforderlich",
+                "description": "Bitte wähle ein Fälligkeitsdatum oder Wiederholungstage aus."
+            },
+            "authError": {
+                "title": "Authentifizierungsfehler",
+                "description": "Du musst angemeldet sein, um eine Aufgabe zu erstellen."
+            },
+            "successCreated": {
+                "title": "Aufgabe erstellt",
+                "description": "Die Aufgabe wurde erfolgreich erstellt."
+            },
+            "successUpdated": {
+                "title": "Aufgabe aktualisiert",
+                "description": "Die Aufgabe wurde erfolgreich aktualisiert."
+            },
+            "error": {
+                "title": "Fehler",
+                "description": "Beim Erstellen der Aufgabe ist ein Fehler aufgetreten. Bitte versuche es erneut."
+            }
+        }
+    },
+    "createInvoice": {
+        "titleCreate": "Rechnung erstellen",
+        "titleEdit": "Rechnung bearbeiten",
+        "namePlaceholder": "Name",
+        "descriptionPlaceholder": "Beschreibung",
+        "price": "Preis",
+        "assignToCompanions": "Mitbewohner zuweisen",
+        "assignButton": "Benutzer der Rechnung zuweisen",
+        "statusPending": "Ausstehend",
+        "statusPaid": "Bezahlt",
+        "photoOptional": "Foto (optional)",
+        "photoLabel": "Rechnungsbild",
+        "createButton": "Rechnung erstellen",
+        "toasts": {
+            "mustAssignUser": "Du musst mindestens einen Benutzer zuweisen.",
+            "updatedSuccess": "Erfolgreich aktualisiert.",
+            "createdSuccess": "Erfolgreich erstellt.",
+            "saveError": "Die Rechnung konnte nicht gespeichert werden."
+        }
+    },
+    "faq": {
+        "title": "Häufig gestellte Fragen",
+        "subtitle": "Hier findest du Antworten auf die häufigsten Fragen.",
+        "q1": "Wie füge ich Mitglieder zu einer Wohnung hinzu?",
+        "a1": "Um Mitglieder hinzuzufügen, muss die betreffende Person den vom Administrator generierten Code auf der Seite zum Beitritt zu einer Wohnung eingeben.",
+        "q2": "Wie verwalte ich eine Rechnung?",
+        "a2": "Gehe einfach im Bereich „Mein Profil“ zu „Meine Rechnungen“.",
+        "q3": "Wie entferne ich ein Mitglied aus einer Wohnung?",
+        "a3": "Der Administrator kann ein Mitglied im Bereich „Meine Wohnung“ entfernen. Mitglieder können die Wohnung dort auch selbst verlassen.",
+        "q4": "Wie erstelle ich eine Wohnung?",
+        "a4": "Nach der Registrierung kannst du über die Option „Wohnung erstellen“ eine neue Wohnung anlegen.",
+        "q5": "Wie verwalte ich eine Aufgabe?",
+        "a5": "Unter „Mein Profil“ kannst du Aufgaben verwalten. Dort kannst du Fälligkeitsdatum, zugewiesene Mitglieder und weitere Einstellungen bearbeiten."
+    },
+    "infoLegal": {
+        "title": "Rechtliche Informationen",
+        "termsButton": "Nutzungsbedingungen",
+        "privacyButton": "Datenschutz- und Cookie-Richtlinie"
+    },
+    "myKarma": {
+        "title": "Mein Karma",
+        "totalPoints": "Gesamtpunkte",
+        "monthPoints": "diesen Monat",
+        "weekPoints": "diese Woche",
+        "completedTasks": "Abgeschlossen",
+        "pendingTasks": "Ausstehend",
+        "lateTasks": "Überfällig",
+        "rankingTitle": "Rangliste",
+        "rankingTotal": "Gesamt",
+        "rankingMonthly": "Monatlich",
+        "rankingWeekly": "Wöchentlich",
+        "viewPodium": "Podium anzeigen",
+        "viewList": "Liste anzeigen",
+        "points": "Pkt.",
+        "noData": "Keine Daten verfügbar",
+        "loading": "Statistiken werden geladen...",
+        "noTasks": "Keine Aufgaben vorhanden",
+        "emptyDescription": "Beginne Aufgaben zu erledigen, sammle Karma-Punkte und sieh dir hier deine Statistiken an.",
+        "backProfile": "Zurück zum Profil",
+        "pointsCount": "{{points}} Punkte!",
+        "ofKarma": "Karma",
+        "statsTitle": "Statistiken",
+        "karmaKing": "Karma-König",
+        "taskStatus": "Aufgabenstatus"
+    },
+    "myResidence": {
+        "title": "Meine Wohnungen",
+        "codeLabel": "Code deiner Wohnung",
+        "codeCopied": "Kopiert!",
+        "generateCode": "Code generieren",
+        "participants": "Teilnehmer",
+        "loadingParticipants": "Teilnehmer werden geladen...",
+        "karmaPointsCount": "{{points}} Karma-Punkte",
+        "settings": "Einstellungen",
+        "leaveResidence": "Wohnung verlassen",
+        "deleteResidence": "Wohnung löschen",
+        "removeParticipant": "Aus der Wohnung entfernen",
+        "errors": {
+            "memberNotFound": "Deine Mitgliedsinformationen konnten nicht gefunden werden.",
+            "leaveError": "Beim Verlassen der Wohnung ist ein Fehler aufgetreten.",
+            "deleteError": "Beim Löschen der Wohnung ist ein Fehler aufgetreten.",
+            "cannotRemoveSelf": "Du kannst dich nicht selbst entfernen."
+        },
+        "toasts": {
+            "getMemberError": "Fehler beim Abrufen der Teilnehmerdaten.",
+            "memberRemoved": "Teilnehmer aus der Wohnung entfernt.",
+            "removeMemberError": "Fehler beim Entfernen des Teilnehmers."
+        },
+        "popups": {
+            "leaveTitle": "Möchtest du diese Wohnung wirklich verlassen?",
+            "leaveDescription": "Du verlierst alle deine Karma-Punkte.",
+            "leaveConfirm": "Verlassen",
+            "deleteTitle": "Möchtest du diese Wohnung wirklich löschen?",
+            "deleteDescription": "Alle Daten, Aufgaben und Rechnungen dieser Wohnung werden gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+            "deleteConfirm": "Löschen",
+            "removeTitle": "Diesen Teilnehmer entfernen?",
+            "removeTitleWithName": "Möchtest du {{name}} wirklich entfernen?",
+            "removeDescription": "Der Teilnehmer wird aus der Wohnung entfernt und verliert den Zugriff auf alle gemeinsamen Daten.",
+            "removeConfirm": "Entfernen"
+        }
+    },
+    "editResidence": {
+        "title": "Meine Wohnung bearbeiten",
+        "nameLabel": "Name der Wohnung",
+        "locationLabel": "Standort",
+        "locationPlaceholder": "Musterstraße 123 (optional)",
+        "searchingLocation": "Standort wird gesucht...",
+        "mapLabel": "Standort auf der Karte",
+        "saveButton": "Speichern!",
+        "errors": {
+            "emptyName": "Bitte gib einen Namen für die Wohnung ein.",
+            "updateError": "Beim Aktualisieren der Wohnung ist ein Fehler aufgetreten."
+        },
+        "popups": {
+            "success": {
+                "title": "Erfolg",
+                "description": "Die Wohnung wurde erfolgreich aktualisiert."
+            },
+            "error": {
+                "title": "Fehler",
+                "description": "Die Wohnung konnte nicht aktualisiert werden."
+            }
+        }
+    },
+    "editProfile": {
+        "title": "Profil bearbeiten",
+        "namePlaceholder": "Name",
+        "phonePlaceholder": "Telefon",
+        "emailPlaceholder": "E-Mail-Adresse",
+        "changePassword": "Passwort ändern",
+        "currentPassword": "Aktuelles Passwort",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Passwort bestätigen",
+        "passwordHint": "* Mindestens 8 Zeichen und mindestens eine Zahl.",
+        "saveButton": "Änderungen speichern",
+        "popups": {
+            "userNotFound": {
+                "title": "Fehler",
+                "description": "Benutzer konnte nicht identifiziert werden."
+            },
+            "invalidPassword": {
+                "title": "Fehler",
+                "description": "Das Passwort muss mindestens 8 Zeichen und eine Zahl enthalten."
+            },
+            "passwordMismatch": {
+                "title": "Fehler",
+                "description": "Die neuen Passwörter stimmen nicht überein."
+            },
+            "wrongCurrentPassword": {
+                "title": "Fehler",
+                "description": "Das aktuelle Passwort ist nicht korrekt."
+            },
+            "success": {
+                "title": "Erfolg",
+                "description": "Das Profil wurde erfolgreich aktualisiert."
+            },
+            "updateError": {
+                "title": "Fehler",
+                "description": "Das Profil konnte nicht aktualisiert werden."
+            }
+        }
+    },
+    "conviviaPro": {
+        "feature1": "PRO-Vorteil: Unbegrenzte Wohnungen",
+        "feature2": "PRO-Vorteil: 24/7-Support",
+        "plan1Month": "1 Monat",
+        "plan12Months": "12 Monate",
+        "trialInfo": "Starte deine 7-tägige kostenlose Testversion.",
+        "trialCancel": "Jederzeit kündbar.",
+        "subscribeButton": "Kostenlos testen und abonnieren"
+    },
+    "taskDetail": {
+        "pointsPill": "{{points}} Punkte",
+        "assignedUser": "Zugewiesener Benutzer",
+        "unassigned": "Nicht zugewiesen",
+        "edit": "Bearbeiten",
+        "unmark": "Markierung entfernen",
+        "complete": "Abschließen"
+    },
+    "facturaDetail": {
+        "totalPrice": "Gesamtbetrag",
+        "pricePerPerson": "Preis pro Person",
+        "photos": "Fotos",
+        "invoiceImage": "Rechnungsbild",
+        "assignedUsers": "Zugewiesene Benutzer",
+        "paid": "Bezahlt",
+        "pending": "Ausstehend",
+        "noAssignedUsers": "Keine Benutzer zugewiesen",
+        "paidCounter": "{{pagados}}/{{total}} bezahlt",
+        "createdDate": "Erstellt am: {{date}}"
+    },
+    "politicaCookies": {
+        "title": "Datenschutzrichtlinie",
+        "intro": "Bei Convivia verpflichten wir uns, deine Privatsphäre zu schützen und dir eine positive Erfahrung auf unserer Plattform zu bieten.",
+        "section1Title": "Welche Informationen wir sammeln",
+        "section1Body": "Wir erfassen Informationen, die du uns direkt zur Verfügung stellst, wie deine E-Mail-Adresse und Profildaten. Darüber hinaus sammeln wir automatisch bestimmte Informationen über dein Gerät und darüber, wie du unsere Dienste nutzt.",
+        "section2Title": "Wie wir deine Informationen verwenden",
+        "section2Body": "Wir verwenden deine Informationen, um unsere Dienste bereitzustellen, zu betreiben und zu verbessern, mit dir zu kommunizieren und gesetzlichen Verpflichtungen nachzukommen. Deine Daten helfen uns außerdem dabei, deine Erfahrung zu personalisieren und unsere Plattform kontinuierlich zu verbessern.",
+        "section3Title": "Cookies und ähnliche Technologien",
+        "section3Body": "Cookies sind kleine Dateien, die auf deinem Gerät gespeichert werden und uns dabei helfen, deine Einstellungen zu speichern und zu verstehen, wie du unsere Dienste nutzt. Wir verwenden notwendige Cookies für die Funktionalität, Analyse-Cookies zur Verbesserung unserer Dienste sowie Präferenz-Cookies, um deine Einstellungen zu speichern.",
+        "section4Title": "Datensicherheit",
+        "section4Body": "Wir setzen geeignete Sicherheitsmaßnahmen ein, um deine personenbezogenen Daten vor unbefugtem Zugriff zu schützen. Dennoch ist keine Methode der Datenübertragung über das Internet vollständig sicher.",
+        "section5Title": "Deine Datenschutzrechte",
+        "section5Body": "Du hast das Recht, auf deine personenbezogenen Daten zuzugreifen, sie zu aktualisieren oder zu löschen. Außerdem kannst du deine Cookie-Einstellungen über deinen Browser verwalten. Wenn du weitere Informationen über deine Rechte benötigst, kontaktiere uns bitte direkt.",
+        "section6Title": "Unsere Cookie-Richtlinie",
+        "section6Body": "Cookies sind ein wesentlicher Bestandteil der Funktionsweise von Convivia. Sie ermöglichen es uns, deine Sitzung und deine Einstellungen zu speichern und dein Nutzungserlebnis zu verbessern. Verschiedene Arten von Cookies erfüllen unterschiedliche Aufgaben auf unserer Plattform.",
+        "section7Title": "Notwendige Cookies",
+        "section7Body": "Diese Cookies sind für den ordnungsgemäßen Betrieb der Website erforderlich. Sie ermöglichen grundlegende Funktionen wie sichere Anmeldung, Benutzerauthentifizierung und Navigation. Ohne diese Cookies funktioniert die Website nicht korrekt.",
+        "section8Title": "Leistungs- und Analyse-Cookies",
+        "section8Body": "Diese Cookies helfen uns zu verstehen, wie Besucher unsere Plattform nutzen. Dadurch können wir beliebte Funktionen erkennen, Fehler beheben und die Gesamtleistung von Convivia verbessern. Diese Daten werden anonym erhoben.",
+        "section9Title": "Präferenz- und Funktions-Cookies",
+        "section9Body": "Diese Cookies speichern deine Einstellungen, um dir ein personalisiertes Erlebnis zu bieten. Dazu gehören beispielsweise Sprache, Design und weitere Konfigurationen. Wenn sie deaktiviert werden, stehen möglicherweise einige Funktionen nicht mehr vollständig zur Verfügung.",
+        "section10Title": "Verwaltung deiner Cookies",
+        "section10Body": "Die meisten Browser ermöglichen dir die Verwaltung von Cookies über ihre Einstellungen. Du kannst alle Cookies akzeptieren, nicht notwendige Cookies ablehnen oder bei jedem Cookie gefragt werden. Bitte beachte, dass das Blockieren von Cookies deine Nutzung von Convivia beeinträchtigen kann.",
+        "section11Title": "Cookies von Drittanbietern",
+        "section11Body": "Einige unserer Dienstleister können Cookies auf deinem Gerät speichern, um die Nutzung der Plattform zu analysieren oder plattformbezogene Dienste bereitzustellen. Für die Datenschutzpraktiken dieser Drittanbieter übernehmen wir keine Verantwortung."
+    },
+    "terminosCondiciones": {
+        "title": "Nutzungsbedingungen",
+        "intro": "Durch die Nutzung von Convivia erklärst du dich mit diesen Nutzungsbedingungen einverstanden. Bitte lies sie sorgfältig durch, bevor du unsere Dienste nutzt.",
+        "section1Title": "Nutzungslizenz",
+        "section1Body": "Es ist gestattet, vorübergehend eine Kopie der Materialien von Convivia ausschließlich für den persönlichen und nicht kommerziellen Gebrauch herunterzuladen. Dies stellt die Gewährung einer Lizenz und keine Eigentumsübertragung dar. Im Rahmen dieser Lizenz ist Folgendes nicht gestattet:",
+        "section1Item1": "• Materialien zu verändern oder zu kopieren",
+        "section1Item2": "• Materialien für kommerzielle Zwecke oder öffentliche Vorführungen zu verwenden",
+        "section1Item3": "• Software von Convivia zu dekompilieren oder zurückzuentwickeln",
+        "section2Title": "Pflichten des Benutzers",
+        "section2Body": "Als Benutzer von Convivia verpflichtest du dich:",
+        "section2Item1": "• korrekte und wahrheitsgemäße Informationen bereitzustellen",
+        "section2Item2": "• die Plattform verantwortungsvoll und im Einklang mit den geltenden Gesetzen zu nutzen",
+        "section2Item3": "• keine Belästigung, Diskriminierung oder rechtswidrige Aktivitäten zu betreiben",
+        "section3Title": "Haftungsbeschränkung",
+        "section3Body": "Convivia wird „wie besehen“ ohne jegliche Garantie bereitgestellt. Wir haften nicht für indirekte, zufällige, besondere oder Folgeschäden sowie Strafschadensersatz, die sich aus der Nutzung oder der Unmöglichkeit der Nutzung der Plattform ergeben.",
+        "section4Title": "Änderungen der Nutzungsbedingungen",
+        "section4Body": "Convivia behält sich das Recht vor, diese Nutzungsbedingungen jederzeit zu ändern. Änderungen treten unmittelbar nach ihrer Veröffentlichung auf der Plattform in Kraft. Die fortgesetzte Nutzung der Plattform gilt als Zustimmung zu den geänderten Bedingungen.",
+        "section5Title": "Kontakt",
+        "section5Body": "Wenn du Fragen oder Anliegen zu diesen Nutzungsbedingungen hast, kontaktiere uns bitte über unsere Support-Kanäle."
+    }
+}

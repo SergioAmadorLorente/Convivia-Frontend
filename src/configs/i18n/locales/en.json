@@ -43,7 +43,10 @@
     "language": {
       "select": "Select Language",
       "spanish": "Spanish",
-      "english": "English"
+      "english": "English",
+      "french": "French",
+      "italian": "Italian",
+      "german": "German"
     }
   },
   "welcome": {
@@ -465,5 +468,51 @@
     "noAssignedUsers": "No assigned users",
     "paidCounter": "{{pagados}}/{{total}} paid",
     "createdDate": "Created: {{date}}"
+  },
+  "politicaCookies": {
+    "title": "Privacy Policy",
+    "intro": "At Convivia, we are committed to protecting your privacy and ensuring you have a positive experience on our platform.",
+    "section1Title": "Information We Collect",
+    "section1Body": "We collect information you provide directly, such as your email address and profile information. We also automatically collect certain information about your device and how you interact with our services.",
+    "section2Title": "How We Use Your Information",
+    "section2Body": "We use your information to provide, maintain and improve our services, communicate with you and comply with legal obligations. Your data helps us personalize your experience and improve our platform.",
+    "section3Title": "Cookies and Similar Technologies",
+    "section3Body": "Cookies are small files stored on your device that help us remember your preferences and understand how you use our services. We use essential cookies for functionality, analytical cookies to improve our services, and preference cookies to remember your settings.",
+    "section4Title": "Data Security",
+    "section4Body": "We implement appropriate security measures to protect your personal information from unauthorized access. However, no method of internet transmission is completely secure.",
+    "section5Title": "Your Privacy Rights",
+    "section5Body": "You have the right to access, update or delete your personal information. You can also control cookie preferences through your browser settings. For more information about your rights, please contact us directly.",
+    "section6Title": "Our Cookie Policy",
+    "section6Body": "Cookies are essential to how Convivia operates. They allow us to remember your session state, preferences, and enhance your overall experience. Different types of cookies serve different purposes on our platform.",
+    "section7Title": "Essential Cookies",
+    "section7Body": "These cookies are necessary for the website to function properly. They enable core functionality such as secure login, user authentication, and basic site navigation. You cannot disable these cookies without preventing the site from working.",
+    "section8Title": "Performance and Analytics Cookies",
+    "section8Body": "We use these cookies to understand how visitors interact with our platform. They help us identify which features are most popular, track errors, and measure the overall performance of Convivia. This data is collected anonymously.",
+    "section9Title": "Preference and Functionality Cookies",
+    "section9Body": "These cookies remember the choices you make to provide a personalized experience. For example, they store your language preference, theme settings, and custom layouts. Disabling them may result in reduced functionality.",
+    "section10Title": "Managing Your Cookies",
+    "section10Body": "Most browsers allow you to control cookies through their settings. You can choose to accept all cookies, reject non-essential cookies, or be asked each time a cookie is set. Please note that blocking cookies may impact your experience on Convivia.",
+    "section11Title": "Third-Party Cookies",
+    "section11Body": "Some of our service partners may place cookies on your device to analyze platform usage and provide services related to platform content and services. We are not responsible for the privacy practices of third parties."
+  },
+  "terminosCondiciones": {
+    "title": "Terms and Conditions of Use",
+    "intro": "By using Convivia, you agree to comply with these terms and conditions. Please read them carefully before using our services.",
+    "section1Title": "License of Use",
+    "section1Body": "You are permitted to temporarily download one copy of the materials on Convivia solely for personal, non-commercial transitory viewing. This is the grant of a license, not a transfer of title, and under this license you may not:",
+    "section1Item1": "• Modify or copy the materials",
+    "section1Item2": "• Use them for commercial purposes or for public display",
+    "section1Item3": "• Attempt to decompile or reverse engineer any software on Convivia",
+    "section2Title": "User Responsibilities",
+    "section2Body": "As a Convivia user, you agree to:",
+    "section2Item1": "• Provide accurate and truthful information",
+    "section2Item2": "• Use the platform responsibly and in accordance with the law",
+    "section2Item3": "• Not engage in harassment, discrimination or illegal activities",
+    "section3Title": "Limitation of Liability",
+    "section3Body": "Convivia provides the platform \"as is\" without warranties of any kind. We will not be liable for any indirect, incidental, special, consequential or punitive damages arising from your use or inability to use the platform.",
+    "section4Title": "Modifications to the Terms",
+    "section4Body": "Convivia reserves the right to modify these terms and conditions at any time. Changes will be effective immediately upon posting on the platform. Your continued use of the platform indicates your acceptance of such modifications.",
+    "section5Title": "Contact Us",
+    "section5Body": "If you have questions or concerns about these terms, please contact us through our support channels."
   }
 }

@@ -8,8 +8,11 @@ import {
 } from "@expo-google-fonts/montserrat";
 import GLOBAL_STYLES from "../../styles/styles";
 import { Desplegable } from "../../components/ui";
+import { useTranslation } from "react-i18next";
 
 const TerminosCondiciones: React.FC = () => {
+  const { t } = useTranslation();
+
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
     Montserrat_400Regular,
@@ -31,21 +34,17 @@ const TerminosCondiciones: React.FC = () => {
     >
       <View style={GLOBAL_STYLES.container}>
         <Text style={[GLOBAL_STYLES.titulo, { fontSize: 42 }]}>
-          Términos y Condiciones de Uso
+          {t("terminosCondiciones.title")}
         </Text>
 
         <View style={{ width: "85%", marginTop: 20 }}>
           <Text style={[GLOBAL_STYLES.subtitle, { marginBottom: 12 }]}>
-            Al usar Convivia, aceptas cumplir con estos términos y condiciones.
-            Léelos atentamente antes de utilizar nuestros servicios.
+            {t("terminosCondiciones.intro")}
           </Text>
 
-          <Desplegable title="Licencia de Uso">
+          <Desplegable title={t("terminosCondiciones.section1Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Se permite descargar temporalmente una copia de los materiales en
-              Convivia únicamente para visualización personal y transitoria sin
-              fines comerciales. Esto constituye la concesión de una licencia,
-              no una transferencia de título, y bajo esta licencia no puedes:
+              {t("terminosCondiciones.section1Body")}
             </Text>
             <Text
               style={[
@@ -53,7 +52,7 @@ const TerminosCondiciones: React.FC = () => {
                 { marginBottom: 12, marginLeft: 16 },
               ]}
             >
-              • Modificar o copiar los materiales
+              {t("terminosCondiciones.section1Item1")}
             </Text>
             <Text
               style={[
@@ -61,7 +60,7 @@ const TerminosCondiciones: React.FC = () => {
                 { marginBottom: 12, marginLeft: 16 },
               ]}
             >
-              • Utilizarlos con fines comerciales o para exhibición pública
+              {t("terminosCondiciones.section1Item2")}
             </Text>
             <Text
               style={[
@@ -69,14 +68,13 @@ const TerminosCondiciones: React.FC = () => {
                 { marginBottom: 12, marginLeft: 16 },
               ]}
             >
-              • Intentar descompilar o realizar ingeniería inversa de cualquier
-              software en Convivia
+              {t("terminosCondiciones.section1Item3")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Responsabilidades del Usuario">
+          <Desplegable title={t("terminosCondiciones.section2Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Como usuario de Convivia, aceptas:
+              {t("terminosCondiciones.section2Body")}
             </Text>
             <Text
               style={[
@@ -84,7 +82,7 @@ const TerminosCondiciones: React.FC = () => {
                 { marginBottom: 12, marginLeft: 16 },
               ]}
             >
-              • Proporcionar información precisa y veraz
+              {t("terminosCondiciones.section2Item1")}
             </Text>
             <Text
               style={[
@@ -92,7 +90,7 @@ const TerminosCondiciones: React.FC = () => {
                 { marginBottom: 12, marginLeft: 16 },
               ]}
             >
-              • Usar la plataforma de forma responsable y conforme a la ley
+              {t("terminosCondiciones.section2Item2")}
             </Text>
             <Text
               style={[
@@ -100,32 +98,25 @@ const TerminosCondiciones: React.FC = () => {
                 { marginBottom: 12, marginLeft: 16 },
               ]}
             >
-              • No participar en acoso, discriminación o actividades ilegales
+              {t("terminosCondiciones.section2Item3")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Limitación de Responsabilidad">
+          <Desplegable title={t("terminosCondiciones.section3Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Convivia proporciona la plataforma "tal cual" sin garantías de
-              ningún tipo. No seremos responsables por daños indirectos,
-              incidentales, especiales, consecuentes o punitivos derivados de tu
-              uso o de la imposibilidad de usar la plataforma.
+              {t("terminosCondiciones.section3Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Modificaciones a los Términos">
+          <Desplegable title={t("terminosCondiciones.section4Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Convivia se reserva el derecho de modificar estos términos y
-              condiciones en cualquier momento. Los cambios serán efectivos
-              inmediatamente al publicarse en la plataforma. Tu uso continuado
-              de la plataforma indica tu aceptación de dichas modificaciones.
+              {t("terminosCondiciones.section4Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Contáctanos">
+          <Desplegable title={t("terminosCondiciones.section5Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Si tienes preguntas o inquietudes sobre estos términos, por favor
-              contáctanos a través de nuestros canales de soporte.
+              {t("terminosCondiciones.section5Body")}
             </Text>
           </Desplegable>
         </View>

@@ -159,7 +159,11 @@ const Perfil: React.FC = () => {
                 onPress={() => setLangModalVisible(true)}
               >
                 <Text style={{ fontSize: 20 }}>
-                  {i18n.language.startsWith("es") ? "🇪🇸" : "🇬🇧"}
+                  {i18n.language.startsWith("es") ? "🇪🇸"
+                    : i18n.language.startsWith("fr") ? "🇫🇷"
+                    : i18n.language.startsWith("it") ? "🇮🇹"
+                    : i18n.language.startsWith("de") ? "🇩🇪"
+                    : "🇬🇧"}
                 </Text>
               </TouchableOpacity>
 
@@ -291,6 +295,60 @@ const Perfil: React.FC = () => {
             >
               <Text style={styles.langOptionText}>English 🇬🇧</Text>
               {i18n.language.startsWith("en") && (
+                <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            {/* Français Option */}
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                i18n.language.startsWith("fr") && styles.langOptionSelected
+              ]}
+              onPress={async () => {
+                await i18n.changeLanguage("fr");
+                await AsyncStorage.setItem("user-language", "fr");
+                setLangModalVisible(false);
+              }}
+            >
+              <Text style={styles.langOptionText}>Français 🇫🇷</Text>
+              {i18n.language.startsWith("fr") && (
+                <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            {/* Italiano Option */}
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                i18n.language.startsWith("it") && styles.langOptionSelected
+              ]}
+              onPress={async () => {
+                await i18n.changeLanguage("it");
+                await AsyncStorage.setItem("user-language", "it");
+                setLangModalVisible(false);
+              }}
+            >
+              <Text style={styles.langOptionText}>Italiano 🇮🇹</Text>
+              {i18n.language.startsWith("it") && (
+                <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            {/* Deutsch Option */}
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                i18n.language.startsWith("de") && styles.langOptionSelected
+              ]}
+              onPress={async () => {
+                await i18n.changeLanguage("de");
+                await AsyncStorage.setItem("user-language", "de");
+                setLangModalVisible(false);
+              }}
+            >
+              <Text style={styles.langOptionText}>Deutsch 🇩🇪</Text>
+              {i18n.language.startsWith("de") && (
                 <Ionicons name="checkmark" size={20} color={COLORS.primary} />
               )}
             </TouchableOpacity>

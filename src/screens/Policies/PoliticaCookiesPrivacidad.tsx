@@ -8,8 +8,11 @@ import {
 } from "@expo-google-fonts/montserrat";
 import GLOBAL_STYLES from "../../styles/styles";
 import { Desplegable } from "../../components/ui";
+import { useTranslation } from "react-i18next";
 
 const PoliticaCookiesPrivacidad: React.FC = () => {
+  const { t } = useTranslation();
+
   const [fontsLoaded] = useFonts({
     DMSerifDisplay_400Regular,
     Montserrat_400Regular,
@@ -30,115 +33,76 @@ const PoliticaCookiesPrivacidad: React.FC = () => {
       showsVerticalScrollIndicator={false}
     >
       <View style={GLOBAL_STYLES.container}>
-        <Text style={GLOBAL_STYLES.titulo}>Política de Privacidad</Text>
+        <Text style={GLOBAL_STYLES.titulo}>{t("politicaCookies.title")}</Text>
 
         <View style={{ width: "85%", marginTop: 20 }}>
           <Text style={[GLOBAL_STYLES.subtitle, { marginBottom: 12 }]}>
-            En Convivia, nos comprometemos a proteger tu privacidad y garantizar
-            que tengas una experiencia positiva en nuestra plataforma.
+            {t("politicaCookies.intro")}
           </Text>
 
-          <Desplegable title="Información que Recopilamos">
+          <Desplegable title={t("politicaCookies.section1Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Recopilamos información que proporcionas directamente, como tu
-              correo electrónico e información de perfil. También recopilamos
-              automáticamente cierta información sobre tu dispositivo y cómo
-              interactúas con nuestros servicios.
+              {t("politicaCookies.section1Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Cómo Utilizamos Tu Información">
+          <Desplegable title={t("politicaCookies.section2Title")}>
             <Text style={GLOBAL_STYLES.helperText}>
-              Utilizamos tu información para proporcionar, mantener y mejorar
-              nuestros servicios, comunicarnos contigo y cumplir con
-              obligaciones legales. Tus datos nos ayudan a personalizar tu
-              experiencia y mejorar nuestra plataforma.
+              {t("politicaCookies.section2Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Cookies y Tecnologías Similares">
+          <Desplegable title={t("politicaCookies.section3Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Las cookies son pequeños archivos almacenados en tu dispositivo
-              que nos ayudan a recordar tus preferencias y entender cómo
-              utilizas nuestros servicios. Utilizamos cookies esenciales para
-              funcionalidad, cookies analíticas para mejorar nuestros servicios,
-              y cookies de preferencia para recordar tus configuraciones.
+              {t("politicaCookies.section3Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Seguridad de Datos">
+          <Desplegable title={t("politicaCookies.section4Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 24 }]}>
-              Implementamos medidas de seguridad apropiadas para proteger tu
-              información personal del acceso no autorizado. Sin embargo, ningún
-              método de transmisión por internet es completamente seguro.
+              {t("politicaCookies.section4Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Tus Derechos de Privacidad">
+          <Desplegable title={t("politicaCookies.section5Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 24 }]}>
-              Tienes derecho a acceder, actualizar o eliminar tu información
-              personal. También puedes controlar las preferencias de cookies a
-              través de la configuración de tu navegador. Para más información
-              sobre tus derechos, por favor contactanos directamente.
+              {t("politicaCookies.section5Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Nuestra Política de Cookies">
+          <Desplegable title={t("politicaCookies.section6Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Las cookies son esenciales para cómo opera Convivia. Nos permiten
-              recordar tu estado de sesión, preferencias, y mejorar tu
-              experiencia general. Diferentes tipos de cookies sirven para
-              diferentes propósitos en nuestra plataforma.
+              {t("politicaCookies.section6Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Cookies Esenciales">
+          <Desplegable title={t("politicaCookies.section7Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Estas cookies son necesarias para que el sitio web funcione
-              correctamente. Habilitan funcionalidad principal como inicio de
-              sesión seguro, autenticación de usuario, y navegación básica del
-              sitio. No puedes desactivar estas cookies sin impedir que el sitio
-              funcione.
+              {t("politicaCookies.section7Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Cookies de Rendimiento y Análisis">
+          <Desplegable title={t("politicaCookies.section8Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Utilizamos estas cookies para entender cómo los visitantes
-              interactúan con nuestra plataforma. Nos ayudan a identificar qué
-              características son más populares, rastrear errores, y medir el
-              rendimiento general de Convivia. Estos datos se recopilan de forma
-              anónima.
+              {t("politicaCookies.section8Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Cookies de Preferencia y Funcionalidad">
+          <Desplegable title={t("politicaCookies.section9Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              Estas cookies recuerdan las opciones que haces para proporcionar
-              una experiencia personalizada. Por ejemplo, almacenan tu
-              preferencia de idioma, configuración de tema, y diseños
-              personalizados. Desactivarlas puede resultar en funcionalidad
-              reducida.
+              {t("politicaCookies.section9Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Gestionando Tus Cookies">
+          <Desplegable title={t("politicaCookies.section10Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 12 }]}>
-              La mayoría de los navegadores te permiten controlar las cookies a
-              través de su configuración. Puedes elegir aceptar todas las
-              cookies, rechazar cookies no esenciales, o ser preguntado cada vez
-              que se establece una cookie. Ten en cuenta que bloquear cookies
-              puede impactar tu experiencia en Convivia.
+              {t("politicaCookies.section10Body")}
             </Text>
           </Desplegable>
 
-          <Desplegable title="Cookies de Terceros">
+          <Desplegable title={t("politicaCookies.section11Title")}>
             <Text style={[GLOBAL_STYLES.helperText, { marginBottom: 24 }]}>
-              Algunos de nuestros socios de servicio pueden establecer cookies
-              en tu dispositivo para analizar el uso de la plataforma y
-              proporcionar servicios relacionados con el contenido y servicios
-              de la plataforma. No somos responsables de las prácticas de
-              privacidad de terceros.
+              {t("politicaCookies.section11Body")}
             </Text>
           </Desplegable>
         </View>
