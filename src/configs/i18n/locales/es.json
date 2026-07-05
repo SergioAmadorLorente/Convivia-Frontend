@@ -43,7 +43,10 @@
     "language": {
       "select": "Seleccionar Idioma",
       "spanish": "Español",
-      "english": "Inglés"
+      "english": "Inglés",
+      "french": "Francés",
+      "italian": "Italiano",
+      "german": "Alemán"
     }
   },
   "welcome": {
@@ -465,5 +468,51 @@
     "noAssignedUsers": "Sin usuarios asignados",
     "paidCounter": "{{pagados}}/{{total}} pagados",
     "createdDate": "Creada: {{date}}"
+  },
+  "politicaCookies": {
+    "title": "Política de Privacidad",
+    "intro": "En Convivia, nos comprometemos a proteger tu privacidad y garantizar que tengas una experiencia positiva en nuestra plataforma.",
+    "section1Title": "Información que Recopilamos",
+    "section1Body": "Recopilamos información que proporcionas directamente, como tu correo electrónico e información de perfil. También recopilamos automáticamente cierta información sobre tu dispositivo y cómo interactúas con nuestros servicios.",
+    "section2Title": "Cómo Utilizamos Tu Información",
+    "section2Body": "Utilizamos tu información para proporcionar, mantener y mejorar nuestros servicios, comunicarnos contigo y cumplir con obligaciones legales. Tus datos nos ayudan a personalizar tu experiencia y mejorar nuestra plataforma.",
+    "section3Title": "Cookies y Tecnologías Similares",
+    "section3Body": "Las cookies son pequeños archivos almacenados en tu dispositivo que nos ayudan a recordar tus preferencias y entender cómo utilizas nuestros servicios. Utilizamos cookies esenciales para funcionalidad, cookies analíticas para mejorar nuestros servicios, y cookies de preferencia para recordar tus configuraciones.",
+    "section4Title": "Seguridad de Datos",
+    "section4Body": "Implementamos medidas de seguridad apropiadas para proteger tu información personal del acceso no autorizado. Sin embargo, ningún método de transmisión por internet es completamente seguro.",
+    "section5Title": "Tus Derechos de Privacidad",
+    "section5Body": "Tienes derecho a acceder, actualizar o eliminar tu información personal. También puedes controlar las preferencias de cookies a través de la configuración de tu navegador. Para más información sobre tus derechos, por favor contactanos directamente.",
+    "section6Title": "Nuestra Política de Cookies",
+    "section6Body": "Las cookies son esenciales para cómo opera Convivia. Nos permiten recordar tu estado de sesión, preferencias, y mejorar tu experiencia general. Diferentes tipos de cookies sirven para diferentes propósitos en nuestra plataforma.",
+    "section7Title": "Cookies Esenciales",
+    "section7Body": "Estas cookies son necesarias para que el sitio web funcione correctamente. Habilitan funcionalidad principal como inicio de sesión seguro, autenticación de usuario, y navegación básica del sitio. No puedes desactivar estas cookies sin impedir que el sitio funcione.",
+    "section8Title": "Cookies de Rendimiento y Análisis",
+    "section8Body": "Utilizamos estas cookies para entender cómo los visitantes interactúan con nuestra plataforma. Nos ayudan a identificar qué características son más populares, rastrear errores, y medir el rendimiento general de Convivia. Estos datos se recopilan de forma anónima.",
+    "section9Title": "Cookies de Preferencia y Funcionalidad",
+    "section9Body": "Estas cookies recuerdan las opciones que haces para proporcionar una experiencia personalizada. Por ejemplo, almacenan tu preferencia de idioma, configuración de tema, y diseños personalizados. Desactivarlas puede resultar en funcionalidad reducida.",
+    "section10Title": "Gestionando Tus Cookies",
+    "section10Body": "La mayoría de los navegadores te permiten controlar las cookies a través de su configuración. Puedes elegir aceptar todas las cookies, rechazar cookies no esenciales, o ser preguntado cada vez que se establece una cookie. Ten en cuenta que bloquear cookies puede impactar tu experiencia en Convivia.",
+    "section11Title": "Cookies de Terceros",
+    "section11Body": "Algunos de nuestros socios de servicio pueden establecer cookies en tu dispositivo para analizar el uso de la plataforma y proporcionar servicios relacionados con el contenido y servicios de la plataforma. No somos responsables de las prácticas de privacidad de terceros."
+  },
+  "terminosCondiciones": {
+    "title": "Términos y Condiciones de Uso",
+    "intro": "Al usar Convivia, aceptas cumplir con estos términos y condiciones. Léelos atentamente antes de utilizar nuestros servicios.",
+    "section1Title": "Licencia de Uso",
+    "section1Body": "Se permite descargar temporalmente una copia de los materiales en Convivia únicamente para visualización personal y transitoria sin fines comerciales. Esto constituye la concesión de una licencia, no una transferencia de título, y bajo esta licencia no puedes:",
+    "section1Item1": "• Modificar o copiar los materiales",
+    "section1Item2": "• Utilizarlos con fines comerciales o para exhibición pública",
+    "section1Item3": "• Intentar descompilar o realizar ingeniería inversa de cualquier software en Convivia",
+    "section2Title": "Responsabilidades del Usuario",
+    "section2Body": "Como usuario de Convivia, aceptas:",
+    "section2Item1": "• Proporcionar información precisa y veraz",
+    "section2Item2": "• Usar la plataforma de forma responsable y conforme a la ley",
+    "section2Item3": "• No participar en acoso, discriminación o actividades ilegales",
+    "section3Title": "Limitación de Responsabilidad",
+    "section3Body": "Convivia proporciona la plataforma \"tal cual\" sin garantías de ningún tipo. No seremos responsables por daños indirectos, incidentales, especiales, consecuentes o punitivos derivados de tu uso o de la imposibilidad de usar la plataforma.",
+    "section4Title": "Modificaciones a los Términos",
+    "section4Body": "Convivia se reserva el derecho de modificar estos términos y condiciones en cualquier momento. Los cambios serán efectivos inmediatamente al publicarse en la plataforma. Tu uso continuado de la plataforma indica tu aceptación de dichas modificaciones.",
+    "section5Title": "Contáctanos",
+    "section5Body": "Si tienes preguntas o inquietudes sobre estos términos, por favor contáctanos a través de nuestros canales de soporte."
   }
 }
