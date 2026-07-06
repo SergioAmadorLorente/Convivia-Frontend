@@ -107,11 +107,33 @@ export const useDashboardData = (newSpaceName?: string) => {
     cargarNombresUsuario();
   }, [espacioId]);
 
+  const tareasRef = useRef<TaskModel[]>([]);
+  useEffect(() => {
+    tareasRef.current = tareas;
+  }, [tareas]);
+
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  const espacioIdRef = useRef(espacioId);
+  useEffect(() => {
+    espacioIdRef.current = espacioId;
+  }, [espacioId]);
+
+  const userNamesMapRef = useRef(userNamesMap);
+  useEffect(() => {
+    userNamesMapRef.current = userNamesMap;
+  }, [userNamesMap]);
+
   const cargarFacturas = async (showLoading = true) => {
-    if (!espacioId || !user?.uid) return;
+    const currentEspacioId = espacioIdRef.current;
+    const currentUser = userRef.current;
+    if (!currentEspacioId || !currentUser?.uid) return;
     if (showLoading) setLoadingFacturas(true);
     try {
-      const result = await obtenerFacturasPorDeudor(espacioId, user.uid);
+      const result = await obtenerFacturasPorDeudor(currentEspacioId, currentUser.uid);
       console.log(
         "📡 Facturas Recibidas (raw):",
         JSON.stringify(result, null, 2),
@@ -135,14 +157,14 @@ export const useDashboardData = (newSpaceName?: string) => {
           const userNames = relIds.map((relId: string) => {
             const cleanedRelId = cleanId(relId);
             // Buscar en el mapa usando el ID limpio
-            const nameKey = Object.keys(userNamesMap).find(
+            const nameKey = Object.keys(userNamesMapRef.current).find(
               (k) => cleanId(k) === cleanedRelId,
             );
 
             return {
               id: relId,
               name: nameKey
-                ? userNamesMap[nameKey]
+                ? userNamesMapRef.current[nameKey]
                 : f.nombresDeudores?.[relId] ||
                   `Usuario (${relId.slice(0, 4)})`,
               // en deudores: true = pendiente (no pagado), false = pagado
@@ -174,169 +196,168 @@ export const useDashboardData = (newSpaceName?: string) => {
   };
 
   const cargarTareas = async (showLoading = true) => {
-    if (!espacioId) return;
-    if (showLoading) setLoadingTareas(true);
+    const currentEspacioId = espacioIdRef.current;
+    if (!currentEspacioId) return;
+    if (showLoading) {
+      setLoadingTareas(true);
+      setLoadingFacturas(true);
+    }
     try {
-      // Paralelizar carga de tareas y facturas
-      cargarFacturas(showLoading);
+      // Paralelizar carga de tareas y facturas de forma sincronizada
+      await Promise.all([
+        cargarFacturas(showLoading),
+        (async () => {
+          const tareasRaw = await obtenerTareasPorEspacio(currentEspacioId);
+          if (Array.isArray(tareasRaw)) {
+            const mappedTasks = tareasRaw.map((t: any) => {
+              const fechaFuente =
+                t.startDate ||
+                t.fechaFin ||
+                t.fechaLimite ||
+                t.FechaLimite ||
+                t.fecha_limite;
+              const fechaObj = fechaFuente ? new Date(fechaFuente) : null;
+              const rawTime =
+                t.HoraLimite ??
+                t.horaLimite ??
+                t.time ??
+                t.Time ??
+                t.hora ??
+                t.Hora;
+              let cleanTime = "12:00";
+              if (rawTime && typeof rawTime === "string" && rawTime.length >= 5)
+                cleanTime = rawTime.substring(0, 5);
 
-      const tareasRaw = await obtenerTareasPorEspacio(espacioId);
-      if (Array.isArray(tareasRaw)) {
-        const mappedTasks = tareasRaw.map((t: any) => {
-          const fechaFuente =
-            t.startDate ||
-            t.fechaFin ||
-            t.fechaLimite ||
-            t.FechaLimite ||
-            t.fecha_limite;
-          const fechaObj = fechaFuente ? new Date(fechaFuente) : null;
-          const rawTime =
-            t.HoraLimite ??
-            t.horaLimite ??
-            t.time ??
-            t.Time ??
-            t.hora ??
-            t.Hora;
-          let cleanTime = "12:00";
-          if (rawTime && typeof rawTime === "string" && rawTime.length >= 5)
-            cleanTime = rawTime.substring(0, 5);
+              const userId = t.usuariosAsignacion?.[0];
+              const userNameResolved = userId
+                ? userNamesMapRef.current[userId] || userId
+                : null;
 
-          const userId = t.usuariosAsignacion?.[0];
-          const userNameResolved = userId
-            ? userNamesMap[userId] || userId
-            : null;
-
-          return new TaskModel({
-            id: t.id,
-            Nombre: t.nombre || t.Nombre,
-            Descripcion: t.descripcion || t.Descripcion,
-            karma: t.karma,
-            DiasRepeticion: t.diasRepeticion || [],
-            FechaLimite: (fechaObj as any) || new Date(),
-            HoraLimite: cleanTime,
-            isCompleted: t.completada || t.Completada || false,
-            usuarioAsignado: userNameResolved,
-            usuarioAsignadoId: userId || null, // Guardar ID de asignación
-            tareasId: t.tareasId || [],
-          });
-        });
-
-        setTareas((prevTareas) => {
-          const mergedTasks = mappedTasks.map((newTask) => {
-            const existing = prevTareas.find((t) => t.id === newTask.id);
-            if (existing) {
-              const prevLastInstance =
-                existing.tareasId?.[existing.tareasId.length - 1];
-              const newLastInstance =
-                newTask.tareasId?.[newTask.tareasId.length - 1];
-              if (prevLastInstance === newLastInstance) {
-                return new TaskModel({
-                  ...(newTask as any),
-                  FechaLimite: existing.FechaLimite,
-                  HoraLimite: existing.HoraLimite,
-                });
-              }
-            }
-            return newTask;
-          });
-
-          setTimeout(() => {
-            const tasksToEnrich = mergedTasks.filter((t) => {
-              // Enriquecemos si falta info O si queremos asegurar el estado de completado/asignación
-              // que suele vivir en la instancia y no en la plantilla.
-              return t.tareasId && t.tareasId.length > 0;
+              return new TaskModel({
+                id: t.id,
+                Nombre: t.nombre || t.Nombre,
+                Descripcion: t.descripcion || t.Descripcion,
+                karma: t.karma,
+                DiasRepeticion: t.diasRepeticion || [],
+                FechaLimite: (fechaObj as any) || new Date(),
+                HoraLimite: cleanTime,
+                isCompleted: t.completada || t.Completada || false,
+                usuarioAsignado: userNameResolved,
+                usuarioAsignadoId: userId || null, // Guardar ID de asignación
+                tareasId: t.tareasId || [],
+              });
             });
-            if (tasksToEnrich.length > 0)
-              fetchRealTaskTimes(tasksToEnrich, espacioId);
-          }, 100);
 
-          return mergedTasks;
-        });
-      }
+            const mergedTasks = mappedTasks.map((newTask) => {
+              const existing = tareasRef.current.find((t) => t.id === newTask.id);
+              if (existing) {
+                const prevLastInstance =
+                  existing.tareasId?.[existing.tareasId.length - 1];
+                const newLastInstance =
+                  newTask.tareasId?.[newTask.tareasId.length - 1];
+                if (prevLastInstance === newLastInstance) {
+                  return new TaskModel({
+                    ...(newTask as any),
+                    FechaLimite: existing.FechaLimite,
+                    HoraLimite: existing.HoraLimite,
+                  });
+                }
+              }
+              return newTask;
+            });
+
+            const enrichedTasks = await fetchRealTaskTimes(mergedTasks, currentEspacioId);
+            setTareas(enrichedTasks);
+          }
+        })()
+      ]);
     } catch (error) {
       // console.error("Error cargando tareas:", error);
     } finally {
-      if (showLoading) setLoadingTareas(false);
+      if (showLoading) {
+        setLoadingTareas(false);
+        setLoadingFacturas(false);
+      }
       setRefreshing(false);
     }
   };
 
-  const fetchRealTaskTimes = async (currentTasks: TaskModel[], eId: string) => {
+  const fetchRealTaskTimes = async (currentTasks: TaskModel[], eId: string): Promise<TaskModel[]> => {
     const candidates = currentTasks.filter(
       (t) => t.tareasId && t.tareasId.length > 0,
     );
-    if (candidates.length === 0) return;
+    if (candidates.length === 0) return currentTasks;
 
-    const updates = await Promise.all(
-      candidates.map(async (task) => {
-        try {
-          const lastInstanceId = task.tareasId[task.tareasId.length - 1];
-          const detail = await obtenerDetalleTareaInstancia(
-            eId,
-            task.id,
-            lastInstanceId,
-          );
-          const result: any = { id: task.id };
-          let hasUpdate = false;
-          const timeFound =
-            detail?.horaLimite || detail?.HoraLimite || detail?.hora;
-          if (
-            timeFound &&
-            typeof timeFound === "string" &&
-            timeFound.length >= 5
-          ) {
-            result.realTime = timeFound.substring(0, 5);
-            hasUpdate = true;
-          }
-          const dateFound = detail?.fechaLimite || detail?.FechaLimite;
-          if (dateFound) {
-            result.realDate = new Date(dateFound);
-            hasUpdate = true;
-          }
-          const userRelId = detail?.usuarioEspacioId || detail?.relacionId;
-          if (userRelId) {
-            result.realUserId = userRelId;
-            hasUpdate = true;
-          }
-          const fechaReal =
-            detail?.fechaRealizacion ||
-            detail?.FechaRealizacion ||
-            detail?.completadoEl;
-          if (fechaReal) {
-            result.realDoneDate = new Date(fechaReal);
-            hasUpdate = true;
-          }
+    try {
+      const updates = await Promise.all(
+        candidates.map(async (task) => {
+          try {
+            const lastInstanceId = task.tareasId[task.tareasId.length - 1];
+            const detail = await obtenerDetalleTareaInstancia(
+              eId,
+              task.id,
+              lastInstanceId,
+            );
+            const result: any = { id: task.id };
+            let hasUpdate = false;
+            const timeFound =
+              detail?.horaLimite || detail?.HoraLimite || detail?.hora;
+            if (
+              timeFound &&
+              typeof timeFound === "string" &&
+              timeFound.length >= 5
+            ) {
+              result.realTime = timeFound.substring(0, 5);
+              hasUpdate = true;
+            }
+            const dateFound = detail?.fechaLimite || detail?.FechaLimite;
+            if (dateFound) {
+              result.realDate = new Date(dateFound);
+              hasUpdate = true;
+            }
+            const userRelId = detail?.usuarioEspacioId || detail?.relacionId;
+            if (userRelId) {
+              result.realUserId = userRelId;
+              hasUpdate = true;
+            }
+            const fechaReal =
+              detail?.fechaRealizacion ||
+              detail?.FechaRealizacion ||
+              detail?.completadoEl;
+            if (fechaReal) {
+              result.realDoneDate = new Date(fechaReal);
+              hasUpdate = true;
+            }
 
-          const rawState = detail?.estado || detail?.Estado;
-          const isComp =
-            rawState === "Pendiente"
-              ? false
-              : !!(
-                  detail?.completada ||
-                  detail?.Completada ||
-                  (rawState &&
-                    typeof rawState === "string" &&
-                    rawState.includes("Completada")) ||
-                  (fechaReal && !isNaN(new Date(fechaReal).getTime())) ||
-                  rawState === "Completada"
-                );
+            const rawState = detail?.estado || detail?.Estado;
+            const isComp =
+              rawState === "Pendiente"
+                ? false
+                : !!(
+                    detail?.completada ||
+                    detail?.Completada ||
+                    (rawState &&
+                      typeof rawState === "string" &&
+                      rawState.includes("Completada")) ||
+                    (fechaReal && !isNaN(new Date(fechaReal).getTime())) ||
+                    rawState === "Completada"
+                  );
 
-          result.realCompleted = isComp;
+            result.realCompleted = isComp;
 
-          if (hasUpdate || result.realCompleted !== undefined) return result;
-        } catch (e) {}
-        return null;
-      }),
-    );
+            if (hasUpdate || result.realCompleted !== undefined) return result;
+          } catch (e) {}
+          return null;
+        }),
+      );
 
-    const validUpdates = updates.filter((u) => u !== null);
-    if (validUpdates.length > 0) {
-      setTareas((prevTareas) =>
-        prevTareas.map((t) => {
+      const validUpdates = updates.filter((u) => u !== null);
+      if (validUpdates.length > 0) {
+        return currentTasks.map((t) => {
           const update = validUpdates.find((u) => u.id === t.id);
           if (update) {
             const assignedName = update.realUserId
-              ? userNamesMap[update.realUserId] || update.realUserId
+              ? userNamesMapRef.current[update.realUserId] || update.realUserId
               : t.usuarioAsignado;
             return new TaskModel({
               ...t,
@@ -353,9 +374,12 @@ export const useDashboardData = (newSpaceName?: string) => {
             });
           }
           return t;
-        }),
-      );
+        });
+      }
+    } catch (e) {
+      console.log("Error enriching task times:", e);
     }
+    return currentTasks;
   };
 
   return {
@@ -371,6 +395,7 @@ export const useDashboardData = (newSpaceName?: string) => {
     tareas,
     setTareas,
     loadingTareas,
+    loadingFacturas,
     refreshing,
     setRefreshing,
     cargarTareas,
