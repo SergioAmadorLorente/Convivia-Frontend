@@ -1,3 +1,34 @@
+export interface Tarea {
+  id: string;
+  estado?: "Pendiente" | "Completada" | string | null;
+  horaLimite?: string | null;
+  usuarioEspacioId?: string | null;
+  completada?: boolean;
+  fechaRealizacion?: Date | string | null;
+  [key: string]: unknown;
+}
+
+export interface PlantillaTarea {
+  id: string;
+  Nombre?: string;
+  nombre?: string;
+  Descripcion?: string | null;
+  descripcion?: string | null;
+  karma?: number;
+  DiasRepeticion?: number[];
+  diasRepeticion?: number[];
+  FechaLimite?: Date | string | null;
+  fechaLimite?: Date | string | null;
+  fechaFin?: Date | string | null;
+  startDate?: Date | string | null;
+  HoraLimite?: string;
+  horaLimite?: string;
+  tareasId?: string[];
+  instanciaActiva?: Tarea | null;
+  InstanciaActiva?: Tarea | null;
+  [key: string]: unknown;
+}
+
 export interface ITask {
   id: string;
   Nombre: string;
@@ -7,11 +38,13 @@ export interface ITask {
   FechaLimite: Date;
   HoraLimite: string; // "HH:MM"
   isCompleted: boolean;
+  estado?: string | null;
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
   usuarioAsignadoId?: string | null;
   tareasId?: string[]; // IDs de las instancias hijas
   usuariosPorDia?: Record<number, string>; // Mapa de día (0-6) a usuario asignado
+  overdue?: boolean;
 }
 
 function startOfDay(d: Date) {
@@ -27,11 +60,13 @@ export class TaskModel implements ITask {
   FechaLimite: Date;
   HoraLimite: string;
   isCompleted: boolean;
+  estado?: string | null;
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
   usuarioAsignadoId?: string | null;
   tareasId: string[];
   usuariosPorDia?: Record<number, string>;
+  overdue?: boolean;
 
   constructor(props: ITask) {
     this.id = props.id;
@@ -42,11 +77,13 @@ export class TaskModel implements ITask {
     this.FechaLimite = new Date(props.FechaLimite);
     this.HoraLimite = props.HoraLimite;
     this.isCompleted = !!props.isCompleted;
+    this.estado = props.estado ?? null;
     this.FechaCompletada = props.FechaCompletada ? new Date(props.FechaCompletada) : null;
     this.usuarioAsignado = props.usuarioAsignado ?? null;
     this.usuarioAsignadoId = props.usuarioAsignadoId ?? null;
     this.tareasId = props.tareasId ?? [];
     this.usuariosPorDia = props.usuariosPorDia ?? {};
+    this.overdue = props.overdue ?? false;
   }
 
   formattedTime() {
@@ -134,10 +171,12 @@ export class TaskModel implements ITask {
       FechaLimite: new Date(this.FechaLimite),
       HoraLimite: this.HoraLimite,
       isCompleted: !this.isCompleted,
+      estado: this.isCompleted ? "Pendiente" : "Completada",
       FechaCompletada: !this.isCompleted ? now : null,
       usuarioAsignado: this.usuarioAsignado,
       usuarioAsignadoId: this.usuarioAsignadoId,
       tareasId: this.tareasId.slice(),
+      overdue: this.isCompleted ? this.overdue : false, // Revertir a false si se pone pendiente, sino mantener
     });
   }
 }

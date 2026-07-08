@@ -111,7 +111,7 @@ const DashBoardPersonal: React.FC = () => {
 
   const onRefresh = React.useCallback(() => { setRefreshing(true); cargarTareas(false); }, [cargarTareas, setRefreshing]);
 
-  useFocusEffect(React.useCallback(() => { cargarTareas(); }, [espacioId, userNamesMap]));
+  useFocusEffect(React.useCallback(() => { cargarTareas(); }, [espacioId]));
 
   const handleEditTask = (task: TaskModel) => {
     navigation.navigate("CreateTask", {
@@ -181,6 +181,7 @@ const DashBoardPersonal: React.FC = () => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const isOverdue = (it: TaskModel) => {
+      if (it.overdue !== undefined) return it.overdue;
       const d = new Date(it.FechaLimite);
       d.setHours(0, 0, 0, 0);
       return d.getTime() < todayStart.getTime();
