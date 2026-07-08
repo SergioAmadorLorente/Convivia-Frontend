@@ -24,7 +24,7 @@ type ToastItem = {
   open: boolean;
 };
 
-type ShowOptions = Omit<ToastItem, "id" | "open">;
+export type ShowOptions = Omit<ToastItem, "id" | "open">;
 
 export type ToastContextValue = {
   show: (opts: ShowOptions) => string;
@@ -222,23 +222,15 @@ function ToastItemComponent({
       {/* Texto */}
       <View style={{ flex: 1, flexShrink: 1 }}>
         <Text
-          numberOfLines={2}
+          numberOfLines={3}
           style={{
             fontFamily: FONTS.bold,
-            fontSize: moderateScale(14),
+            fontSize: moderateScale(13),
             color: toneColors.fg,
+            lineHeight: moderateScale(18),
           }}
         >
-          ¡{entity.charAt(0).toUpperCase() + entity.slice(1)} creada correctamente!
-        </Text>
-        <Text
-          style={{
-            fontFamily: FONTS.regular,
-            fontSize: moderateScale(12),
-            color: toneColors.muted,
-          }}
-        >
-          @{name}
+          {name}
         </Text>
       </View>
 
@@ -249,7 +241,7 @@ function ToastItemComponent({
       >
         <Text style={{ color: "#5b5f61", fontSize: moderateScale(18) }}>×</Text>
       </Pressable>
-       </Animated.View>
+    </Animated.View>
   );
 }
 

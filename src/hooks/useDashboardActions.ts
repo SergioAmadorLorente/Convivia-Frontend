@@ -4,8 +4,12 @@ import { editarFactura } from "../api/factura";
 import { actualizarUsuarioEspacio } from "../api/usuarioEspacio";
 import TaskModel from "../types/Task";
 import FacturaModel from "../types/Factura";
+import { ShowOptions, Tone } from "../components/ui/ToastProvider";
+import { useToast } from "../hooks/useToast";
+import { useTranslation } from 'react-i18next';
 
 const cleanId = (id: string) => id?.replace(/-/g, "").toLowerCase() || "";
+
 
 interface ActionsProps {
   espacioId: string | null;
@@ -17,10 +21,12 @@ interface ActionsProps {
   facturas: FacturaModel[];
   setFacturas: React.Dispatch<React.SetStateAction<FacturaModel[]>>;
   showPopup: (opts: any) => void;
+  showToast?: (opts: ShowOptions) => string;
   closeDetalle: () => void;
   CURRENT_USER_ID: string;
   activeTab: string;
   openDetalleTarea: (t: TaskModel) => void;
+  t: (key: string) => string;
 }
 
 export const useDashboardActions = ({
@@ -33,6 +39,8 @@ export const useDashboardActions = ({
   facturas,
   setFacturas,
   showPopup,
+  showToast,
+  t,
   closeDetalle,
   CURRENT_USER_ID,
   activeTab,
@@ -145,17 +153,28 @@ export const useDashboardActions = ({
           const nuevoKarma = currentKarma + (task.karma || 0);
           await actualizarUsuarioEspacio(userRelacionId, { karma: nuevoKarma });
           setCurrentKarma(nuevoKarma);
-        } catch (e) {}
+        } catch (e) { }
       }
 
-      showPopup({
-        imageType: "happy",
-        title: wasOverdue ? "¡Casi lo logras!" : "¡Felicidades!",
-        description: wasOverdue
-          ? "Has ganado 0 puntos de Karma."
-          : `Has ganado ${task.karma} puntos de Karma.`,
-        buttons: [{ text: "Aceptar" }],
-      });
+      if (showToast) {
+        showToast({
+          entity: "tarea",
+          name: wasOverdue
+            ? `¡Tarea completada fuera de plazo! (+0 karma)`
+            : `¡Tarea completada! +${task.karma} karma`,
+          tone: (wasOverdue ? "warning" : "success") as Tone,
+          autoHideMs: 3000,
+        });
+      } else {
+        showPopup({
+          imageType: "happy",
+          title: wasOverdue ? "¡Casi lo logras!" : "¡Felicidades!",
+          description: wasOverdue
+            ? "Has ganado 0 puntos de Karma."
+            : `Has ganado ${task.karma} puntos de Karma.`,
+          buttons: [{ text: "Aceptar" }],
+        });
+      }
 
       setTareas((prev) =>
         prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
@@ -271,25 +290,45 @@ export const useDashboardActions = ({
                 }
 
                 if (marcada.Pagado) {
-                  showPopup({
-                    imageType: "happy",
-                    title: "¡Factura completada!",
-                    description: "Todos los participantes han pagado su parte.",
-                    buttons: [{ text: "Aceptar" }],
-                  });
+                  if (showToast) {
+                    showToast({
+                      entity: "factura",
+                      name: `¡${marcada.Nombre || 'Factura'} completamente pagada!`,
+                      tone: "success",
+                      autoHideMs: 3000,
+                    });
+                  } else {
+                    showPopup({
+                      imageType: "happy",
+                      title: "¡Factura completada!",
+                      description: "Todos los participantes han pagado su parte.",
+                      buttons: [{ text: "Aceptar" }],
+                    });
+                  }
                 } else {
                   const restantes = marcada.UsuariosAsignados.filter(
                     (u) => !u.completed,
                   );
-                  showPopup({
-                    imageType: "success",
-                    title: "Has marcado tu parte como pagada",
-                    description:
-                      restantes.length > 0
-                        ? `Faltan por pagar: ${restantes.map((u) => u.name).join(", ")}.`
-                        : undefined,
-                    buttons: [{ text: "Aceptar" }],
-                  });
+                  if (showToast) {
+                    showToast({
+                      entity: "factura",
+                      name: restantes.length > 0
+                        ? `Tu parte pagada. Faltan: ${restantes.map((u) => u.name).join(", ")}`
+                        : `¡Has pagado tu parte de ${marcada.Nombre || 'la factura'}!`,
+                      tone: "success",
+                      autoHideMs: 3500,
+                    });
+                  } else {
+                    showPopup({
+                      imageType: "success",
+                      title: "Has marcado tu parte como pagada",
+                      description:
+                        restantes.length > 0
+                          ? `Faltan por pagar: ${restantes.map((u) => u.name).join(", ")}.`
+                          : undefined,
+                      buttons: [{ text: "Aceptar" }],
+                    });
+                  }
                 }
               },
             },
@@ -300,6 +339,8 @@ export const useDashboardActions = ({
   };
 
   const handleDeleteTask = async (id: string | number) => {
+
+
     if (!espacioId) return;
     showPopup({
       imageType: "goback",
@@ -313,6 +354,15 @@ export const useDashboardActions = ({
               await eliminarTarea(espacioId, id);
               setTareas((prev) => prev.filter((t) => t.id !== id.toString()));
               closeDetalle();
+
+              showToast?.({
+                entity: "tarea",
+                name: t("createTask.popups.successTaskDeleted.title"),
+                tone: "success",
+                autoHideMs: 3000,
+              });
+
+
             } catch (error) {
               Alert.alert("Error", "No se pudo eliminar.");
             }

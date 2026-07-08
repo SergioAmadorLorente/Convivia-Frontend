@@ -33,6 +33,7 @@ import Popup from "../../components/ui/Popup";
 import Detalle from "../../components/ui/Detalle";
 import { useDashboardData } from "../../hooks/useDashboardData";
 import { useDashboardActions, useQuickToggleFactura } from "../../hooks/useDashboardActions";
+import { useToast } from "../../hooks/useToast";
 
 const { hp } = HELPERS;
 
@@ -40,6 +41,7 @@ const DashBoardPersonal: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { t, i18n } = useTranslation();
+  const { show: showToast } = useToast();
 
   const {
     user,
@@ -53,6 +55,7 @@ const DashBoardPersonal: React.FC = () => {
     tareas,
     setTareas,
     loadingTareas,
+    loadingFacturas,
     refreshing,
     setRefreshing,
     cargarTareas,
@@ -64,6 +67,7 @@ const DashBoardPersonal: React.FC = () => {
   const CURRENT_USER_RELACION_ID = userRelacionId;
 
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
+  const isLoading = activeTab === "tareas" ? loadingTareas : loadingFacturas;
   const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
   const [visibility, setVisibility] = useState({
     showUnassigned: true,
@@ -95,6 +99,8 @@ const DashBoardPersonal: React.FC = () => {
     facturas,
     setFacturas,
     showPopup,
+    showToast,
+    t,
     closeDetalle,
     CURRENT_USER_ID,
     activeTab,
@@ -105,7 +111,7 @@ const DashBoardPersonal: React.FC = () => {
 
   const onRefresh = React.useCallback(() => { setRefreshing(true); cargarTareas(false); }, [cargarTareas, setRefreshing]);
 
-  useFocusEffect(React.useCallback(() => { cargarTareas(); }, [espacioId, userNamesMap]));
+  useFocusEffect(React.useCallback(() => { cargarTareas(); }, [espacioId]));
 
   const handleEditTask = (task: TaskModel) => {
     navigation.navigate("CreateTask", {
@@ -175,6 +181,7 @@ const DashBoardPersonal: React.FC = () => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const isOverdue = (it: TaskModel) => {
+      if (it.overdue !== undefined) return it.overdue;
       const d = new Date(it.FechaLimite);
       d.setHours(0, 0, 0, 0);
       return d.getTime() < todayStart.getTime();
@@ -237,75 +244,84 @@ const DashBoardPersonal: React.FC = () => {
           </View>
         )}
 
-        <View style={GLOBAL_STYLES.container}>
-          {activeTab === "facturas" && pendingItems.length === 0 && completedItems.length === 0 && (
-            <View style={[{ paddingVertical: 40 }]}>
-              <Text style={{ fontSize: 16, color: COLORS.secondary, fontFamily: FONTS.regular, textAlign: "center" }}>
-                {t('dashboard.noInvoices')}
-              </Text>
-            </View>
-          )}
+        {isLoading ? (
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 60, minHeight: 300 }}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+            <Text style={{ marginTop: 20, fontFamily: FONTS.regular, fontSize: SIZES.text16, color: "#666" }}>
+              {t('common.loading')}
+            </Text>
+          </View>
+        ) : (
+          <View style={GLOBAL_STYLES.container}>
+            {activeTab === "facturas" && pendingItems.length === 0 && completedItems.length === 0 && (
+              <View style={[{ paddingVertical: 40 }]}>
+                <Text style={{ fontSize: 16, color: COLORS.secondary, fontFamily: FONTS.regular, textAlign: "center" }}>
+                  {t('dashboard.noInvoices')}
+                </Text>
+              </View>
+            )}
 
-          {pendingItems.length > 0 && (
-            <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.pending') : t('dashboard.sections.pendingPayment')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
-              {pendingItems.map((item: any) => (
-                <TaskItem
-                  key={activeTab === "tareas" ? item.id : item.IdFactura}
-                  variant={activeTab === "tareas" ? "tarea" : "factura"}
-                  title={item.Nombre}
-                  isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
-                  onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
-                  onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
-                  onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
-                  time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
-                  fechaLimite={activeTab === "tareas" ? new Date(item.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" }) : undefined}
-                  dateLabel={activeTab === "facturas" ? item.formattedDate?.(i18n.language === 'en' ? 'en-US' : 'es-ES') : undefined}
-                  perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
-                  paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
-                  totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
-                />
-              ))}
-            </Desplegable>
-          )}
+            {pendingItems.length > 0 && (
+              <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.pending') : t('dashboard.sections.pendingPayment')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+                {pendingItems.map((item: any) => (
+                  <TaskItem
+                    key={activeTab === "tareas" ? item.id : item.IdFactura}
+                    variant={activeTab === "tareas" ? "tarea" : "factura"}
+                    title={item.Nombre}
+                    isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
+                    onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
+                    onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
+                    onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
+                    time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
+                    fechaLimite={activeTab === "tareas" ? new Date(item.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" }) : undefined}
+                    dateLabel={activeTab === "facturas" ? item.formattedDate?.(i18n.language === 'en' ? 'en-US' : 'es-ES') : undefined}
+                    perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
+                    paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
+                    totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
+                  />
+                ))}
+              </Desplegable>
+            )}
 
-          {activeTab === "tareas" && visibility.showOverdue && overdueItems.length > 0 && (
-            <Desplegable title={t('dashboard.sections.overdue')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
-              {overdueItems.map((task: TaskModel) => (
-                <TaskItem
-                  key={task.id}
-                  variant="tarea"
-                  title={task.Nombre}
-                  isCompleted={task.isCompleted}
-                  onToggle={() => handleToggleTask(task.id)}
-                  onPressRow={() => openDetalleTarea(task)}
-                  time={task.formattedTime()}
-                  fechaLimite={new Date(task.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" })}
-                />
-              ))}
-            </Desplegable>
-          )}
+            {activeTab === "tareas" && visibility.showOverdue && overdueItems.length > 0 && (
+              <Desplegable title={t('dashboard.sections.overdue')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+                {overdueItems.map((task: TaskModel) => (
+                  <TaskItem
+                    key={task.id}
+                    variant="tarea"
+                    title={task.Nombre}
+                    isCompleted={task.isCompleted}
+                    onToggle={() => handleToggleTask(task.id)}
+                    onPressRow={() => openDetalleTarea(task)}
+                    time={task.formattedTime()}
+                    fechaLimite={new Date(task.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" })}
+                  />
+                ))}
+              </Desplegable>
+            )}
 
-          {visibility.showCompleted && completedItems.length > 0 && (
-            <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.completed') : t('dashboard.sections.paid')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
-              {completedItems.map((item: any) => (
-                <TaskItem
-                  key={activeTab === "tareas" ? item.id : item.IdFactura}
-                  variant={activeTab === "tareas" ? "tarea" : "factura"}
-                  title={item.Nombre}
-                  isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
-                  onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
-                  onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
-                  onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
-                  time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
-                  dateLabel={activeTab === "facturas" ? item.formattedDate?.(i18n.language === 'en' ? 'en-US' : 'es-ES') : undefined}
-                  perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
-                  paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
-                  totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
-                />
-              ))}
-            </Desplegable>
-          )}
-        </View>
+            {visibility.showCompleted && completedItems.length > 0 && (
+              <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.completed') : t('dashboard.sections.paid')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
+                {completedItems.map((item: any) => (
+                  <TaskItem
+                    key={activeTab === "tareas" ? item.id : item.IdFactura}
+                    variant={activeTab === "tareas" ? "tarea" : "factura"}
+                    title={item.Nombre}
+                    isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
+                    onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
+                    onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
+                    onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
+                    time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
+                    dateLabel={activeTab === "facturas" ? item.formattedDate?.(i18n.language === 'en' ? 'en-US' : 'es-ES') : undefined}
+                    perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
+                    paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
+                    totalAssigned={activeTab === "facturas" ? item.totalUsersCount?.() : undefined}
+                  />
+                ))}
+              </Desplegable>
+            )}
+          </View>
+        )}
       </ScrollView>
 
       <Popup
