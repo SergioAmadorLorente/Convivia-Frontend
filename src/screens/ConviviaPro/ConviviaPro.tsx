@@ -95,7 +95,7 @@ const ConviviaPro: React.FC = () => {
 
           {/* Subscribe Button */}
           <View style={styles.buttonContainer}>
-            <Button onPress={() => console.log("Suscribirse")}>
+            <Button onPress={() => console.log("Suscribirse")} disabled={true}>
               {t('conviviaPro.subscribeButton')}
             </Button>
           </View>

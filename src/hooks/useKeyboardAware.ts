@@ -121,7 +121,7 @@ export default function useKeyboardAware(options: Options = {}) {
     /* ────────────────────────────────────────────────
      *               REACT NATIVE (iOS/Android)
      * ──────────────────────────────────────────────── */
-    const adjustNative = () => {
+    const adjustNative = (force = false) => {
       try {
         const State =
           (TextInput as any).State ||
@@ -131,10 +131,20 @@ export default function useKeyboardAware(options: Options = {}) {
         const focused = State?.currentlyFocusedInput
           ? State.currentlyFocusedInput()
           : State?.currentlyFocusedField?.();
-        if (!focused) return;
+        if (!focused) {
+          lastActiveRef.current = null;
+          return;
+        }
         const inputHandle =
           typeof focused === "number" ? focused : findNodeHandle(focused);
-        if (!inputHandle) return;
+        if (!inputHandle) {
+          lastActiveRef.current = null;
+          return;
+        }
+        if (!force && lastActiveRef.current === inputHandle) {
+          return;
+        }
+        lastActiveRef.current = inputHandle;
         const container = containerRef?.current;
         const containerHandle = container ? findNodeHandle(container) : null;
         if (containerHandle) {
@@ -154,9 +164,11 @@ export default function useKeyboardAware(options: Options = {}) {
       } catch {}
     };
     const kShow = Keyboard.addListener("keyboardDidShow", () => {
-      setTimeout(adjustNative, 50);
+      setTimeout(() => adjustNative(true), 50);
     });
-    const kHide = Keyboard.addListener("keyboardDidHide", () => {});
+    const kHide = Keyboard.addListener("keyboardDidHide", () => {
+      lastActiveRef.current = null;
+    });
     const focusPoll = setInterval(() => {
       adjustNative();
     }, 500);
