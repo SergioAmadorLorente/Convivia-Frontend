@@ -15,6 +15,7 @@ import {
 	StyleSheet,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useNavigation } from '@react-navigation/native';
 import { useAuthListener } from '../../../hooks/useAuthListener';
 import { obtenerUsuarioPorId, actualizarUsuario } from '../../../api/usuario';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,6 +34,7 @@ import Perfilicono from '../../../assets/Perfilicono.svg';
 const { width } = Dimensions.get('window');
 
 const EditarPerfil = () => {
+	const navigation = useNavigation<any>();
 	const currentUser = useAuthListener();
 	const { t } = useTranslation();
 	const [dbPassword, setDbPassword] = useState('');
@@ -169,7 +171,7 @@ const EditarPerfil = () => {
 				title: t('editProfile.popups.success.title'),
 				description: t('editProfile.popups.success.description'),
 				imageType: 'success',
-				buttons: [{ text: t('common.accept'), onPress: handleClosePopup }],
+				buttons: [{ text: t('common.accept'), onPress: () => { handleClosePopup(); navigation.navigate('Perfil'); } }],
 			});
 		} catch (error) {
 			// console.error("Error actualizando perfil:", error);
