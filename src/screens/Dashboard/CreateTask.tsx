@@ -317,7 +317,8 @@ const CreateTask: React.FC = () => {
                 // Para EDITAR: actualizamos la plantilla y la instancia (si existe)
                 console.log("Actualizando tarea. Plantilla:", taskId, "Instancia:", instanceId);
                 const editPayload = {
-                    ...baseData
+                    ...baseData,
+                    tareasId: route.params?.taskToEdit?.tareasId || [],
                 };
                 console.log("Datos de edición a enviar:", JSON.stringify(editPayload, null, 2));
 

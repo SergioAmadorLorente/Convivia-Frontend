@@ -126,7 +126,8 @@ const DashBoardPersonal: React.FC = () => {
         assignedUsers: task.usuarioAsignadoId && task.usuarioAsignado
           ? [{ id: task.usuarioAsignadoId, name: task.usuarioAsignado }]
           : [],
-        instanceId: task.tareasId?.[0]
+        instanceId: task.tareasId?.[0],
+        tareasId: task.tareasId || [],
       },
       onSave: () => cargarTareas(),
     });
