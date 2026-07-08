@@ -27,6 +27,7 @@ import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio, obtenerUsuarioEsp
 import { crearTarea, editarTarea, TareaPayload } from "../../api/tarea";
 import { obtenerUsuarios } from "../../api/usuario";
 import Popup from "../../components/ui/Popup";
+import { useToast } from "../../hooks/useToast";
 
 const { hp } = HELPERS;
 
@@ -64,7 +65,7 @@ const CreateTask: React.FC = () => {
     useEffect(() => {
         if (route.params?.taskToEdit) {
             const t = route.params.taskToEdit;
-            console.log("📝 Editando tarea (Datos recibidos):", t);
+            console.log("Editando tarea (Datos recibidos):", t);
 
             // 1. Mapear días numéricos a strings (para el selector visual)
             // Usamos Lunes=0, ..., Domingo=6 para que sea consistente con la lógica de envío
@@ -110,6 +111,8 @@ const CreateTask: React.FC = () => {
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const { show: showToast } = useToast();
 
     // Popup state
     const [popupVisible, setPopupVisible] = useState(false);
@@ -168,7 +171,7 @@ const CreateTask: React.FC = () => {
                 if (!myUserSpace?.espacioId) return;
 
                 const currentEspacioId = myUserSpace.espacioId;
-                console.log("🏠 Buscando miembros para el espacio:", currentEspacioId);
+                console.log("Buscando miembros para el espacio:", currentEspacioId);
 
                 // 2. Obtener todas las relaciones UsuarioEspacio para filtrar por espacioId
                 const allRelations = await obtenerUsuarioEspacios();
@@ -309,15 +312,15 @@ const CreateTask: React.FC = () => {
 
             if (isEditing && taskId) {
                 // Para EDITAR: actualizamos la plantilla y la instancia (si existe)
-                console.log("✏️ Actualizando tarea. Plantilla:", taskId, "Instancia:", instanceId);
+                console.log("Actualizando tarea. Plantilla:", taskId, "Instancia:", instanceId);
                 const editPayload = {
                     ...baseData
                 };
-                console.log("📤 Datos de edición a enviar:", JSON.stringify(editPayload, null, 2));
+                console.log("Datos de edición a enviar:", JSON.stringify(editPayload, null, 2));
 
                 responseData = await editarTarea(taskId, editPayload, instanceId);
                 resultId = taskId;
-                console.log("✅ Tarea e instancia actualizadas correctamente");
+                console.log("Tarea e instancia actualizadas correctamente");
             } else {
                 // Para CREAR: incluimos todos los campos adicionales con redundancia para mapeo del backend
                 const tareaData: any = {
@@ -338,11 +341,11 @@ const CreateTask: React.FC = () => {
                     tareasId: [],
                 };
 
-                console.log("✨ Creando nueva tarea");
-                console.log("📤 Datos de creación a enviar:", JSON.stringify(tareaData, null, 2));
+                console.log("Creando nueva tarea");
+                console.log("Datos de creación a enviar:", JSON.stringify(tareaData, null, 2));
 
                 responseData = await crearTarea(tareaData);
-                console.log("✅ Tarea creada con ID:", responseData);
+                console.log(" Tarea creada con ID:", responseData);
                 resultId = typeof responseData === 'string' ? responseData : responseData?.id;
             }
 
@@ -406,18 +409,13 @@ const CreateTask: React.FC = () => {
                 route.params.onSave(updatedData);
             }
 
-            showPopup({
-                title: isEditing ? t('createTask.popups.successUpdated.title') : t('createTask.popups.successCreated.title'),
-                description: isEditing ? t('createTask.popups.successUpdated.description') : t('createTask.popups.successCreated.description'),
-                imageType: 'convivia',
-                buttons: [{
-                    text: t('common.accept'),
-                    onPress: () => {
-                        setPopupVisible(false);
-                        navigation.goBack();
-                    }
-                }],
+            showToast({
+                entity: "tarea",
+                name: isEditing ? t('createTask.popups.successUpdated.title') : t('createTask.popups.successCreated.title'),
+                tone: "success",
+                autoHideMs: 3000,
             });
+            navigation.goBack();
 
         } catch (error: any) {
             // console.error('Error al crear tarea:', error);
@@ -490,7 +488,7 @@ const CreateTask: React.FC = () => {
                             time={selectedTime}
                             onTimeClick={() => setTimePopupVisible(true)}
                             onDateSelect={(date) => {
-                                console.log("📅 Calendario seleccionó fecha (Local):", date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : "null");
+                                console.log(" Calendario seleccionó fecha (Local):", date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : "null");
                                 setSelectedDate(date);
                             }}
                             selectedDate={selectedDate}

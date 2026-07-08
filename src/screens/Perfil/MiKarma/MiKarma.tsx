@@ -569,11 +569,11 @@ const styles = StyleSheet.create({
         backgroundColor: "#E6ECDC",
     },
     podiumBar2: {
-        height: 80,
+        height: 100,
         backgroundColor: COLORS.background,
     },
     podiumBar3: {
-        height: 100,
+        height: 80,
         backgroundColor: COLORS.background,
     },
     podiumPoints: {
