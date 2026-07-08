@@ -268,6 +268,10 @@
         "title": "Task created",
         "description": "The task has been created successfully."
       },
+      "successTaskDeleted": {
+        "title": "Task deleted",
+        "description": "The task has been deleted."
+      },
       "successUpdated": {
         "title": "Task updated",
         "description": "The task has been updated successfully."

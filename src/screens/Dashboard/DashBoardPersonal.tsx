@@ -123,7 +123,9 @@ const DashBoardPersonal: React.FC = () => {
         repeatDays: task.DiasRepeticion,
         karma: task.karma,
         date: task.FechaLimite instanceof Date ? task.FechaLimite.toISOString() : task.FechaLimite,
-        assignedUsers: task.usuarioAsignado ? [{ id: task.usuarioAsignado, name: task.usuarioAsignado }] : [],
+        assignedUsers: task.usuarioAsignadoId && task.usuarioAsignado
+          ? [{ id: task.usuarioAsignadoId, name: task.usuarioAsignado }]
+          : [],
         instanceId: task.tareasId?.[0]
       },
       onSave: () => cargarTareas(),
@@ -181,7 +183,7 @@ const DashBoardPersonal: React.FC = () => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const isOverdue = (it: TaskModel) => {
-      if (it.overdue !== undefined) return it.overdue;
+      if (it.overdue) return true;
       const d = new Date(it.FechaLimite);
       d.setHours(0, 0, 0, 0);
       return d.getTime() < todayStart.getTime();
@@ -268,6 +270,8 @@ const DashBoardPersonal: React.FC = () => {
                     key={activeTab === "tareas" ? item.id : item.IdFactura}
                     variant={activeTab === "tareas" ? "tarea" : "factura"}
                     title={item.Nombre}
+                    subtitle={activeTab === "tareas" ? item.usuarioAsignado || undefined : undefined}
+                    unassigned={activeTab === "tareas" ? !item.usuarioAsignado : undefined}
                     isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
                     onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
                     onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
@@ -290,6 +294,8 @@ const DashBoardPersonal: React.FC = () => {
                     key={task.id}
                     variant="tarea"
                     title={task.Nombre}
+                    subtitle={task.usuarioAsignado || undefined}
+                    unassigned={!task.usuarioAsignado}
                     isCompleted={task.isCompleted}
                     onToggle={() => handleToggleTask(task.id)}
                     onPressRow={() => openDetalleTarea(task)}
@@ -307,6 +313,7 @@ const DashBoardPersonal: React.FC = () => {
                     key={activeTab === "tareas" ? item.id : item.IdFactura}
                     variant={activeTab === "tareas" ? "tarea" : "factura"}
                     title={item.Nombre}
+                    subtitle={activeTab === "tareas" ? item.usuarioAsignado || undefined : undefined}
                     isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
                     onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
                     onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}

@@ -265,6 +265,10 @@
                 "title": "Tâche créée",
                 "description": "La tâche a été créée avec succès."
             },
+            "successTaskDeleted": {
+                "title": "Tâche supprimée",
+                "description": "La tâche a été supprimée."
+            },
             "successUpdated": {
                 "title": "Tâche mise à jour",
                 "description": "La tâche a été mise à jour avec succès."

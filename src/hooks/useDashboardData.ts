@@ -6,7 +6,7 @@ import {
   obtenerUsuarioEspacios,
 } from "../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../api/espacio";
-import { obtenerTareasPorEspacio } from "../api/tarea";
+import { obtenerTareasPorEspacio, obtenerDetalleTareaInstancia } from "../api/tarea";
 import TaskModel from "../types/Task";
 import type { PlantillaTarea, Tarea } from "../types/Task";
 import FacturaModel from "../types/Factura";
@@ -230,95 +230,134 @@ export const useDashboardData = (newSpaceName?: string) => {
           if (!Array.isArray(tareasRaw)) return;
 
           const plantillas = tareasRaw as PlantillaTarea[];
-          const mappedTasks = plantillas.map((plantilla) => {
-            const instanciaActiva =
-              plantilla.instanciaActiva ?? plantilla.InstanciaActiva ?? null;
 
-            const esRepetida =
-              (plantilla.diasRepeticion && plantilla.diasRepeticion.length > 0) ||
-              (plantilla.DiasRepeticion && plantilla.DiasRepeticion.length > 0);
-            
-            const fechaFinFuente =
-              plantilla.fechaFin ?? plantilla.fechaLimite ?? plantilla.FechaLimite;
+          // Para cada plantilla, buscar la instancia activa en paralelo
+          // El endpoint de lista NO devuelve instanciaActiva, hay que ir al nivel 3
+          const mappedTasks = await Promise.all(
+            plantillas.map(async (plantilla) => {
+              // instanciaActiva puede ya venir embebida (algunos backends la incluyen)
+              let instanciaActiva: any =
+                plantilla.instanciaActiva ?? plantilla.InstanciaActiva ?? null;
 
-            let fechaLimiteObj: Date;
-            if (esRepetida) {
-              fechaLimiteObj = fechaFinFuente
-                ? new Date(fechaFinFuente as string | Date)
-                : new Date(3000, 0, 1);
-            } else {
-              const fechaFuente =
-                plantilla.startDate ??
-                plantilla.fechaFin ??
-                plantilla.fechaLimite ??
-                plantilla.FechaLimite;
-              fechaLimiteObj = fechaFuente
-                ? new Date(fechaFuente as string | Date)
-                : new Date();
-            }
+              // Si no viene embebida, buscar la primera instancia del array tareasId
+              if (!instanciaActiva && Array.isArray(plantilla.tareasId) && plantilla.tareasId.length > 0) {
+                const primerInstanciaId = plantilla.tareasId[0];
+                try {
+                  instanciaActiva = await obtenerDetalleTareaInstancia(
+                    currentEspacioId,
+                    String(plantilla.id),
+                    primerInstanciaId,
+                  );
+                } catch {
+                  // Silenciar error si la instancia no existe
+                }
+              }
 
-            const rawTime =
-              instanciaActiva?.horaLimite ??
-              (instanciaActiva?.HoraLimite as string | null | undefined) ??
-              plantilla.HoraLimite ??
-              plantilla.horaLimite;
-            const cleanTime =
-              rawTime && typeof rawTime === "string" && rawTime.length >= 5
-                ? rawTime.substring(0, 5)
-                : "12:00";
+              const esRepetida =
+                (plantilla.diasRepeticion && plantilla.diasRepeticion.length > 0) ||
+                (plantilla.DiasRepeticion && plantilla.DiasRepeticion.length > 0);
+              
+              const fechaFinFuente =
+                plantilla.fechaFin ?? plantilla.fechaLimite ?? plantilla.FechaLimite;
 
-            const userId = instanciaActiva?.usuarioEspacioId ?? null;
-            const userNameResolved = userId
-              ? currentNamesMap[userId] || userId
-              : null;
+              let fechaLimiteObj: Date;
+              if (esRepetida) {
+                fechaLimiteObj = fechaFinFuente
+                  ? new Date(fechaFinFuente as string | Date)
+                  : new Date(3000, 0, 1);
+              } else {
+                const fechaFuente =
+                  plantilla.startDate ??
+                  plantilla.fechaFin ??
+                  plantilla.fechaLimite ??
+                  plantilla.FechaLimite;
+                fechaLimiteObj = fechaFuente
+                  ? new Date(fechaFuente as string | Date)
+                  : new Date();
+              }
 
-            const instanciaId = instanciaActiva?.id ?? instanciaActiva?.Id ?? null;
-            const rawState = (instanciaActiva?.estado ?? instanciaActiva?.Estado) as string | null | undefined;
-            const completedState =
-              rawState === "Completada" ||
-              rawState === "Completada Fuera de Plazo" ||
-              instanciaActiva?.completada === true ||
-              (instanciaActiva?.Completada as boolean | null | undefined) === true;
+              const rawTime =
+                instanciaActiva?.horaLimite ??
+                (instanciaActiva?.HoraLimite as string | null | undefined) ??
+                plantilla.HoraLimite ??
+                plantilla.horaLimite;
+              const cleanTime =
+                rawTime && typeof rawTime === "string" && rawTime.length >= 5
+                  ? rawTime.substring(0, 5)
+                  : "12:00";
 
-            const fechaRealizacionRaw =
-              instanciaActiva?.fechaRealizacion ??
-              (instanciaActiva?.FechaRealizacion as string | Date | null | undefined);
-            
-            const fechaCompletada = fechaRealizacionRaw
-              ? new Date(fechaRealizacionRaw as string | Date)
-              : completedState
-                ? new Date()
+              const diasRep =
+                plantilla.diasRepeticion || plantilla.DiasRepeticion || [];
+
+              // 1. Resolver el usuarioEspacioId desde la instancia activa
+              const activeInstanceUserId: string | null =
+                instanciaActiva?.usuarioEspacioId ??
+                (instanciaActiva?.UsuarioEspacioId as string | null | undefined) ??
+                null;
+
+              const userNameResolved = activeInstanceUserId
+                ? currentNamesMap[activeInstanceUserId] || activeInstanceUserId
                 : null;
 
-            return new TaskModel({
-              id: String(plantilla.id),
-              Nombre: plantilla.nombre || plantilla.Nombre || "Tarea sin nombre",
-              Descripcion: plantilla.descripcion || plantilla.Descripcion,
-              karma: Number(plantilla.karma || 0),
-              DiasRepeticion:
-                plantilla.diasRepeticion || plantilla.DiasRepeticion || [],
-              FechaLimite: fechaLimiteObj,
-              HoraLimite: cleanTime,
-              isCompleted: completedState,
-              estado:
-                rawState ||
-                (instanciaActiva
-                  ? completedState
-                    ? "Completada"
-                    : "Pendiente"
-                  : "Pendiente"),
-              usuarioAsignado: userNameResolved,
-              usuarioAsignadoId: userId || null,
-              tareasId:
-                Array.isArray(plantilla.tareasId) && plantilla.tareasId.length > 0
-                  ? plantilla.tareasId
-                  : instanciaId
-                    ? [String(instanciaId)]
-                    : [],
-              FechaCompletada: fechaCompletada,
-              overdue: ((instanciaActiva?.overdue ?? instanciaActiva?.Overdue) as boolean | undefined) ?? false,
-            });
-          });
+              // 2. Resolver mapa de usuarios por día (tareas repetitivas)
+              const resolvedUsuariosPorDia: Record<number, string> = {};
+              // Intentar leer desde la instancia si tiene el mapa, o construirlo
+              if (activeInstanceUserId && Array.isArray(diasRep) && diasRep.length > 0) {
+                // Para tareas repetitivas la instancia tiene diaSemana
+                const diaSemana = instanciaActiva?.diaSemana as number | undefined;
+                if (typeof diaSemana === "number" && diaSemana >= 0) {
+                  resolvedUsuariosPorDia[diaSemana] = userNameResolved || activeInstanceUserId;
+                }
+              }
+
+              const instanciaId = instanciaActiva?.id ?? instanciaActiva?.Id ?? null;
+              const rawState = (instanciaActiva?.estado ?? instanciaActiva?.Estado) as string | null | undefined;
+              const completedState =
+                rawState === "Completada" ||
+                rawState === "Completada Fuera de Plazo" ||
+                instanciaActiva?.completada === true ||
+                (instanciaActiva?.Completada as boolean | null | undefined) === true;
+
+              const fechaRealizacionRaw =
+                instanciaActiva?.fechaRealizacion ??
+                (instanciaActiva?.FechaRealizacion as string | Date | null | undefined);
+              
+              const fechaCompletada = fechaRealizacionRaw
+                ? new Date(fechaRealizacionRaw as string | Date)
+                : completedState
+                  ? new Date()
+                  : null;
+
+              return new TaskModel({
+                id: String(plantilla.id),
+                Nombre: plantilla.nombre || plantilla.Nombre || "Tarea sin nombre",
+                Descripcion: plantilla.descripcion || plantilla.Descripcion,
+                karma: Number(plantilla.karma || 0),
+                DiasRepeticion: diasRep,
+                FechaLimite: fechaLimiteObj,
+                HoraLimite: cleanTime,
+                isCompleted: completedState,
+                estado:
+                  rawState ||
+                  (instanciaActiva
+                    ? completedState
+                      ? "Completada"
+                      : "Pendiente"
+                    : "Pendiente"),
+                usuarioAsignado: userNameResolved,
+                usuarioAsignadoId: activeInstanceUserId,
+                tareasId:
+                  Array.isArray(plantilla.tareasId) && plantilla.tareasId.length > 0
+                    ? plantilla.tareasId
+                    : instanciaId
+                      ? [String(instanciaId)]
+                      : [],
+                FechaCompletada: fechaCompletada,
+                overdue: ((instanciaActiva?.overdue ?? instanciaActiva?.Overdue) as boolean | undefined) ?? false,
+                usuariosPorDia: resolvedUsuariosPorDia,
+              });
+            })
+          );
 
           setTareas(mappedTasks);
         })(),

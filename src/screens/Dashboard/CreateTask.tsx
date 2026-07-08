@@ -23,7 +23,7 @@ import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
 import { useEditTask } from "../../hooks/useEditTask";
 import { useAuthListener } from "../../hooks/useAuthListener";
-import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
+import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio, obtenerUsuarioEspacios, obtenerUsuarioEspacioPorId } from "../../api/usuarioEspacio";
 import { crearTarea, editarTarea, TareaPayload } from "../../api/tarea";
 import { obtenerUsuarios } from "../../api/usuario";
 import Popup from "../../components/ui/Popup";
@@ -191,10 +191,13 @@ const CreateTask: React.FC = () => {
 
                 const usersInSpace = allUsers
                     .filter((u: any) => userIdsInSpace.includes(u.id))
-                    .map((u: any) => ({
-                        id: u.id,
-                        name: u.nombre || u.email || "Usuario sin nombre"
-                    }));
+                    .map((u: any) => {
+                        const rel = spaceRelations.find((r: any) => r.usuarioId === u.id);
+                        return {
+                            id: rel ? (rel.id || rel.id_UsuarioEspacio) : u.id,
+                            name: u.nombre || u.email || "Usuario sin nombre"
+                        };
+                    });
 
                 console.log(`👥 ${usersInSpace.length} usuarios encontrados en el espacio.`);
                 setAvailableUsers(usersInSpace);
@@ -359,12 +362,11 @@ const CreateTask: React.FC = () => {
                     });
                 }
 
-                for (const userId of listaUsuariosAsignados) {
+                for (const relacionId of listaUsuariosAsignados) {
                     try {
-                        const usuarioEspacioAsignado = await obtenerEspacioPorUsuarioId(userId);
-                        const relacionId = usuarioEspacioAsignado?.id || usuarioEspacioAsignado?.id_UsuarioEspacio;
+                        const usuarioEspacioAsignado = await obtenerUsuarioEspacioPorId(relacionId);
 
-                        if (relacionId) {
+                        if (usuarioEspacioAsignado) {
                             const currentTasks = usuarioEspacioAsignado.tareasId || [];
                             // Filtrar IDs que ya existen para no duplicar
                             const nuevosIds = idsATareas.filter(id => !currentTasks.includes(id));
@@ -375,15 +377,13 @@ const CreateTask: React.FC = () => {
                                 await actualizarUsuarioEspacio(relacionId, {
                                     tareasId: tareasActualizadas
                                 });
-                                console.log(`✅ UsuarioEspacio actualizado para usuario ${userId} con tareas: ${nuevosIds.join(', ')}`);
+                                console.log(`✅ UsuarioEspacio actualizado para relación ${relacionId} con tareas: ${nuevosIds.join(', ')}`);
                             } else {
-                                console.log(`ℹ️ Las tareas ya estaban asignadas al usuario ${userId}.`);
+                                console.log(`ℹ️ Las tareas ya estaban asignadas a la relación ${relacionId}.`);
                             }
-                        } else {
-                            console.warn(`⚠️ No se encontró ID de relación UsuarioEspacio para usuario ${userId}`);
                         }
                     } catch (updateError) {
-                        console.warn(`⚠️ No se pudo actualizar UsuarioEspacio para usuario ${userId}:`, updateError);
+                        console.warn(`⚠️ No se pudo actualizar UsuarioEspacio para relación ${relacionId}:`, updateError);
                     }
                 }
             }

@@ -265,6 +265,10 @@
                 "title": "Attività creata",
                 "description": "L'attività è stata creata con successo."
             },
+            "successTaskDeleted": {
+                "title": "Attività eliminata",
+                "description": "L'attività è stata eliminata."
+            },
             "successUpdated": {
                 "title": "Attività aggiornata",
                 "description": "L'attività è stata aggiornata con successo."
