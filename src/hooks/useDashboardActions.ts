@@ -73,11 +73,15 @@ export const useDashboardActions = ({
         }
 
         // Bloquear si no está asignada al usuario actual
-        if (
-          CURRENT_USER_ID &&
-          task.usuarioAsignadoId &&
-          task.usuarioAsignadoId !== CURRENT_USER_ID
-        ) {
+        const cleanAssignedId = cleanId(task.usuarioAsignadoId || "");
+        const cleanUserRelId = cleanId(userRelacionId || "");
+        const cleanFirebaseUid = cleanId(CURRENT_USER_ID || "");
+
+        const isAssignedToMe =
+          cleanAssignedId === cleanUserRelId ||
+          cleanAssignedId === cleanFirebaseUid;
+
+        if (!isAssignedToMe) {
           showPopup({
             imageType: "error",
             title: "No puedes completar esta tarea",
