@@ -11,10 +11,16 @@ export interface Task {
     assignedUsers: any[]; // Using any for now to match existing component
 }
 
+const getNextHourString = () => {
+    const now = new Date();
+    const nextHour = (now.getHours() + 1) % 24;
+    return `${nextHour.toString().padStart(2, '0')}:00`;
+};
+
 export const useEditTask = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [selectedTime, setSelectedTime] = useState('12:00');
+    const [selectedTime, setSelectedTime] = useState(getNextHourString());
     const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); // Initialize with today's date
     const [repeatDays, setRepeatDays] = useState<string[]>([]);
     const [karma, setKarma] = useState(0);
@@ -29,7 +35,7 @@ export const useEditTask = () => {
         setInstanceId(task.instanceId);
         setName(task.name);
         setDescription(task.description);
-        setSelectedTime(task.time);
+        setSelectedTime(task.time && task.time.trim() !== '' ? task.time : getNextHourString());
         setSelectedDate(task.date || null); // Load the date
         setRepeatDays(task.repeatDays);
         setKarma(task.karma);
@@ -42,7 +48,7 @@ export const useEditTask = () => {
         setInstanceId(undefined);
         setName('');
         setDescription('');
-        setSelectedTime('12:00');
+        setSelectedTime(getNextHourString());
         setSelectedDate(new Date()); // Reset to today's date
         setRepeatDays([]);
         setKarma(0);
