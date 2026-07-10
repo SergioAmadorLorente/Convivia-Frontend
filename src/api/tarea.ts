@@ -127,25 +127,31 @@ export const editarTarea = async (
         ? data.usuariosAsignacion[0]
         : null;
 
-    if (nuevoUsuarioRelId) {
-      // Si se pasó instanceId, actualizar esa instancia directamente
-      const instanciasAActualizar: string[] = instanceId ? [instanceId] : [];
+    // Si se pasó instanceId, actualizar esa instancia directamente
+    const instanciasAActualizar: string[] = instanceId ? [instanceId] : [];
 
-      // También intentar actualizar cualquier otra instancia que venga en tareasId del response
-      if (Array.isArray(data.tareasId)) {
-        data.tareasId.forEach((tid: string) => {
-          if (!instanciasAActualizar.includes(tid)) instanciasAActualizar.push(tid);
-        });
-      }
+    // También intentar actualizar cualquier otra instancia que venga en tareasId del response
+    if (Array.isArray(data.tareasId)) {
+      data.tareasId.forEach((tid: string) => {
+        if (!instanciasAActualizar.includes(tid)) instanciasAActualizar.push(tid);
+      });
+    }
 
+    if (instanciasAActualizar.length > 0) {
       for (const tid of instanciasAActualizar) {
         try {
-          console.log(`📝 [PASO 2] Actualizando instancia ${tid} con usuarioEspacioId=${nuevoUsuarioRelId}...`);
-          await api.patch(
-            `/espacios/${espacioId}/tareas/${plantillaId}/${tid}`,
-            { usuarioEspacioId: nuevoUsuarioRelId },
-          );
-          console.log(`✅ Instancia ${tid} actualizada con nuevo usuario`);
+          const patchPayload: any = {};
+          if (nuevoUsuarioRelId) patchPayload.usuarioEspacioId = nuevoUsuarioRelId;
+          if (data.horaLimite) patchPayload.horaLimite = data.horaLimite;
+
+          if (Object.keys(patchPayload).length > 0) {
+            console.log(`📝 [PASO 2] Actualizando instancia ${tid} con payload:`, patchPayload);
+            await api.patch(
+              `/espacios/${espacioId}/tareas/${plantillaId}/${tid}`,
+              patchPayload,
+            );
+            console.log(`✅ Instancia ${tid} actualizada correctamente`);
+          }
         } catch (instErr) {
           console.warn(`⚠️ No se pudo actualizar instancia ${tid}:`, instErr);
         }

@@ -85,7 +85,7 @@ export function ToastProvider({
             right: 0,
             alignItems: "center",
             paddingHorizontal: wp("2%"),
-            ...(position === "top" ? { top: hp("2%") } : { bottom: hp("2%") }),
+            ...(position === "top" ? { top: hp("8%") } : { bottom: hp("2%") }),
           }}
         >
           <View
