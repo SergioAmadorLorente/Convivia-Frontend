@@ -264,6 +264,14 @@ const DashBoardPersonal: React.FC = () => {
               </View>
             )}
 
+            {activeTab === "tareas" && tareas.length === 0 && (
+              <View style={[{ paddingVertical: 40 }]}>
+                <Text style={{ fontSize: 16, color: COLORS.secondary, fontFamily: FONTS.regular, textAlign: "center" }}>
+                  {t('dashboard.noTasks')}
+                </Text>
+              </View>
+            )}
+
             {pendingItems.length > 0 && (
               <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.pending') : t('dashboard.sections.pendingPayment')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
                 {pendingItems.map((item: any) => (

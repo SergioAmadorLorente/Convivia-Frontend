@@ -117,9 +117,6 @@ export const useDashboardActions = ({
                       0,
                       currentKarma - (task.karma || 0),
                     );
-                    await actualizarUsuarioEspacio(userRelacionId, {
-                      karma: nuevoKarma,
-                    });
                     setCurrentKarma(nuevoKarma);
                   }
                   setTareas((prev) =>
@@ -138,9 +135,6 @@ export const useDashboardActions = ({
       // Completar
       try {
         if (espacioId && task.tareasId && task.tareasId.length > 0) {
-          const nuevoEstado = wasOverdue
-            ? "Completada Fuera de Plazo"
-            : "Completada";
           await completarTareaInstancia(
             espacioId,
             task.id,
@@ -149,15 +143,24 @@ export const useDashboardActions = ({
           );
         }
       } catch (error) {
-        /*/ console.error("Error al completar tarea:", error);*/
+        console.error("[Karma] Error al completar instancia de tarea:", error);
       }
 
+      console.log("[Karma] Notificando suma local de karma:", {
+        wasOverdue,
+        userRelacionId,
+        taskKarma: task.karma,
+        currentKarma,
+      });
+
       if (!wasOverdue && userRelacionId) {
-        try {
-          const nuevoKarma = currentKarma + (task.karma || 0);
-          await actualizarUsuarioEspacio(userRelacionId, { karma: nuevoKarma });
-          setCurrentKarma(nuevoKarma);
-        } catch (e) { }
+        const nuevoKarma = currentKarma + (task.karma || 0);
+        setCurrentKarma(nuevoKarma);
+      } else {
+        console.warn("[Karma] No se sumó karma localmente:", {
+          motivoOverdue: wasOverdue,
+          motivoSinRelacion: !userRelacionId,
+        });
       }
 
       if (showToast) {

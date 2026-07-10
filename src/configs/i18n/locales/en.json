@@ -226,6 +226,7 @@
       "paid": "Paid"
     },
     "noInvoices": "No invoices assigned to your user",
+    "noTasks": "No tasks assigned to your user",
     "filter": {
       "title": "Filter",
       "accessibilityOpen": "Open filters",

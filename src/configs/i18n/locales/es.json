@@ -226,6 +226,7 @@
       "paid": "Pagadas"
     },
     "noInvoices": "No hay facturas asignadas a tu usuario",
+    "noTasks": "No hay tareas asignadas a tu usuario",
     "filter": {
       "title": "Filtrar",
       "accessibilityOpen": "Abrir filtros",

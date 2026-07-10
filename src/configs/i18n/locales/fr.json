@@ -223,6 +223,7 @@
             "paid": "Payées"
         },
         "noInvoices": "Aucune facture n'est attribuée à votre utilisateur",
+        "noTasks": "Aucune tâche n'est attribuée à votre utilisateur",
         "filter": {
             "title": "Filtrer",
             "accessibilityOpen": "Ouvrir les filtres",

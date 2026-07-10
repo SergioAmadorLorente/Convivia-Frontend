@@ -223,6 +223,7 @@
             "paid": "Pagate"
         },
         "noInvoices": "Non ci sono fatture assegnate al tuo utente.",
+        "noTasks": "Non ci sono compiti assegnati al tuo utente.",
         "filter": {
             "title": "Filtra",
             "accessibilityOpen": "Apri filtri",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Text,
   View,
@@ -17,14 +17,14 @@ import {
   Montserrat_400Regular,
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Keep for fallback or other icons
 import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerUsuarioPorId } from "../../api/usuario";
-import { obtenerKarmaUsuario } from "../../api/karma";
 import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
+import { obtenerKarmaUsuario } from "../../api/karma";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
@@ -65,36 +65,46 @@ const Perfil: React.FC = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        if (user?.uid) {
-          const userData = await obtenerUsuarioPorId(user.uid);
-          if (userData) {
-            const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
-            setUserName(realName);
-          }
-
-          // Obtener karma del usuario
-          try {
-            const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
-            if (usuarioEspacio?.espacioId) {
-              const karmaData = await obtenerKarmaUsuario(usuarioEspacio.espacioId, usuarioEspacio.usuarioId);
-              setUserKarma(karmaData.karmaTotal || 0);
-            }
-          } catch (karmaError) {
-            // console.error("Error al cargar karma:", karmaError);
-            setUserKarma(0);
-          }
+  const fetchUserData = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (user?.uid) {
+        const userData = await obtenerUsuarioPorId(user.uid);
+        if (userData) {
+          const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
+          setUserName(realName);
         }
-      } catch (error) {
-        // console.error("Error al cargar los datos del usuario:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
+        // Obtener karma del usuario desde estadísticas oficiales
+        try {
+          const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
+          if (usuarioEspacio?.espacioId) {
+            const usuarioEspacioId = usuarioEspacio.id || usuarioEspacio.id_UsuarioEspacio;
+            const karmaData = await obtenerKarmaUsuario(usuarioEspacio.espacioId, usuarioEspacioId);
+            setUserKarma(karmaData.karmaTotal || 0);
+          }
+        } catch (karmaError) {
+          // console.error("Error al cargar karma:", karmaError);
+          setUserKarma(0);
+        }
+      }
+    } catch (error) {
+      // console.error("Error al cargar los datos del usuario:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Recargar datos al volver a esta pantalla
+  useFocusEffect(
+    useCallback(() => {
+      if (fontsLoaded && user) {
+        fetchUserData();
+      }
+    }, [fetchUserData, fontsLoaded, user])
+  );
+
+  useEffect(() => {
     if (fontsLoaded && user) {
       fetchUserData();
     }

@@ -257,7 +257,7 @@ const CreateTask: React.FC = () => {
         setSingleUserAssignment(singleUser);
 
         // Proceder con la creación de la tarea
-        console.log("💾 Guardando tarea. Fecha seleccionada en state:", selectedDate?.toISOString());
+        console.log("Guardando tarea. Fecha seleccionada en state:", selectedDate?.toISOString());
         await executeCreateTask(assignments, singleUser);
     };
 
