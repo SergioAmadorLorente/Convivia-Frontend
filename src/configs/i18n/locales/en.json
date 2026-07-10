@@ -252,6 +252,19 @@
     "buttonCreate": "Assign Users and Create",
     "saving": "Saving...",
     "errorEmptyName": "Name cannot be empty",
+    "timePicker": {
+      "title": "Select time",
+      "hour": "Hour",
+      "minute": "Minutes",
+      "confirm": "Confirm"
+    },
+    "assignUsers": {
+      "title": "User assignment (Optional)",
+      "selectUser": "Select user",
+      "random": "Random",
+      "loading": "Loading users…",
+      "later": "Maybe later..."
+    },
     "popups": {
       "requiredName": {
         "title": "Required field",

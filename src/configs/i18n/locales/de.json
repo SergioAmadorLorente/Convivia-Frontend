@@ -249,6 +249,19 @@
         "buttonCreate": "Benutzer zuweisen und erstellen",
         "saving": "Wird gespeichert...",
         "errorEmptyName": "Der Name darf nicht leer sein.",
+        "timePicker": {
+            "title": "Zeit auswählen",
+            "hour": "Stunde",
+            "minute": "Minuten",
+            "confirm": "Bestätigen"
+        },
+        "assignUsers": {
+            "title": "Benutzerzuweisung (Optional)",
+            "selectUser": "Benutzer auswählen",
+            "random": "Zufällig",
+            "loading": "Lade Benutzer...",
+            "later": "Vielleicht später..."
+        },
         "popups": {
             "requiredName": {
                 "title": "Pflichtfeld",

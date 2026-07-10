@@ -249,6 +249,19 @@
         "buttonCreate": "Attribuer des utilisateurs et créer",
         "saving": "Enregistrement...",
         "errorEmptyName": "Le nom ne peut pas être vide",
+        "timePicker": {
+            "title": "Sélectionner l'heure",
+            "hour": "Heure",
+            "minute": "Minutes",
+            "confirm": "Confirmer"
+        },
+        "assignUsers": {
+            "title": "Attribution d'utilisateurs (Optionnel)",
+            "selectUser": "Sélectionner l'utilisateur",
+            "random": "Aléatoire",
+            "loading": "Chargement des utilisateurs...",
+            "later": "Peut-être plus tard..."
+        },
         "popups": {
             "requiredName": {
                 "title": "Champ obligatoire",

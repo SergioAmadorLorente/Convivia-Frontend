@@ -557,7 +557,7 @@ const CreateTask: React.FC = () => {
                 days={repeatDays}
                 initialAssignments={getInitialAssignments()}
                 initialSingleUserId={singleUserAssignment?.id || null}
-                confirmLabel="Crear"
+                confirmLabel={isEditing ? t('common.save') : t('bottomBar.create')}
                 onConfirm={(assignments) => {
                     handleConfirmAssignmentAndCreate(assignments, singleUserAssignment);
                 }}

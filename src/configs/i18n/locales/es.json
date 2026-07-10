@@ -252,6 +252,19 @@
     "buttonCreate": "Asignar Usuarios y Crear",
     "saving": "Guardando...",
     "errorEmptyName": "El nombre no puede estar vacío",
+    "timePicker": {
+      "title": "Selecciona la hora",
+      "hour": "Hora",
+      "minute": "Minutos",
+      "confirm": "Confirmar"
+    },
+    "assignUsers": {
+      "title": "Asignación de usuarios (Opcional)",
+      "selectUser": "Seleccionar usuario",
+      "random": "Aleatorio",
+      "loading": "Cargando usuarios…",
+      "later": "Mas tarde..."
+    },
     "popups": {
       "requiredName": {
         "title": "Campo requerido",

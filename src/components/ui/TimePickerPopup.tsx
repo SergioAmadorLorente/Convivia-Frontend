@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { COLORS, FONTS, SIZES } from "../../styles/theme";
 import GLOBAL_STYLES from "../../styles/styles";
+import { useTranslation } from "react-i18next";
 const ITEM_HEIGHT = 50;
 type TimePickerPopupProps = {
     visible: boolean;
@@ -35,6 +36,7 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
     initialHour = "00",
     initialMinute = "00",
 }) => {
+    const { t } = useTranslation();
     const [selectedHour, setSelectedHour] = useState(initialHour);
     const [selectedMinute, setSelectedMinute] = useState(initialMinute);
     const hourRef = useRef<FlatList>(null);
@@ -116,12 +118,12 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
             <View style={styles.overlay}>
                 <View style={styles.popup}>
                     <Text style={GLOBAL_STYLES.popupTitle}>
-                        Selecciona la hora
+                        {t('createTask.timePicker.title')}
                     </Text>
                     <View style={styles.listsContainer}>
                         {/* HOURS LOOP */}
                         <View style={styles.listWrapper}>
-                            <Text style={styles.columnHeader}>Hora</Text>
+                            <Text style={styles.columnHeader}>{t('createTask.timePicker.hour')}</Text>
                             <View style={styles.headerDivider} />
                             <FlatList
                                 ref={hourRef}
@@ -161,7 +163,7 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
                         </View>
                         {/* MINUTES LOOP */}
                         <View style={styles.listWrapper}>
-                            <Text style={styles.columnHeader}>Minutos</Text>
+                            <Text style={styles.columnHeader}>{t('createTask.timePicker.minute')}</Text>
                             <View style={styles.headerDivider} />
                             <FlatList
                                 ref={minuteRef}
@@ -206,7 +208,7 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
                             onPress={onClose}
                         >
                             <Text style={GLOBAL_STYLES.textoBoton}>
-                                Cancelar
+                                {t('common.cancel')}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -225,7 +227,7 @@ const TimePickerPopup: React.FC<TimePickerPopupProps> = ({
                                     { color: COLORS.secondary },
                                 ]}
                             >
-                                Confirmar
+                                {t('createTask.timePicker.confirm')}
                             </Text>
                         </TouchableOpacity>
                     </View>
