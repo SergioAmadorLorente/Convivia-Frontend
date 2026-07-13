@@ -22,7 +22,8 @@
     "loading": "Loading...",
     "continue": "Continue",
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "delete": "Delete"
   },
   "profile": {
     "title": "My Profile",
@@ -238,6 +239,23 @@
       "unassigned": "Unassigned tasks",
       "overdue": "Overdue",
       "completed": "Completed"
+    },
+    "invoices": {
+      "notAssigned": "You are not assigned to this invoice",
+      "unmarkPaymentTitle": "Unmark your payment?",
+      "unmarkPaymentDescription": "Confirm that this will revert your payment and the invoice may return to \"Pending\".",
+      "confirmPaymentTitle": "Confirm payment action?",
+      "confirmPaymentDescription": "Your part will be marked as paid. This action does not grant karma points.",
+      "updatePaymentError": "Could not update the payment on the server.",
+      "invoiceCompletedTitle": "Invoice completed!",
+      "invoiceCompletedDescription": "All participants have paid their part.",
+      "partPaidTitle": "You have marked your part as paid",
+      "partPaidRemaining": "Still pending payment: {{names}}.",
+      "fallbackInvoiceName": "the invoice",
+      "fallbackInvoiceWord": "Invoice",
+      "invoiceCompletedToast": "¡{{name}} fully paid!",
+      "partPaidRemainingToast": "Your part paid. Missing: {{names}}",
+      "partPaidToast": "You have paid your part of {{name}}!"
     }
   },
   "createTask": {
@@ -284,11 +302,19 @@
       },
       "successTaskDeleted": {
         "title": "Task deleted",
-        "description": "The task has been deleted."
+        "description": "The task has been deleted.",
+        "deleteTaskQuestion": "Delete task?"
       },
       "successUpdated": {
         "title": "Task updated",
         "description": "The task has been updated successfully."
+      },
+      "successUnMarked": {
+        "title": "Are you sure you want to mark the task as pending?",
+        "description": "You will lose the Karma points earned."
+      },
+      "unassigned": {
+        "title": "Unassigned Task"
       },
       "error": {
         "title": "Error",
@@ -459,6 +485,7 @@
     }
   },
   "conviviaPro": {
+    "title": "Free trial",
     "feature1": "PRO Benefit: Unlimited residences",
     "feature2": "PRO Benefit: 24/7 Support",
     "plan1Month": "1 Month",

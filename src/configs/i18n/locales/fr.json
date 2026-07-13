@@ -22,7 +22,8 @@
         "loading": "Chargement...",
         "continue": "Continuer",
         "back": "Retour",
-        "close": "Fermer"
+        "close": "Fermer",
+        "delete": "Supprimer"
     },
     "profile": {
         "title": "Mon Profil",
@@ -235,6 +236,23 @@
             "unassigned": "Tâches non attribuées",
             "overdue": "En retard",
             "completed": "Terminées"
+        },
+        "invoices": {
+            "notAssigned": "Vous n'êtes pas assigné à cette facture",
+            "unmarkPaymentTitle": "Annuler votre paiement ?",
+            "unmarkPaymentDescription": "Confirmez que cela annulera votre paiement et que la facture pourrait revenir à \"En attente\".",
+            "confirmPaymentTitle": "Confirmer l'action de paiement ?",
+            "confirmPaymentDescription": "Votre part sera marquée comme payée. Cette action n'accorde pas de points de karma.",
+            "updatePaymentError": "Impossible de mettre à jour le paiement sur le serveur.",
+            "invoiceCompletedTitle": "Facture complétée !",
+            "invoiceCompletedDescription": "Tous les participants ont payé leur part.",
+            "partPaidTitle": "Vous avez marqué votre part comme payée",
+            "partPaidRemaining": "En attente de paiement : {{names}}.",
+            "fallbackInvoiceName": "la facture",
+            "fallbackInvoiceWord": "Facture",
+            "invoiceCompletedToast": "¡{{name}} entièrement payée!",
+            "partPaidRemainingToast": "Votre part a été payée. Restants : {{names}}",
+            "partPaidToast": "Vous avez payé votre part de {{name}}!"
         }
     },
     "createTask": {
@@ -281,11 +299,19 @@
             },
             "successTaskDeleted": {
                 "title": "Tâche supprimée",
-                "description": "La tâche a été supprimée."
+                "description": "La tâche a été supprimée.",
+                "deleteTaskQuestion": "Supprimer la tâche ?"
             },
             "successUpdated": {
                 "title": "Tâche mise à jour",
                 "description": "La tâche a été mise à jour avec succès."
+            },
+            "successUnMarked": {
+                "title": "Êtes-vous sûr de vouloir marquer cette tâche comme en attente ?",
+                "description": "Vous perdrez les points de Karma gagnés."
+            },
+            "unassigned": {
+                "title": "Tâche non assignée"
             },
             "error": {
                 "title": "Erreur",
@@ -456,6 +482,7 @@
         }
     },
     "conviviaPro": {
+        "title": "Essai gratuit",
         "feature1": "Avantage PRO : Résidences illimitées",
         "feature2": "Avantage PRO : Assistance 24 h/24 et 7 j/7",
         "plan1Month": "1 mois",

@@ -22,7 +22,8 @@
     "loading": "Cargando...",
     "continue": "Continuar",
     "back": "Volver",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "delete": "Eliminar"
   },
   "profile": {
     "title": "Mi Perfil",
@@ -238,6 +239,23 @@
       "unassigned": "Tareas sin asignar",
       "overdue": "Fuera de plazo",
       "completed": "Completadas"
+    },
+    "invoices": {
+      "notAssigned": "No estás asignado a esta factura",
+      "unmarkPaymentTitle": "¿Desmarcar tu pago?",
+      "unmarkPaymentDescription": "Confirmar que revertirá su pago y que la factura podría volver a \"Pendientes\".",
+      "confirmPaymentTitle": "¿Confirmar acción de pago?",
+      "confirmPaymentDescription": "Se marcará tu parte como pagada. Esta acción no otorga puntos de karma.",
+      "updatePaymentError": "No se pudo actualizar el pago en el servidor.",
+      "invoiceCompletedTitle": "¡Factura completada!",
+      "invoiceCompletedDescription": "Todos los participantes han pagado su parte.",
+      "partPaidTitle": "Has marcado tu parte como pagada",
+      "partPaidRemaining": "Faltan por pagar: {{names}}.",
+      "fallbackInvoiceName": "la factura",
+      "fallbackInvoiceWord": "Factura",
+      "invoiceCompletedToast": "¡{{name}} completamente pagada!",
+      "partPaidRemainingToast": "Tu parte pagada. Faltan: {{names}}",
+      "partPaidToast": "¡Has pagado tu parte de {{name}}!"
     }
   },
   "createTask": {
@@ -284,11 +302,19 @@
       },
       "successTaskDeleted": {
         "title": "Tarea eliminada",
-        "description": "La tarea se ha eliminado."
+        "description": "La tarea se ha eliminado.",
+        "deleteTaskQuestion": "¿Eliminar tarea?"
       },
       "successUpdated": {
         "title": "Tarea actualizada",
         "description": "La tarea se ha actualizado exitosamente."
+      },
+      "successUnMarked": {
+        "title": "¿Estás seguro de que quieres marcar la tarea como pendiente?",
+        "description": "Perderás los puntos de Karma obtenidos."
+      },
+      "unassigned": {
+        "title": "Tarea sin asignar"
       },
       "error": {
         "title": "Error",
@@ -459,6 +485,7 @@
     }
   },
   "conviviaPro": {
+    "title": "Prueba gratis",
     "feature1": "Ventaja PRO: Residencias ilimitadas",
     "feature2": "Ventaja PRO: Soporte 24/7",
     "plan1Month": "1 Mes",

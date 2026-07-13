@@ -22,7 +22,8 @@
         "loading": "Wird geladen...",
         "continue": "Weiter",
         "back": "Zurück",
-        "close": "Schließen"
+        "close": "Schließen",
+        "delete": "Löschen"
     },
     "profile": {
         "title": "Mein Profil",
@@ -235,6 +236,23 @@
             "unassigned": "Nicht zugewiesene Aufgaben",
             "overdue": "Überfällig",
             "completed": "Abgeschlossen"
+        },
+        "invoices": {
+            "notAssigned": "Du bist dieser Rechnung nicht zugewiesen",
+            "unmarkPaymentTitle": "Zahlung aufheben?",
+            "unmarkPaymentDescription": "Bestätige, dass deine Zahlung rückgängig gemacht wird und die Rechnung möglicherweise zu \"Ausstehend\" zurückkehrt.",
+            "confirmPaymentTitle": "Zahlungsvorgang bestätigen?",
+            "confirmPaymentDescription": "Dein Anteil wird als bezahlt markiert. Diese Aktion vergibt keine Karma-Punkte.",
+            "updatePaymentError": "Die Zahlung konnte nicht auf dem Server aktualisiert werden.",
+            "invoiceCompletedTitle": "Rechnung abgeschlossen!",
+            "invoiceCompletedDescription": "Alle Teilnehmer haben ihren Anteil bezahlt.",
+            "partPaidTitle": "Du hast deinen Anteil als bezahlt markiert",
+            "partPaidRemaining": "Noch ausstehend: {{names}}.",
+            "fallbackInvoiceName": "die Rechnung",
+            "fallbackInvoiceWord": "Rechnung",
+            "invoiceCompletedToast": "¡{{name}} vollständig bezahlt!",
+            "partPaidRemainingToast": "Dein Anteil wurde bezahlt. Es fehlen noch: {{names}}",
+            "partPaidToast": "Du hast deinen Anteil an {{name}} bezahlt!"
         }
     },
     "createTask": {
@@ -281,11 +299,19 @@
             },
             "successTaskDeleted": {
                 "title": "Aufgabe gelöscht",
-                "description": "Die Aufgabe wurde gelöscht."
+                "description": "Die Aufgabe wurde gelöscht.",
+                "deleteTaskQuestion": "Aufgabe löschen?"
             },
             "successUpdated": {
                 "title": "Aufgabe aktualisiert",
                 "description": "Die Aufgabe wurde erfolgreich aktualisiert."
+            },
+            "successUnMarked": {
+                "title": "Möchten Sie diese Aufgabe wirklich als ausstehend markieren?",
+                "description": "Sie verlieren die erhaltenen Karma-Punkte."
+            },
+            "unassigned": {
+                "title": "Nicht zugewiesene Aufgabe"
             },
             "error": {
                 "title": "Fehler",
@@ -456,6 +482,7 @@
         }
     },
     "conviviaPro": {
+        "title": "Kostenlose Testversion",
         "feature1": "PRO-Vorteil: Unbegrenzte Wohnungen",
         "feature2": "PRO-Vorteil: 24/7-Support",
         "plan1Month": "1 Monat",

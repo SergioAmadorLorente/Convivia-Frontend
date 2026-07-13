@@ -95,12 +95,12 @@ export const useDashboardActions = ({
       if (task.isCompleted) {
         showPopup({
           imageType: "goback",
-          title: "¿Estás seguro de que quieres marcar la tarea como pendiente?",
-          description: "Perderás los puntos de Karma obtenidos.",
+          title: t("createTask.popups.successUnMarked.title"),
+          description: t("createTask.popups.successUnMarked.description"),
           buttons: [
-            { text: "Cancelar" },
+            { text: t("common.cancel") },
             {
-              text: "Aceptar",
+              text: t("common.accept"),
               onPress: async () => {
                 try {
                   if (espacioId && task.tareasId && task.tareasId.length > 0) {
@@ -197,8 +197,8 @@ export const useDashboardActions = ({
       if (!yo) {
         showPopup({
           imageType: "error",
-          title: "No estás asignado a esta factura",
-          buttons: [{ text: "Aceptar" }],
+          title: t("dashboard.invoices.notAssigned"),
+          buttons: [{ text: t("common.accept") }],
         });
         return;
       }
@@ -207,13 +207,12 @@ export const useDashboardActions = ({
         // DESMARCAR PAGO
         showPopup({
           imageType: "goback",
-          title: "¿Desmarcar tu pago?",
-          description:
-            "Confirmar que revertirá su pago y que la factura podría volver a “Pendientes”.",
+          title: t("dashboard.invoices.unmarkPaymentTitle"),
+          description: t("dashboard.invoices.unmarkPaymentDescription"),
           buttons: [
-            { text: "Cancelar" },
+            { text: t("common.cancel") },
             {
-              text: "Aceptar",
+              text: t("common.accept"),
               onPress: async () => {
                 const desmarcada = factura.withUserCompleted(yo.id, false);
                 setFacturas((prev) =>
@@ -242,8 +241,8 @@ export const useDashboardActions = ({
                   } catch (e) {
                     // console.error("Error actualizando factura:", e);
                     Alert.alert(
-                      "Error",
-                      "No se pudo actualizar el pago en el servidor.",
+                      t("common.error"),
+                      t("dashboard.invoices.updatePaymentError"),
                     );
                   }
                 }
@@ -255,13 +254,12 @@ export const useDashboardActions = ({
         // MARCAR COMO PAGADO
         showPopup({
           imageType: "success",
-          title: "¿Confirmar acción de pago?",
-          description:
-            "Se marcará tu parte como pagada. Esta acción no otorga puntos de karma.",
+          title: t("dashboard.invoices.confirmPaymentTitle"),
+          description: t("dashboard.invoices.confirmPaymentDescription"),
           buttons: [
-            { text: "Cancelar" },
+            { text: t("common.cancel") },
             {
-              text: "Aceptar",
+              text: t("common.accept"),
               onPress: async () => {
                 const marcada = factura.withUserCompleted(yo.id, true);
                 setFacturas((prev) =>
@@ -289,8 +287,8 @@ export const useDashboardActions = ({
                   } catch (e) {
                     // console.error("Error actualizando factura:", e);
                     Alert.alert(
-                      "Error",
-                      "No se pudo actualizar el pago en el servidor.",
+                      t("common.error"),
+                      t("dashboard.invoices.updatePaymentError"),
                     );
                     return;
                   }
@@ -300,16 +298,17 @@ export const useDashboardActions = ({
                   if (showToast) {
                     showToast({
                       entity: "factura",
-                      name: `¡${marcada.Nombre || 'Factura'} completamente pagada!`,
+                      name: t("dashboard.invoices.invoiceCompletedToast")
+                        .replace("{{name}}", marcada.Nombre || t("dashboard.invoices.fallbackInvoiceWord")),
                       tone: "success",
                       autoHideMs: 3000,
                     });
                   } else {
                     showPopup({
                       imageType: "happy",
-                      title: "¡Factura completada!",
-                      description: "Todos los participantes han pagado su parte.",
-                      buttons: [{ text: "Aceptar" }],
+                      title: t("dashboard.invoices.invoiceCompletedTitle"),
+                      description: t("dashboard.invoices.invoiceCompletedDescription"),
+                      buttons: [{ text: t("common.accept") }],
                     });
                   }
                 } else {
@@ -320,20 +319,22 @@ export const useDashboardActions = ({
                     showToast({
                       entity: "factura",
                       name: restantes.length > 0
-                        ? `Tu parte pagada. Faltan: ${restantes.map((u) => u.name).join(", ")}`
-                        : `¡Has pagado tu parte de ${marcada.Nombre || 'la factura'}!`,
+                        ? t("dashboard.invoices.partPaidRemainingToast")
+                          .replace("{{names}}", restantes.map((u) => u.name).join(", "))
+                        : t("dashboard.invoices.partPaidToast")
+                          .replace("{{name}}", marcada.Nombre || t("dashboard.invoices.fallbackInvoiceName")),
                       tone: "success",
                       autoHideMs: 3500,
                     });
                   } else {
                     showPopup({
                       imageType: "success",
-                      title: "Has marcado tu parte como pagada",
+                      title: t("dashboard.invoices.partPaidTitle"),
                       description:
                         restantes.length > 0
-                          ? `Faltan por pagar: ${restantes.map((u) => u.name).join(", ")}.`
+                          ? t("dashboard.invoices.partPaidRemaining").replace("{{names}}", restantes.map((u) => u.name).join(", "))
                           : undefined,
-                      buttons: [{ text: "Aceptar" }],
+                      buttons: [{ text: t("common.accept") }],
                     });
                   }
                 }
@@ -351,11 +352,11 @@ export const useDashboardActions = ({
     if (!espacioId) return;
     showPopup({
       imageType: "goback",
-      title: "¿Eliminar tarea?",
+      title: t("createTask.popups.successTaskDeleted.deleteTaskQuestion"),
       buttons: [
-        { text: "Cancelar" },
+        { text: t("common.cancel") },
         {
-          text: "Eliminar",
+          text: t("common.delete"),
           onPress: async () => {
             try {
               await eliminarTarea(espacioId, id);

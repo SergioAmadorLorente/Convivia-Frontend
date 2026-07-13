@@ -22,7 +22,8 @@
         "loading": "Caricamento...",
         "continue": "Continua",
         "back": "Indietro",
-        "close": "Chiudi"
+        "close": "Chiudi",
+        "delete": "Elimina"
     },
     "profile": {
         "title": "Il mio profilo",
@@ -235,6 +236,23 @@
             "unassigned": "Attività non assegnate",
             "overdue": "Scadute",
             "completed": "Completate"
+        },
+        "invoices": {
+            "notAssigned": "Non sei assegnato a questa fattura",
+            "unmarkPaymentTitle": "Annullare il pagamento?",
+            "unmarkPaymentDescription": "Conferma che questo annullerà il tuo pagamento e la fattura potrebbe tornare a \"In attesa\".",
+            "confirmPaymentTitle": "Confermare l'azione di pagamento?",
+            "confirmPaymentDescription": "La tua parte verrà contrassegnata come pagata. Questa azione non assegna punti karma.",
+            "updatePaymentError": "Impossibile aggiornare il pagamento sul server.",
+            "invoiceCompletedTitle": "Fattura completata!",
+            "invoiceCompletedDescription": "Tutti i partecipanti hanno pagato la loro parte.",
+            "partPaidTitle": "Hai contrassegnato la tua parte come pagata",
+            "partPaidRemaining": "In attesa di pagamento: {{names}}.",
+            "fallbackInvoiceName": "la fattura",
+            "fallbackInvoiceWord": "Fattura",
+            "invoiceCompletedToast": "¡{{name}} completamente pagata!",
+            "partPaidRemainingToast": "La tua parte è stata pagata. Mancano: {{names}}",
+            "partPaidToast": "Hai pagato la tua parte di {{name}}!"
         }
     },
     "createTask": {
@@ -281,11 +299,19 @@
             },
             "successTaskDeleted": {
                 "title": "Attività eliminata",
-                "description": "L'attività è stata eliminata."
+                "description": "L'attività è stata eliminata.",
+                "deleteTaskQuestion": "Eliminare l'attività?"
             },
             "successUpdated": {
                 "title": "Attività aggiornata",
                 "description": "L'attività è stata aggiornata con successo."
+            },
+            "successUnMarked": {
+                "title": "Sei sicuro di voler segnare l'attività come in sospeso?",
+                "description": "Perderai i punti Karma ottenuti."
+            },
+            "unassigned": {
+                "title": "Attività non assegnata"
             },
             "error": {
                 "title": "Errore",
@@ -456,6 +482,7 @@
         }
     },
     "conviviaPro": {
+        "title": "Prova Gratuita",
         "feature1": "Vantaggio PRO: Residenze illimitate",
         "feature2": "Vantaggio PRO: Assistenza 24/7",
         "plan1Month": "1 mese",

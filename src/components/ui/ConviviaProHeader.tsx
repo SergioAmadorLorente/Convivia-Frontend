@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FONTS, SIZES } from "../../styles/theme";
 import LogoReal from "../../assets/logoReal.svg";
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get("window");
 
@@ -11,9 +12,10 @@ interface ConviviaProHeaderProps {
 }
 
 const ConviviaProHeader: React.FC<ConviviaProHeaderProps> = ({ features }) => {
+  const { t } = useTranslation();
   return (
     <View style={styles.headerContainer}>
-      <Text style={styles.title}>Prueba gratis</Text>
+      <Text style={styles.title}>{t('conviviaPro.title')}</Text>
       <Text style={styles.subtitle}>Convivia PRO</Text>
 
       <View style={styles.iconWrapper}>
@@ -23,10 +25,10 @@ const ConviviaProHeader: React.FC<ConviviaProHeaderProps> = ({ features }) => {
       <View style={styles.featuresContainer}>
         {features.map((feature, index) => (
           <View key={index} style={styles.featureItem}>
-            <Ionicons 
-              name="checkmark" 
-              size={24} 
-              color="#A8B89E" 
+            <Ionicons
+              name="checkmark"
+              size={24}
+              color="#A8B89E"
               style={{ marginRight: 5 }}
             />
             <Text style={styles.featureText}>{feature}</Text>
