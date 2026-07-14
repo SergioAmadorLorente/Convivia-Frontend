@@ -345,6 +345,14 @@
             "updatedSuccess": "Erfolgreich aktualisiert.",
             "createdSuccess": "Erfolgreich erstellt.",
             "saveError": "Die Rechnung konnte nicht gespeichert werden."
+        },
+        "backConfirm": {
+            "titleCreate": "Ohne Speichern beenden?",
+            "titleEdit": "Ohne Speichern beenden?",
+            "description": "Wenn Sie zurückgehen, werden Ihre Änderungen nicht gespeichert.",
+            "exit": "Ohne Speichern beenden",
+            "continueCreate": "Weiter erstellen",
+            "continueEdit": "Weiter bearbeiten"
         }
     },
     "faq": {

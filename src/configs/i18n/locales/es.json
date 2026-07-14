@@ -236,7 +236,7 @@
       "today": "Hoy",
       "week": "Esta semana",
       "all": "Todas",
-      "unassigned": "Tareas sin asignar",
+      "unassigned": "Sin asignar",
       "overdue": "Fuera de plazo",
       "completed": "Completadas"
     },
@@ -322,7 +322,7 @@
         "description": "Perderás los puntos de Karma obtenidos."
       },
       "unassigned": {
-        "title": "Tarea sin asignar"
+        "title": "Sin asignar"
       },
       "error": {
         "title": "Error",
@@ -348,6 +348,14 @@
       "updatedSuccess": "Actualizada correctamente",
       "createdSuccess": "Creada correctamente",
       "saveError": "No se pudo guardar la factura"
+    },
+    "backConfirm": {
+      "titleCreate": "¿Salir sin guardar?",
+      "titleEdit": "¿Salir sin guardar?",
+      "description": "Si vuelves atrás, los cambios que hayas hecho no se guardarán.",
+      "exit": "Salir sin guardar",
+      "continueCreate": "Seguir creando",
+      "continueEdit": "Seguir editando"
     }
   },
   "faq": {

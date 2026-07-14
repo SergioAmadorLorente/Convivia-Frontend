@@ -345,6 +345,14 @@
             "updatedSuccess": "Aggiornata con successo.",
             "createdSuccess": "Creata con successo.",
             "saveError": "Impossibile salvare la fattura."
+        },
+        "backConfirm": {
+            "titleCreate": "Uscire senza salvare?",
+            "titleEdit": "Uscire senza salvare?",
+            "description": "Se torni indietro, le modifiche non verranno salvate.",
+            "exit": "Esci senza salvare",
+            "continueCreate": "Continua a creare",
+            "continueEdit": "Continua a modificare"
         }
     },
     "faq": {

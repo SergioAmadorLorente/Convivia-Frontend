@@ -345,6 +345,14 @@
             "updatedSuccess": "Mise à jour effectuée avec succès",
             "createdSuccess": "Créée avec succès",
             "saveError": "Impossible d'enregistrer la facture"
+        },
+        "backConfirm": {
+            "titleCreate": "Quitter sans enregistrer ?",
+            "titleEdit": "Quitter sans enregistrer ?",
+            "description": "Si vous revenez en arrière, vos modifications ne seront pas sauvegardées.",
+            "exit": "Quitter sans enregistrer",
+            "continueCreate": "Continuer la création",
+            "continueEdit": "Continuer l'édition"
         }
     },
     "faq": {
