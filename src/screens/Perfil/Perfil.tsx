@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Text,
   View,
@@ -17,17 +17,18 @@ import {
   Montserrat_400Regular,
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons"; // Keep for fallback or other icons
 import BottomBar from "../../components/ui/BottomBar";
 import Popup from "../../components/ui/Popup";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerUsuarioPorId } from "../../api/usuario";
-import { obtenerKarmaUsuario } from "../../api/karma";
 import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
+import { obtenerKarmaUsuario } from "../../api/karma";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
+import { useToast } from "../../hooks/useToast";
 
 // Import SVG Assets
 import LogoKarma from "../../assets/logo_karma.svg";
@@ -48,6 +49,28 @@ const Perfil: React.FC = () => {
   const [userKarma, setUserKarma] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Easter egg: tap title 6 times
+  const { show: showToast } = useToast();
+  const easterTapCount = useRef(0);
+  const easterTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleTitleTap = () => {
+    easterTapCount.current += 1;
+    if (easterTapTimer.current) clearTimeout(easterTapTimer.current);
+    easterTapTimer.current = setTimeout(() => {
+      easterTapCount.current = 0;
+    }, 1500);
+    if (easterTapCount.current >= 6) {
+      easterTapCount.current = 0;
+      showToast({
+        entity: "tarea",
+        name: "Stop tapping the screen like a crazy, or you'll cause a bug.",
+        tone: "info",
+        autoHideMs: 4000,
+      });
+    }
+  };
+
   const handleLogout = () => {
     navigation.replace('Main');
   };
@@ -65,36 +88,46 @@ const Perfil: React.FC = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        if (user?.uid) {
-          const userData = await obtenerUsuarioPorId(user.uid);
-          if (userData) {
-            const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
-            setUserName(realName);
-          }
-
-          // Obtener karma del usuario
-          try {
-            const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
-            if (usuarioEspacio?.espacioId) {
-              const karmaData = await obtenerKarmaUsuario(usuarioEspacio.espacioId, usuarioEspacio.usuarioId);
-              setUserKarma(karmaData.karmaTotal || 0);
-            }
-          } catch (karmaError) {
-            // console.error("Error al cargar karma:", karmaError);
-            setUserKarma(0);
-          }
+  const fetchUserData = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (user?.uid) {
+        const userData = await obtenerUsuarioPorId(user.uid);
+        if (userData) {
+          const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
+          setUserName(realName);
         }
-      } catch (error) {
-        // console.error("Error al cargar los datos del usuario:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
+        // Obtener karma del usuario desde estadísticas oficiales
+        try {
+          const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
+          if (usuarioEspacio?.espacioId) {
+            const usuarioEspacioId = usuarioEspacio.id || usuarioEspacio.id_UsuarioEspacio;
+            const karmaData = await obtenerKarmaUsuario(usuarioEspacio.espacioId, usuarioEspacioId);
+            setUserKarma(karmaData.karmaTotal || 0);
+          }
+        } catch (karmaError) {
+          // console.error("Error al cargar karma:", karmaError);
+          setUserKarma(0);
+        }
+      }
+    } catch (error) {
+      // console.error("Error al cargar los datos del usuario:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  // Recargar datos al volver a esta pantalla
+  useFocusEffect(
+    useCallback(() => {
+      if (fontsLoaded && user) {
+        fetchUserData();
+      }
+    }, [fetchUserData, fontsLoaded, user])
+  );
+
+  useEffect(() => {
     if (fontsLoaded && user) {
       fetchUserData();
     }
@@ -128,7 +161,9 @@ const Perfil: React.FC = () => {
         style={styles.scrollContent}
       >
         {/* Header Title */}
-        <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
+        <TouchableOpacity onPress={handleTitleTap} activeOpacity={1}>
+          <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
+        </TouchableOpacity>
 
         {/* User Card */}
         <View style={styles.userCard}>
@@ -140,14 +175,19 @@ const Perfil: React.FC = () => {
 
             {/* User Details */}
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{userName}</Text>
               {loading ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={[styles.userName, { color: "#999" }]}>{t("common.loading")}</Text>
+                </View>
               ) : (
-                <Text style={styles.userKarma}>
-                  {t("profile.karmaPoints", { points: userKarma })}
-                  <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
-                </Text>
+                <>
+                  <Text style={styles.userName}>{userName}</Text>
+                  <Text style={styles.userKarma}>
+                    {t("profile.karmaPoints", { points: userKarma })}
+                    <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
+                  </Text>
+                </>
               )}
             </View>
 
@@ -161,9 +201,9 @@ const Perfil: React.FC = () => {
                 <Text style={{ fontSize: 20 }}>
                   {i18n.language.startsWith("es") ? "🇪🇸"
                     : i18n.language.startsWith("fr") ? "🇫🇷"
-                    : i18n.language.startsWith("it") ? "🇮🇹"
-                    : i18n.language.startsWith("de") ? "🇩🇪"
-                    : "🇬🇧"}
+                      : i18n.language.startsWith("it") ? "🇮🇹"
+                        : i18n.language.startsWith("de") ? "🇩🇪"
+                          : "🇬🇧"}
                 </Text>
               </TouchableOpacity>
 

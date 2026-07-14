@@ -22,7 +22,8 @@
     "loading": "Cargando...",
     "continue": "Continuar",
     "back": "Volver",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "delete": "Eliminar"
   },
   "profile": {
     "title": "Mi Perfil",
@@ -226,6 +227,7 @@
       "paid": "Pagadas"
     },
     "noInvoices": "No hay facturas asignadas a tu usuario",
+    "noTasks": "No hay tareas asignadas a tu usuario",
     "filter": {
       "title": "Filtrar",
       "accessibilityOpen": "Abrir filtros",
@@ -234,9 +236,27 @@
       "today": "Hoy",
       "week": "Esta semana",
       "all": "Todas",
-      "unassigned": "Tareas sin asignar",
+      "unassigned": "Sin asignar",
       "overdue": "Fuera de plazo",
       "completed": "Completadas"
+    },
+    "invoices": {
+      "notAssigned": "No estás asignado a esta factura",
+      "unmarkPaymentTitle": "¿Desmarcar tu pago?",
+      "unmarkPaymentDescription": "Confirmar que revertirá su pago y que la factura podría volver a \"Pendientes\".",
+      "confirmPaymentTitle": "¿Confirmar acción de pago?",
+      "confirmPaymentDescription": "Se marcará tu parte como pagada. Esta acción no otorga puntos de karma.",
+      "updatePaymentError": "No se pudo actualizar el pago en el servidor.",
+      "invoiceCompletedTitle": "¡Factura completada!",
+      "invoiceCompletedDescription": "Todos los participantes han pagado su parte.",
+      "partPaidTitle": "Has marcado tu parte como pagada",
+      "partPaidRemaining": "Faltan por pagar: {{names}}.",
+      "fallbackInvoiceName": "la factura",
+      "fallbackInvoiceWord": "Factura",
+      "invoiceCompletedToast": "¡{{name}} completamente pagada!",
+      "partPaidRemainingToast": "Tu parte pagada. Faltan: {{names}}",
+      "partPaidToast": "¡Has pagado tu parte de {{name}}!",
+      "unmarkPaymentToast": "Pago desmarcado correctamente"
     }
   },
   "createTask": {
@@ -251,6 +271,27 @@
     "buttonCreate": "Asignar Usuarios y Crear",
     "saving": "Guardando...",
     "errorEmptyName": "El nombre no puede estar vacío",
+    "backConfirm": {
+      "titleCreate": "¿Salir sin guardar?",
+      "titleEdit": "¿Salir sin guardar?",
+      "description": "Si vuelves atrás, los cambios que hayas hecho no se guardarán.",
+      "exit": "Salir sin guardar",
+      "continueCreate": "Seguir creando",
+      "continueEdit": "Seguir editando"
+    },
+    "timePicker": {
+      "title": "Selecciona la hora",
+      "hour": "Hora",
+      "minute": "Minutos",
+      "confirm": "Confirmar"
+    },
+    "assignUsers": {
+      "title": "Asignación de usuarios (Opcional)",
+      "selectUser": "Seleccionar usuario",
+      "random": "Aleatorio",
+      "loading": "Cargando usuarios…",
+      "later": "Mas tarde..."
+    },
     "popups": {
       "requiredName": {
         "title": "Campo requerido",
@@ -270,15 +311,28 @@
       },
       "successTaskDeleted": {
         "title": "Tarea eliminada",
-        "description": "La tarea se ha eliminado."
+        "description": "La tarea se ha eliminado.",
+        "deleteTaskQuestion": "¿Eliminar tarea?"
       },
       "successUpdated": {
         "title": "Tarea actualizada",
         "description": "La tarea se ha actualizado exitosamente."
       },
+      "successUnMarked": {
+        "title": "¿Estás seguro de que quieres marcar la tarea como pendiente?",
+        "description": "Perderás los puntos de Karma obtenidos."
+      },
+      "unassigned": {
+        "title": "Sin asignar"
+      },
       "error": {
         "title": "Error",
         "description": "Error al crear la tarea. Intenta de nuevo."
+      },
+      "notAssignedToMe": {
+        "title": "No puedes completar esta tarea",
+        "description": "Esta tarea está asignada a {{name}}. Solo el usuario asignado puede completarla.",
+        "otherUser": "otro usuario"
       }
     }
   },
@@ -300,6 +354,14 @@
       "updatedSuccess": "Actualizada correctamente",
       "createdSuccess": "Creada correctamente",
       "saveError": "No se pudo guardar la factura"
+    },
+    "backConfirm": {
+      "titleCreate": "¿Salir sin guardar?",
+      "titleEdit": "¿Salir sin guardar?",
+      "description": "Si vuelves atrás, los cambios que hayas hecho no se guardarán.",
+      "exit": "Salir sin guardar",
+      "continueCreate": "Seguir creando",
+      "continueEdit": "Seguir editando"
     }
   },
   "faq": {
@@ -445,6 +507,7 @@
     }
   },
   "conviviaPro": {
+    "title": "Prueba gratis",
     "feature1": "Ventaja PRO: Residencias ilimitadas",
     "feature2": "Ventaja PRO: Soporte 24/7",
     "plan1Month": "1 Mes",

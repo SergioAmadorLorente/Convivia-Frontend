@@ -22,7 +22,8 @@
         "loading": "Chargement...",
         "continue": "Continuer",
         "back": "Retour",
-        "close": "Fermer"
+        "close": "Fermer",
+        "delete": "Supprimer"
     },
     "profile": {
         "title": "Mon Profil",
@@ -223,6 +224,7 @@
             "paid": "Payées"
         },
         "noInvoices": "Aucune facture n'est attribuée à votre utilisateur",
+        "noTasks": "Aucune tâche n'est attribuée à votre utilisateur",
         "filter": {
             "title": "Filtrer",
             "accessibilityOpen": "Ouvrir les filtres",
@@ -234,6 +236,24 @@
             "unassigned": "Tâches non attribuées",
             "overdue": "En retard",
             "completed": "Terminées"
+        },
+        "invoices": {
+            "notAssigned": "Vous n'êtes pas assigné à cette facture",
+            "unmarkPaymentTitle": "Annuler votre paiement ?",
+            "unmarkPaymentDescription": "Confirmez que cela annulera votre paiement et que la facture pourrait revenir à \"En attente\".",
+            "confirmPaymentTitle": "Confirmer l'action de paiement ?",
+            "confirmPaymentDescription": "Votre part sera marquée comme payée. Cette action n'accorde pas de points de karma.",
+            "updatePaymentError": "Impossible de mettre à jour le paiement sur le serveur.",
+            "invoiceCompletedTitle": "Facture complétée !",
+            "invoiceCompletedDescription": "Tous les participants ont payé leur part.",
+            "partPaidTitle": "Vous avez marqué votre part comme payée",
+            "partPaidRemaining": "En attente de paiement : {{names}}.",
+            "fallbackInvoiceName": "la facture",
+            "fallbackInvoiceWord": "Facture",
+            "invoiceCompletedToast": "¡{{name}} entièrement payée!",
+            "partPaidRemainingToast": "Votre part a été payée. Restants : {{names}}",
+            "partPaidToast": "Vous avez payé votre part de {{name}}!",
+            "unmarkPaymentToast": "Paiement démarqué avec succès"
         }
     },
     "createTask": {
@@ -248,6 +268,27 @@
         "buttonCreate": "Attribuer des utilisateurs et créer",
         "saving": "Enregistrement...",
         "errorEmptyName": "Le nom ne peut pas être vide",
+        "backConfirm": {
+            "titleCreate": "Quitter sans enregistrer ?",
+            "titleEdit": "Quitter sans enregistrer ?",
+            "description": "Si vous revenez en arrière, vos modifications ne seront pas sauvegardées.",
+            "exit": "Quitter sans enregistrer",
+            "continueCreate": "Continuer la création",
+            "continueEdit": "Continuer l'édition"
+        },
+        "timePicker": {
+            "title": "Sélectionner l'heure",
+            "hour": "Heure",
+            "minute": "Minutes",
+            "confirm": "Confirmer"
+        },
+        "assignUsers": {
+            "title": "Attribution d'utilisateurs (Optionnel)",
+            "selectUser": "Sélectionner l'utilisateur",
+            "random": "Aléatoire",
+            "loading": "Chargement des utilisateurs...",
+            "later": "Peut-être plus tard..."
+        },
         "popups": {
             "requiredName": {
                 "title": "Champ obligatoire",
@@ -265,13 +306,30 @@
                 "title": "Tâche créée",
                 "description": "La tâche a été créée avec succès."
             },
+            "successTaskDeleted": {
+                "title": "Tâche supprimée",
+                "description": "La tâche a été supprimée.",
+                "deleteTaskQuestion": "Supprimer la tâche ?"
+            },
             "successUpdated": {
                 "title": "Tâche mise à jour",
                 "description": "La tâche a été mise à jour avec succès."
             },
+            "successUnMarked": {
+                "title": "Êtes-vous sûr de vouloir marquer cette tâche comme en attente ?",
+                "description": "Vous perdrez les points de Karma gagnés."
+            },
+            "unassigned": {
+                "title": "Tâche non assignée"
+            },
             "error": {
                 "title": "Erreur",
                 "description": "Erreur lors de la création de la tâche. Veuillez réessayer."
+            },
+            "notAssignedToMe": {
+                "title": "Vous ne pouvez pas compléter cette tâche",
+                "description": "Cette tâche est assignée à {{name}}. Seul l'utilisateur assigné peut la compléter.",
+                "otherUser": "un autre utilisateur"
             }
         }
     },
@@ -293,6 +351,14 @@
             "updatedSuccess": "Mise à jour effectuée avec succès",
             "createdSuccess": "Créée avec succès",
             "saveError": "Impossible d'enregistrer la facture"
+        },
+        "backConfirm": {
+            "titleCreate": "Quitter sans enregistrer ?",
+            "titleEdit": "Quitter sans enregistrer ?",
+            "description": "Si vous revenez en arrière, vos modifications ne seront pas sauvegardées.",
+            "exit": "Quitter sans enregistrer",
+            "continueCreate": "Continuer la création",
+            "continueEdit": "Continuer l'édition"
         }
     },
     "faq": {
@@ -438,6 +504,7 @@
         }
     },
     "conviviaPro": {
+        "title": "Essai gratuit",
         "feature1": "Avantage PRO : Résidences illimitées",
         "feature2": "Avantage PRO : Assistance 24 h/24 et 7 j/7",
         "plan1Month": "1 mois",

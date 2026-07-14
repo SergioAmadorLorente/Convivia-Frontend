@@ -22,7 +22,8 @@
         "loading": "Wird geladen...",
         "continue": "Weiter",
         "back": "Zurück",
-        "close": "Schließen"
+        "close": "Schließen",
+        "delete": "Löschen"
     },
     "profile": {
         "title": "Mein Profil",
@@ -223,6 +224,7 @@
             "paid": "Bezahlt"
         },
         "noInvoices": "Deinem Benutzer sind keine Rechnungen zugewiesen.",
+        "noTasks": "Deinem Benutzer sind keine Aufgaben zugewiesen.",
         "filter": {
             "title": "Filtern",
             "accessibilityOpen": "Filter öffnen",
@@ -234,6 +236,24 @@
             "unassigned": "Nicht zugewiesene Aufgaben",
             "overdue": "Überfällig",
             "completed": "Abgeschlossen"
+        },
+        "invoices": {
+            "notAssigned": "Du bist dieser Rechnung nicht zugewiesen",
+            "unmarkPaymentTitle": "Zahlung aufheben?",
+            "unmarkPaymentDescription": "Bestätige, dass deine Zahlung rückgängig gemacht wird und die Rechnung möglicherweise zu \"Ausstehend\" zurückkehrt.",
+            "confirmPaymentTitle": "Zahlungsvorgang bestätigen?",
+            "confirmPaymentDescription": "Dein Anteil wird als bezahlt markiert. Diese Aktion vergibt keine Karma-Punkte.",
+            "updatePaymentError": "Die Zahlung konnte nicht auf dem Server aktualisiert werden.",
+            "invoiceCompletedTitle": "Rechnung abgeschlossen!",
+            "invoiceCompletedDescription": "Alle Teilnehmer haben ihren Anteil bezahlt.",
+            "partPaidTitle": "Du hast deinen Anteil als bezahlt markiert",
+            "partPaidRemaining": "Noch ausstehend: {{names}}.",
+            "fallbackInvoiceName": "die Rechnung",
+            "fallbackInvoiceWord": "Rechnung",
+            "invoiceCompletedToast": "¡{{name}} vollständig bezahlt!",
+            "partPaidRemainingToast": "Dein Anteil wurde bezahlt. Es fehlen noch: {{names}}",
+            "partPaidToast": "Du hast deinen Anteil an {{name}} bezahlt!",
+            "unmarkPaymentToast": "Zahlung erfolgreich aufgehoben"
         }
     },
     "createTask": {
@@ -248,6 +268,27 @@
         "buttonCreate": "Benutzer zuweisen und erstellen",
         "saving": "Wird gespeichert...",
         "errorEmptyName": "Der Name darf nicht leer sein.",
+        "backConfirm": {
+            "titleCreate": "Ohne Speichern beenden?",
+            "titleEdit": "Ohne Speichern beenden?",
+            "description": "Wenn Sie zurückgehen, werden Ihre Änderungen nicht gespeichert.",
+            "exit": "Ohne Speichern beenden",
+            "continueCreate": "Weiter erstellen",
+            "continueEdit": "Weiter bearbeiten"
+        },
+        "timePicker": {
+            "title": "Zeit auswählen",
+            "hour": "Stunde",
+            "minute": "Minuten",
+            "confirm": "Bestätigen"
+        },
+        "assignUsers": {
+            "title": "Benutzerzuweisung (Optional)",
+            "selectUser": "Benutzer auswählen",
+            "random": "Zufällig",
+            "loading": "Lade Benutzer...",
+            "later": "Vielleicht später..."
+        },
         "popups": {
             "requiredName": {
                 "title": "Pflichtfeld",
@@ -265,13 +306,30 @@
                 "title": "Aufgabe erstellt",
                 "description": "Die Aufgabe wurde erfolgreich erstellt."
             },
+            "successTaskDeleted": {
+                "title": "Aufgabe gelöscht",
+                "description": "Die Aufgabe wurde gelöscht.",
+                "deleteTaskQuestion": "Aufgabe löschen?"
+            },
             "successUpdated": {
                 "title": "Aufgabe aktualisiert",
                 "description": "Die Aufgabe wurde erfolgreich aktualisiert."
             },
+            "successUnMarked": {
+                "title": "Möchten Sie diese Aufgabe wirklich als ausstehend markieren?",
+                "description": "Sie verlieren die erhaltenen Karma-Punkte."
+            },
+            "unassigned": {
+                "title": "Nicht zugewiesene Aufgabe"
+            },
             "error": {
                 "title": "Fehler",
                 "description": "Beim Erstellen der Aufgabe ist ein Fehler aufgetreten. Bitte versuche es erneut."
+            },
+            "notAssignedToMe": {
+                "title": "Du kannst diese Aufgabe nicht abschließen",
+                "description": "Diese Aufgabe ist {{name}} zugewiesen. Nur der zugewiesene Benutzer kann sie abschließen.",
+                "otherUser": "ein anderer Benutzer"
             }
         }
     },
@@ -293,6 +351,14 @@
             "updatedSuccess": "Erfolgreich aktualisiert.",
             "createdSuccess": "Erfolgreich erstellt.",
             "saveError": "Die Rechnung konnte nicht gespeichert werden."
+        },
+        "backConfirm": {
+            "titleCreate": "Ohne Speichern beenden?",
+            "titleEdit": "Ohne Speichern beenden?",
+            "description": "Wenn Sie zurückgehen, werden Ihre Änderungen nicht gespeichert.",
+            "exit": "Ohne Speichern beenden",
+            "continueCreate": "Weiter erstellen",
+            "continueEdit": "Weiter bearbeiten"
         }
     },
     "faq": {
@@ -438,6 +504,7 @@
         }
     },
     "conviviaPro": {
+        "title": "Kostenlose Testversion",
         "feature1": "PRO-Vorteil: Unbegrenzte Wohnungen",
         "feature2": "PRO-Vorteil: 24/7-Support",
         "plan1Month": "1 Monat",

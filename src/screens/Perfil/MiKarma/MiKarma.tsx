@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     View,
     Text,
@@ -8,7 +8,7 @@ import {
     Dimensions,
     ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
@@ -24,7 +24,7 @@ import BottomBar from "../../../components/ui/BottomBar";
 import TasksDonutChart from "../../../components/ui/TasksDonutChart";
 import LogoKarma from "../../../assets/logo_karma.svg";
 import { useAuthListener } from "../../../hooks/useAuthListener";
-import { obtenerEspacioPorUsuarioId } from "../../../api/usuarioEspacio";
+import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../../api/usuarioEspacio";
 import { obtenerKarmaUsuario, obtenerRankingKarma } from "../../../api/karma";
 import { obtenerEstadisticasTareas } from "../../../api/espacio";
 import { obtenerUsuarios } from "../../../api/usuario";
@@ -65,78 +65,112 @@ const MiKarma: React.FC = () => {
     });
 
     // Cargar datos del backend
-    useEffect(() => {
-        const fetchKarmaData = async () => {
-            if (!user?.uid) {
-                setLoading(false);
-                return;
+    const fetchKarmaData = useCallback(async () => {
+        if (!user?.uid) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+
+            // 1. Obtener el espacio del usuario
+            const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
+            if (!usuarioEspacio?.espacioId) {
+                throw new Error("No se encontró un espacio asignado");
             }
 
-            try {
-                setLoading(true);
-                setError(null);
+            const espacioId = usuarioEspacio.espacioId;
+            const usuarioEspacioId = usuarioEspacio.id || usuarioEspacio.id_UsuarioEspacio;
 
-                // 1. Obtener el espacio del usuario
-                const usuarioEspacio = await obtenerEspacioPorUsuarioId(user.uid);
-                if (!usuarioEspacio?.espacioId) {
-                    throw new Error("No se encontró un espacio asignado");
+            console.log("[MiKarma] Obteniendo estadísticas para usuarioEspacioId:", usuarioEspacioId);
+
+            // 2. Obtener datos en paralelo con el id de relación correcto
+            const limit = viewMode === 'podio' ? 3 : 100; // Top 3 para podio, todos para lista
+            const [karmaUsuario, ranking, estadisticas, usuarios, usuarioEspacios] = await Promise.all([
+                obtenerKarmaUsuario(espacioId, usuarioEspacioId),
+                obtenerRankingKarma(espacioId, rankingType, limit),
+                obtenerEstadisticasTareas(espacioId, usuarioEspacioId),
+                obtenerUsuarios(),
+                obtenerUsuarioEspacios(),
+            ]);
+
+            // 3. Crear un mapa de usuarios para obtener nombres
+            const usuariosMap = new Map<string, string>(
+                usuarios.map((u: any) => [u.id, u.nombre || u.email || "Usuario"])
+            );
+
+            // Crear un mapa de relación usuarioEspacioId -> usuarioId (Firebase UID) sólo para el espacio actual
+            const uEspaciosMap = new Map<string, string>();
+            if (Array.isArray(usuarioEspacios)) {
+                usuarioEspacios
+                    .filter((rel: any) => rel.espacioId === espacioId)
+                    .forEach((rel: any) => {
+                        const relId = rel.id || rel.id_UsuarioEspacio;
+                        if (relId && rel.usuarioId) {
+                            uEspaciosMap.set(relId.replace(/-/g, "").toLowerCase(), rel.usuarioId);
+                        }
+                    });
+            }
+
+            // 4. Mapear datos del ranking al formato del componente, conservando sólo miembros activos
+            const getPoints = (r: any) => {
+                switch (rankingType) {
+                    case 'mensual':
+                        return r.karmaMensual;
+                    case 'semanal':
+                        return r.karmaSemanal;
+                    default:
+                        return r.karmaTotal;
                 }
+            };
 
-                const espacioId = usuarioEspacio.espacioId;
-
-                // 2. Obtener datos en paralelo
-                const limit = viewMode === 'podio' ? 3 : 100; // Top 3 para podio, todos para lista
-                const [karmaUsuario, ranking, estadisticas, usuarios] = await Promise.all([
-                    obtenerKarmaUsuario(espacioId, user.uid),
-                    obtenerRankingKarma(espacioId, rankingType, limit),
-                    obtenerEstadisticasTareas(espacioId, user.uid),
-                    obtenerUsuarios(),
-                ]);
-
-                // 3. Crear un mapa de usuarios para obtener nombres
-                const usuariosMap = new Map<string, string>(
-                    usuarios.map((u: any) => [u.id, u.nombre || u.email || "Usuario"])
-                );
-
-                // 4. Mapear datos del ranking al formato del componente
-                const getPoints = (r: any) => {
-                    switch (rankingType) {
-                        case 'mensual':
-                            return r.karmaMensual;
-                        case 'semanal':
-                            return r.karmaSemanal;
-                        default:
-                            return r.karmaTotal;
-                    }
-                };
-
-                const participants = ranking.ranking.map((r: any) => ({
-                    name: usuariosMap.get(r.usuarioId) ?? "Usuario",
-                    points: getPoints(r),
-                }));
-
-                // 5. Actualizar estado
-                setKarmaData({
-                    totalPoints: karmaUsuario.karmaTotal,
-                    monthPoints: karmaUsuario.karmaMensual,
-                    weekPoints: karmaUsuario.karmaSemanal,
-                    completedTasks: estadisticas.completadas,
-                    pendingTasks: estadisticas.pendientes,
-                    lateTasks: estadisticas.tardes,
-                    participants: participants.slice(0, 3), // Top 3 para el podio
+            const participants = ranking.ranking
+                .filter((r: any) => {
+                    const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
+                    return uEspaciosMap.has(cleanKey); // Filtrar registros inactivos/huérfanos del espacio
+                })
+                .map((r: any) => {
+                    const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
+                    const firebaseUid = uEspaciosMap.get(cleanKey);
+                    const name = firebaseUid ? (usuariosMap.get(firebaseUid) ?? "Usuario") : "Usuario";
+                    return {
+                        name,
+                        points: getPoints(r),
+                    };
                 });
-                setAllParticipants(participants); // Todos para la lista
-            } catch (err: any) {
-                // console.error("Error al cargar datos de karma:", err);
-                setError(err.message || "Error al cargar los datos");
-                setKarmaData(null);
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        fetchKarmaData();
+            // 5. Actualizar estado
+            setKarmaData({
+                totalPoints: karmaUsuario.karmaTotal,
+                monthPoints: karmaUsuario.karmaMensual,
+                weekPoints: karmaUsuario.karmaSemanal,
+                completedTasks: estadisticas.completadas,
+                pendingTasks: estadisticas.pendientes,
+                lateTasks: estadisticas.tardes,
+                participants: participants.slice(0, 3), // Top 3 para el podio
+            });
+            setAllParticipants(participants); // Todos para la lista
+        } catch (err: any) {
+            console.error("Error al cargar datos de karma:", err);
+            setError(err.message || "Error al cargar los datos");
+            setKarmaData(null);
+        } finally {
+            setLoading(false);
+        }
     }, [user, rankingType, viewMode]);
+
+    // Recargar datos al enfocar la pantalla
+    useFocusEffect(
+        useCallback(() => {
+            fetchKarmaData();
+        }, [fetchKarmaData])
+    );
+
+    useEffect(() => {
+        fetchKarmaData();
+    }, [fetchKarmaData]);
 
     if (!fontsLoaded) return null;
 

@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -40,6 +41,7 @@ const MiResidencia: React.FC = () => {
   const { userData } = useUser();
   const { t } = useTranslation();
   const [residenciaName, setResidenciaName] = useState<string>("@Nombre Piso");
+  const [loadingResidencia, setLoadingResidencia] = useState<boolean>(true);
   const [residenciaData, setResidenciaData] = useState<any>(null);
 
   const { participants, fetchParticipants } = useFetchParticipants();
@@ -105,7 +107,7 @@ const MiResidencia: React.FC = () => {
 
   const fetchResidencia = async () => {
     if (!user) return;
-
+    setLoadingResidencia(true);
     try {
       const relacion = await obtenerEspacioPorUsuarioId(user.uid);
       if (relacion && relacion.espacioId) {
@@ -118,6 +120,8 @@ const MiResidencia: React.FC = () => {
       }
     } catch (error) {
       // console.error("Error fetching residencia:", error);
+    } finally {
+      setLoadingResidencia(false);
     }
   };
 
@@ -221,7 +225,14 @@ const MiResidencia: React.FC = () => {
               <View style={styles.iconContainer}>
                 <Ionicons name="home" size={30} color="#fff" />
               </View>
-              <Text style={styles.residenciaName}>{residenciaName}</Text>
+              {loadingResidencia ? (
+                <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={[styles.residenciaName, { color: "#999" }]}>{t("common.loading")}</Text>
+                </View>
+              ) : (
+                <Text style={styles.residenciaName}>{residenciaName}</Text>
+              )}
               <TouchableOpacity
                 style={styles.editIcon}
                 onPress={() =>
