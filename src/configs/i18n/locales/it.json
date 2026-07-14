@@ -252,7 +252,8 @@
             "fallbackInvoiceWord": "Fattura",
             "invoiceCompletedToast": "¡{{name}} completamente pagata!",
             "partPaidRemainingToast": "La tua parte è stata pagata. Mancano: {{names}}",
-            "partPaidToast": "Hai pagato la tua parte di {{name}}!"
+            "partPaidToast": "Hai pagato la tua parte di {{name}}!",
+            "unmarkPaymentToast": "Pagamento rimosso correttamente"
         }
     },
     "createTask": {
@@ -324,6 +325,11 @@
             "error": {
                 "title": "Errore",
                 "description": "Errore durante la creazione dell'attività. Riprova."
+            },
+            "notAssignedToMe": {
+                "title": "Non puoi completare questo compito",
+                "description": "Questo compito è assegnato a {{name}}. Solo l'utente assegnato può completarlo.",
+                "otherUser": "un altro utente"
             }
         }
     },

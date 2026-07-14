@@ -84,9 +84,10 @@ export const useDashboardActions = ({
         if (!isAssignedToMe) {
           showPopup({
             imageType: "error",
-            title: "No puedes completar esta tarea",
-            description: `Esta tarea está asignada a ${task.usuarioAsignado || "otro usuario"}.\nSolo el usuario asignado puede completarla.`,
-            buttons: [{ text: "Entendido" }],
+            title: t("createTask.popups.notAssignedToMe.title"),
+            description: t("createTask.popups.notAssignedToMe.description")
+              .replace("{{name}}", task.usuarioAsignado || t("createTask.popups.notAssignedToMe.otherUser")),
+            buttons: [{ text: t("common.accept") }],
           });
           return;
         }
@@ -244,6 +245,16 @@ export const useDashboardActions = ({
                       t("common.error"),
                       t("dashboard.invoices.updatePaymentError"),
                     );
+                    return;
+                  }
+
+                  if (showToast) {
+                    showToast({
+                      entity: "factura",
+                      name: t("dashboard.invoices.unmarkPaymentToast"),
+                      tone: "info",
+                      autoHideMs: 3000,
+                    });
                   }
                 }
               },

@@ -252,7 +252,8 @@
             "fallbackInvoiceWord": "Facture",
             "invoiceCompletedToast": "¡{{name}} entièrement payée!",
             "partPaidRemainingToast": "Votre part a été payée. Restants : {{names}}",
-            "partPaidToast": "Vous avez payé votre part de {{name}}!"
+            "partPaidToast": "Vous avez payé votre part de {{name}}!",
+            "unmarkPaymentToast": "Paiement démarqué avec succès"
         }
     },
     "createTask": {
@@ -324,6 +325,11 @@
             "error": {
                 "title": "Erreur",
                 "description": "Erreur lors de la création de la tâche. Veuillez réessayer."
+            },
+            "notAssignedToMe": {
+                "title": "Vous ne pouvez pas compléter cette tâche",
+                "description": "Cette tâche est assignée à {{name}}. Seul l'utilisateur assigné peut la compléter.",
+                "otherUser": "un autre utilisateur"
             }
         }
     },

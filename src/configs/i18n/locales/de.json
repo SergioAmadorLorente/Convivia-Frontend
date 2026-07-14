@@ -252,7 +252,8 @@
             "fallbackInvoiceWord": "Rechnung",
             "invoiceCompletedToast": "¡{{name}} vollständig bezahlt!",
             "partPaidRemainingToast": "Dein Anteil wurde bezahlt. Es fehlen noch: {{names}}",
-            "partPaidToast": "Du hast deinen Anteil an {{name}} bezahlt!"
+            "partPaidToast": "Du hast deinen Anteil an {{name}} bezahlt!",
+            "unmarkPaymentToast": "Zahlung erfolgreich aufgehoben"
         }
     },
     "createTask": {
@@ -324,6 +325,11 @@
             "error": {
                 "title": "Fehler",
                 "description": "Beim Erstellen der Aufgabe ist ein Fehler aufgetreten. Bitte versuche es erneut."
+            },
+            "notAssignedToMe": {
+                "title": "Du kannst diese Aufgabe nicht abschließen",
+                "description": "Diese Aufgabe ist {{name}} zugewiesen. Nur der zugewiesene Benutzer kann sie abschließen.",
+                "otherUser": "ein anderer Benutzer"
             }
         }
     },
