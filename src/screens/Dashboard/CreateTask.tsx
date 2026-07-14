@@ -16,14 +16,14 @@ import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
 import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
 import TimePickerPopup from "../../components/ui/TimePickerPopup";
 import { useEditTask } from "../../hooks/useEditTask";
 import { useAuthListener } from "../../hooks/useAuthListener";
-import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
+import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio, obtenerUsuarioEspacios, obtenerUsuarioEspacioPorId } from "../../api/usuarioEspacio";
 import { crearTarea, editarTarea, TareaPayload } from "../../api/tarea";
 import { obtenerUsuarios } from "../../api/usuario";
 import Popup from "../../components/ui/Popup";
@@ -123,6 +123,28 @@ const CreateTask: React.FC = () => {
         setPopupVisible(true);
     };
 
+    // Back navigation confirmation popup
+    const [backConfirmVisible, setBackConfirmVisible] = useState(false);
+    const pendingBackAction = useRef<any>(null);
+    // Flag to skip the confirmation when navigating back after a successful save
+    const isSavingRef = useRef(false);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
+            // If we are saving, allow the navigation without showing the modal
+            if (isSavingRef.current) {
+                isSavingRef.current = false;
+                return;
+            }
+            if (e.data.action.type === 'GO_BACK' || e.data.action.type === 'POP') {
+                e.preventDefault();
+                pendingBackAction.current = e.data.action;
+                setBackConfirmVisible(true);
+            }
+        });
+        return unsubscribe;
+    }, [navigation]);
+
     // User assignments per day: { "Lunes": UserItem, "Martes": UserItem, ... }
     const [dayUserAssignments, setDayUserAssignments] = useState<Record<string, UserItem | null>>({});
 
@@ -191,10 +213,13 @@ const CreateTask: React.FC = () => {
 
                 const usersInSpace = allUsers
                     .filter((u: any) => userIdsInSpace.includes(u.id))
-                    .map((u: any) => ({
-                        id: u.id,
-                        name: u.nombre || u.email || "Usuario sin nombre"
-                    }));
+                    .map((u: any) => {
+                        const rel = spaceRelations.find((r: any) => r.usuarioId === u.id);
+                        return {
+                            id: rel ? (rel.id || rel.id_UsuarioEspacio) : u.id,
+                            name: u.nombre || u.email || "Usuario sin nombre"
+                        };
+                    });
 
                 console.log(`👥 ${usersInSpace.length} usuarios encontrados en el espacio.`);
                 setAvailableUsers(usersInSpace);
@@ -254,7 +279,7 @@ const CreateTask: React.FC = () => {
         setSingleUserAssignment(singleUser);
 
         // Proceder con la creación de la tarea
-        console.log("💾 Guardando tarea. Fecha seleccionada en state:", selectedDate?.toISOString());
+        console.log("Guardando tarea. Fecha seleccionada en state:", selectedDate?.toISOString());
         await executeCreateTask(assignments, singleUser);
     };
 
@@ -314,7 +339,8 @@ const CreateTask: React.FC = () => {
                 // Para EDITAR: actualizamos la plantilla y la instancia (si existe)
                 console.log("Actualizando tarea. Plantilla:", taskId, "Instancia:", instanceId);
                 const editPayload = {
-                    ...baseData
+                    ...baseData,
+                    tareasId: route.params?.taskToEdit?.tareasId || [],
                 };
                 console.log("Datos de edición a enviar:", JSON.stringify(editPayload, null, 2));
 
@@ -359,12 +385,11 @@ const CreateTask: React.FC = () => {
                     });
                 }
 
-                for (const userId of listaUsuariosAsignados) {
+                for (const relacionId of listaUsuariosAsignados) {
                     try {
-                        const usuarioEspacioAsignado = await obtenerEspacioPorUsuarioId(userId);
-                        const relacionId = usuarioEspacioAsignado?.id || usuarioEspacioAsignado?.id_UsuarioEspacio;
+                        const usuarioEspacioAsignado = await obtenerUsuarioEspacioPorId(relacionId);
 
-                        if (relacionId) {
+                        if (usuarioEspacioAsignado) {
                             const currentTasks = usuarioEspacioAsignado.tareasId || [];
                             // Filtrar IDs que ya existen para no duplicar
                             const nuevosIds = idsATareas.filter(id => !currentTasks.includes(id));
@@ -375,15 +400,13 @@ const CreateTask: React.FC = () => {
                                 await actualizarUsuarioEspacio(relacionId, {
                                     tareasId: tareasActualizadas
                                 });
-                                console.log(`✅ UsuarioEspacio actualizado para usuario ${userId} con tareas: ${nuevosIds.join(', ')}`);
+                                console.log(`✅ UsuarioEspacio actualizado para relación ${relacionId} con tareas: ${nuevosIds.join(', ')}`);
                             } else {
-                                console.log(`ℹ️ Las tareas ya estaban asignadas al usuario ${userId}.`);
+                                console.log(`ℹ️ Las tareas ya estaban asignadas a la relación ${relacionId}.`);
                             }
-                        } else {
-                            console.warn(`⚠️ No se encontró ID de relación UsuarioEspacio para usuario ${userId}`);
                         }
                     } catch (updateError) {
-                        console.warn(`⚠️ No se pudo actualizar UsuarioEspacio para usuario ${userId}:`, updateError);
+                        console.warn(`⚠️ No se pudo actualizar UsuarioEspacio para relación ${relacionId}:`, updateError);
                     }
                 }
             }
@@ -415,6 +438,7 @@ const CreateTask: React.FC = () => {
                 tone: "success",
                 autoHideMs: 3000,
             });
+            isSavingRef.current = true;
             navigation.goBack();
 
         } catch (error: any) {
@@ -556,7 +580,7 @@ const CreateTask: React.FC = () => {
                 days={repeatDays}
                 initialAssignments={getInitialAssignments()}
                 initialSingleUserId={singleUserAssignment?.id || null}
-                confirmLabel="Crear"
+                confirmLabel={isEditing ? t('common.save') : t('bottomBar.create')}
                 onConfirm={(assignments) => {
                     handleConfirmAssignmentAndCreate(assignments, singleUserAssignment);
                 }}
@@ -583,6 +607,35 @@ const CreateTask: React.FC = () => {
                 description={popupOptions.description}
                 imageType={popupOptions.imageType}
                 buttons={popupOptions.buttons}
+            />
+
+            {/* Back navigation confirmation popup */}
+            <Popup
+                visible={backConfirmVisible}
+                onClose={() => setBackConfirmVisible(false)}
+                title={isEditing ? t('createTask.backConfirm.titleEdit') : t('createTask.backConfirm.titleCreate')}
+                description={t('createTask.backConfirm.description')}
+                imageType="goback"
+                buttons={[
+                    {
+                        text: t('createTask.backConfirm.exit'),
+                        onPress: () => {
+                            setBackConfirmVisible(false);
+                            if (pendingBackAction.current) {
+                                navigation.dispatch(pendingBackAction.current);
+                            }
+                        },
+                    },
+                    {
+                        text: isEditing
+                            ? t('createTask.backConfirm.continueEdit')
+                            : t('createTask.backConfirm.continueCreate'),
+                        onPress: () => {
+                            setBackConfirmVisible(false);
+                            pendingBackAction.current = null;
+                        },
+                    },
+                ]}
             />
 
             <BottomBar />

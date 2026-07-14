@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { COLORS, FONTS, CHECKBOX } from "../../styles/theme";
 import { Feather } from "@expo/vector-icons";
+import { useTranslation } from 'react-i18next';
 
 type Variant = "tarea" | "factura";
 
@@ -59,6 +60,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const toggleTooltip = () => setShowTooltip(prev => !prev);
+  const { t } = useTranslation();
 
   const isFactura = variant === "factura";
   const counterText =
@@ -133,7 +135,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 numberOfLines={1}
                 ellipsizeMode="clip"
               >
-                Sin asignar
+                {t("createTask.popups.unassigned.title")}
               </Text>
             </View>
           )}

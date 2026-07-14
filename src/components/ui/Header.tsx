@@ -10,15 +10,25 @@ interface HeaderProps {
   location: string;
 }
 
+const LOCALE_MAP: Record<string, string> = {
+  es: "es-ES",
+  en: "en-US",
+  fr: "fr-FR",
+  de: "de-DE",
+  it: "it-IT",
+};
+
 function formatLongDate(date: Date, locale: string): string {
-  const isEs = locale.startsWith("es");
-  const fmt = new Intl.DateTimeFormat(isEs ? "es-ES" : "en-US", {
+  const lang = locale.split("-")[0]; // "es-ES" → "es"
+  const intlLocale = LOCALE_MAP[lang] ?? "en-US";
+
+  const fmt = new Intl.DateTimeFormat(intlLocale, {
     weekday: "long",
     day: "numeric",
     month: "long",
   }).format(date);
 
-  // Capitaliza cada palabra (Miércoles, 15 de Septiembre)
+  // Capitaliza la primera letra de cada palabra
   return fmt
     .split(" ")
     .map((w) => (w[0] ? w[0].toUpperCase() + w.slice(1) : w))

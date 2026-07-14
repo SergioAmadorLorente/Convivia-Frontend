@@ -13,6 +13,7 @@ import { FONTS, COLORS } from "../../styles/styles";
 import ConviviaSvg from "../../assets/Convivia.svg";
 import { CHECKBOX } from "../../styles/theme"; // estilo global del checkbox
 import { Feather } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 type UserItem = {
   id: string;
@@ -34,14 +35,15 @@ type AssignUsersPopupProps = {
 const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
   visible,
   onClose,
-  title = "Asignación de usuarios (Opcional)",
+  title,
   users,
   multiSelect = true,
   initialSelectedIds = [],
-  confirmLabel = "¡Asigna!",
+  confirmLabel,
   onConfirm,
   loadingUsers = false,
 }) => {
+  const { t } = useTranslation();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirming, setConfirming] = useState(false);
 
@@ -110,13 +112,13 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
       <View style={styles.overlay}>
         <View style={styles.popup}>
           <ConviviaSvg style={styles.image} width={150} height={150} />
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title}>{title || t('createTask.assignUsers.title')}</Text>
 
           <View style={{ maxHeight: 320, width: "100%" }}>
             {loadingUsers ? (
               <View style={styles.loadingBox}>
                 <ActivityIndicator size="small" color={COLORS.secondary} />
-                <Text style={styles.loadingText}>Cargando usuarios…</Text>
+                <Text style={styles.loadingText}>{t('createTask.assignUsers.loading')}</Text>
               </View>
             ) : (
               <FlatList
@@ -137,7 +139,7 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
               <ActivityIndicator size="small" color={COLORS.secondary} />
             ) : (
               <Text style={styles.confirmButtonText}>
-                {selectedIds.size > 0 ? confirmLabel : "Mas tarde..."}
+                {selectedIds.size > 0 ? (confirmLabel || t('common.accept')) : t('createTask.assignUsers.later')}
               </Text>
             )}
           </TouchableOpacity>

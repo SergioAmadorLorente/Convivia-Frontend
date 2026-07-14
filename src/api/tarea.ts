@@ -118,7 +118,45 @@ export const editarTarea = async (
     };
 
     await api.patch(urlPlantilla, templateData);
-    console.log(`✅ PlantillaTarea actualizada correctamente (tareas regeneradas por el backend)`);
+    console.log(`✅ PlantillaTarea actualizada correctamente`);
+
+    // 2. Si hay usuario asignado e instancias existentes, actualizar la instancia directamente
+    // Esto es necesario porque el backend no regenera las instancias pendientes al editar la plantilla
+    const nuevoUsuarioRelId: string | null =
+      Array.isArray(data.usuariosAsignacion) && data.usuariosAsignacion.length > 0
+        ? data.usuariosAsignacion[0]
+        : null;
+
+    // Si se pasó instanceId, actualizar esa instancia directamente
+    const instanciasAActualizar: string[] = instanceId ? [instanceId] : [];
+
+    // También intentar actualizar cualquier otra instancia que venga en tareasId del response
+    if (Array.isArray(data.tareasId)) {
+      data.tareasId.forEach((tid: string) => {
+        if (!instanciasAActualizar.includes(tid)) instanciasAActualizar.push(tid);
+      });
+    }
+
+    if (instanciasAActualizar.length > 0) {
+      for (const tid of instanciasAActualizar) {
+        try {
+          const patchPayload: any = {};
+          if (nuevoUsuarioRelId) patchPayload.usuarioEspacioId = nuevoUsuarioRelId;
+          if (data.horaLimite) patchPayload.horaLimite = data.horaLimite;
+
+          if (Object.keys(patchPayload).length > 0) {
+            console.log(`📝 [PASO 2] Actualizando instancia ${tid} con payload:`, patchPayload);
+            await api.patch(
+              `/espacios/${espacioId}/tareas/${plantillaId}/${tid}`,
+              patchPayload,
+            );
+            console.log(`✅ Instancia ${tid} actualizada correctamente`);
+          }
+        } catch (instErr) {
+          console.warn(`⚠️ No se pudo actualizar instancia ${tid}:`, instErr);
+        }
+      }
+    }
 
     console.log("✅ PlantillaTarea actualizada exitosamente");
     return { success: true };
@@ -127,6 +165,7 @@ export const editarTarea = async (
     throw error;
   }
 };
+
 
 export const eliminarTarea = async (espacioId: string, id: string | number) => {
   try {

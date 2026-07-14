@@ -27,6 +27,7 @@ import { crearFacturaEnEspacio, editarFactura, subirImagenFactura, actualizarIma
 import { Alert } from "react-native";
 import UserList from "../../components/ui/UserList";
 import { useToast } from "../../hooks/useToast";
+import Popup from "../../components/ui/Popup";
 
 const { hp } = HELPERS;
 
@@ -85,6 +86,28 @@ const CreateFactura: React.FC = () => {
     const [loadingUsers, setLoadingUsers] = useState(false);
     const [checkedAutoasign, setcheckedAutoasign] = useState(false);
     const [assignPopupVisible, setAssignPopupVisible] = useState(false);
+
+    // Back navigation confirmation popup
+    const [backConfirmVisible, setBackConfirmVisible] = useState(false);
+    const pendingBackAction = useRef<any>(null);
+    // Flag to skip the confirmation when navigating back after a successful save
+    const isSavingRef = useRef(false);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
+            // If we are saving, allow the navigation without showing the modal
+            if (isSavingRef.current) {
+                isSavingRef.current = false;
+                return;
+            }
+            if (e.data.action.type === 'GO_BACK' || e.data.action.type === 'POP') {
+                e.preventDefault();
+                pendingBackAction.current = e.data.action;
+                setBackConfirmVisible(true);
+            }
+        });
+        return unsubscribe;
+    }, [navigation]);
 
     const currentUserData = useMemo(() => {
         return {
@@ -248,6 +271,7 @@ const CreateFactura: React.FC = () => {
                 route.params.onSave();
             }
 
+            isSavingRef.current = true;
             navigation.goBack();
         } catch (err) {
             // console.error("Error al guardar factura:", err);
@@ -423,6 +447,35 @@ const CreateFactura: React.FC = () => {
                     console.log("Usuarios asignados:", selected);
                     setAssignedUsers(selected);
                 }}
+            />
+
+            {/* Back navigation confirmation popup */}
+            <Popup
+                visible={backConfirmVisible}
+                onClose={() => setBackConfirmVisible(false)}
+                title={isEditing ? t('createInvoice.backConfirm.titleEdit') : t('createInvoice.backConfirm.titleCreate')}
+                description={t('createInvoice.backConfirm.description')}
+                imageType="goback"
+                buttons={[
+                    {
+                        text: t('createInvoice.backConfirm.exit'),
+                        onPress: () => {
+                            setBackConfirmVisible(false);
+                            if (pendingBackAction.current) {
+                                navigation.dispatch(pendingBackAction.current);
+                            }
+                        },
+                    },
+                    {
+                        text: isEditing
+                            ? t('createInvoice.backConfirm.continueEdit')
+                            : t('createInvoice.backConfirm.continueCreate'),
+                        onPress: () => {
+                            setBackConfirmVisible(false);
+                            pendingBackAction.current = null;
+                        },
+                    },
+                ]}
             />
 
             <BottomBar />

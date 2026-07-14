@@ -45,12 +45,14 @@ const DashBoardPersonal: React.FC = () => {
 
   const {
     user,
+    authLoading,
     userName,
     espacioNombre,
     espacioId,
     userRelacionId,
     currentKarma,
     setCurrentKarma,
+    loadingEspacio,
     userNamesMap,
     tareas,
     setTareas,
@@ -67,7 +69,7 @@ const DashBoardPersonal: React.FC = () => {
   const CURRENT_USER_RELACION_ID = userRelacionId;
 
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
-  const isLoading = activeTab === "tareas" ? loadingTareas : loadingFacturas;
+  const isLoading = authLoading || loadingEspacio || (activeTab === "tareas" ? loadingTareas : loadingFacturas);
   const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
   const [visibility, setVisibility] = useState({
     showUnassigned: true,
@@ -123,8 +125,11 @@ const DashBoardPersonal: React.FC = () => {
         repeatDays: task.DiasRepeticion,
         karma: task.karma,
         date: task.FechaLimite instanceof Date ? task.FechaLimite.toISOString() : task.FechaLimite,
-        assignedUsers: task.usuarioAsignado ? [{ id: task.usuarioAsignado, name: task.usuarioAsignado }] : [],
-        instanceId: task.tareasId?.[0]
+        assignedUsers: task.usuarioAsignadoId && task.usuarioAsignado
+          ? [{ id: task.usuarioAsignadoId, name: task.usuarioAsignado }]
+          : [],
+        instanceId: task.tareasId?.[0],
+        tareasId: task.tareasId || [],
       },
       onSave: () => cargarTareas(),
     });
@@ -165,10 +170,12 @@ const DashBoardPersonal: React.FC = () => {
   const isFacturaPaidByMe = (item: FacturaModel): boolean => {
     if (item.Pagado) return true;
     const relId = (userRelacionId || "").replace(/-/g, "").toLowerCase();
+    const myUid = (user?.uid || "").replace(/-/g, "").toLowerCase();
     return (
-      item.UsuariosAsignados?.some(
-        (u) => u.id.replace(/-/g, "").toLowerCase() === relId && u.completed
-      ) ?? false
+      item.UsuariosAsignados?.some((u) => {
+        const cleanUId = u.id.replace(/-/g, "").toLowerCase();
+        return (cleanUId === relId || cleanUId === myUid) && u.completed;
+      }) ?? false
     );
   };
 
@@ -181,7 +188,7 @@ const DashBoardPersonal: React.FC = () => {
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const isOverdue = (it: TaskModel) => {
-      if (it.overdue !== undefined) return it.overdue;
+      if (it.overdue) return true;
       const d = new Date(it.FechaLimite);
       d.setHours(0, 0, 0, 0);
       return d.getTime() < todayStart.getTime();
@@ -261,6 +268,14 @@ const DashBoardPersonal: React.FC = () => {
               </View>
             )}
 
+            {activeTab === "tareas" && tareas.length === 0 && (
+              <View style={[{ paddingVertical: 40 }]}>
+                <Text style={{ fontSize: 16, color: COLORS.secondary, fontFamily: FONTS.regular, textAlign: "center" }}>
+                  {t('dashboard.noTasks')}
+                </Text>
+              </View>
+            )}
+
             {pendingItems.length > 0 && (
               <Desplegable title={activeTab === "tareas" ? t('dashboard.sections.pending') : t('dashboard.sections.pendingPayment')} fontSize={SIZES.text16} fontWeight="bold" defaultOpen={true}>
                 {pendingItems.map((item: any) => (
@@ -268,6 +283,8 @@ const DashBoardPersonal: React.FC = () => {
                     key={activeTab === "tareas" ? item.id : item.IdFactura}
                     variant={activeTab === "tareas" ? "tarea" : "factura"}
                     title={item.Nombre}
+                    subtitle={activeTab === "tareas" ? item.usuarioAsignado || undefined : undefined}
+                    unassigned={activeTab === "tareas" ? !item.usuarioAsignado : undefined}
                     isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
                     onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
                     onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
@@ -290,6 +307,8 @@ const DashBoardPersonal: React.FC = () => {
                     key={task.id}
                     variant="tarea"
                     title={task.Nombre}
+                    subtitle={task.usuarioAsignado || undefined}
+                    unassigned={!task.usuarioAsignado}
                     isCompleted={task.isCompleted}
                     onToggle={() => handleToggleTask(task.id)}
                     onPressRow={() => openDetalleTarea(task)}
@@ -307,6 +326,7 @@ const DashBoardPersonal: React.FC = () => {
                     key={activeTab === "tareas" ? item.id : item.IdFactura}
                     variant={activeTab === "tareas" ? "tarea" : "factura"}
                     title={item.Nombre}
+                    subtitle={activeTab === "tareas" ? item.usuarioAsignado || undefined : undefined}
                     isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
                     onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
                     onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}

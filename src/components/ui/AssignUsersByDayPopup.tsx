@@ -12,6 +12,7 @@ import {
 import { FONTS, COLORS } from "../../styles/styles";
 import { Feather } from "@expo/vector-icons";
 import LogoReal from "../../assets/logoReal.svg";
+import { useTranslation } from "react-i18next";
 
 type UserItem = {
     id: string;
@@ -43,16 +44,17 @@ type AssignUsersByDayPopupProps = {
 const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
     visible,
     onClose,
-    title = "Asignación de usuarios (Opcional)",
+    title,
     users,
     days,
     initialAssignments = {},
     initialSingleUserId = null,
-    confirmLabel = "¡Asigna!",
+    confirmLabel,
     onConfirm,
     onConfirmSingleUser,
     loadingUsers = false,
 }) => {
+    const { t } = useTranslation();
     // Track selected user for each day
     const [assignments, setAssignments] = useState<Record<string, string | null>>({});
     const [confirming, setConfirming] = useState(false);
@@ -84,9 +86,9 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
     };
 
     const getUserName = (userId: string | null): string => {
-        if (!userId) return "Seleccionar usuario";
+        if (!userId) return t('createTask.assignUsers.selectUser');
         const user = users.find((u) => u.id === userId);
-        return user ? user.name : "Seleccionar usuario";
+        return user ? user.name : t('createTask.assignUsers.selectUser');
     };
 
     const allDaysAssigned = days.every((day) => assignments[day] !== null);
@@ -193,7 +195,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
             <View style={styles.overlay}>
                 <View style={styles.popup}>
                     <LogoReal style={styles.image} width={120} height={120} />
-                    <Text style={styles.title}>{title}</Text>
+                    <Text style={styles.title}>{title || t('createTask.assignUsers.title')}</Text>
 
                     {days.length > 0 && !loadingUsers && (
                         <TouchableOpacity
@@ -201,7 +203,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                             style={styles.randomizeButton}
                         >
                             <Feather name="shuffle" size={16} color={COLORS.primary} />
-                            <Text style={styles.randomizeButtonText}>Aleatorio</Text>
+                            <Text style={styles.randomizeButtonText}>{t('createTask.assignUsers.random')}</Text>
                         </TouchableOpacity>
                     )}
 
@@ -210,7 +212,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                         loadingUsers ? (
                             <View style={styles.loadingBox}>
                                 <ActivityIndicator size="small" color={COLORS.secondary} />
-                                <Text style={styles.loadingText}>Cargando usuarios…</Text>
+                                <Text style={styles.loadingText}>{t('createTask.assignUsers.loading')}</Text>
                             </View>
                         ) : (
                             <ScrollView
@@ -248,7 +250,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                     ) : loadingUsers ? (
                         <View style={styles.loadingBox}>
                             <ActivityIndicator size="small" color={COLORS.secondary} />
-                            <Text style={styles.loadingText}>Cargando usuarios…</Text>
+                            <Text style={styles.loadingText}>{t('createTask.assignUsers.loading')}</Text>
                         </View>
                     ) : (
                         <ScrollView
@@ -265,7 +267,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                             onPress={onClose}
                             style={styles.cancelButton}
                         >
-                            <Text style={styles.cancelButtonText}>Cancelar</Text>
+                            <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -277,7 +279,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                                 <ActivityIndicator size="small" color={COLORS.secondary} />
                             ) : (
                                 <Text style={styles.confirmButtonText}>
-                                    {hasSelection ? confirmLabel : "Mas tarde..."}
+                                    {hasSelection ? (confirmLabel || t('common.accept')) : t('createTask.assignUsers.later')}
                                 </Text>
                             )}
                         </TouchableOpacity>

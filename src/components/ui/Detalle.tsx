@@ -414,10 +414,12 @@ const Detalle: React.FC<Props> = (props) => {
   const isFacturaPaidByMe = (item: FacturaModel): boolean => {
     if (item.Pagado) return true;
     const relId = (userRelacionId || "").replace(/-/g, "").toLowerCase();
+    const myUid = (facturaUser?.uid || "").replace(/-/g, "").toLowerCase();
     return (
-      item.UsuariosAsignados?.some(
-        (u) => u.id.replace(/-/g, "").toLowerCase() === relId && u.completed
-      ) ?? false
+      item.UsuariosAsignados?.some((u) => {
+        const cleanUId = u.id.replace(/-/g, "").toLowerCase();
+        return (cleanUId === relId || cleanUId === myUid) && u.completed;
+      }) ?? false
     );
   };
   return (
@@ -554,7 +556,7 @@ const Detalle: React.FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
   overlay: {
-    // ✅ reutiliza COMMON.OVERLAY y bottom-sheet
+    // reutiliza COMMON.OVERLAY y bottom-sheet
     ...(COMMON.OVERLAY as any),
     justifyContent: "flex-end",
   },
