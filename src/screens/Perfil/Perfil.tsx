@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Text,
   View,
@@ -28,6 +28,7 @@ import { obtenerKarmaUsuario } from "../../api/karma";
 import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
+import { useToast } from "../../hooks/useToast";
 
 // Import SVG Assets
 import LogoKarma from "../../assets/logo_karma.svg";
@@ -47,6 +48,28 @@ const Perfil: React.FC = () => {
   const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
   const [userKarma, setUserKarma] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Easter egg: tap title 6 times
+  const { show: showToast } = useToast();
+  const easterTapCount = useRef(0);
+  const easterTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleTitleTap = () => {
+    easterTapCount.current += 1;
+    if (easterTapTimer.current) clearTimeout(easterTapTimer.current);
+    easterTapTimer.current = setTimeout(() => {
+      easterTapCount.current = 0;
+    }, 1500);
+    if (easterTapCount.current >= 6) {
+      easterTapCount.current = 0;
+      showToast({
+        entity: "tarea",
+        name: "Stop tapping the screen like a crazy, or you'll cause a bug.",
+        tone: "info",
+        autoHideMs: 4000,
+      });
+    }
+  };
 
   const handleLogout = () => {
     navigation.replace('Main');
@@ -138,7 +161,9 @@ const Perfil: React.FC = () => {
         style={styles.scrollContent}
       >
         {/* Header Title */}
-        <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
+        <TouchableOpacity onPress={handleTitleTap} activeOpacity={1}>
+          <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
+        </TouchableOpacity>
 
         {/* User Card */}
         <View style={styles.userCard}>
@@ -176,9 +201,9 @@ const Perfil: React.FC = () => {
                 <Text style={{ fontSize: 20 }}>
                   {i18n.language.startsWith("es") ? "🇪🇸"
                     : i18n.language.startsWith("fr") ? "🇫🇷"
-                    : i18n.language.startsWith("it") ? "🇮🇹"
-                    : i18n.language.startsWith("de") ? "🇩🇪"
-                    : "🇬🇧"}
+                      : i18n.language.startsWith("it") ? "🇮🇹"
+                        : i18n.language.startsWith("de") ? "🇩🇪"
+                          : "🇬🇧"}
                 </Text>
               </TouchableOpacity>
 
