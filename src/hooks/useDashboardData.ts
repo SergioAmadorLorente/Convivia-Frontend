@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useAuthListener } from "./useAuthListener";
+import { useAuthListenerFull } from "./useAuthListener";
 import { obtenerUsuarioPorId, obtenerUsuarios } from "../api/usuario";
 import {
   obtenerEspacioPorUsuarioId,
@@ -13,7 +13,7 @@ import FacturaModel from "../types/Factura";
 import { obtenerFacturasPorDeudor } from "../api/factura";
 
 export const useDashboardData = (newSpaceName?: string) => {
-  const user = useAuthListener();
+  const { user, authLoading } = useAuthListenerFull();
   const [userName, setUserName] = useState<string>("Usuario");
   const [espacioNombre, setEspacioNombre] = useState<string>(
     newSpaceName || "Mi espacio",
@@ -24,20 +24,21 @@ export const useDashboardData = (newSpaceName?: string) => {
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
   const [userNamesMap, setUserNamesMap] = useState<Record<string, string>>({});
   const [tareas, setTareas] = useState<TaskModel[]>([]);
-  const [loadingTareas, setLoadingTareas] = useState(false);
+  const [loadingTareas, setLoadingTareas] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [facturas, setFacturas] = useState<FacturaModel[]>([]);
-  const [loadingFacturas, setLoadingFacturas] = useState(false);
+  const [loadingFacturas, setLoadingFacturas] = useState(true);
 
 
   // Cargar información del espacio del usuario
   useEffect(() => {
     const cargarEspacio = async () => {
+      let tieneEspacio = false;
       try {
         if (user?.uid) {
           let displayName =
             user.displayName || user.email?.split("@")[0] || "Usuario";
-          
+
           const [usuarioData, result] = await Promise.all([
             obtenerUsuarioPorId(user.uid).catch((e) => {
               console.log("No se pudo obtener usuario de la BD", e);
@@ -56,6 +57,7 @@ export const useDashboardData = (newSpaceName?: string) => {
 
           if (result?.espacioId && result.espacioId !== "string") {
             setEspacioId(result.espacioId);
+            tieneEspacio = true;
 
             setUserRelacionId(result.id || result.id_UsuarioEspacio);
 
@@ -78,10 +80,16 @@ export const useDashboardData = (newSpaceName?: string) => {
         setEspacioNombre("Mi espacio");
       } finally {
         setLoadingEspacio(false);
+        if (!tieneEspacio) {
+          setLoadingTareas(false);
+          setLoadingFacturas(false);
+        }
       }
     };
+    // Don't attempt to load until Firebase auth has resolved
+    if (authLoading) return;
     cargarEspacio();
-  }, [user, newSpaceName]);
+  }, [user, authLoading, newSpaceName]);
 
   // Nombres de usuario
   const cargarNombresUsuario = async () => {
@@ -143,12 +151,15 @@ export const useDashboardData = (newSpaceName?: string) => {
   const cargarFacturas = async (showLoading = true) => {
     const currentEspacioId = espacioIdRef.current;
     const currentUser = userRef.current;
-    if (!currentEspacioId || !currentUser?.uid) return;
+    if (!currentEspacioId || !currentUser?.uid) {
+      setLoadingFacturas(false);
+      return;
+    }
     if (showLoading) setLoadingFacturas(true);
     try {
       const result = await obtenerFacturasPorDeudor(currentEspacioId, currentUser.uid);
       console.log(
-        "📡 Facturas Recibidas (raw):",
+        "Facturas Recibidas (raw):",
         JSON.stringify(result, null, 2),
       );
 
@@ -179,7 +190,7 @@ export const useDashboardData = (newSpaceName?: string) => {
               name: nameKey
                 ? userNamesMapRef.current[nameKey]
                 : f.nombresDeudores?.[relId] ||
-                  `Usuario (${relId.slice(0, 4)})`,
+                `Usuario (${relId.slice(0, 4)})`,
               // en deudores: true = pendiente (no pagado), false = pagado
               completed: deudoresDict[relId] === false,
             };
@@ -210,7 +221,13 @@ export const useDashboardData = (newSpaceName?: string) => {
 
   const cargarTareas = async (showLoading = true) => {
     const currentEspacioId = espacioIdRef.current;
-    if (!currentEspacioId) return;
+    if (!currentEspacioId) {
+      if (!loadingEspacio) {
+        setLoadingTareas(false);
+        setLoadingFacturas(false);
+      }
+      return;
+    }
     if (showLoading) {
       setLoadingTareas(true);
       setLoadingFacturas(true);
@@ -256,7 +273,7 @@ export const useDashboardData = (newSpaceName?: string) => {
               const esRepetida =
                 (plantilla.diasRepeticion && plantilla.diasRepeticion.length > 0) ||
                 (plantilla.DiasRepeticion && plantilla.DiasRepeticion.length > 0);
-              
+
               const fechaFinFuente =
                 plantilla.fechaFin ?? plantilla.fechaLimite ?? plantilla.FechaLimite;
 
@@ -321,7 +338,7 @@ export const useDashboardData = (newSpaceName?: string) => {
               const fechaRealizacionRaw =
                 instanciaActiva?.fechaRealizacion ??
                 (instanciaActiva?.FechaRealizacion as string | Date | null | undefined);
-              
+
               const fechaCompletada = fechaRealizacionRaw
                 ? new Date(fechaRealizacionRaw as string | Date)
                 : completedState
@@ -375,6 +392,7 @@ export const useDashboardData = (newSpaceName?: string) => {
 
   return {
     user,
+    authLoading,
     userName,
     espacioNombre,
     espacioId,

@@ -270,6 +270,14 @@
     "buttonCreate": "Asignar Usuarios y Crear",
     "saving": "Guardando...",
     "errorEmptyName": "El nombre no puede estar vacío",
+    "backConfirm": {
+      "titleCreate": "¿Salir sin guardar?",
+      "titleEdit": "¿Salir sin guardar?",
+      "description": "Si vuelves atrás, los cambios que hayas hecho no se guardarán.",
+      "exit": "Salir sin guardar",
+      "continueCreate": "Seguir creando",
+      "continueEdit": "Seguir editando"
+    },
     "timePicker": {
       "title": "Selecciona la hora",
       "hour": "Hora",

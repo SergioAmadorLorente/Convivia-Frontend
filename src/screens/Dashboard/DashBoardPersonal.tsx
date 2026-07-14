@@ -45,12 +45,14 @@ const DashBoardPersonal: React.FC = () => {
 
   const {
     user,
+    authLoading,
     userName,
     espacioNombre,
     espacioId,
     userRelacionId,
     currentKarma,
     setCurrentKarma,
+    loadingEspacio,
     userNamesMap,
     tareas,
     setTareas,
@@ -67,7 +69,7 @@ const DashBoardPersonal: React.FC = () => {
   const CURRENT_USER_RELACION_ID = userRelacionId;
 
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
-  const isLoading = activeTab === "tareas" ? loadingTareas : loadingFacturas;
+  const isLoading = authLoading || loadingEspacio || (activeTab === "tareas" ? loadingTareas : loadingFacturas);
   const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
   const [visibility, setVisibility] = useState({
     showUnassigned: true,

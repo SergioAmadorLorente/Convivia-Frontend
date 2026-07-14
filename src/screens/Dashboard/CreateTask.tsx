@@ -16,7 +16,7 @@ import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
 import AssignUsersByDayPopup from "../../components/ui/AssignUsersByDayPopup";
@@ -122,6 +122,28 @@ const CreateTask: React.FC = () => {
         setPopupOptions(opts);
         setPopupVisible(true);
     };
+
+    // Back navigation confirmation popup
+    const [backConfirmVisible, setBackConfirmVisible] = useState(false);
+    const pendingBackAction = useRef<any>(null);
+    // Flag to skip the confirmation when navigating back after a successful save
+    const isSavingRef = useRef(false);
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
+            // If we are saving, allow the navigation without showing the modal
+            if (isSavingRef.current) {
+                isSavingRef.current = false;
+                return;
+            }
+            if (e.data.action.type === 'GO_BACK' || e.data.action.type === 'POP') {
+                e.preventDefault();
+                pendingBackAction.current = e.data.action;
+                setBackConfirmVisible(true);
+            }
+        });
+        return unsubscribe;
+    }, [navigation]);
 
     // User assignments per day: { "Lunes": UserItem, "Martes": UserItem, ... }
     const [dayUserAssignments, setDayUserAssignments] = useState<Record<string, UserItem | null>>({});
@@ -416,6 +438,7 @@ const CreateTask: React.FC = () => {
                 tone: "success",
                 autoHideMs: 3000,
             });
+            isSavingRef.current = true;
             navigation.goBack();
 
         } catch (error: any) {
@@ -584,6 +607,35 @@ const CreateTask: React.FC = () => {
                 description={popupOptions.description}
                 imageType={popupOptions.imageType}
                 buttons={popupOptions.buttons}
+            />
+
+            {/* Back navigation confirmation popup */}
+            <Popup
+                visible={backConfirmVisible}
+                onClose={() => setBackConfirmVisible(false)}
+                title={isEditing ? t('createTask.backConfirm.titleEdit') : t('createTask.backConfirm.titleCreate')}
+                description={t('createTask.backConfirm.description')}
+                imageType="goback"
+                buttons={[
+                    {
+                        text: t('createTask.backConfirm.exit'),
+                        onPress: () => {
+                            setBackConfirmVisible(false);
+                            if (pendingBackAction.current) {
+                                navigation.dispatch(pendingBackAction.current);
+                            }
+                        },
+                    },
+                    {
+                        text: isEditing
+                            ? t('createTask.backConfirm.continueEdit')
+                            : t('createTask.backConfirm.continueCreate'),
+                        onPress: () => {
+                            setBackConfirmVisible(false);
+                            pendingBackAction.current = null;
+                        },
+                    },
+                ]}
             />
 
             <BottomBar />

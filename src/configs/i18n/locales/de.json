@@ -267,6 +267,14 @@
         "buttonCreate": "Benutzer zuweisen und erstellen",
         "saving": "Wird gespeichert...",
         "errorEmptyName": "Der Name darf nicht leer sein.",
+        "backConfirm": {
+            "titleCreate": "Ohne Speichern beenden?",
+            "titleEdit": "Ohne Speichern beenden?",
+            "description": "Wenn Sie zurückgehen, werden Ihre Änderungen nicht gespeichert.",
+            "exit": "Ohne Speichern beenden",
+            "continueCreate": "Weiter erstellen",
+            "continueEdit": "Weiter bearbeiten"
+        },
         "timePicker": {
             "title": "Zeit auswählen",
             "hour": "Stunde",

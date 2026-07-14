@@ -36,7 +36,7 @@ const InfoLegal: React.FC = () => {
                         </Button>
                     </View>
                     <Text style={{ marginTop: 150, width: "100%", marginRight: -300, bottom: 100, alignItems: "center", color: "green" }}>
-                        {"v3.5.33"}
+                        {"v3.5.45"}
                     </Text>
                 </View>
             </ScrollView>

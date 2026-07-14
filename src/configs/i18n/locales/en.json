@@ -270,6 +270,14 @@
     "buttonCreate": "Assign Users and Create",
     "saving": "Saving...",
     "errorEmptyName": "Name cannot be empty",
+    "backConfirm": {
+      "titleCreate": "Exit without saving?",
+      "titleEdit": "Exit without saving?",
+      "description": "If you go back, your changes will not be saved.",
+      "exit": "Exit without saving",
+      "continueCreate": "Keep creating",
+      "continueEdit": "Keep editing"
+    },
     "timePicker": {
       "title": "Select time",
       "hour": "Hour",

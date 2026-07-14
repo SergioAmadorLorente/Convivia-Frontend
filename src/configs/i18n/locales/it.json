@@ -267,6 +267,14 @@
         "buttonCreate": "Assegna utenti e crea",
         "saving": "Salvataggio...",
         "errorEmptyName": "Il nome non può essere vuoto.",
+        "backConfirm": {
+            "titleCreate": "Uscire senza salvare?",
+            "titleEdit": "Uscire senza salvare?",
+            "description": "Se torni indietro, le modifiche non verranno salvate.",
+            "exit": "Esci senza salvare",
+            "continueCreate": "Continua a creare",
+            "continueEdit": "Continua a modificare"
+        },
         "timePicker": {
             "title": "Seleziona l'ora",
             "hour": "Ora",

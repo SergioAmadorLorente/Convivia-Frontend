@@ -267,6 +267,14 @@
         "buttonCreate": "Attribuer des utilisateurs et créer",
         "saving": "Enregistrement...",
         "errorEmptyName": "Le nom ne peut pas être vide",
+        "backConfirm": {
+            "titleCreate": "Quitter sans enregistrer ?",
+            "titleEdit": "Quitter sans enregistrer ?",
+            "description": "Si vous revenez en arrière, vos modifications ne seront pas sauvegardées.",
+            "exit": "Quitter sans enregistrer",
+            "continueCreate": "Continuer la création",
+            "continueEdit": "Continuer l'édition"
+        },
         "timePicker": {
             "title": "Sélectionner l'heure",
             "hour": "Heure",
