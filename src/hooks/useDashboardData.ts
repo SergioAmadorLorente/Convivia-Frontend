@@ -16,7 +16,7 @@ export const useDashboardData = (newSpaceName?: string) => {
   const { user, authLoading } = useAuthListenerFull();
   const [userName, setUserName] = useState<string>("Usuario");
   const [espacioNombre, setEspacioNombre] = useState<string>(
-    newSpaceName || "Mi espacio",
+    newSpaceName || "......",
   );
   const [espacioId, setEspacioId] = useState<string | null>(null);
   const [userRelacionId, setUserRelacionId] = useState<string | null>(null);
@@ -209,11 +209,11 @@ export const useDashboardData = (newSpaceName?: string) => {
           });
         });
 
-        console.log("✅ Facturas mapeadas:", mapped.length);
+        console.log("Facturas mapeadas:", mapped.length);
         setFacturas(mapped);
       }
     } catch (err) {
-      // console.error("❌ Error cargando facturas:", err);
+      // console.error("Error cargando facturas:", err);
     } finally {
       setLoadingFacturas(false);
     }

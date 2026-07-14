@@ -37,10 +37,13 @@ const useFetchParticipants = () => {
       // Obtener el ranking de karma para tener los puntos de todos
       const ranking = await obtenerRankingKarma(espacioId, "total", 100);
       
-      // Crear un mapa de karma por usuarioId
+      // Función para limpiar GUIDs y comparar sin guiones
+      const cleanId = (id: string) => id?.replace(/-/g, "").toLowerCase() || "";
+
+      // Crear un mapa de karma por el ID de relación (que en el ranking viene como usuarioId)
       const karmaMap = new Map(
         ranking.ranking.map((r: any) => [
-          r.usuarioId,
+          cleanId(r.usuarioId),
           {
             karmaTotal: r.karmaTotal,
             karmaMensual: r.karmaMensual,
@@ -55,8 +58,10 @@ const useFetchParticipants = () => {
           const usuario = await obtenerUsuarioPorId(r.usuarioId);
           if (!usuario) return null;
           
-          // Combinar datos del usuario con su karma
-          const karma = karmaMap.get(r.usuarioId) || {
+          const relId = cleanId(r.id || r.id_UsuarioEspacio || "");
+
+          // Combinar datos del usuario con su karma usando el ID de relación
+          const karma = karmaMap.get(relId) || {
             karmaTotal: 0,
             karmaMensual: 0,
             karmaSemanal: 0,

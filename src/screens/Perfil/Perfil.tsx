@@ -150,14 +150,19 @@ const Perfil: React.FC = () => {
 
             {/* User Details */}
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{userName}</Text>
               {loading ? (
-                <ActivityIndicator size="small" color={COLORS.primary} />
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={[styles.userName, { color: "#999" }]}>{t("common.loading")}</Text>
+                </View>
               ) : (
-                <Text style={styles.userKarma}>
-                  {t("profile.karmaPoints", { points: userKarma })}
-                  <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
-                </Text>
+                <>
+                  <Text style={styles.userName}>{userName}</Text>
+                  <Text style={styles.userKarma}>
+                    {t("profile.karmaPoints", { points: userKarma })}
+                    <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
+                  </Text>
+                </>
               )}
             </View>
 

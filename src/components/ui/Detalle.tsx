@@ -556,7 +556,7 @@ const Detalle: React.FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
   overlay: {
-    // ✅ reutiliza COMMON.OVERLAY y bottom-sheet
+    // reutiliza COMMON.OVERLAY y bottom-sheet
     ...(COMMON.OVERLAY as any),
     justifyContent: "flex-end",
   },
