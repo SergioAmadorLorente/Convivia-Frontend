@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import Animated, { FadeInDown, ReduceMotion } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
@@ -156,66 +157,82 @@ const IniciarSesion: React.FC = () => {
               Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
             ]}
           >
-            <Text style={styles.titulo}>{t('login.title')}</Text>
-            <Text style={GLOBAL_STYLES.subtitle}>
-              {t('login.subtitle')}
-            </Text>
+            {/* TÍTULO */}
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(0).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+              <Text style={styles.titulo}>{t('login.title')}</Text>
+            </Animated.View>
+            {/* SUBTÍTULO */}
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(80).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+              <Text style={GLOBAL_STYLES.subtitle}>
+                {t('login.subtitle')}
+              </Text>
+            </Animated.View>
             {/* EMAIL */}
-            <TextField
-              label={t('login.emailLabel')}
-              value={email}
-              onChangeText={validateEmail}
-              placeholder={t('login.emailPlaceholder')}
-              keyboardType="email-address"
-              error={emailError}
-            />
+            <Animated.View style={{ alignSelf: "stretch" }} entering={FadeInDown.delay(160).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+              <TextField
+                label={t('login.emailLabel')}
+                value={email}
+                onChangeText={validateEmail}
+                placeholder={t('login.emailPlaceholder')}
+                keyboardType="email-address"
+                error={emailError}
+              />
+            </Animated.View>
             {/* PASSWORD */}
-            <TextField
-              label={t('login.passwordLabel')}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="• • • • • • • •"
-              secureTextEntry
-            />
+            <Animated.View style={{ alignSelf: "stretch" }} entering={FadeInDown.delay(240).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+              <TextField
+                label={t('login.passwordLabel')}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="• • • • • • • •"
+                secureTextEntry
+              />
+            </Animated.View>
             {/* RECUPERAR CONTRASEÑA */}
-            <TouchableOpacity
-              style={GLOBAL_STYLES.checkboxContainer}
-              onPress={() => navigation.navigate("RecuperarPassword")}
-            >
-              <Text style={GLOBAL_STYLES.link}>{t('login.recoverPassword')}</Text>
-            </TouchableOpacity>
-            {/* CHECKBOX RECUÉRDAME */}
-            <View style={GLOBAL_STYLES.checkboxContainer}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(320).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
               <TouchableOpacity
-                style={CHECKBOX.touchArea}
-                onPress={() => setIsChecked(!isChecked)}
+                style={GLOBAL_STYLES.checkboxContainer}
+                onPress={() => navigation.navigate("RecuperarPassword")}
               >
-                <Feather
-                  name={isChecked ? "check-square" : "square"}
-                  size={CHECKBOX.iconSize}
-                  color={
-                    isChecked
-                      ? CHECKBOX.colors.checked
-                      : CHECKBOX.colors.unchecked
-                  }
-                />
+                <Text style={GLOBAL_STYLES.link}>{t('login.recoverPassword')}</Text>
               </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.labelCheckbox}>{t('login.rememberMe')}</Text>
-            </View>
+            </Animated.View>
+            {/* CHECKBOX RECUÉRDAME */}
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(380).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+              <View style={GLOBAL_STYLES.checkboxContainer}>
+                <TouchableOpacity
+                  style={CHECKBOX.touchArea}
+                  onPress={() => setIsChecked(!isChecked)}
+                >
+                  <Feather
+                    name={isChecked ? "check-square" : "square"}
+                    size={CHECKBOX.iconSize}
+                    color={
+                      isChecked
+                        ? CHECKBOX.colors.checked
+                        : CHECKBOX.colors.unchecked
+                    }
+                  />
+                </TouchableOpacity>
+                <Text style={GLOBAL_STYLES.labelCheckbox}>{t('login.rememberMe')}</Text>
+              </View>
+            </Animated.View>
             {/* BOTÓN LOGIN */}
-            <ConfettiButton
-              onPress={handleLogin}
-              disabled={!isButtonEnabled}
-              style={[
-                GLOBAL_STYLES.buttonPrimaryGreen,
-                { backgroundColor: COLORS.success },
-              ]}
-              variant="success"
-              disableAutoConfetti={true}
-              trigger={showConfetti}
-            >
-              {t('login.loginButton')}
-            </ConfettiButton>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(460).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+              <ConfettiButton
+                onPress={handleLogin}
+                disabled={!isButtonEnabled}
+                style={[
+                  GLOBAL_STYLES.buttonPrimaryGreen,
+                  { backgroundColor: COLORS.success },
+                ]}
+                variant="success"
+                disableAutoConfetti={true}
+                trigger={showConfetti}
+              >
+                {t('login.loginButton')}
+              </ConfettiButton>
+            </Animated.View>
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>

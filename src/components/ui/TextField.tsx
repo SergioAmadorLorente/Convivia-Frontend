@@ -140,7 +140,7 @@ export default TextField;
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: "90%",
+    alignSelf: "stretch",
     marginTop: 12,
   },
   inputError: {
