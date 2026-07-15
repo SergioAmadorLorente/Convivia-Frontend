@@ -158,7 +158,7 @@ const IniciarSesion: React.FC = () => {
             ]}
           >
             {/* TÍTULO */}
-            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(0).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(0).duration(500).springify().damping(22).reduceMotion(ReduceMotion.Never)}>
               <Text style={styles.titulo}>{t('login.title')}</Text>
             </Animated.View>
             {/* SUBTÍTULO */}
