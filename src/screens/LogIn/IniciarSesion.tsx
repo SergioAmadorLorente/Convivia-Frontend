@@ -33,6 +33,7 @@ import TextField from "../../components/ui/TextField";
 import Popup from "../../components/ui/Popup";
 import { COLORS, CHECKBOX } from "../../styles/theme";
 import ConfettiButton from "../../components/ui/ConfettiButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const ANIM = (delay: number) =>
   FadeInDown.delay(delay).duration(500).springify().damping(22).reduceMotion(ReduceMotion.Never);
 
@@ -93,8 +94,17 @@ const IniciarSesion: React.FC = () => {
         return;
       }
 
-      // OK login - Verificar si el usuario tiene una residencia
+      // OK login
       setShowConfetti(true);
+
+      // Guardar flag de "Recuérdame" si el checkbox estaba marcado
+      if (isChecked) {
+        await AsyncStorage.setItem('REMEMBER_ME', 'true');
+        console.log('REMEMBER_ME:', isChecked);
+        console.log('Firebase user:', auth.currentUser?.email);
+      } else {
+        await AsyncStorage.removeItem('REMEMBER_ME');
+      }
 
       // Importar la función para verificar residencia
       const { obtenerEspacioPorUsuarioId } = require("../../api/usuarioEspacio");
