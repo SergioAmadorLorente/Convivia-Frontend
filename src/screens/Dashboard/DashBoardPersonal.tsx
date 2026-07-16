@@ -8,6 +8,7 @@ import {
   RefreshControl,
   Text,
 } from "react-native";
+import Animated, { LinearTransition, ReduceMotion } from "react-native-reanimated";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
 import {
@@ -259,7 +260,10 @@ const DashBoardPersonal: React.FC = () => {
             </Text>
           </View>
         ) : (
-          <View style={GLOBAL_STYLES.container}>
+          <Animated.View
+            layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
+            style={GLOBAL_STYLES.container}
+          >
             {activeTab === "facturas" && pendingItems.length === 0 && completedItems.length === 0 && (
               <View style={[{ paddingVertical: 40 }]}>
                 <Text style={{ fontSize: 16, color: COLORS.secondary, fontFamily: FONTS.regular, textAlign: "center" }}>
@@ -340,7 +344,7 @@ const DashBoardPersonal: React.FC = () => {
                 ))}
               </Desplegable>
             )}
-          </View>
+          </Animated.View>
         )}
       </ScrollView>
 

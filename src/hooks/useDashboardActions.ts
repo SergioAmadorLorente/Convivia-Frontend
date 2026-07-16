@@ -133,35 +133,17 @@ export const useDashboardActions = ({
         return;
       }
 
-      // Completar
-      try {
-        if (espacioId && task.tareasId && task.tareasId.length > 0) {
-          await completarTareaInstancia(
-            espacioId,
-            task.id,
-            task.tareasId[task.tareasId.length - 1],
-            true,
-          );
-        }
-      } catch (error) {
-        console.error("[Karma] Error al completar instancia de tarea:", error);
-      }
+      // Completar (Optimista)
+      const oldTareas = tareas;
+      const oldKarma = currentKarma;
 
-      console.log("[Karma] Notificando suma local de karma:", {
-        wasOverdue,
-        userRelacionId,
-        taskKarma: task.karma,
-        currentKarma,
-      });
+      setTareas((prev) =>
+        prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
+      );
 
       if (!wasOverdue && userRelacionId) {
         const nuevoKarma = currentKarma + (task.karma || 0);
         setCurrentKarma(nuevoKarma);
-      } else {
-        console.warn("[Karma] No se sumó karma localmente:", {
-          motivoOverdue: wasOverdue,
-          motivoSinRelacion: !userRelacionId,
-        });
       }
 
       if (showToast) {
@@ -184,9 +166,19 @@ export const useDashboardActions = ({
         });
       }
 
-      setTareas((prev) =>
-        prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
-      );
+      if (espacioId && task.tareasId && task.tareasId.length > 0) {
+        completarTareaInstancia(
+          espacioId,
+          task.id,
+          task.tareasId[task.tareasId.length - 1],
+          true,
+        ).catch((error) => {
+          console.error("[Karma] Error al completar instancia de tarea (revertiendo):", error);
+          setTareas(oldTareas);
+          setCurrentKarma(oldKarma);
+          Alert.alert("Error", "No se pudo completar la tarea en el servidor.");
+        });
+      }
     } else {
       // FACTURAS
       const factura = facturas.find((f) => f.IdFactura === id);

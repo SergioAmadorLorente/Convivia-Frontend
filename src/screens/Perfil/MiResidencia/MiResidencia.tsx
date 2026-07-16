@@ -8,7 +8,15 @@ import {
   Dimensions,
   Alert,
   ActivityIndicator,
+  Platform,
 } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  FadeOut,
+  LinearTransition,
+  ReduceMotion,
+} from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../../navigation/RootStackParamList";
@@ -33,10 +41,10 @@ const { width } = Dimensions.get("window");
 import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
 import useFetchParticipants from "../../../hooks/useFetchParticipants";
 import { Colors } from "react-native/Libraries/NewAppScreen";
+import Desplegable from "../../../components/ui/Desplegable";
 
 const MiResidencia: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [isParticipantsOpen, setIsParticipantsOpen] = useState(true);
   const user = useAuthListener();
   const { userData } = useUser();
   const { t } = useTranslation();
@@ -248,7 +256,10 @@ const MiResidencia: React.FC = () => {
             </View>
 
             {/* Code Section */}
-            <View style={styles.section}>
+            <Animated.View 
+              style={styles.section}
+              layout={LinearTransition.duration(260).reduceMotion(ReduceMotion.Never)}
+            >
               <Text style={styles.sectionTitle}>{t('myResidence.codeLabel')}</Text>
               <View style={styles.divider} />
 
@@ -276,29 +287,19 @@ const MiResidencia: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
               )}
-            </View>
+            </Animated.View>
 
             {/* Participants Section */}
-            <View style={styles.section}>
-              <TouchableOpacity
-                style={styles.sectionHeaderClickable}
-                onPress={() => setIsParticipantsOpen(!isParticipantsOpen)}
-              >
-                <Text style={styles.sectionTitle}>{t('myResidence.participants')}</Text>
-                <Ionicons
-                  name={isParticipantsOpen ? "chevron-up" : "chevron-down"}
-                  size={24}
-                  color={COLORS.secondary}
-                />
-              </TouchableOpacity>
-              <View style={styles.divider} />
-
-              {isParticipantsOpen && (
-                <View style={styles.participantsList}>
-                  {participants.length > 0 ? (
-                    participants.map((participant, index) => (
+            <Desplegable title={t('myResidence.participants')} defaultOpen={true}>
+              <View style={styles.participantsList}>
+                {participants.length > 0 ? (
+                  participants.map((participant, index) => (
+                    <Animated.View
+                      key={index}
+                      entering={FadeInDown.delay(index * 50).duration(450).springify().damping(15).reduceMotion(ReduceMotion.Never)}
+                      layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
+                    >
                       <TouchableOpacity
-                        key={index}
                         style={styles.participantItem}
                         onPress={() => handleParticipantPress(participant)}
                         activeOpacity={0.7}
@@ -325,18 +326,21 @@ const MiResidencia: React.FC = () => {
                           </Text>
                         </View>
                       </TouchableOpacity>
-                    ))
-                  ) : (
-                    <Text style={{ fontFamily: FONTS.regular, color: "#666", marginTop: 5 }}>
-                      {t('myResidence.loadingParticipants')}
-                    </Text>
-                  )}
-                </View>
-              )}
-            </View>
+                    </Animated.View>
+                  ))
+                ) : (
+                  <Text style={{ fontFamily: FONTS.regular, color: "#666", marginTop: 5 }}>
+                    {t('myResidence.loadingParticipants')}
+                  </Text>
+                )}
+              </View>
+            </Desplegable>
 
             {/* Settings Section */}
-            <View style={styles.section}>
+            <Animated.View 
+              style={styles.section}
+              layout={LinearTransition.duration(260).reduceMotion(ReduceMotion.Never)}
+            >
               <Text style={styles.sectionTitle}>{t('myResidence.settings')}</Text>
               <View style={styles.divider} />
 
@@ -363,9 +367,9 @@ const MiResidencia: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
+            </Animated.View>
             </View>
           </View>
-        </View>
       </ScrollView>
 
       <BottomBar />
@@ -457,7 +461,14 @@ const styles = StyleSheet.create({
     padding: 15,
     flexDirection: "row",
     alignItems: "center",
-    ...COMMON.SHADOW,
+    ...Platform.select({
+      ios: { ...COMMON.SHADOW },
+      web: { ...COMMON.SHADOW },
+      android: {
+        borderWidth: 1,
+        borderColor: "#EAE9E6",
+      },
+    }),
     marginBottom: 30,
   },
   iconContainer: {
@@ -510,7 +521,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    ...COMMON.SHADOW,
+    ...Platform.select({
+      ios: { ...COMMON.SHADOW },
+      web: { ...COMMON.SHADOW },
+      android: {
+        borderWidth: 1,
+        borderColor: "#D4DCB9",
+      },
+    }),
   },
   codeText: {
     fontFamily: FONTS.title,
@@ -522,7 +540,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
-    ...COMMON.SHADOW,
+    ...Platform.select({
+      ios: { ...COMMON.SHADOW },
+      web: { ...COMMON.SHADOW },
+      android: {
+        borderWidth: 1,
+        borderColor: "#D4DCB9",
+      },
+    }),
   },
   generateButtonText: {
     fontFamily: FONTS.bold,
@@ -533,7 +558,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   participantItem: {
-    ...COMMON.SHADOW,
+    ...Platform.select({
+      ios: { ...COMMON.SHADOW },
+      web: { ...COMMON.SHADOW },
+      android: {
+        borderWidth: 1,
+        borderColor: "#EAE9E6",
+      },
+    }),
     backgroundColor: COLORS.background,
     padding: 15,
     borderRadius: 12,
@@ -594,7 +626,14 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 15,
     alignItems: "center",
-    ...COMMON.SHADOW,
+    ...Platform.select({
+      ios: { ...COMMON.SHADOW },
+      web: { ...COMMON.SHADOW },
+      android: {
+        borderWidth: 1,
+        borderColor: "#CCCCCC",
+      },
+    }),
   },
   actionButtonText: {
     fontFamily: FONTS.regular,

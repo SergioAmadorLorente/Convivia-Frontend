@@ -8,6 +8,11 @@ import {
   LayoutChangeEvent,
   TouchableWithoutFeedback,
 } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeOut,
+  ReduceMotion,
+} from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { COLORS, FONTS } from "../../styles/theme";
@@ -99,8 +104,13 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
 
       {/* Panel del desplegable inline */}
       {isOpen && (
-        <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
-          <View style={[styles.dropdownContent, { top: headerHeight + 5 }]}>
+        <Animated.View
+          style={[styles.dropdownContent, { top: headerHeight + 5 }]}
+          entering={FadeInDown.duration(400).springify().damping(14).reduceMotion(ReduceMotion.Never)}
+          exiting={FadeOut.duration(200).reduceMotion(ReduceMotion.Never)}
+        >
+          {/* View interior que absorbe los toques para que no cierren el backdrop */}
+          <View onStartShouldSetResponder={() => true}>
             {/* CUÁNDO — 3 botones compactos */}
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>{t('dashboard.filter.when')}</Text>
@@ -169,7 +179,7 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
               </View>
             </View>
           </View>
-        </TouchableWithoutFeedback>
+        </Animated.View>
       )}
     </View>
   );

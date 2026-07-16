@@ -1,6 +1,12 @@
 // components/ui/Desplegable.tsx
 import React, { useState } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+  ReduceMotion,
+} from "react-native-reanimated";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COMPONENTS, FONTS } from "../../styles/theme";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +24,8 @@ interface DesplegableProps {
   defaultOpen?: boolean;      // default false
 }
 
+const CONTENT_ANIM_DURATION = 260;
+
 const Desplegable: React.FC<DesplegableProps> = ({
   title,
   fontSize = 14,
@@ -30,7 +38,7 @@ const Desplegable: React.FC<DesplegableProps> = ({
   const [isOpen, setIsOpen] = useState<boolean>(defaultOpen);
 
   const toggleOpen = () => {
-    if (!collapsible) return; // si no es colapsable, no hace nada
+    if (!collapsible) return;
     setIsOpen((prev) => !prev);
   };
 
@@ -41,11 +49,16 @@ const Desplegable: React.FC<DesplegableProps> = ({
   const contentVisible = collapsible ? isOpen : true;
 
   return (
-    <View style={styles.container}>
+    // El layout transition en el contenedor hace que los hermanos (otras secciones)
+    // esperen a que la animación de salida del contenido termine antes de moverse.
+    <Animated.View
+      style={styles.container}
+      layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
+    >
       <TouchableOpacity
         style={styles.headerRow}
         onPress={toggleOpen}
-        disabled={!collapsible} // deshabilitado si no hay colapso
+        disabled={!collapsible}
         activeOpacity={collapsible ? 0.7 : 1}
       >
         <Text
@@ -76,9 +89,19 @@ const Desplegable: React.FC<DesplegableProps> = ({
       {/* Línea subrayada */}
       <View style={styles.lineFull} />
 
-      {/* Contenido */}
-      {contentVisible && <View style={styles.content}>{children}</View>}
-    </View>
+      {/* Contenido: FadeIn al abrir, FadeOut al cerrar.
+          El exiting es lo clave: Reanimated mantiene el nodo vivo mientras
+          dura la animación de salida, así los hermanos de abajo no saltan. */}
+      {contentVisible && (
+        <Animated.View
+          style={styles.content}
+          entering={FadeIn.duration(CONTENT_ANIM_DURATION).reduceMotion(ReduceMotion.Never)}
+          exiting={FadeOut.duration(CONTENT_ANIM_DURATION).reduceMotion(ReduceMotion.Never)}
+        >
+          {children}
+        </Animated.View>
+      )}
+    </Animated.View>
   );
 };
 
@@ -122,4 +145,3 @@ const styles = StyleSheet.create({
   },
 });
 export default Desplegable;
-
