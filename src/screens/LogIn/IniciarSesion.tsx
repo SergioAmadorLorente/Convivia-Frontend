@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import Animated, { FadeInDown, ReduceMotion } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
@@ -32,6 +33,10 @@ import TextField from "../../components/ui/TextField";
 import Popup from "../../components/ui/Popup";
 import { COLORS, CHECKBOX } from "../../styles/theme";
 import ConfettiButton from "../../components/ui/ConfettiButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+const ANIM = (delay: number) =>
+  FadeInDown.delay(delay).duration(500).springify().damping(22).reduceMotion(ReduceMotion.Never);
+
 const IniciarSesion: React.FC = () => {
   const {
     email,
@@ -89,8 +94,17 @@ const IniciarSesion: React.FC = () => {
         return;
       }
 
-      // OK login - Verificar si el usuario tiene una residencia
+      // OK login
       setShowConfetti(true);
+
+      // Guardar flag de "Recuérdame" si el checkbox estaba marcado
+      if (isChecked) {
+        await AsyncStorage.setItem('REMEMBER_ME', 'true');
+        console.log('REMEMBER_ME:', isChecked);
+        console.log('Firebase user:', auth.currentUser?.email);
+      } else {
+        await AsyncStorage.removeItem('REMEMBER_ME');
+      }
 
       // Importar la función para verificar residencia
       const { obtenerEspacioPorUsuarioId } = require("../../api/usuarioEspacio");
@@ -156,66 +170,82 @@ const IniciarSesion: React.FC = () => {
               Platform.OS === "web" ? WEB_FULL_VIEWPORT : {},
             ]}
           >
-            <Text style={styles.titulo}>{t('login.title')}</Text>
-            <Text style={GLOBAL_STYLES.subtitle}>
-              {t('login.subtitle')}
-            </Text>
+            {/* TÍTULO */}
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(0)}>
+              <Text style={styles.titulo}>{t('login.title')}</Text>
+            </Animated.View>
+            {/* SUBTÍTULO */}
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(80)}>
+              <Text style={GLOBAL_STYLES.subtitle}>
+                {t('login.subtitle')}
+              </Text>
+            </Animated.View>
             {/* EMAIL */}
-            <TextField
-              label={t('login.emailLabel')}
-              value={email}
-              onChangeText={validateEmail}
-              placeholder={t('login.emailPlaceholder')}
-              keyboardType="email-address"
-              error={emailError}
-            />
+            <Animated.View style={{ alignSelf: "stretch" }} entering={ANIM(160)}>
+              <TextField
+                label={t('login.emailLabel')}
+                value={email}
+                onChangeText={validateEmail}
+                placeholder={t('login.emailPlaceholder')}
+                keyboardType="email-address"
+                error={emailError}
+              />
+            </Animated.View>
             {/* PASSWORD */}
-            <TextField
-              label={t('login.passwordLabel')}
-              value={password}
-              onChangeText={setPassword}
-              placeholder="• • • • • • • •"
-              secureTextEntry
-            />
+            <Animated.View style={{ alignSelf: "stretch" }} entering={ANIM(240)}>
+              <TextField
+                label={t('login.passwordLabel')}
+                value={password}
+                onChangeText={setPassword}
+                placeholder="• • • • • • • •"
+                secureTextEntry
+              />
+            </Animated.View>
             {/* RECUPERAR CONTRASEÑA */}
-            <TouchableOpacity
-              style={GLOBAL_STYLES.checkboxContainer}
-              onPress={() => navigation.navigate("RecuperarPassword")}
-            >
-              <Text style={GLOBAL_STYLES.link}>{t('login.recoverPassword')}</Text>
-            </TouchableOpacity>
-            {/* CHECKBOX RECUÉRDAME */}
-            <View style={GLOBAL_STYLES.checkboxContainer}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(320)}>
               <TouchableOpacity
-                style={CHECKBOX.touchArea}
-                onPress={() => setIsChecked(!isChecked)}
+                style={GLOBAL_STYLES.checkboxContainer}
+                onPress={() => navigation.navigate("RecuperarPassword")}
               >
-                <Feather
-                  name={isChecked ? "check-square" : "square"}
-                  size={CHECKBOX.iconSize}
-                  color={
-                    isChecked
-                      ? CHECKBOX.colors.checked
-                      : CHECKBOX.colors.unchecked
-                  }
-                />
+                <Text style={GLOBAL_STYLES.link}>{t('login.recoverPassword')}</Text>
               </TouchableOpacity>
-              <Text style={GLOBAL_STYLES.labelCheckbox}>{t('login.rememberMe')}</Text>
-            </View>
+            </Animated.View>
+            {/* CHECKBOX RECUÉRDAME */}
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(380)}>
+              <View style={GLOBAL_STYLES.checkboxContainer}>
+                <TouchableOpacity
+                  style={CHECKBOX.touchArea}
+                  onPress={() => setIsChecked(!isChecked)}
+                >
+                  <Feather
+                    name={isChecked ? "check-square" : "square"}
+                    size={CHECKBOX.iconSize}
+                    color={
+                      isChecked
+                        ? CHECKBOX.colors.checked
+                        : CHECKBOX.colors.unchecked
+                    }
+                  />
+                </TouchableOpacity>
+                <Text style={GLOBAL_STYLES.labelCheckbox}>{t('login.rememberMe')}</Text>
+              </View>
+            </Animated.View>
             {/* BOTÓN LOGIN */}
-            <ConfettiButton
-              onPress={handleLogin}
-              disabled={!isButtonEnabled}
-              style={[
-                GLOBAL_STYLES.buttonPrimaryGreen,
-                { backgroundColor: COLORS.success },
-              ]}
-              variant="success"
-              disableAutoConfetti={true}
-              trigger={showConfetti}
-            >
-              {t('login.loginButton')}
-            </ConfettiButton>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(460)}>
+              <ConfettiButton
+                onPress={handleLogin}
+                disabled={!isButtonEnabled}
+                style={[
+                  GLOBAL_STYLES.buttonPrimaryGreen,
+                  { backgroundColor: COLORS.success },
+                ]}
+                variant="success"
+                disableAutoConfetti={true}
+                trigger={showConfetti}
+              >
+                {t('login.loginButton')}
+              </ConfettiButton>
+            </Animated.View>
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>

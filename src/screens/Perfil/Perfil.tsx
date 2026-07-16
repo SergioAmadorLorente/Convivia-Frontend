@@ -10,6 +10,8 @@ import {
   Modal,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signOut } from "firebase/auth";
+import { auth } from "../../configs/firebaseConfig";
 import { useTranslation } from "react-i18next";
 import { useFonts } from "expo-font";
 import { DMSerifDisplay_400Regular } from "@expo-google-fonts/dm-serif-display";
@@ -71,7 +73,13 @@ const Perfil: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('REMEMBER_ME');
+      await signOut(auth);
+    } catch {
+      // Ignorar errores de cierre de sesión
+    }
     navigation.replace('Main');
   };
 

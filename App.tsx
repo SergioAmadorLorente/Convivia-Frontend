@@ -10,6 +10,7 @@ import {
   Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import AppNavigator from "./src/navigation/AppNavigator";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const App: React.FC = () => {
   const [fontsLoaded] = useFonts({
@@ -34,11 +35,13 @@ const App: React.FC = () => {
   }
 
   return (
-    <UserProvider>
-      <ToastProvider position="top" maxToasts={3}>
-        <AppNavigator />
-      </ToastProvider>
-    </UserProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <UserProvider>
+        <ToastProvider position="top" maxToasts={3}>
+          <AppNavigator />
+        </ToastProvider>
+      </UserProvider>
+    </GestureHandlerRootView>
   );
 };
 
