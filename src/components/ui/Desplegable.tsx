@@ -53,7 +53,7 @@ const Desplegable: React.FC<DesplegableProps> = ({
     // esperen a que la animación de salida del contenido termine antes de moverse.
     <Animated.View
       style={styles.container}
-      layout={LinearTransition.duration(CONTENT_ANIM_DURATION).reduceMotion(ReduceMotion.Never)}
+      layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
     >
       <TouchableOpacity
         style={styles.headerRow}

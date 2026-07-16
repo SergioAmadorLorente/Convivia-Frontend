@@ -33,6 +33,9 @@ import TextField from "../../components/ui/TextField";
 import Popup from "../../components/ui/Popup";
 import { COLORS, CHECKBOX } from "../../styles/theme";
 import ConfettiButton from "../../components/ui/ConfettiButton";
+const ANIM = (delay: number) =>
+  FadeInDown.delay(delay).duration(500).springify().damping(22).reduceMotion(ReduceMotion.Never);
+
 const IniciarSesion: React.FC = () => {
   const {
     email,
@@ -158,17 +161,17 @@ const IniciarSesion: React.FC = () => {
             ]}
           >
             {/* TÍTULO */}
-            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(0).duration(500).springify().damping(22).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(0)}>
               <Text style={styles.titulo}>{t('login.title')}</Text>
             </Animated.View>
             {/* SUBTÍTULO */}
-            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(80).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(80)}>
               <Text style={GLOBAL_STYLES.subtitle}>
                 {t('login.subtitle')}
               </Text>
             </Animated.View>
             {/* EMAIL */}
-            <Animated.View style={{ alignSelf: "stretch" }} entering={FadeInDown.delay(160).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch" }} entering={ANIM(160)}>
               <TextField
                 label={t('login.emailLabel')}
                 value={email}
@@ -179,7 +182,7 @@ const IniciarSesion: React.FC = () => {
               />
             </Animated.View>
             {/* PASSWORD */}
-            <Animated.View style={{ alignSelf: "stretch" }} entering={FadeInDown.delay(240).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch" }} entering={ANIM(240)}>
               <TextField
                 label={t('login.passwordLabel')}
                 value={password}
@@ -189,7 +192,7 @@ const IniciarSesion: React.FC = () => {
               />
             </Animated.View>
             {/* RECUPERAR CONTRASEÑA */}
-            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(320).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(320)}>
               <TouchableOpacity
                 style={GLOBAL_STYLES.checkboxContainer}
                 onPress={() => navigation.navigate("RecuperarPassword")}
@@ -198,7 +201,7 @@ const IniciarSesion: React.FC = () => {
               </TouchableOpacity>
             </Animated.View>
             {/* CHECKBOX RECUÉRDAME */}
-            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(380).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(380)}>
               <View style={GLOBAL_STYLES.checkboxContainer}>
                 <TouchableOpacity
                   style={CHECKBOX.touchArea}
@@ -218,7 +221,7 @@ const IniciarSesion: React.FC = () => {
               </View>
             </Animated.View>
             {/* BOTÓN LOGIN */}
-            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={FadeInDown.delay(460).duration(500).springify().damping(14).reduceMotion(ReduceMotion.Never)}>
+            <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(460)}>
               <ConfettiButton
                 onPress={handleLogin}
                 disabled={!isButtonEnabled}

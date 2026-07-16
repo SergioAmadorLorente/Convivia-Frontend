@@ -158,10 +158,10 @@ export const useDashboardData = (newSpaceName?: string) => {
     if (showLoading) setLoadingFacturas(true);
     try {
       const result = await obtenerFacturasPorDeudor(currentEspacioId, currentUser.uid);
-      console.log(
-        "Facturas Recibidas (raw):",
-        JSON.stringify(result, null, 2),
-      );
+      // console.log(
+      //   "Facturas Recibidas (raw):",
+      //   JSON.stringify(result, null, 2),
+      // );
 
       // Manejar tanto array directo como objeto con $values (común en .NET)
       const facturasRaw = Array.isArray(result)
