@@ -217,7 +217,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 
               {/* CENTRO: Título + subtítulo */}
               <View style={styles.contentContainer}>
-                <Text style={[styles.title, isCompleted && styles.completedText]} numberOfLines={1}>
+                <Text style={[styles.title, isCompleted && styles.completedText]} numberOfLines={2}>
                   {title}
                 </Text>
                 {subtitle ? (
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     marginRight: 14,
     flexDirection: "column",
     alignItems: "flex-start",
-    minWidth: 72,
+    minWidth: 58,
   },
   perPersonText: {
     marginTop: 4,
@@ -436,6 +436,7 @@ const styles = StyleSheet.create({
   rowBody: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
 });
 
