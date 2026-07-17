@@ -46,10 +46,10 @@ export const useDashboardActions = ({
   activeTab,
   openDetalleTarea,
 }: ActionsProps) => {
-  const handleToggleTask = async (id: string) => {
+  const handleToggleTask = async (id: string): Promise<boolean> => {
     if (activeTab === "tareas") {
       const task = tareas.find((t) => t.id === id);
-      if (!task) return;
+      if (!task) return false;
 
       const due = new Date(task.FechaLimite);
       const today = new Date();
@@ -69,7 +69,7 @@ export const useDashboardActions = ({
               { text: "Ir al detalle", onPress: () => openDetalleTarea(task) },
             ],
           });
-          return;
+          return false;
         }
 
         // Bloquear si no está asignada al usuario actual
@@ -89,7 +89,7 @@ export const useDashboardActions = ({
               .replace("{{name}}", task.usuarioAsignado || t("createTask.popups.notAssignedToMe.otherUser")),
             buttons: [{ text: t("common.accept") }],
           });
-          return;
+          return false;
         }
       }
 
@@ -130,7 +130,7 @@ export const useDashboardActions = ({
             },
           ],
         });
-        return;
+        return true;
       }
 
       // Completar (Optimista)
@@ -179,10 +179,11 @@ export const useDashboardActions = ({
           Alert.alert("Error", "No se pudo completar la tarea en el servidor.");
         });
       }
+      return true;
     } else {
       // FACTURAS
       const factura = facturas.find((f) => f.IdFactura === id);
-      if (!factura) return;
+      if (!factura) return false;
 
       const yo = factura.UsuariosAsignados?.find(
         (u) => cleanId(u.id) === cleanId(CURRENT_USER_ID || ""),
@@ -193,7 +194,7 @@ export const useDashboardActions = ({
           title: t("dashboard.invoices.notAssigned"),
           buttons: [{ text: t("common.accept") }],
         });
-        return;
+        return false;
       }
 
       if (yo.completed) {
@@ -207,7 +208,7 @@ export const useDashboardActions = ({
             {
               text: t("common.accept"),
               onPress: async () => {
-                const desmarcada = factura.withUserCompleted(yo.id, false);
+                const desmarcada = factura!.withUserCompleted(yo!.id, false);
                 setFacturas((prev) =>
                   prev.map((f) => (f.IdFactura === id ? desmarcada : f)),
                 );
@@ -264,7 +265,7 @@ export const useDashboardActions = ({
             {
               text: t("common.accept"),
               onPress: async () => {
-                const marcada = factura.withUserCompleted(yo.id, true);
+                const marcada = factura!.withUserCompleted(yo!.id, true);
                 setFacturas((prev) =>
                   prev.map((f) => (f.IdFactura === id ? marcada : f)),
                 );
@@ -346,7 +347,9 @@ export const useDashboardActions = ({
           ],
         });
       }
+      return true;
     }
+    return false;
   };
 
   const handleDeleteTask = async (id: string | number) => {

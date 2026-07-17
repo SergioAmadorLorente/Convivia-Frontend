@@ -36,7 +36,7 @@ interface TaskItemProps {
   isCompleted: boolean;
 
   /** Toggle checkbox (para tareas, o toggle rápido en facturas si onQuickToggle no está definido) */
-  onToggle: () => void;
+  onToggle: () => any;
 
   /** (Opcional) Callback para toggle rápido sin abrir detalle (principalmente para facturas) */
   onQuickToggle?: () => void;
@@ -131,9 +131,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
         });
 
         // Esperar 400ms a que termine el feedback y luego hacer la transición
-        setTimeout(() => {
-          onToggle();
+        setTimeout(async () => {
+          const success = await onToggle();
           isTogglingRef.current = false;
+          if (success === false) {
+            // Revertir animación del checkbox si fue rechazado (ej. no asignada a mí)
+            checkboxScale.value = withSpring(0, { damping: 12, stiffness: 150, reduceMotion: ReduceMotion.Never });
+            checkboxBgColor.value = withTiming(0, { duration: 150, reduceMotion: ReduceMotion.Never });
+          }
         }, 400);
       }
     } else {
