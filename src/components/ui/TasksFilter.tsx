@@ -18,6 +18,12 @@ import { useTranslation } from "react-i18next";
 import { COLORS, FONTS } from "../../styles/theme";
 
 interface TasksFilterProps {
+  currentFilter?: "today" | "week" | "all";
+  currentVisibility?: {
+    showUnassigned: boolean;
+    showOverdue: boolean;
+    showCompleted: boolean;
+  };
   onFilterChange: (filter: "today" | "week" | "all") => void;
   onVisibilityChange: (visibility: {
     showUnassigned: boolean;
@@ -30,17 +36,32 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const TasksFilter: React.FC<TasksFilterProps> = ({
+  currentFilter = "today",
+  currentVisibility,
   onFilterChange,
   onVisibilityChange,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
+  const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">(currentFilter);
 
-  const [showUnassigned, setShowUnassigned] = useState(true);
-  const [showOverdue, setShowOverdue] = useState(true);
-  const [showCompleted, setShowCompleted] = useState(true);
+  const [showUnassigned, setShowUnassigned] = useState(currentVisibility?.showUnassigned ?? true);
+  const [showOverdue, setShowOverdue] = useState(currentVisibility?.showOverdue ?? true);
+  const [showCompleted, setShowCompleted] = useState(currentVisibility?.showCompleted ?? true);
+
+  // Sync state if props change externally
+  React.useEffect(() => {
+    setSelectedFilter(currentFilter);
+  }, [currentFilter]);
+
+  React.useEffect(() => {
+    if (currentVisibility) {
+      setShowUnassigned(currentVisibility.showUnassigned);
+      setShowOverdue(currentVisibility.showOverdue);
+      setShowCompleted(currentVisibility.showCompleted);
+    }
+  }, [currentVisibility]);
 
   const filterOptions = [
     { key: "today", label: t('dashboard.filter.today') },

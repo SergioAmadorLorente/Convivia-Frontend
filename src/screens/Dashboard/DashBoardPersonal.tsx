@@ -248,7 +248,12 @@ const DashBoardPersonal: React.FC = () => {
       >
         {activeTab === "tareas" && (
           <View style={[GLOBAL_STYLES.fullWidth, { marginTop: 10, marginBottom: 15 }]}>
-            <TasksFilter onFilterChange={setSelectedFilter} onVisibilityChange={setVisibility} />
+            <TasksFilter
+              currentFilter={selectedFilter}
+              currentVisibility={visibility}
+              onFilterChange={setSelectedFilter}
+              onVisibilityChange={setVisibility}
+            />
           </View>
         )}
 
