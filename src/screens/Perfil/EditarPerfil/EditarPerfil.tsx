@@ -49,6 +49,24 @@ const EditarPerfil = () => {
 	const [popupOptions, setPopupOptions] = useState<any>({});
 	const [isLoading, setIsLoading] = useState(false);
 
+	const [backConfirmVisible, setBackConfirmVisible] = useState(false);
+	const pendingBackAction = useRef<any>(null);
+	const isSavingRef = useRef(false);
+
+	useEffect(() => {
+		const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
+			if (isSavingRef.current) {
+				return;
+			}
+			if (e.data.action.type === 'GO_BACK' || e.data.action.type === 'POP') {
+				e.preventDefault();
+				pendingBackAction.current = e.data.action;
+				setBackConfirmVisible(true);
+			}
+		});
+		return unsubscribe;
+	}, [navigation]);
+
 	const fontsLoaded = useLoadFonts();
 	const containerRef = useRef<any>(null);
 	useKeyboardAware({ containerRef, padding: 12 });
@@ -167,6 +185,8 @@ const EditarPerfil = () => {
 			// Actualizar la contraseña guardada si cambió
 			if (nuevaContrasena) setDbPassword(nuevaContrasena);
 
+			isSavingRef.current = true;
+
 			showPopup({
 				title: t('editProfile.popups.success.title'),
 				description: t('editProfile.popups.success.description'),
@@ -277,6 +297,33 @@ const EditarPerfil = () => {
 				description={popupOptions.description}
 				imageType={popupOptions.imageType}
 				buttons={popupOptions.buttons}
+			/>
+
+			{/* Back navigation confirmation popup */}
+			<Popup
+				visible={backConfirmVisible}
+				onClose={() => setBackConfirmVisible(false)}
+				title={t('createTask.backConfirm.titleEdit')}
+				description={t('createTask.backConfirm.description')}
+				imageType="goback"
+				buttons={[
+					{
+						text: t('createTask.backConfirm.exit'),
+						onPress: () => {
+							setBackConfirmVisible(false);
+							if (pendingBackAction.current) {
+								navigation.dispatch(pendingBackAction.current);
+							}
+						},
+					},
+					{
+						text: t('createTask.backConfirm.continueEdit'),
+						onPress: () => {
+							setBackConfirmVisible(false);
+							pendingBackAction.current = null;
+						},
+					},
+				]}
 			/>
 		</View >
 	);
