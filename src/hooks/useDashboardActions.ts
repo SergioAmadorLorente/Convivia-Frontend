@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { completarTareaInstancia, eliminarTarea } from "../api/tarea";
-import { editarFactura } from "../api/factura";
+import { editarFactura, eliminarFactura } from "../api/factura";
 import { actualizarUsuarioEspacio } from "../api/usuarioEspacio";
 import TaskModel from "../types/Task";
 import FacturaModel from "../types/Factura";
@@ -384,9 +384,33 @@ export const useDashboardActions = ({
   };
 
   const handleDeleteFactura = async (id: string) => {
-    // Implementación para facturas...
-    setFacturas((prev) => prev.filter((f) => f.IdFactura !== id));
-    closeDetalle();
+    if (!espacioId) return;
+    showPopup({
+      imageType: "goback",
+      title: t("dashboard.invoices.deleteQuestion") || "¿Deseas eliminar esta factura?",
+      buttons: [
+        { text: t("common.cancel") },
+        {
+          text: t("common.delete"),
+          onPress: async () => {
+            try {
+              await eliminarFactura(espacioId, id);
+              setFacturas((prev) => prev.filter((f) => f.IdFactura !== id));
+              closeDetalle();
+
+              showToast?.({
+                entity: "factura",
+                name: t("dashboard.invoices.deletedSuccess") || "Factura eliminada correctamente",
+                tone: "success",
+                autoHideMs: 3000,
+              });
+            } catch (error) {
+              Alert.alert(t("common.error") || "Error", "No se pudo eliminar la factura.");
+            }
+          },
+        },
+      ],
+    });
   };
 
   return { handleToggleTask, handleDeleteTask, handleDeleteFactura };

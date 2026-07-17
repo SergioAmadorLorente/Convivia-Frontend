@@ -256,7 +256,9 @@
       "invoiceCompletedToast": "¡{{name}} completamente pagada!",
       "partPaidRemainingToast": "Tu parte pagada. Faltan: {{names}}",
       "partPaidToast": "¡Has pagado tu parte de {{name}}!",
-      "unmarkPaymentToast": "Pago desmarcado correctamente"
+      "unmarkPaymentToast": "Pago desmarcado correctamente",
+      "deleteQuestion": "¿Deseas eliminar esta factura?",
+      "deletedSuccess": "Factura eliminada correctamente"
     }
   },
   "createTask": {

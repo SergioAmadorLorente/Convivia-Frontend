@@ -451,6 +451,17 @@ const Detalle: React.FC<Props> = (props) => {
                 <Text style={styles.subtitle}>{factura.Descripcion}</Text>
               ) : null}
             </View>
+
+            {/* Botón Eliminar */}
+            <View style={{ alignItems: "flex-end" }}>
+              <TouchableOpacity
+                onPress={onDelete}
+                activeOpacity={0.7}
+                style={styles.deleteButton}
+              >
+                <Feather name="trash-2" size={20} color={COLORS.error} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Precio total */}
