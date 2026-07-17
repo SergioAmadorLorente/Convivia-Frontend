@@ -265,22 +265,24 @@ const TaskItem: React.FC<TaskItemProps> = ({
             </View>
           </TouchableOpacity>
 
-          {/* Checkbox Animado (Hermano de touchableContent, no hijo) */}
-          <TouchableOpacity
-            onPress={handlePressCheckbox}
-            activeOpacity={0.8}
-            style={CHECKBOX.touchArea}
-          >
-            <Animated.View style={[styles.customCheckbox, checkboxAnimatedStyle]}>
-              <Animated.View style={checkmarkAnimatedStyle}>
-                <Feather
-                  name="check"
-                  size={14}
-                  color="#FFF"
-                />
+          {/* Checkbox Animado (Hermano de touchableContent, no hijo) - Oculto en facturas */}
+          {!isFactura && (
+            <TouchableOpacity
+              onPress={handlePressCheckbox}
+              activeOpacity={0.8}
+              style={CHECKBOX.touchArea}
+            >
+              <Animated.View style={[styles.customCheckbox, checkboxAnimatedStyle]}>
+                <Animated.View style={checkmarkAnimatedStyle}>
+                  <Feather
+                    name="check"
+                    size={14}
+                    color="#FFF"
+                  />
+                </Animated.View>
               </Animated.View>
-            </Animated.View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          )}
         </View>
       </Animated.View>
     </Animated.View>

@@ -475,7 +475,7 @@ const Detalle: React.FC<Props> = (props) => {
             {loadingImage ? (
               <View style={styles.imageSkeleton}>
                 <ActivityIndicator size="small" color={COLORS.primary} />
-                <Text style={styles.imageSkeletonText}>Cargando foto...</Text>
+                <Text style={styles.imageSkeletonText}>Loading Photo...</Text>
               </View>
             ) : facturaImageUri ? (
               <UploadImage
@@ -485,7 +485,7 @@ const Detalle: React.FC<Props> = (props) => {
               />
             ) : (
               <View style={styles.imageSkeleton}>
-                <Text style={styles.imageSkeletonText}>Factura sin foto</Text>
+                <Text style={styles.imageSkeletonText}>No photo</Text>
               </View>
             )}
           </View>
