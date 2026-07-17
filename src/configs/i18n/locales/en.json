@@ -335,7 +335,8 @@
         "title": "You cannot complete this task",
         "description": "This task is assigned to {{name}}. Only the assigned user can complete it.",
         "otherUser": "another user"
-      }
+      },
+      "taskReactivated": "Task reactivated"
     }
   },
   "createInvoice": {

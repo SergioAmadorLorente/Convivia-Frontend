@@ -332,7 +332,8 @@
                 "title": "Du kannst diese Aufgabe nicht abschließen",
                 "description": "Diese Aufgabe ist {{name}} zugewiesen. Nur der zugewiesene Benutzer kann sie abschließen.",
                 "otherUser": "ein anderer Benutzer"
-            }
+            },
+            "taskReactivated": "Aufgabe wieder aktiviert"
         }
     },
     "createInvoice": {

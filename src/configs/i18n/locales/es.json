@@ -335,7 +335,8 @@
         "title": "No puedes completar esta tarea",
         "description": "Esta tarea está asignada a {{name}}. Solo el usuario asignado puede completarla.",
         "otherUser": "otro usuario"
-      }
+      },
+      "taskReactivated": "Tarea activada de nuevo"
     }
   },
   "createInvoice": {

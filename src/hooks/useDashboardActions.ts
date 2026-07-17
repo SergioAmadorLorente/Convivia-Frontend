@@ -123,6 +123,12 @@ export const useDashboardActions = ({
                   setTareas((prev) =>
                     prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
                   );
+                  showToast?.({
+                    entity: "tarea",
+                    name: t("createTask.popups.taskReactivated"),
+                    tone: "info",
+                    autoHideMs: 3000,
+                  });
                 } catch (error) {
                   Alert.alert("Error", "No se pudo actualizar la tarea.");
                 }

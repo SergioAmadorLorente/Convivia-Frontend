@@ -332,7 +332,8 @@
                 "title": "Vous ne pouvez pas compléter cette tâche",
                 "description": "Cette tâche est assignée à {{name}}. Seul l'utilisateur assigné peut la compléter.",
                 "otherUser": "un autre utilisateur"
-            }
+            },
+            "taskReactivated": "Tâche réactivée"
         }
     },
     "createInvoice": {

@@ -332,7 +332,8 @@
                 "title": "Non puoi completare questo compito",
                 "description": "Questo compito è assegnato a {{name}}. Solo l'utente assegnato può completarlo.",
                 "otherUser": "un altro utente"
-            }
+            },
+            "taskReactivated": "Attività riattivata"
         }
     },
     "createInvoice": {
