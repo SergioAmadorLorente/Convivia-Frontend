@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { completarTareaInstancia, eliminarTarea } from "../api/tarea";
-import { editarFactura } from "../api/factura";
+import { editarFactura, eliminarFactura } from "../api/factura";
 import { actualizarUsuarioEspacio } from "../api/usuarioEspacio";
 import TaskModel from "../types/Task";
 import FacturaModel from "../types/Factura";
@@ -46,10 +46,10 @@ export const useDashboardActions = ({
   activeTab,
   openDetalleTarea,
 }: ActionsProps) => {
-  const handleToggleTask = async (id: string) => {
+  const handleToggleTask = async (id: string): Promise<boolean> => {
     if (activeTab === "tareas") {
       const task = tareas.find((t) => t.id === id);
-      if (!task) return;
+      if (!task) return false;
 
       const due = new Date(task.FechaLimite);
       const today = new Date();
@@ -69,7 +69,7 @@ export const useDashboardActions = ({
               { text: "Ir al detalle", onPress: () => openDetalleTarea(task) },
             ],
           });
-          return;
+          return false;
         }
 
         // Bloquear si no está asignada al usuario actual
@@ -89,7 +89,7 @@ export const useDashboardActions = ({
               .replace("{{name}}", task.usuarioAsignado || t("createTask.popups.notAssignedToMe.otherUser")),
             buttons: [{ text: t("common.accept") }],
           });
-          return;
+          return false;
         }
       }
 
@@ -123,6 +123,12 @@ export const useDashboardActions = ({
                   setTareas((prev) =>
                     prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
                   );
+                  showToast?.({
+                    entity: "tarea",
+                    name: t("createTask.popups.taskReactivated"),
+                    tone: "info",
+                    autoHideMs: 3000,
+                  });
                 } catch (error) {
                   Alert.alert("Error", "No se pudo actualizar la tarea.");
                 }
@@ -130,7 +136,7 @@ export const useDashboardActions = ({
             },
           ],
         });
-        return;
+        return true;
       }
 
       // Completar (Optimista)
@@ -179,10 +185,11 @@ export const useDashboardActions = ({
           Alert.alert("Error", "No se pudo completar la tarea en el servidor.");
         });
       }
+      return true;
     } else {
       // FACTURAS
       const factura = facturas.find((f) => f.IdFactura === id);
-      if (!factura) return;
+      if (!factura) return false;
 
       const yo = factura.UsuariosAsignados?.find(
         (u) => cleanId(u.id) === cleanId(CURRENT_USER_ID || ""),
@@ -193,7 +200,7 @@ export const useDashboardActions = ({
           title: t("dashboard.invoices.notAssigned"),
           buttons: [{ text: t("common.accept") }],
         });
-        return;
+        return false;
       }
 
       if (yo.completed) {
@@ -207,7 +214,7 @@ export const useDashboardActions = ({
             {
               text: t("common.accept"),
               onPress: async () => {
-                const desmarcada = factura.withUserCompleted(yo.id, false);
+                const desmarcada = factura!.withUserCompleted(yo!.id, false);
                 setFacturas((prev) =>
                   prev.map((f) => (f.IdFactura === id ? desmarcada : f)),
                 );
@@ -264,7 +271,7 @@ export const useDashboardActions = ({
             {
               text: t("common.accept"),
               onPress: async () => {
-                const marcada = factura.withUserCompleted(yo.id, true);
+                const marcada = factura!.withUserCompleted(yo!.id, true);
                 setFacturas((prev) =>
                   prev.map((f) => (f.IdFactura === id ? marcada : f)),
                 );
@@ -346,7 +353,9 @@ export const useDashboardActions = ({
           ],
         });
       }
+      return true;
     }
+    return false;
   };
 
   const handleDeleteTask = async (id: string | number) => {
@@ -384,9 +393,33 @@ export const useDashboardActions = ({
   };
 
   const handleDeleteFactura = async (id: string) => {
-    // Implementación para facturas...
-    setFacturas((prev) => prev.filter((f) => f.IdFactura !== id));
-    closeDetalle();
+    if (!espacioId) return;
+    showPopup({
+      imageType: "goback",
+      title: t("dashboard.invoices.deleteQuestion") || "¿Deseas eliminar esta factura?",
+      buttons: [
+        { text: t("common.cancel") },
+        {
+          text: t("common.delete"),
+          onPress: async () => {
+            try {
+              await eliminarFactura(espacioId, id);
+              setFacturas((prev) => prev.filter((f) => f.IdFactura !== id));
+              closeDetalle();
+
+              showToast?.({
+                entity: "factura",
+                name: t("dashboard.invoices.deletedSuccess") || "Factura eliminada correctamente",
+                tone: "success",
+                autoHideMs: 3000,
+              });
+            } catch (error) {
+              Alert.alert(t("common.error") || "Error", "No se pudo eliminar la factura.");
+            }
+          },
+        },
+      ],
+    });
   };
 
   return { handleToggleTask, handleDeleteTask, handleDeleteFactura };

@@ -72,6 +72,7 @@ const DashBoardPersonal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
   const isLoading = authLoading || loadingEspacio || (activeTab === "tareas" ? loadingTareas : loadingFacturas);
   const [selectedFilter, setSelectedFilter] = useState<"today" | "week" | "all">("today");
+  const [selectedUserFilter, setSelectedUserFilter] = useState<string>("all");
   const [visibility, setVisibility] = useState({
     showUnassigned: true,
     showOverdue: true,
@@ -211,7 +212,14 @@ const DashBoardPersonal: React.FC = () => {
       pendingItems = pendingItems.filter(i => i.usuarioAsignado);
       overdueItems = overdueItems.filter(i => i.usuarioAsignado);
     }
+    if (selectedUserFilter !== "all") {
+      pendingItems = pendingItems.filter(i => i.usuarioAsignado === selectedUserFilter);
+      overdueItems = overdueItems.filter(i => i.usuarioAsignado === selectedUserFilter);
+    }
     completedItems = tareas.filter(i => i.isCompleted && i.isCompletedWithinDays(7));
+    if (selectedUserFilter !== "all") {
+      completedItems = completedItems.filter(i => i.usuarioAsignado === selectedUserFilter);
+    }
   } else {
     // Mostrar todas las facturas (tanto pendientes como completadas)
 
@@ -248,7 +256,16 @@ const DashBoardPersonal: React.FC = () => {
       >
         {activeTab === "tareas" && (
           <View style={[GLOBAL_STYLES.fullWidth, { marginTop: 10, marginBottom: 15 }]}>
-            <TasksFilter onFilterChange={setSelectedFilter} onVisibilityChange={setVisibility} />
+            <TasksFilter
+              currentFilter={selectedFilter}
+              currentVisibility={visibility}
+              currentUserFilter={selectedUserFilter}
+              userNamesMap={userNamesMap}
+              currentUserName={userName}
+              onFilterChange={setSelectedFilter}
+              onVisibilityChange={setVisibility}
+              onUserFilterChange={setSelectedUserFilter}
+            />
           </View>
         )}
 
