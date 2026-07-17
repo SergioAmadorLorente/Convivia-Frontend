@@ -242,21 +242,31 @@ const CreateFactura: React.FC = () => {
 
             const newFacturaId = result?.id || result?.IdFactura;
 
-            // Gestión de imagen
+            // Gestión de imagen (errores aquí no bloquean el guardado de la factura)
             const targetFacturaId = (isEditing && facturaIdToEdit) ? facturaIdToEdit : newFacturaId;
             if (targetFacturaId) {
-                if (imageUri && imageUri !== imagenOriginal) {
-                    // Hay imagen nueva o cambiada
-                    if (imagenOriginal) {
-                        await actualizarImagenFactura(eIdToUse, targetFacturaId, imageUri);
-                    } else {
-                        await subirImagenFactura(eIdToUse, targetFacturaId, imageUri);
+                try {
+                    if (imageUri && imageUri !== imagenOriginal) {
+                        // Hay imagen nueva o cambiada
+                        if (imagenOriginal) {
+                            await actualizarImagenFactura(eIdToUse, targetFacturaId, imageUri);
+                        } else {
+                            await subirImagenFactura(eIdToUse, targetFacturaId, imageUri);
+                        }
+                        setImagenOriginal(imageUri);
+                    } else if (!imageUri && imagenOriginal) {
+                        // Se eliminó la imagen
+                        await eliminarImagenFactura(eIdToUse, targetFacturaId);
+                        setImagenOriginal(null);
                     }
-                    setImagenOriginal(imageUri);
-                } else if (!imageUri && imagenOriginal) {
-                    // Se eliminó la imagen
-                    await eliminarImagenFactura(eIdToUse, targetFacturaId);
-                    setImagenOriginal(null);
+                } catch (imgErr) {
+                    console.warn("Error al gestionar imagen de factura:", imgErr);
+                    showToast({
+                        entity: "factura",
+                        name: t('createInvoice.toasts.imageError') || "Error al subir la imagen, pero la factura fue guardada.",
+                        tone: "error",
+                        autoHideMs: 4000
+                    });
                 }
             }
 

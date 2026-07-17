@@ -126,11 +126,7 @@ export const subirImagenFactura = async (
     const match = /\.([\w]+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : "image/jpeg";
 
-    formData.append("imagen", {
-      uri: imageUri,
-      name: filename,
-      type: type,
-    } as any);
+    formData.append("imagen", { uri: imageUri, name: filename, type } as any);
 
     const response = await api.post(
       `/espacio/${espacioId}/factura/${facturaId}/imagen`,
@@ -159,11 +155,7 @@ export const actualizarImagenFactura = async (
     const match = /\.([\w]+)$/.exec(filename);
     const type = match ? `image/${match[1]}` : "image/jpeg";
 
-    formData.append("imagen", {
-      uri: imageUri,
-      name: filename,
-      type: type,
-    } as any);
+    formData.append("imagen", { uri: imageUri, name: filename, type } as any);
 
     const response = await api.put(
       `/espacio/${espacioId}/factura/${facturaId}/imagen`,
