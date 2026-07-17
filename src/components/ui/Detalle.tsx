@@ -470,23 +470,25 @@ const Detalle: React.FC<Props> = (props) => {
           </View>
 
           {/* Fotos */}
-          {(loadingImage || facturaImageUri) ? (
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>{t('facturaDetail.photos')}</Text>
-              {loadingImage ? (
-                <View style={styles.imageSkeleton}>
-                  <ActivityIndicator size="small" color={COLORS.primary} />
-                  <Text style={styles.imageSkeletonText}>{t('facturaDetail.loadingImage') || 'Cargando imagen...'}</Text>
-                </View>
-              ) : (
-                <UploadImage
-                  label={t('facturaDetail.invoiceImage')}
-                  initialImageUri={facturaImageUri}
-                  editable={false}
-                />
-              )}
-            </View>
-          ) : null}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t('facturaDetail.photos')}</Text>
+            {loadingImage ? (
+              <View style={styles.imageSkeleton}>
+                <ActivityIndicator size="small" color={COLORS.primary} />
+                <Text style={styles.imageSkeletonText}>Cargando foto...</Text>
+              </View>
+            ) : facturaImageUri ? (
+              <UploadImage
+                label={t('facturaDetail.invoiceImage')}
+                initialImageUri={facturaImageUri}
+                editable={false}
+              />
+            ) : (
+              <View style={styles.imageSkeleton}>
+                <Text style={styles.imageSkeletonText}>Factura sin foto</Text>
+              </View>
+            )}
+          </View>
 
           {/* Usuarios asignados */}
           <View style={styles.section}>
