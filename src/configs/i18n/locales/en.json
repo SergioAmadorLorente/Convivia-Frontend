@@ -238,7 +238,9 @@
       "all": "All",
       "unassigned": "Unassigned tasks",
       "overdue": "Overdue",
-      "completed": "Completed"
+      "completed": "Completed",
+      "assignedTo": "Assigned to",
+      "allUsers": "All"
     },
     "invoices": {
       "notAssigned": "You are not assigned to this invoice",

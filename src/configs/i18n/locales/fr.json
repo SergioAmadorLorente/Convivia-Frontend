@@ -235,7 +235,9 @@
             "all": "Toutes",
             "unassigned": "Tâches non attribuées",
             "overdue": "En retard",
-            "completed": "Terminées"
+            "completed": "Terminées",
+            "assignedTo": "Assigné à",
+            "allUsers": "Tous"
         },
         "invoices": {
             "notAssigned": "Vous n'êtes pas assigné à cette facture",

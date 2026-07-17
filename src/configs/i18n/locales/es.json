@@ -238,7 +238,9 @@
       "all": "Todas",
       "unassigned": "Sin asignar",
       "overdue": "Fuera de plazo",
-      "completed": "Completadas"
+      "completed": "Completadas",
+      "assignedTo": "Asignado a",
+      "allUsers": "Todos"
     },
     "invoices": {
       "notAssigned": "No estás asignado a esta factura",

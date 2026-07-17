@@ -235,7 +235,9 @@
             "all": "Alle",
             "unassigned": "Nicht zugewiesene Aufgaben",
             "overdue": "Überfällig",
-            "completed": "Abgeschlossen"
+            "completed": "Abgeschlossen",
+            "assignedTo": "Zugewiesen an",
+            "allUsers": "Alle"
         },
         "invoices": {
             "notAssigned": "Du bist dieser Rechnung nicht zugewiesen",

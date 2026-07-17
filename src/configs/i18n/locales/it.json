@@ -235,7 +235,9 @@
             "all": "Tutte",
             "unassigned": "Attività non assegnate",
             "overdue": "Scadute",
-            "completed": "Completate"
+            "completed": "Completate",
+            "assignedTo": "Assegnato a",
+            "allUsers": "Tutti"
         },
         "invoices": {
             "notAssigned": "Non sei assegnato a questa fattura",
