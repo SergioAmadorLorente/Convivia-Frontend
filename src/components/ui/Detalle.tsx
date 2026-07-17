@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Pressable,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../styles/theme";
@@ -362,22 +363,29 @@ const Detalle: React.FC<Props> = (props) => {
 
   const facturaUser = useAuthListener();
   const [facturaImageUri, setFacturaImageUri] = useState<string | null>(null);
+  const [loadingImage, setLoadingImage] = useState(false);
   const [userRelacionId, setUserRelacionId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!visible || !facturaUser?.uid) return;
+    setFacturaImageUri(null);
+    setLoadingImage(true);
     const cargar = async () => {
       try {
         const relacion = await obtenerEspacioPorUsuarioId(facturaUser.uid);
         const eId = relacion?.espacioId;
         setUserRelacionId(relacion?.id || null);
-        if (!eId) return;
+        if (!eId) { setLoadingImage(false); return; }
         const blob = await obtenerImagenFactura(eId, factura.IdFactura);
         const reader = new FileReader();
         reader.readAsDataURL(blob);
-        reader.onloadend = () => setFacturaImageUri(reader.result as string);
+        reader.onloadend = () => {
+          setFacturaImageUri(reader.result as string);
+          setLoadingImage(false);
+        };
       } catch {
         setFacturaImageUri(null);
+        setLoadingImage(false);
       }
     };
     cargar();
@@ -462,14 +470,21 @@ const Detalle: React.FC<Props> = (props) => {
           </View>
 
           {/* Fotos */}
-          {facturaImageUri ? (
+          {(loadingImage || facturaImageUri) ? (
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>{t('facturaDetail.photos')}</Text>
-              <UploadImage
-                label={t('facturaDetail.invoiceImage')}
-                initialImageUri={facturaImageUri}
-                editable={false}
-              />
+              {loadingImage ? (
+                <View style={styles.imageSkeleton}>
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                  <Text style={styles.imageSkeletonText}>{t('facturaDetail.loadingImage') || 'Cargando imagen...'}</Text>
+                </View>
+              ) : (
+                <UploadImage
+                  label={t('facturaDetail.invoiceImage')}
+                  initialImageUri={facturaImageUri}
+                  editable={false}
+                />
+              )}
             </View>
           ) : null}
 
@@ -720,6 +735,24 @@ const styles = StyleSheet.create({
   },
 
   // ---- Factura: fotos ----
+  imageSkeleton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    backgroundColor: COLORS.inputBackground,
+    borderRadius: HELPERS.moderateScale(10),
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingVertical: HELPERS.verticalScale(18),
+    marginBottom: HELPERS.verticalScale(4),
+  },
+  imageSkeletonText: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
+    opacity: 0.6,
+  },
   downloadRow: {
     flexDirection: "row",
     alignItems: "center",
