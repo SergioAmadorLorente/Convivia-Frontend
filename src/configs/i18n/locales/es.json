@@ -238,7 +238,9 @@
       "all": "Todas",
       "unassigned": "Sin asignar",
       "overdue": "Fuera de plazo",
-      "completed": "Completadas"
+      "completed": "Completadas",
+      "assignedTo": "Asignado a",
+      "allUsers": "Todos"
     },
     "invoices": {
       "notAssigned": "No estás asignado a esta factura",
@@ -256,7 +258,9 @@
       "invoiceCompletedToast": "¡{{name}} completamente pagada!",
       "partPaidRemainingToast": "Tu parte pagada. Faltan: {{names}}",
       "partPaidToast": "¡Has pagado tu parte de {{name}}!",
-      "unmarkPaymentToast": "Pago desmarcado correctamente"
+      "unmarkPaymentToast": "Pago desmarcado correctamente",
+      "deleteQuestion": "¿Deseas eliminar esta factura?",
+      "deletedSuccess": "Factura eliminada correctamente"
     }
   },
   "createTask": {
@@ -333,7 +337,8 @@
         "title": "No puedes completar esta tarea",
         "description": "Esta tarea está asignada a {{name}}. Solo el usuario asignado puede completarla.",
         "otherUser": "otro usuario"
-      }
+      },
+      "taskReactivated": "Tarea activada de nuevo"
     }
   },
   "createInvoice": {

@@ -235,7 +235,9 @@
             "all": "Alle",
             "unassigned": "Nicht zugewiesene Aufgaben",
             "overdue": "Überfällig",
-            "completed": "Abgeschlossen"
+            "completed": "Abgeschlossen",
+            "assignedTo": "Zugewiesen an",
+            "allUsers": "Alle"
         },
         "invoices": {
             "notAssigned": "Du bist dieser Rechnung nicht zugewiesen",
@@ -253,7 +255,9 @@
             "invoiceCompletedToast": "¡{{name}} vollständig bezahlt!",
             "partPaidRemainingToast": "Dein Anteil wurde bezahlt. Es fehlen noch: {{names}}",
             "partPaidToast": "Du hast deinen Anteil an {{name}} bezahlt!",
-            "unmarkPaymentToast": "Zahlung erfolgreich aufgehoben"
+            "unmarkPaymentToast": "Zahlung erfolgreich aufgehoben",
+            "deleteQuestion": "Möchten Sie diese Rechnung löschen?",
+            "deletedSuccess": "Rechnung erfolgreich gelöscht"
         }
     },
     "createTask": {
@@ -330,7 +334,8 @@
                 "title": "Du kannst diese Aufgabe nicht abschließen",
                 "description": "Diese Aufgabe ist {{name}} zugewiesen. Nur der zugewiesene Benutzer kann sie abschließen.",
                 "otherUser": "ein anderer Benutzer"
-            }
+            },
+            "taskReactivated": "Aufgabe wieder aktiviert"
         }
     },
     "createInvoice": {

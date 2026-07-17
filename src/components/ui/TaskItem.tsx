@@ -36,7 +36,7 @@ interface TaskItemProps {
   isCompleted: boolean;
 
   /** Toggle checkbox (para tareas, o toggle rápido en facturas si onQuickToggle no está definido) */
-  onToggle: () => void;
+  onToggle: () => any;
 
   /** (Opcional) Callback para toggle rápido sin abrir detalle (principalmente para facturas) */
   onQuickToggle?: () => void;
@@ -131,9 +131,14 @@ const TaskItem: React.FC<TaskItemProps> = ({
         });
 
         // Esperar 400ms a que termine el feedback y luego hacer la transición
-        setTimeout(() => {
-          onToggle();
+        setTimeout(async () => {
+          const success = await onToggle();
           isTogglingRef.current = false;
+          if (success === false) {
+            // Revertir animación del checkbox si fue rechazado (ej. no asignada a mí)
+            checkboxScale.value = withSpring(0, { damping: 12, stiffness: 150, reduceMotion: ReduceMotion.Never });
+            checkboxBgColor.value = withTiming(0, { duration: 150, reduceMotion: ReduceMotion.Never });
+          }
         }, 400);
       }
     } else {
@@ -265,22 +270,24 @@ const TaskItem: React.FC<TaskItemProps> = ({
             </View>
           </TouchableOpacity>
 
-          {/* Checkbox Animado (Hermano de touchableContent, no hijo) */}
-          <TouchableOpacity
-            onPress={handlePressCheckbox}
-            activeOpacity={0.8}
-            style={CHECKBOX.touchArea}
-          >
-            <Animated.View style={[styles.customCheckbox, checkboxAnimatedStyle]}>
-              <Animated.View style={checkmarkAnimatedStyle}>
-                <Feather
-                  name="check"
-                  size={14}
-                  color="#FFF"
-                />
+          {/* Checkbox Animado (Hermano de touchableContent, no hijo) - Oculto en facturas */}
+          {!isFactura && (
+            <TouchableOpacity
+              onPress={handlePressCheckbox}
+              activeOpacity={0.8}
+              style={CHECKBOX.touchArea}
+            >
+              <Animated.View style={[styles.customCheckbox, checkboxAnimatedStyle]}>
+                <Animated.View style={checkmarkAnimatedStyle}>
+                  <Feather
+                    name="check"
+                    size={14}
+                    color="#FFF"
+                  />
+                </Animated.View>
               </Animated.View>
-            </Animated.View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          )}
         </View>
       </Animated.View>
     </Animated.View>
