@@ -4,7 +4,8 @@
         "welcome": "Benvenuto in Convivia",
         "description": "Organizza, collabora e raggiungi i tuoi obiettivi insieme ai tuoi coinquilini.\nQui la produttività è condivisa e le idee scorrono in armonia!",
         "createAccount": "Crea un account",
-        "login": "Accedi"
+        "login": "Accedi",
+        "loadingHome": "Caricamento della tua casa..."
     },
     "bottomBar": {
         "home": "Home",

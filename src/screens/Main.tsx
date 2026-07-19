@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, ScrollView, ActivityIndicator } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { Text, View, ScrollView, ActivityIndicator, Animated, Easing } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import useLoadFonts from "../hooks/useLoadFonts";
 import Logo from "../components/ui/Logo";
@@ -9,12 +9,53 @@ import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from "../configs/firebaseConfig";
 import { onAuthStateChanged } from "firebase/auth";
+import { COLORS, FONTS } from "../styles/theme";
 
 const Main: React.FC = () => {
   const navigation = useNavigation<any>();
   const fontsLoaded = useLoadFonts();
   const { t } = useTranslation();
   const [checkingSession, setCheckingSession] = useState(true);
+
+  const fadeAnim = useRef(new Animated.Value(0.6)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    const breatheAnim = Animated.loop(
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 1200,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(fadeAnim, {
+            toValue: 0.6,
+            duration: 1200,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.sequence([
+          Animated.timing(scaleAnim, {
+            toValue: 1.05,
+            duration: 1200,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleAnim, {
+            toValue: 0.95,
+            duration: 1200,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+        ]),
+      ])
+    );
+    breatheAnim.start();
+    return () => breatheAnim.stop();
+  }, [fadeAnim, scaleAnim]);
 
   useEffect(() => {
     // Comprueba si hay un usuario autenticado en Firebase y el flag REMEMBER_ME guardado
@@ -49,8 +90,38 @@ const Main: React.FC = () => {
 
   if (checkingSession || !fontsLoaded) {
     return (
-      <View style={[GLOBAL_STYLES.container, { justifyContent: "center" }]}>
-        <ActivityIndicator size="large" />
+      <View style={{
+        flex: 1,
+        backgroundColor: COLORS.background,
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
+        <Animated.View style={{
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }],
+          alignItems: "center",
+          marginBottom: 30,
+        }}>
+          <Logo />
+        </Animated.View>
+        
+        <View style={{
+          position: "absolute",
+          bottom: 80,
+          alignItems: "center",
+          gap: 15,
+        }}>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={{
+            fontFamily: FONTS.regular,
+            fontSize: 14,
+            color: COLORS.secondary,
+            opacity: 0.7,
+            letterSpacing: 0.5,
+          }}>
+            {t('main.loadingHome')}
+          </Text>
+        </View>
       </View>
     );
   }
