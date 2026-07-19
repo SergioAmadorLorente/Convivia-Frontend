@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import {
   Modal,
   View,
@@ -8,6 +8,7 @@ import {
   Pressable,
   Platform,
   ActivityIndicator,
+  PanResponder,
 } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../styles/theme";
@@ -56,6 +57,22 @@ type Props =
 const Detalle: React.FC<Props> = (props) => {
   const { visible, onClose } = props;
   const { t, i18n } = useTranslation();
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponderCapture: () => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        if (props.kind !== "factura") return;
+        if (gestureState.dx > 40 || gestureState.vx > 0.25) {
+          onClose();
+        }
+      },
+      onPanResponderTerminate: () => {},
+    })
+  ).current;
 
   // ---- PARTICIPANTE ----
   if (props.kind === "participante") {
@@ -441,6 +458,19 @@ const Detalle: React.FC<Props> = (props) => {
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
         <View style={styles.sheet}>
+          <View
+            collapsable={false}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 40,
+              backgroundColor: "transparent",
+              zIndex: 9999,
+            }}
+            {...panResponder.panHandlers}
+          />
           <View style={styles.handle} />
 
           {/* Header */}
