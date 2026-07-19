@@ -1,0 +1,592 @@
+{
+  "main": {
+    "hello": "Olá!",
+    "welcome": "Bem-vindo ao Convivia",
+    "description": "Organize, colabore e cumpra os seus objetivos junto com os seus companheiros.\nAqui a produtividade é compartilhada e as ideias fluem em sintonia!",
+    "createAccount": "Criar uma conta",
+    "login": "Iniciar sessão",
+    "loadingHome": "A carregar o seu lar..."
+  },
+  "bottomBar": {
+    "home": "Início",
+    "create": "Criar",
+    "profile": "Perfil",
+    "createInvoice": "Criar nova fatura",
+    "createTask": "Criar nova tarefa"
+  },
+  "common": {
+    "accept": "Aceitar",
+    "cancel": "Cancelar",
+    "error": "Erro",
+    "success": "Sucesso",
+    "save": "Guardar alterações",
+    "loading": "A carregar...",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "close": "Fechar",
+    "delete": "Eliminar"
+  },
+  "profile": {
+    "title": "Meu Perfil",
+    "karmaPoints": "Pontos de Karma: {{points}}",
+    "menu": {
+      "karma": "Meu Karma",
+      "residences": "Minhas Residências",
+      "faq": "Perguntas frequentes",
+      "legal": "Informação Legal",
+      "pro": "Convivia PRO",
+      "logout": "Terminar Sessão"
+    },
+    "logoutPopup": {
+      "title": "Tem a certeza de que deseja terminar a sessão?",
+      "cancel": "Cancelar",
+      "confirm": "Terminar sessão"
+    },
+    "language": {
+      "select": "Selecionar Idioma",
+      "spanish": "Espanhol",
+      "english": "Inglês",
+      "french": "Francês",
+      "italian": "Italiano",
+      "german": "Alemão",
+      "portuguese": "Português"
+    }
+  },
+  "welcome": {
+    "title": "O seu espaço partilhado começa aqui. \nComo deseja juntar-se?",
+    "createButton": "Criar uma nova residência",
+    "joinButton": "Juntar-se a uma residência",
+    "logoutPopup": {
+      "title": "Tem a certeza de que deseja terminar a sessão?",
+      "cancel": "Cancelar",
+      "confirm": "Terminar sessão"
+    }
+  },
+  "newResidence": {
+    "title": "Criar uma nova residência",
+    "subtitle": "Obtenha o código da sua residência na secção ",
+    "subtitleLink": "Perfil - Minha residência",
+    "nameLabel": "Nome da residência",
+    "namePlaceholder": "Apartamento Lisboa",
+    "createButton": "Criar",
+    "errorMinChars": "O nome deve ter pelo menos 2 caracteres",
+    "errorEmpty": "Introduza um nome válido",
+    "errorMaxChars": "O nome não pode exceder 80 caracteres",
+    "popups": {
+      "alreadyHasResidence": {
+        "title": "Já tem uma residência",
+        "description": "Apenas pode criar uma residência por conta. Será redirecionado para o seu dashboard.",
+        "goToDashboard": "Ir para o Dashboard"
+      },
+      "requiredField": {
+        "title": "Campo obrigatório",
+        "description": "Por favor, introduza um nome válido para la residência."
+      },
+      "invalidName": "Nome inválido",
+      "authError": {
+        "title": "Erro de autenticação",
+        "description": "Deve iniciar sessão para criar uma residência."
+      },
+      "createdWithWarning": {
+        "title": "Residência criada com aviso",
+        "understood": "Entendido"
+      },
+      "created": {
+        "title": "Residência criada",
+        "description": "Pode encontrá-la novamente em Perfil > Minha residência",
+        "start": "Começar!"
+      },
+      "genericError": {
+        "title": "Erro",
+        "description": "Erro ao criar a residência. Tente novamente."
+      }
+    }
+  },
+  "joinResidence": {
+    "title": "Juntar-se a uma residência",
+    "subtitle": "Obtenha o código da residência à qual deseja juntar-se na secção ",
+    "subtitleLink": "Perfil - Minha residência",
+    "codeLabel": "Código da residência",
+    "joinButton": "Juntar-se",
+    "popups": {
+      "invalidCode": {
+        "title": "Código inválido",
+        "description": "Por favor, introduza um código válido."
+      },
+      "sessionError": {
+        "title": "Erro de sessão",
+        "description": "Nenhum utilizador autenticado foi detetado."
+      },
+      "alreadyMember": {
+        "title": "Já se encontra associado!",
+        "goHome": "Ir para o início"
+      },
+      "joinSuccess": {
+        "title": "Sucesso"
+      },
+      "notFound": {
+        "title": "Residência não encontrada",
+        "description": "O código introduzido não corresponde a nenhuma residência existente. Verifique-o e tente novamente."
+      },
+      "genericError": {
+        "title": "Erro",
+        "description": "Não foi possível juntar-se à residência. Tente novamente mais tarde."
+      }
+    }
+  },
+  "login": {
+    "title": "Iniciar sessão",
+    "subtitle": "Está prestes a poder utilizar a aplicação Convivia!",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "utilizador@dominio.com",
+    "passwordLabel": "Palavra-passe",
+    "recoverPassword": "Recuperar palavra-passe",
+    "rememberMe": "Lembrar-me",
+    "loginButton": "Entrar",
+    "popups": {
+      "emailNotVerified": {
+        "title": "Erro",
+        "description": "O e-mail não está verificado. Por favor, verifique o seu e-mail."
+      },
+      "welcomeBack": {
+        "title": "Bem-vindo de volta!",
+        "description": "A redirecionar para a sua residência..."
+      },
+      "loginOk": {
+        "title": "Sucesso",
+        "description": "Sessão iniciada com sucesso. Crie ou junte-se a uma residência para continuar."
+      },
+      "loginOkSimple": {
+        "title": "Sucesso",
+        "description": "Sessão iniciada com sucesso"
+      },
+      "wrongCredentials": {
+        "title": "Erro",
+        "description": "Credenciais incorretas ou utilizador não existente"
+      }
+    }
+  },
+  "recoverPassword": {
+    "title": "Recuperar palavra-passe",
+    "subtitle": "Esqueceu-se da sua palavra-passe?",
+    "emailLabel": "E-mail",
+    "helperText": "Introduza o seu e-mail e enviar-lhe-emos uma ligação para criar uma nova palavra-passe.\n\nDeve ter um formato válido, por exemplo: utilizador@dominio.com",
+    "sendButton": "Enviar e-mail",
+    "popups": {
+      "sent": {
+        "title": "E-mail enviado",
+        "description": "Enviámos-lhe uma ligação para redefinir a sua palavra-passe. Verifique a sua caixa de entrada."
+      },
+      "userNotFound": "Não existe nenhuma conta associada a este e-mail.",
+      "invalidEmail": "O e-mail introduzido não é válido.",
+      "cantSend": "Não foi possível enviar o e-mail.",
+      "errorTitle": "Erro"
+    }
+  },
+  "createAccount": {
+    "title": "Criar conta",
+    "subtitle": "Deseja começar a sua experiência com o Convivia?",
+    "nameLabel": "Nome",
+    "namePlaceholder": "O seu nome",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "utilizador@dominio.com",
+    "passwordLabel": "Palavra-passe",
+    "confirmPasswordLabel": "Confirmar palavra-passe",
+    "passwordMismatch": "As palavras-passe não coincidem",
+    "passwordRequirements": "Requisitos da palavra-passe:",
+    "validPassword": "✓ Palavra-passe válida",
+    "reqLength": "Pelo menos 8 caracteres",
+    "reqUppercase": "Pelo menos uma letra maiúscula",
+    "reqNumber": "Pelo menos um número",
+    "termsLabel": "Termos e Condições",
+    "privacyLabel": "Política de Privacidade e Cookies",
+    "createButton": "Criar conta",
+    "resendButton": "Reenviar verificação",
+    "resendText": "A reenviar em {{seconds}}s",
+    "sendVerification": "Enviar verificação",
+    "emailUsed": "Este e-mail já está registado.",
+    "genericError": "Erro ao criar a conta.",
+    "verificationTitle": "Verifique o seu e-mail",
+    "verificationDescription": "Enviámos-lhe uma ligação de verificação. Por favor, verifique a sua caixa de entrada e clique na ligação.",
+    "popups": {
+      "verificationSent": {
+        "title": "Verificação enviada!",
+        "description": "Verifique o seu e-mail e a pasta de spam."
+      }
+    }
+  },
+  "dashboard": {
+    "greeting": "Olá, {{username}}, hoje é",
+    "tabs": {
+      "tasks": "Tarefas",
+      "invoices": "Faturas"
+    },
+    "sections": {
+      "pending": "Pendentes",
+      "pendingPayment": "Pagamentos Pendentes",
+      "overdue": "Fora do prazo",
+      "completed": "Concluídas",
+      "paid": "Pagas"
+    },
+    "noInvoices": "Não existem faturas atribuídas ao seu utilizador",
+    "noTasks": "Não existem tarefas atribuídas ao seu utilizador",
+    "filter": {
+      "title": "Filtrar",
+      "accessibilityOpen": "Abrir filtros",
+      "when": "Quando",
+      "show": "Mostrar",
+      "today": "Hoje",
+      "week": "Esta semana",
+      "all": "Todas",
+      "unassigned": "Sem atribuição",
+      "overdue": "Fora do prazo",
+      "completed": "Concluídas",
+      "assignedTo": "Atribuído a",
+      "allUsers": "Todos"
+    },
+    "invoices": {
+      "notAssigned": "Não está atribuído a esta fatura",
+      "unmarkPaymentTitle": "Desmarcar o seu pagamento?",
+      "unmarkPaymentDescription": "Confirmar reverterá o seu pagamento e a fatura poderá regressar a \"Pendentes\".",
+      "confirmPaymentTitle": "Confirmar ação de pagamento?",
+      "confirmPaymentDescription": "A sua parte será marcada como paga. Esta ação não atribui pontos de karma.",
+      "updatePaymentError": "Não foi possível atualizar o pagamento no servidor.",
+      "invoiceCompletedTitle": "Fatura concluída!",
+      "invoiceCompletedDescription": "Todos os participantes pagaram a sua parte.",
+      "partPaidTitle": "Marcou a sua parte como paga",
+      "partPaidRemaining": "Falta pagar a: {{names}}.",
+      "fallbackInvoiceName": "a fatura",
+      "fallbackInvoiceWord": "Fatura",
+      "invoiceCompletedToast": "¡{{name}} totalmente paga!",
+      "partPaidRemainingToast": "A sua parte está paga. Faltam: {{names}}",
+      "partPaidToast": "Pagou a sua parte de {{name}}!",
+      "unmarkPaymentToast": "Pagamento desmarcado com sucesso",
+      "deleteQuestion": "Deseja eliminar esta fatura?",
+      "deletedSuccess": "Fatura eliminada com sucesso"
+    }
+  },
+  "createTask": {
+    "titleCreate": "Criar Tarefa",
+    "titleEdit": "Editar Tarefa",
+    "namePlaceholder": "Nome",
+    "descriptionPlaceholder": "Descrição (opcional)",
+    "dateTimeLimit": "Data e hora limite",
+    "repeat": "Repetição da tarefa",
+    "karma": "Pontos de karma",
+    "buttonSave": "Atribuir Utilizadores e Guardar",
+    "buttonCreate": "Atribuir Utilizadores e Criar",
+    "saving": "A guardar...",
+    "errorEmptyName": "O nome não pode estar vazio",
+    "backConfirm": {
+      "titleCreate": "Sair sem guardar?",
+      "titleEdit": "Sair sem guardar?",
+      "description": "Se voltar atrás, as alterações que efetuou não serão guardadas.",
+      "exit": "Sair sem guardar",
+      "continueCreate": "Continuar a criar",
+      "continueEdit": "Continuar a editar"
+    },
+    "timePicker": {
+      "title": "Selecione a hora",
+      "hour": "Hora",
+      "minute": "Minutos",
+      "confirm": "Confirmar"
+    },
+    "assignUsers": {
+      "title": "Atribuição de utilizadores (Opcional)",
+      "selectUser": "Selecionar utilizador",
+      "random": "Aleatório",
+      "loading": "A carregar utilizadores...",
+      "later": "Mais tarde..."
+    },
+    "popups": {
+      "requiredName": {
+        "title": "Campo obrigatório",
+        "description": "Por favor, introduza um nome para la tarefa."
+      },
+      "requiredDate": {
+        "title": "Data obrigatória",
+        "description": "Por favor, selecione uma data limite ou dias de repetição."
+      },
+      "authError": {
+        "title": "Erro de autenticação",
+        "description": "Deve iniciar sessão para criar uma tarefa."
+      },
+      "successCreated": {
+        "title": "Tarefa criada",
+        "description": "A tarefa foi criada com sucesso."
+      },
+      "successTaskDeleted": {
+        "title": "Tarefa eliminada",
+        "description": "A tarefa foi eliminada.",
+        "deleteTaskQuestion": "Eliminar tarefa?"
+      },
+      "successUpdated": {
+        "title": "Tarefa atualizada",
+        "description": "A tarefa foi atualizada com sucesso."
+      },
+      "successUnMarked": {
+        "title": "Tem a certeza de que deseja marcar la tarefa como pendente?",
+        "description": "Perderá os pontos de Karma obtidos."
+      },
+      "unassigned": {
+        "title": "Sem atribuição"
+      },
+      "error": {
+        "title": "Erro",
+        "description": "Erro ao criar a tarefa. Tente novamente."
+      },
+      "notAssignedToMe": {
+        "title": "Não pode concluir esta tarefa",
+        "description": "Esta tarefa está atribuída a {{name}}. Apenas o utilizador atribuído a pode concluir.",
+        "otherUser": "outro utilizador"
+      },
+      "taskReactivated": "Tarefa ativada novamente"
+    }
+  },
+  "createInvoice": {
+    "titleCreate": "Criar Fatura",
+    "titleEdit": "Editar Fatura",
+    "namePlaceholder": "Nome",
+    "descriptionPlaceholder": "Descrição",
+    "price": "Preço",
+    "assignToCompanions": "Atribuir a companheiros",
+    "assignButton": "Atribuir utilizador à fatura",
+    "statusPending": "Pendente",
+    "statusPaid": "Paga",
+    "photoOptional": "Foto (opcional)",
+    "photoLabel": "Imagem da fatura",
+    "createButton": "Criar fatura",
+    "toasts": {
+      "mustAssignUser": "Deve atribuir pelo menos um utilizador",
+      "updatedSuccess": "Atualizada com sucesso",
+      "createdSuccess": "Criada com sucesso",
+      "saveError": "Não foi possível guardar a fatura"
+    },
+    "backConfirm": {
+      "titleCreate": "Sair sem guardar?",
+      "titleEdit": "Sair sem guardar?",
+      "description": "Se voltar atrás, as alterações que efetuou não serão guardadas.",
+      "exit": "Sair sem guardar",
+      "continueCreate": "Continuar a criar",
+      "continueEdit": "Continuar a editar"
+    }
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "subtitle": "Aqui encontrará respostas às dúvidas mais comuns.",
+    "q1": "Como posso adicionar membros a uma residência?",
+    "a1": "Para adicionar membros a uma residência, o membro interessado deve introduzir o código gerado aleatoriamente pelo administrador da mesma no ecrã de adesão a uma residência.",
+    "q2": "Como posso gerir uma fatura?",
+    "a2": "Para gerir uma fatura, basta aceder ao ecrã \"Minhas Faturas\" na secção \"Meu Perfil\".",
+    "q3": "Como eliminar um membro de uma residência?",
+    "a3": "O administrador puede eliminar um membro a partir do ecrã \"Minha Residência\". O membro também pode abandonar a residência a partir do mesmo ecrã.",
+    "q4": "Como posso criar uma residência?",
+    "a4": "Uma vez registado como utilizador, pode criar uma residência ao premir a opção \"Criar Residência\".",
+    "q5": "Como posso gerir uma tarefa?",
+    "a5": "A partir do \"Meu Perfil\", pode gerir tarefas. Abrir-se-á um menu no qual pode gerir a data, os membros atribuídos e outros parâmetros."
+  },
+  "infoLegal": {
+    "title": "Informação Legal",
+    "termsButton": "Termos e Condições de Uso",
+    "privacyButton": "Política de Privacidade e Cookies"
+  },
+  "myKarma": {
+    "title": "Meu Karma",
+    "totalPoints": "Pontos totais",
+    "monthPoints": "este mês",
+    "weekPoints": "esta semana",
+    "completedTasks": "Concluídas",
+    "pendingTasks": "Pendentes",
+    "lateTasks": "Fora do prazo",
+    "rankingTitle": "Classificação",
+    "rankingTotal": "Total",
+    "rankingMonthly": "Mensal",
+    "rankingWeekly": "Semanal",
+    "viewPodium": "Ver pódio",
+    "viewList": "Ver lista",
+    "points": "pts",
+    "noData": "Sem dados disponíveis",
+    "loading": "A carregar estatísticas...",
+    "noTasks": "Sem tarefas registadas",
+    "emptyDescription": "Comece a concluir tarefas para acumular pontos de karma e ver as suas estatísticas aqui.",
+    "backProfile": "Voltar ao perfil",
+    "pointsCount": "{{points}} pontos!",
+    "ofKarma": "de karma",
+    "statsTitle": "Estatísticas",
+    "karmaKing": "Rei do Karma",
+    "taskStatus": "Estado das tarefas"
+  },
+  "myResidence": {
+    "title": "Minhas Residências",
+    "codeLabel": "Código da sua Residência",
+    "codeCopied": "Copiado!",
+    "generateCode": "Gerar Código",
+    "participants": "Participantes",
+    "loadingParticipants": "A carregar participantes...",
+    "karmaPointsCount": "{{points}} pontos de karma",
+    "settings": "Ajustes",
+    "leaveResidence": "Abandonar Residência",
+    "deleteResidence": "Eliminar Residência",
+    "removeParticipant": "Eliminar da residência",
+    "errors": {
+      "memberNotFound": "Não foi possível encontrar a sua informação de membro.",
+      "leaveError": "Ocorreu um erro ao tentar abandonar a residência.",
+      "deleteError": "Ocorreu um erro ao tentar eliminar la residência.",
+      "cannotRemoveSelf": "Não se pode eliminar a si mesmo"
+    },
+    "toasts": {
+      "getMemberError": "Erro ao obter os dados do participante",
+      "memberRemoved": "Participante eliminado da residência",
+      "removeMemberError": "Erro ao eliminar o participante"
+    },
+    "popups": {
+      "leaveTitle": "Tem a certeza de que deseja abandonar esta residência?",
+      "leaveDescription": "Perderá todos os seus pontos de karma",
+      "leaveConfirm": "Abandonar",
+      "deleteTitle": "Tem a certeza de que deseja eliminar esta residência?",
+      "deleteDescription": "Todos os dados, tarefas e faturas desta residência serão eliminados. Esta ação não pode ser desfeita.",
+      "deleteConfirm": "Eliminar",
+      "removeTitle": "Eliminar este participante?",
+      "removeTitleWithName": "Tem a certeza de que deseja eliminar {{name}}?",
+      "removeDescription": "Será eliminado da residência e perderá o acesso a todos os dados partilhados.",
+      "removeConfirm": "Eliminar"
+    }
+  },
+  "editResidence": {
+    "title": "Editar Minha Residência",
+    "nameLabel": "Nome da Residência",
+    "locationLabel": "Localização",
+    "locationPlaceholder": "Rua Falsa 123 (opcional)",
+    "searchingLocation": "A procurar localização...",
+    "mapLabel": "Localização no mapa",
+    "saveButton": "Guardar!",
+    "errors": {
+      "emptyName": "Por favor, introduza um nome para a residência",
+      "updateError": "Ocorreu um erro ao atualizar a residência"
+    },
+    "popups": {
+      "success": {
+        "title": "Sucesso",
+        "description": "Residência atualizada com sucesso."
+      },
+      "error": {
+        "title": "Erro",
+        "description": "Não foi possível atualizar a residência."
+      }
+    }
+  },
+  "editProfile": {
+    "title": "Editar Perfil",
+    "namePlaceholder": "Nome",
+    "phonePlaceholder": "Telefone",
+    "emailPlaceholder": "E-mail",
+    "changePassword": "Alterar Palavra-passe",
+    "currentPassword": "Palavra-passe Atual",
+    "newPassword": "Nova Palavra-passe",
+    "confirmPassword": "Confirme a Palavra-passe",
+    "passwordHint": "* Mínimo 8 caracteres e pelo menos um número.",
+    "saveButton": "Guardar alterações",
+    "popups": {
+      "userNotFound": {
+        "title": "Erro",
+        "description": "Utilizador não identificado"
+      },
+      "invalidPassword": {
+        "title": "Erro",
+        "description": "A palavra-passe deve ter pelo menos 8 caracteres e um número."
+      },
+      "passwordMismatch": {
+        "title": "Erro",
+        "description": "As novas palavras-passe não coincidem"
+      },
+      "wrongCurrentPassword": {
+        "title": "Erro",
+        "description": "A palavra-passe atual não está correta"
+      },
+      "success": {
+        "title": "Sucesso",
+        "description": "Perfil atualizado com sucesso"
+      },
+      "updateError": {
+        "title": "Erro",
+        "description": "Não foi possível atualizar o perfil"
+      }
+    }
+  },
+  "conviviaPro": {
+    "title": "Experimente grátis",
+    "feature1": "Vantagem PRO: Residências ilimitadas",
+    "feature2": "Vantagem PRO: Suporte 24/7",
+    "plan1Month": "1 Mês",
+    "plan12Months": "12 Meses",
+    "trialInfo": "Inicie o seu período de teste de 7 dias grátis.",
+    "trialCancel": "Cancele a qualquer momento.",
+    "subscribeButton": "Experimente grátis e subscreva"
+  },
+  "taskDetail": {
+    "pointsPill": "{{points}} Pontos",
+    "assignedUser": "Utilizador atribuído",
+    "unassigned": "Sem atribuição",
+    "edit": "Editar",
+    "unmark": "Desmarcar",
+    "complete": "Concluir"
+  },
+  "facturaDetail": {
+    "totalPrice": "Preço total",
+    "pricePerPerson": "Preço por pessoa",
+    "photos": "Fotos",
+    "invoiceImage": "Imagem da fatura",
+    "assignedUsers": "Utilizadores atribuídos",
+    "paid": "Pago",
+    "pending": "Pendente",
+    "noAssignedUsers": "Sem utilizadores atribuídos",
+    "paidCounter": "{{pagados}}/{{total}} pagos",
+    "createdDate": "Criada: {{date}}"
+  },
+  "politicaCookies": {
+    "title": "Política de Privacidade",
+    "intro": "No Convivia, comprometemo-nos a proteger a sua privacidade e a garantir que tenha uma experiência positiva na nossa plataforma.",
+    "section1Title": "Informação que Recolhemos",
+    "section1Body": "Recolhemos informação que faculta diretamente, como o seu e-mail e informação do perfil. Também recolhemos automaticamente determinada informação sobre o seu dispositivo e a forma como interage com os nossos serviços.",
+    "section2Title": "Como Utilizamos a Sua Informação",
+    "section2Body": "Utilizamos a sua informação para fornecer, manter e melhorar os nossos serviços, comunicar consigo e cumprir obrigações legais. Os seus dados ajudam-nos a personalizar a sua experiência e a melhorar a nossa plataforma.",
+    "section3Title": "Cookies e Tecnologias Semelhantes",
+    "section3Body": "Os cookies são pequenos ficheiros armazenados no seu dispositivo que nos ajudam a recordar as suas preferências e a compreender como utiliza os nossos serviços. Utilizamos cookies essenciais para o funcionamento, cookies analíticos para melhorar os nossos serviços e cookies de preferência para recordar as suas definições.",
+    "section4Title": "Segurança dos Dados",
+    "section4Body": "Implementamos medidas de segurança adequadas para proteger a sua informação pessoal de acessos não autorizados. No entanto, nenhum método de transmissão pela Internet é totalmente seguro.",
+    "section5Title": "Os Seus Direitos de Privacidade",
+    "section5Body": "Tem o direito de aceder, atualizar ou eliminar a sua informação pessoal. Também pode controlar as preferências de cookies através das definições do seu navegador. Para mais informações sobre os seus direitos, por favor contacte-nos diretamente.",
+    "section6Title": "A Nossa Política de Cookies",
+    "section6Body": "Os cookies são essenciais para o funcionamento do Convivia. Permitem-nos recordar o seu estado de sessão, preferências e melhorar a sua experiência geral. Diferentes tipos de cookies servem para diferentes propósitos na nossa plataforma.",
+    "section7Title": "Cookies Essenciais",
+    "section7Body": "Estes cookies são necessários para que o website funcione corretamente. Permitem funcionalidades principais como o início de sessão seguro, autenticação do utilizador e navegação básica no site. Não pode desativar estes cookies sem impedir o funcionamento do site.",
+    "section8Title": "Cookies de Desempenho e Análise",
+    "section8Body": "Utilizamos estes cookies para compreender como os visitantes interagem com a nossa plataforma. Ajudam-nos a identificar quais as funcionalidades mais populares, a rastrear erros e a medir o desempenho geral do Convivia. Estes dados são recolhidos de forma anónima.",
+    "section9Title": "Cookies de Preferência e Funcionalidade",
+    "section9Body": "Estes cookies recordam as opções que efetua para proporcionar uma experiência personalizada. Por exemplo, armazenam a sua preferência de idioma, configuração de tema e esquemas personalizados. Desativá-los pode resultar numa funcionalidade reduzida.",
+    "section10Title": "Gerir os Seus Cookies",
+    "section10Body": "A maioria dos navegadores permite-lhe controlar os cookies através das suas definições. Pode optar por aceitar todos os cookies, rejeitar cookies não essenciais ou ser questionado cada vez que um cookie é definido. Tenha em atenção que o bloqueio de cookies pode afetar a sua experiência no Convivia.",
+    "section11Title": "Cookies de Terceiros",
+    "section11Body": "Alguns dos nossos parceiros de serviço podem definir cookies no seu dispositivo para analisar a utilização da plataforma e fornecer serviços relacionados com o conteúdo e serviços da plataforma. Não somos responsáveis pelas práticas de privacidade de terceiros."
+  },
+  "terminosCondiciones": {
+    "title": "Termos e Condições de Uso",
+    "intro": "Ao utilizar o Convivia, aceita cumprir estes termos e condições. Leia-os atentamente antes de utilizar os nossos serviços.",
+    "section1Title": "Licença de Uso",
+    "section1Body": "É permitida a descarga temporária de uma cópia dos materiais no Convivia unicamente para visualização pessoal e transitória sem fins comerciais. Isto constitui a concessão de uma licença, não uma transferência de título, e sob esta licença não pode:",
+    "section1Item1": "• Modificar ou copiar os materiais",
+    "section1Item2": "• Utilizá-los para fins comerciais ou para exibição pública",
+    "section1Item3": "• Tentar descompilar ou realizar engenharia inversa de qualquer software no Convivia",
+    "section2Title": "Responsabilidades do Utilizador",
+    "section2Body": "Como utilizador do Convivia, aceita:",
+    "section2Item1": "• Proporcionar informação precisa e verídica",
+    "section2Item2": "• Utilizar a plataforma de forma responsável e em conformidade com a lei",
+    "section2Item3": "• Não participar em assédio, discriminação ou atividades ilegais",
+    "section3Title": "Limitação de Responsabilidade",
+    "section3Body": "O Convivia fornece a plataforma \"tal como está\", sem garantias de qualquer tipo. Não seremos responsáveis por danos indiretos, incidentais, especiais, consequentes ou punitivos decorrentes da sua utilização ou da impossibilidade de utilizar a plataforma.",
+    "section4Title": "Modificações aos Termos",
+    "section4Body": "O Convivia reserva-se o direito de modificar estes termos e condições a qualquer momento. As alterações serão eficazes imediatamente após a publicação na plataforma. A sua utilização continuada da plataforma indica a sua aceitação das referidas modificações.",
+    "section5Title": "Contacte-nos",
+    "section5Body": "Se tiver dúvidas ou preocupações sobre estes termos, por favor contacte-nos através dos nossos canais de suporte."
+  }
+}

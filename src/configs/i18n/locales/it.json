@@ -45,7 +45,11 @@
         "language": {
             "select": "Seleziona lingua",
             "spanish": "Spagnolo",
-            "english": "Inglese"
+            "english": "Inglese",
+            "french": "Francese",
+            "italian": "Italiano",
+            "german": "Tedesco",
+            "portuguese": "Portoghese"
         }
     },
     "welcome": {

@@ -9,10 +9,11 @@ import en from './locales/en.json';
 import fr from './locales/fr.json';
 import it from './locales/it.json';
 import de from './locales/de.json';
+import pt from './locales/pt.json';
 
 const LANGUAGE_KEY = 'user-language';
 
-const SUPPORTED_LANGUAGES = ['es', 'en', 'fr', 'it', 'de'];
+const SUPPORTED_LANGUAGES = ['es', 'en', 'fr', 'it', 'de', 'pt'];
 
 // Detect default device language
 const getDeviceLanguage = (): string => {
@@ -38,6 +39,7 @@ i18n
       fr: { translation: fr },
       it: { translation: it },
       de: { translation: de },
+      pt: { translation: pt },
     },
     lng: defaultLanguage,
     fallbackLng: 'es',
