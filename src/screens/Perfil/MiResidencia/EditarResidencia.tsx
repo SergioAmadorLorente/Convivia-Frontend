@@ -22,6 +22,7 @@ import { WebView } from "react-native-webview";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { actualizarEspacio } from "../../../api/espacio";
+import { useToast } from "../../../hooks/useToast";
 
 type EditarResidenciaNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -43,6 +44,7 @@ const EditarResidencia: React.FC = () => {
   const route = useRoute<EditarResidenciaRouteProp>();
   const { espacioId, nombreInicial, ubicacionInicial } = route.params;
   const { t } = useTranslation();
+  const { show: showToast } = useToast();
 
   // Estados para los campos
   const [nombre, setNombre] = useState(nombreInicial || "");
@@ -133,7 +135,11 @@ const EditarResidencia: React.FC = () => {
         nombre: nombre,
         direccion: ubicacion.trim() || "",
       });
-      console.log("Espacio actualizado exitosamente");
+      showToast({
+        entity: "tarea",
+        name: t('editResidence.saveSuccess'),
+        tone: "success",
+      });
       navigation.goBack();
     } catch (error) {
       // console.error("Error al actualizar el espacio:", error);

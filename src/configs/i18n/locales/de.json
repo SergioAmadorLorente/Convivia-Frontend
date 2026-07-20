@@ -460,6 +460,7 @@
         "searchingLocation": "Standort wird gesucht...",
         "mapLabel": "Standort auf der Karte",
         "saveButton": "Speichern!",
+        "saveSuccess": "Die Wohnung wurde erfolgreich aktualisiert.",
         "errors": {
             "emptyName": "Bitte gib einen Namen für die Wohnung ein.",
             "updateError": "Beim Aktualisieren der Wohnung ist ein Fehler aufgetreten."

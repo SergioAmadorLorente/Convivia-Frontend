@@ -460,6 +460,7 @@
         "searchingLocation": "Ricerca della posizione...",
         "mapLabel": "Posizione sulla mappa",
         "saveButton": "Salva!",
+        "saveSuccess": "Residenza aggiornata con successo.",
         "errors": {
             "emptyName": "Inserisci un nome per la residenza.",
             "updateError": "Si è verificato un errore durante l'aggiornamento della residenza."
