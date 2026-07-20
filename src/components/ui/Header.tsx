@@ -1,6 +1,6 @@
 
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { COLORS, FONTS, SIZES } from "../../styles/theme";
 import { useTranslation } from "react-i18next";
 
@@ -39,11 +39,30 @@ const Header: React.FC<HeaderProps> = ({ username, date, location }) => {
   const { t, i18n } = useTranslation();
   const displayDate = typeof date === "string" ? date : formatLongDate(date, i18n.language);
 
+  const isUsernameLoading = username === "......";
+  const isLocationLoading = location === "......";
+
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>{t('dashboard.greeting', { username })}</Text>
+      {isUsernameLoading ? (
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, height: 24 }}>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={[styles.greeting, { color: "#999" }]}>{t("common.loading")}</Text>
+        </View>
+      ) : (
+        <Text style={styles.greeting}>{t('dashboard.greeting', { username })}</Text>
+      )}
+
       <Text style={styles.date}>{displayDate}</Text>
-      <Text style={styles.location}>{location}</Text>
+
+      {isLocationLoading ? (
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, height: 20, marginTop: 8 }}>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={[styles.location, { color: "#999", marginTop: 0 }]}>{t("common.loading")}</Text>
+        </View>
+      ) : (
+        <Text style={styles.location}>{location}</Text>
+      )}
     </View>
   );
 };
