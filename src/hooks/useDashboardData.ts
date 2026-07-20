@@ -14,7 +14,7 @@ import { obtenerFacturasPorDeudor } from "../api/factura";
 
 export const useDashboardData = (newSpaceName?: string) => {
   const { user, authLoading } = useAuthListenerFull();
-  const [userName, setUserName] = useState<string>("Usuario");
+  const [userName, setUserName] = useState<string>("......");
   const [espacioNombre, setEspacioNombre] = useState<string>(
     newSpaceName || "......",
   );
@@ -91,40 +91,74 @@ export const useDashboardData = (newSpaceName?: string) => {
     cargarEspacio();
   }, [user, authLoading, newSpaceName]);
 
-  // Nombres de usuario
-  const cargarNombresUsuario = async () => {
+  // Nombres de usuario — carga miembros del mismo espacio usando la misma lógica probada de useFetchParticipants
+  const cargarNombresUsuario = async (targetEspacioId?: string) => {
     try {
-      const [users, uEspacios] = await Promise.all([
-        obtenerUsuarios(),
-        obtenerUsuarioEspacios(),
-      ]);
+      const currentEspacioId = targetEspacioId || espacioId || espacioIdRef.current;
+      if (!currentEspacioId) return {};
 
-      if (Array.isArray(users)) {
-        const map: Record<string, string> = {};
-        users.forEach((u: any) => {
-          map[u.id] = u.nombre || u.email || u.id;
+      // Obtener todas las relaciones usuario-espacio
+      const uEspacios = await obtenerUsuarioEspacios();
+      const uEspaciosRaw = Array.isArray(uEspacios) ? uEspacios : uEspacios?.$values || [];
+
+      if (Array.isArray(uEspaciosRaw)) {
+        const cleanId = (id: string) => id?.replace(/-/g, "").toLowerCase() || "";
+        const targetClean = cleanId(currentEspacioId);
+
+        // Filtrar relaciones por espacioId de forma estricta (idéntica a useFetchParticipants)
+        // y con fallback de cleanId por si acaso
+        const relacionesDelEspacio = uEspaciosRaw.filter((rel: any) => {
+          return rel.espacioId === currentEspacioId || cleanId(rel.espacioId || "") === targetClean;
         });
-        if (Array.isArray(uEspacios)) {
-          uEspacios.forEach((rel: any) => {
+
+        // Construir mapa solo con miembros de este espacio
+        const map: Record<string, string> = {};
+
+        // Cargar los usuarios del espacio en paralelo para resolver sus nombres
+        await Promise.all(
+          relacionesDelEspacio.map(async (rel: any) => {
             const relId = rel.id || rel.id_UsuarioEspacio;
-            if (relId && rel.usuarioId && map[rel.usuarioId]) {
-              map[relId] = map[rel.usuarioId];
+            const usuarioId = rel.usuarioId;
+            if (!usuarioId) return;
+
+            try {
+              const u = await obtenerUsuarioPorId(usuarioId);
+              if (u) {
+                const nombre = u.nombre || u.email || u.id || "Miembro";
+                if (relId) map[relId] = nombre;
+                if (usuarioId) map[usuarioId] = nombre;
+                if (relId) map[cleanId(relId || "")] = nombre;
+                if (usuarioId) map[cleanId(usuarioId || "")] = nombre;
+              } else {
+                const fallback = `Usuario (${usuarioId.slice(0, 4)})`;
+                if (relId) map[relId] = fallback;
+                if (usuarioId) map[usuarioId] = fallback;
+                if (relId) map[cleanId(relId || "")] = fallback;
+                if (usuarioId) map[cleanId(usuarioId || "")] = fallback;
+              }
+            } catch (err) {
+              const fallback = `Usuario (${usuarioId.slice(0, 4)})`;
+              if (relId) map[relId] = fallback;
+              if (usuarioId) map[usuarioId] = fallback;
+              if (relId) map[cleanId(relId || "")] = fallback;
+              if (usuarioId) map[cleanId(usuarioId || "")] = fallback;
             }
-          });
-        }
+          })
+        );
+
         setUserNamesMap(map);
         userNamesMapRef.current = map;
         return map;
       }
     } catch (error) {
-      // console.error("Error cargando nombres de usuario:", error);
+      console.error("Error al cargar nombres de usuario del espacio:", error);
     }
     return {};
   };
 
   useEffect(() => {
     if (espacioId) {
-      cargarNombresUsuario();
+      cargarNombresUsuario(espacioId);
     }
   }, [espacioId]);
 
@@ -236,7 +270,7 @@ export const useDashboardData = (newSpaceName?: string) => {
       // Asegurarse de tener el mapa de nombres cargado para evitar mostrar IDs
       let currentNamesMap = userNamesMapRef.current;
       if (Object.keys(currentNamesMap).length === 0) {
-        currentNamesMap = await cargarNombresUsuario();
+        currentNamesMap = await cargarNombresUsuario(currentEspacioId);
       }
 
       // Paralelizar carga de tareas y facturas de forma sincronizada
