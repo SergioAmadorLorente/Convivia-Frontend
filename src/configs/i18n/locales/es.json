@@ -4,7 +4,8 @@
     "welcome": "Bienvenido a Convivia",
     "description": "Organiza, colabora y cumple tus metas junto a tus compañeros.\n¡Aquí la productividad es compartida y las ideas fluyen en sintonía!",
     "createAccount": "Crea una cuenta",
-    "login": "Inicia sesión"
+    "login": "Inicia sesión",
+    "loadingHome": "Cargando tu hogar..."
   },
   "bottomBar": {
     "home": "Inicio",
@@ -47,7 +48,8 @@
       "english": "Inglés",
       "french": "Francés",
       "italian": "Italiano",
-      "german": "Alemán"
+      "german": "Alemán",
+      "portuguese": "Portugués"
     }
   },
   "welcome": {
@@ -458,6 +460,7 @@
     "searchingLocation": "Buscando ubicación...",
     "mapLabel": "Ubicación en el mapa",
     "saveButton": "¡Guardar!",
+    "saveSuccess": "Residencia actualizada correctamente.",
     "errors": {
       "emptyName": "Por favor, ingresa un nombre para la residencia",
       "updateError": "Hubo un error al actualizar la residencia"

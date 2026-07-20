@@ -211,7 +211,8 @@ const Perfil: React.FC = () => {
                     : i18n.language.startsWith("fr") ? "🇫🇷"
                       : i18n.language.startsWith("it") ? "🇮🇹"
                         : i18n.language.startsWith("de") ? "🇩🇪"
-                          : "🇬🇧"}
+                          : i18n.language.startsWith("pt") ? "🇵🇹"
+                            : "🇬🇧"}
                 </Text>
               </TouchableOpacity>
 
@@ -397,6 +398,24 @@ const Perfil: React.FC = () => {
             >
               <Text style={styles.langOptionText}>Deutsch 🇩🇪</Text>
               {i18n.language.startsWith("de") && (
+                <Ionicons name="checkmark" size={20} color={COLORS.primary} />
+              )}
+            </TouchableOpacity>
+
+            {/* Português Option */}
+            <TouchableOpacity
+              style={[
+                styles.langOption,
+                i18n.language.startsWith("pt") && styles.langOptionSelected
+              ]}
+              onPress={async () => {
+                await i18n.changeLanguage("pt");
+                await AsyncStorage.setItem("user-language", "pt");
+                setLangModalVisible(false);
+              }}
+            >
+              <Text style={styles.langOptionText}>Português 🇵🇹</Text>
+              {i18n.language.startsWith("pt") && (
                 <Ionicons name="checkmark" size={20} color={COLORS.primary} />
               )}
             </TouchableOpacity>

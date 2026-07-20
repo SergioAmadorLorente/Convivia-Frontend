@@ -80,7 +80,7 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
   // Derive unique user names from userNamesMap and include current user name if not present
   const uniqueUserNames = React.useMemo(() => {
     const names = new Set(Object.values(userNamesMap));
-    if (currentUserName && currentUserName.trim() !== "" && currentUserName !== "Usuario") {
+    if (currentUserName && currentUserName.trim() !== "") {
       names.add(currentUserName);
     }
     return Array.from(names).sort();
@@ -285,8 +285,8 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
                     >
                       <ScrollView
                         nestedScrollEnabled
-                        showsVerticalScrollIndicator={false}
-                        style={{ maxHeight: 140 }}
+                        showsVerticalScrollIndicator={true}
+                        style={{ maxHeight: 240 }}
                       >
                         {/* Opción "Todos" */}
                         <TouchableOpacity
