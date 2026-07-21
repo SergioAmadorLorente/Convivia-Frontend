@@ -2,9 +2,9 @@
   "expo": {
     "name": "Convivia",
     "slug": "Convivia",
-    "version": "1.0.0",
+    "version": "3.8.20",
     "orientation": "portrait",
-    "icon": "./src/assets/icon.png",
+    "icon": "./src/assets/logoReal.svg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -21,7 +21,6 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "usesCleartextTraffic": true,
       "package": "com.kiwi22.Convivia"
     },
     "web": {
