@@ -414,7 +414,9 @@
     "ofKarma": "of karma",
     "statsTitle": "Statistics",
     "karmaKing": "Karma King",
-    "taskStatus": "Task status"
+    "taskStatus": "Task status",
+    "infoModalTitle": "Karma Points",
+    "infoModalDescription": "Karma points indicate which user completed the most tasks on time and turn them into the Karma King."
   },
   "myResidence": {
     "title": "My Residences",

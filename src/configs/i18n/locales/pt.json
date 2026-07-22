@@ -414,7 +414,9 @@
     "ofKarma": "de karma",
     "statsTitle": "Estatísticas",
     "karmaKing": "Rei do Karma",
-    "taskStatus": "Estado das tarefas"
+    "taskStatus": "Estado das tarefas",
+    "infoModalTitle": "Pontos de Karma",
+    "infoModalDescription": "Os pontos de Karma servem para indicar qual usuário completou mais tarefas no prazo e torná-lo o Rei do Karma."
   },
   "myResidence": {
     "title": "Minhas Residências",

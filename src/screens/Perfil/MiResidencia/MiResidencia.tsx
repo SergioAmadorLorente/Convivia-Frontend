@@ -40,7 +40,6 @@ const { width } = Dimensions.get("window");
 
 import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
 import useFetchParticipants from "../../../hooks/useFetchParticipants";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import Desplegable from "../../../components/ui/Desplegable";
 
 const MiResidencia: React.FC = () => {
@@ -239,7 +238,7 @@ const MiResidencia: React.FC = () => {
                   <Text style={[styles.residenciaName, { color: "#999" }]}>{t("common.loading")}</Text>
                 </View>
               ) : (
-                <Text style={styles.residenciaName}>{residenciaName}</Text>
+                <Text style={styles.residenciaName} numberOfLines={2} adjustsFontSizeToFit>{residenciaName}</Text>
               )}
               <TouchableOpacity
                 style={styles.editIcon}
@@ -483,7 +482,7 @@ const styles = StyleSheet.create({
   residenciaName: {
     flex: 1,
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 15,
     color: "#333",
   },
   editIcon: {

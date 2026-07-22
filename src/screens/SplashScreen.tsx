@@ -20,7 +20,7 @@ const SplashScreen: React.FC = () => {
           <Text style={GLOBAL_STYLES.subtitle}>JUNTOS, SIN ENREDOS</Text>
         </View>
       </View>
-      <Text style={GLOBAL_STYLES.splashText}>Cargando aplicación...</Text>
+      <Text style={GLOBAL_STYLES.splashText}>Cargando app</Text>
     </View>
   );
 };

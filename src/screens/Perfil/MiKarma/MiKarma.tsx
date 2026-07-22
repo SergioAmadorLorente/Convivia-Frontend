@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Dimensions,
     ActivityIndicator,
+    Modal,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
@@ -28,7 +29,6 @@ import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../../api
 import { obtenerKarmaUsuario, obtenerRankingKarma } from "../../../api/karma";
 import { obtenerEstadisticasTareas } from "../../../api/espacio";
 import { obtenerUsuarios } from "../../../api/usuario";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const { width } = Dimensions.get("window");
 
@@ -57,6 +57,7 @@ const MiKarma: React.FC = () => {
     const [rankingType, setRankingType] = useState<'total' | 'mensual' | 'semanal'>('total');
     const [viewMode, setViewMode] = useState<'podio' | 'lista'>('podio');
     const [allParticipants, setAllParticipants] = useState<Array<{ name: string; points: number }>>([]);
+    const [infoModalVisible, setInfoModalVisible] = useState(false);
 
     const [fontsLoaded] = useFonts({
         DMSerifDisplay_400Regular,
@@ -184,9 +185,43 @@ const MiKarma: React.FC = () => {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Header Title */}
-                <View style={{ width: "100%" }}>
+                <View style={styles.titleRow}>
                     <Text style={GLOBAL_STYLES.titulo}>{t('myKarma.title')}</Text>
+                    <TouchableOpacity
+                        style={styles.infoButton}
+                        onPress={() => setInfoModalVisible(true)}
+                        accessibilityRole="button"
+                        accessibilityLabel="Info karma"
+                    >
+                        <Ionicons name="help-circle-outline" size={26} color={COLORS.accent} />
+                    </TouchableOpacity>
                 </View>
+
+                {/* Info Modal */}
+                <Modal
+                    visible={infoModalVisible}
+                    transparent
+                    animationType="fade"
+                    onRequestClose={() => setInfoModalVisible(false)}
+                >
+                    <TouchableOpacity
+                        style={styles.infoModalOverlay}
+                        activeOpacity={1}
+                        onPress={() => setInfoModalVisible(false)}
+                    >
+                        <View style={styles.infoModalBox}>
+                            <Ionicons name="help-circle" size={40} color={COLORS.accent} style={{ marginBottom: 10 }} />
+                            <Text style={styles.infoModalTitle}>{t('myKarma.infoModalTitle')}</Text>
+                            <Text style={styles.infoModalDescription}>{t('myKarma.infoModalDescription')}</Text>
+                            <TouchableOpacity
+                                style={styles.infoModalButton}
+                                onPress={() => setInfoModalVisible(false)}
+                            >
+                                <Text style={styles.infoModalButtonText}>OK</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </Modal>
  
                 {/* Loading State */}
                 {loading ? (
@@ -478,6 +513,7 @@ const styles = StyleSheet.create({
     viewModeContainerBottom: {
         alignItems: "center",
         marginTop: 20,
+        gap: 12,
     },
     viewModeButton: {
         flexDirection: "row",
@@ -740,6 +776,60 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginTop: 10,
+    },
+    titleRow: {
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    infoButton: {
+        marginTop: 8,
+        marginLeft: 6,
+        padding: 2,
+    },
+    infoModalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 30,
+    },
+    infoModalBox: {
+        backgroundColor: COLORS.background,
+        borderRadius: 20,
+        padding: 28,
+        alignItems: "center",
+        width: "100%",
+        maxWidth: 340,
+        ...COMMON.SHADOW,
+    },
+    infoModalTitle: {
+        fontFamily: FONTS.title,
+        fontSize: 22,
+        color: COLORS.primary,
+        textAlign: "center",
+        marginBottom: 12,
+    },
+    infoModalDescription: {
+        fontFamily: FONTS.regular,
+        fontSize: 14,
+        color: COLORS.secondary,
+        textAlign: "center",
+        lineHeight: 22,
+        marginBottom: 22,
+    },
+    infoModalButton: {
+        backgroundColor: COLORS.success,
+        paddingVertical: 10,
+        paddingHorizontal: 40,
+        borderRadius: 10,
+        ...COMMON.SHADOW,
+    },
+    infoModalButtonText: {
+        fontFamily: FONTS.bold,
+        fontSize: 15,
+        color: COLORS.primary,
     },
 });
 

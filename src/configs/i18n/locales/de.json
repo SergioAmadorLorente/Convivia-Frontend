@@ -414,7 +414,9 @@
         "ofKarma": "Karma",
         "statsTitle": "Statistiken",
         "karmaKing": "Karma-König",
-        "taskStatus": "Aufgabenstatus"
+        "taskStatus": "Aufgabenstatus",
+        "infoModalTitle": "Karma-Punkte",
+        "infoModalDescription": "Karma-Punkte zeigen an, welcher Benutzer die meisten Aufgaben pünktlich abgeschlossen hat und zum Karma-König ernannt wird."
     },
     "myResidence": {
         "title": "Meine Wohnungen",
