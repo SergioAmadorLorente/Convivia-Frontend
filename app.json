@@ -2,9 +2,9 @@
   "expo": {
     "name": "Convivia",
     "slug": "Convivia",
-    "version": "3.8.20",
+    "version": "3.8.23",
     "orientation": "portrait",
-    "icon": "./src/assets/logoReal.svg",
+    "icon": "./src/assets/logoReal.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
