@@ -7,8 +7,8 @@
 Convivia es una app móvil diseñada para mejorar la convivencia en pisos compartidos o residencias, ayudando a distribuir equitativamente las tareas del hogar. A través de una interfaz intuitiva y un sistema de niveles llamado **Karma**, los usuarios pueden organizar quién hace qué y cuándo, fomentando un entorno más justo y colaborativo.
 
 ##  Tecnologías utilizadas
-- Frontend: **React**
-- Backend: **.NET**
+- Frontend: **React (TypeScript)**
+- Backend: **C#.NET**
 - Diseño de interfaz: **Figma**
 - Base de datos: **Firebase**
 
@@ -18,7 +18,7 @@ Convivia es una app móvil diseñada para mejorar la convivencia en pisos compar
 - Visualizar actividades en un **Calendario Integrado**
 - Recibir **Recordatorios** automáticos
 - Sistema de **Niveles “Karma”** que recompensa a quienes más contribuyen
-- Disponible idioma **Español e Íngles**
+- Disponible idioma **Español, Íngles, Francés, Italiano , Alemán y Portugués**
 
 ## Usuarios objetivo
 - Personas que comparten piso
@@ -34,9 +34,13 @@ Disponible en plataformas móviles como **Play Store** y **App Store**. Solo tie
 - _"Marta crea la residencia, asigna tareas semanales y consulta el calendario para ver quién está al día."_  
 - _"Luis revisa su Karma y ve que necesita colaborar más para subir de nivel."_
 
-##  Licencia
-Este proyecto está licenciado bajo la **Apache License 2.0**.  
-Consulta el archivo `LICENSE` para más detalles.
+## License
+
+This project is provided for educational, research, and portfolio purposes only.
+
+Commercial use, redistribution, sublicensing, selling, hosting as a service, or creating commercial derivative works is prohibited without the prior written permission of the author.
+
+See the LICENSE file for more information.
 
 
 **### _ENGLISH_**
@@ -52,8 +56,8 @@ Convivia is a mobile app designed to improve cohabitation in shared apartments o
 **Facilitating the fair and organized distribution of household chores.**
 **Convivia**
 ****** ## Technologies Used
-- Frontend: **React**
-- Backend: **.NET**
+- Frontend: **React (TypeScript)**
+- Backend: **C#.NET**
 - Interface Design: **Figma**
 - Database: **Firebase**
 
@@ -63,7 +67,7 @@ Convivia is a mobile app designed to improve cohabitation in shared apartments o
 - View activities in an **Integrated Calendar**
 - Receive automatic **Reminders**
 - **Karma Leveling** system that rewards top contributors
--  Available **English and Spanish** Language
+-  Available **English, Spanish, French, Italian, German and Portuguese** Language
 
 ## Target Users
 - People who share apartments
@@ -80,7 +84,12 @@ Available on mobile platforms such as the **Play Store** and **App Store**. Simp
 - "Luis checks his Karma and sees that he needs to collaborate more to level up."
 
 ## License
-This project is licensed under the Apache License 2.0.
 
-See the `LICENSE` file for more details.
+This project is provided for educational, research, and portfolio purposes only.
+
+Commercial use, redistribution, sublicensing, selling, hosting as a service, or creating commercial derivative works is prohibited without the prior written permission of the author.
+
+See the LICENSE file for more information.
+
+
 
