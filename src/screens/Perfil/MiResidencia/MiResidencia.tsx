@@ -31,6 +31,7 @@ import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
+import { obtenerTareasPorEspacio, eliminarTarea, obtenerDetalleTareaInstancia } from "../../../api/tarea";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -41,6 +42,111 @@ const { width } = Dimensions.get("window");
 import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
 import useFetchParticipants from "../../../hooks/useFetchParticipants";
 import Desplegable from "../../../components/ui/Desplegable";
+
+const cleanId = (id?: string | null) => (id ? String(id).replace(/-/g, "").toLowerCase() : "");
+
+const borrarTareasDelUsuario = async (
+  espacioId: string,
+  usuarioEspacioRelacion: any,
+  participantUserObj?: any
+) => {
+  try {
+    const relId = cleanId(usuarioEspacioRelacion?.id || usuarioEspacioRelacion?.id_UsuarioEspacio);
+    const userUid = cleanId(usuarioEspacioRelacion?.usuarioId || participantUserObj?.id);
+
+    const targetIds = new Set([relId, userUid].filter((id) => id.length > 0));
+    if (targetIds.size === 0) return;
+
+    console.log(" Buscando tareas asociadas a IDs de usuario:", Array.from(targetIds));
+
+    const plantillasRaw = await obtenerTareasPorEspacio(espacioId);
+    if (!Array.isArray(plantillasRaw)) return;
+
+    for (const plantilla of plantillasRaw) {
+      let estaAsignada = false;
+
+      // 1. Revisar arrays de asignación en la plantilla
+      const asignaciones = [
+        ...(Array.isArray(plantilla.usuariosAsignacion) ? plantilla.usuariosAsignacion : []),
+        ...(Array.isArray(plantilla.UsuariosAsignacion) ? plantilla.UsuariosAsignacion : []),
+        ...(Array.isArray(plantilla.usuariosAsignados) ? plantilla.usuariosAsignados : []),
+        ...(Array.isArray(plantilla.UsuariosAsignados) ? plantilla.UsuariosAsignados : []),
+      ];
+
+      for (const asigId of asignaciones) {
+        if (targetIds.has(cleanId(asigId))) {
+          estaAsignada = true;
+          break;
+        }
+      }
+
+      // 2. Revisar IDs directos en la plantilla
+      if (!estaAsignada) {
+        const plantillaUserIds = [
+          plantilla.usuarioEspacioId,
+          plantilla.UsuarioEspacioId,
+          plantilla.usuarioId,
+          plantilla.UsuarioId,
+        ];
+        for (const pId of plantillaUserIds) {
+          if (pId && targetIds.has(cleanId(pId))) {
+            estaAsignada = true;
+            break;
+          }
+        }
+      }
+
+      // 3. Revisar instanciaActiva (embebida o remota nivel 3)
+      if (!estaAsignada) {
+        let instancia = plantilla.instanciaActiva ?? plantilla.InstanciaActiva ?? null;
+
+        if (!instancia && Array.isArray(plantilla.tareasId) && plantilla.tareasId.length > 0) {
+          try {
+            instancia = await obtenerDetalleTareaInstancia(
+              espacioId,
+              String(plantilla.id),
+              String(plantilla.tareasId[0])
+            );
+          } catch {
+            // Ignorar error si falla al traer detalle de instancia
+          }
+        }
+
+        if (instancia) {
+          const instUserIds = [
+            instancia.usuarioEspacioId,
+            instancia.UsuarioEspacioId,
+            instancia.usuarioId,
+            instancia.UsuarioId,
+          ];
+          const instAsignaciones = [
+            ...(Array.isArray(instancia.usuariosAsignacion) ? instancia.usuariosAsignacion : []),
+            ...(Array.isArray(instancia.UsuariosAsignacion) ? instancia.UsuariosAsignacion : []),
+          ];
+
+          for (const iId of [...instUserIds, ...instAsignaciones]) {
+            if (iId && targetIds.has(cleanId(iId))) {
+              estaAsignada = true;
+              break;
+            }
+          }
+        }
+      }
+
+      // 4. Si la tarea pertenece al usuario, la eliminamos
+      if (estaAsignada) {
+        console.log(` Eliminando plantilla de tarea ${plantilla.id} por pertenecer al usuario eliminado`);
+        try {
+          await eliminarTarea(espacioId, plantilla.id);
+        } catch (delErr) {
+          console.warn(` Error al eliminar tarea ${plantilla.id}:`, delErr);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(" Error en borrarTareasDelUsuario:", err);
+  }
+};
 
 const MiResidencia: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -72,9 +178,13 @@ const MiResidencia: React.FC = () => {
     if (!user) return;
     try {
       // 1. Necesitamos el ID de la relación UsuarioEspacio para eliminarla
-      // Ya tenemos relacion.id si lo guardamos, o lo buscamos de nuevo
       const relacion = await obtenerEspacioPorUsuarioId(user.uid);
       if (relacion && relacion.id) {
+        // Eliminar todas las tareas asignadas al usuario antes de abandonar
+        if (relacion.espacioId) {
+          await borrarTareasDelUsuario(relacion.espacioId, relacion, { id: user.uid });
+        }
+
         await eliminarUsuarioEspacio(relacion.id);
         setIsAbandonPopupOpen(false);
         // Redirigir a Bienvenida para que pueda crear o unirse a otra residencia
@@ -190,6 +300,16 @@ const MiResidencia: React.FC = () => {
 
     setIsEliminandoParticipante(true);
     try {
+      // 1. Eliminar todas las tareas asignadas al usuario antes de eliminarlo
+      if (residenciaData?.id && selectedParticipantRelacion) {
+        await borrarTareasDelUsuario(
+          residenciaData.id,
+          selectedParticipantRelacion,
+          selectedParticipant
+        );
+      }
+
+      // 2. Eliminar la relación usuario-espacio
       await eliminarUsuarioEspacio(selectedParticipantRelacion.id);
       setIsEliminarParticipantePopupOpen(false);
       showToast({
@@ -255,7 +375,7 @@ const MiResidencia: React.FC = () => {
             </View>
 
             {/* Code Section */}
-            <Animated.View 
+            <Animated.View
               style={styles.section}
               layout={LinearTransition.duration(260).reduceMotion(ReduceMotion.Never)}
             >
@@ -336,7 +456,7 @@ const MiResidencia: React.FC = () => {
             </Desplegable>
 
             {/* Settings Section */}
-            <Animated.View 
+            <Animated.View
               style={styles.section}
               layout={LinearTransition.duration(260).reduceMotion(ReduceMotion.Never)}
             >
@@ -367,8 +487,8 @@ const MiResidencia: React.FC = () => {
                 </TouchableOpacity>
               </View>
             </Animated.View>
-            </View>
           </View>
+        </View>
       </ScrollView>
 
       <BottomBar />
