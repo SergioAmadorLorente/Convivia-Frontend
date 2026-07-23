@@ -1,6 +1,6 @@
 // components/ui/Desplegable.tsx
 import React, { useState } from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -22,6 +22,8 @@ interface DesplegableProps {
   showIcon?: boolean;         // default true
   /** Nuevo: estado inicial cuando colapsable es true */
   defaultOpen?: boolean;      // default false
+  contentStyle?: StyleProp<ViewStyle>;
+  lineStyle?: StyleProp<ViewStyle>;
 }
 
 const CONTENT_ANIM_DURATION = 260;
@@ -34,6 +36,8 @@ const Desplegable: React.FC<DesplegableProps> = ({
   collapsible = true,
   showIcon = true,
   defaultOpen = false,
+  contentStyle,
+  lineStyle,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(defaultOpen);
 
@@ -87,14 +91,14 @@ const Desplegable: React.FC<DesplegableProps> = ({
       </TouchableOpacity>
 
       {/* Línea subrayada */}
-      <View style={styles.lineFull} />
+      <View style={[styles.lineFull, lineStyle]} />
 
       {/* Contenido: FadeIn al abrir, FadeOut al cerrar.
           El exiting es lo clave: Reanimated mantiene el nodo vivo mientras
           dura la animación de salida, así los hermanos de abajo no saltan. */}
       {contentVisible && (
         <Animated.View
-          style={styles.content}
+          style={[styles.content, contentStyle]}
           entering={FadeIn.duration(CONTENT_ANIM_DURATION).reduceMotion(ReduceMotion.Never)}
           exiting={FadeOut.duration(CONTENT_ANIM_DURATION).reduceMotion(ReduceMotion.Never)}
         >
