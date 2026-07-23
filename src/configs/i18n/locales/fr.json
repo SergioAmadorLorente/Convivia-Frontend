@@ -434,7 +434,8 @@
             "memberNotFound": "Vos informations de membre sont introuvables.",
             "leaveError": "Une erreur est survenue lors de la tentative de quitter la résidence.",
             "deleteError": "Une erreur est survenue lors de la suppression de la résidence.",
-            "cannotRemoveSelf": "Vous ne pouvez pas vous supprimer vous-même."
+            "cannotRemoveSelf": "Vous ne pouvez pas vous supprimer vous-même.",
+            "notAdminToKick": "Vous devez être administrateur pour expulser"
         },
         "toasts": {
             "getMemberError": "Erreur lors de la récupération des données du participant",

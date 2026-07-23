@@ -434,7 +434,8 @@
             "memberNotFound": "Deine Mitgliedsinformationen konnten nicht gefunden werden.",
             "leaveError": "Beim Verlassen der Wohnung ist ein Fehler aufgetreten.",
             "deleteError": "Beim Löschen der Wohnung ist ein Fehler aufgetreten.",
-            "cannotRemoveSelf": "Du kannst dich nicht selbst entfernen."
+            "cannotRemoveSelf": "Du kannst dich nicht selbst entfernen.",
+            "notAdminToKick": "Du musst Admin sein, um zu kicken"
         },
         "toasts": {
             "getMemberError": "Fehler beim Abrufen der Teilnehmerdaten.",

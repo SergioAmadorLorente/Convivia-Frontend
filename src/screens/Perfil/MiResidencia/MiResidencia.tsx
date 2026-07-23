@@ -167,6 +167,7 @@ const MiResidencia: React.FC = () => {
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [selectedParticipantRelacion, setSelectedParticipantRelacion] = useState<any>(null);
   const [isEliminandoParticipante, setIsEliminandoParticipante] = useState(false);
+  const [userRol, setUserRol] = useState<string | null>(null);
   const { show: showToast } = useToast();
 
   const handleAbandonarResidencia = () => {
@@ -228,6 +229,7 @@ const MiResidencia: React.FC = () => {
     try {
       const relacion = await obtenerEspacioPorUsuarioId(user.uid);
       if (relacion && relacion.espacioId) {
+        setUserRol(relacion.rol ?? null);
         const espacio = await obtenerEspacioPorId(relacion.espacioId);
         if (espacio) {
           setResidenciaName(espacio.nombre);
@@ -524,6 +526,7 @@ const MiResidencia: React.FC = () => {
         onClose={() => setIsParticipantModalOpen(false)}
         onEliminar={handleEliminarParticipante}
         isCurrentUser={selectedParticipant?.id === userData?.id}
+        isAdmin={userRol === 'admin'}
       />
       <Popup
         visible={isDeletePopupOpen}

@@ -434,7 +434,8 @@
       "memberNotFound": "Não foi possível encontrar a sua informação de membro.",
       "leaveError": "Ocorreu um erro ao tentar abandonar a residência.",
       "deleteError": "Ocorreu um erro ao tentar eliminar la residência.",
-      "cannotRemoveSelf": "Não se pode eliminar a si mesmo"
+      "cannotRemoveSelf": "Não se pode eliminar a si mesmo",
+      "notAdminToKick": "Precisa ser administrador para expulsar"
     },
     "toasts": {
       "getMemberError": "Erro ao obter os dados do participante",

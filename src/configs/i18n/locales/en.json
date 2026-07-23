@@ -434,7 +434,8 @@
       "memberNotFound": "Your member info could not be found.",
       "leaveError": "An error occurred while trying to leave the residence.",
       "deleteError": "An error occurred while trying to delete the residence.",
-      "cannotRemoveSelf": "You cannot remove yourself"
+      "cannotRemoveSelf": "You cannot remove yourself",
+      "notAdminToKick": "You need to be admin to kick"
     },
     "toasts": {
       "getMemberError": "Error fetching member details",
