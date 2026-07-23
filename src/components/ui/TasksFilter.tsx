@@ -8,6 +8,7 @@ import {
   LayoutChangeEvent,
   TouchableWithoutFeedback,
   ScrollView,
+  Modal,
 } from "react-native";
 import Animated, {
   FadeInDown,
@@ -174,8 +175,8 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
           entering={FadeInDown.duration(400).springify().damping(14).reduceMotion(ReduceMotion.Never)}
           exiting={FadeOut.duration(200).reduceMotion(ReduceMotion.Never)}
         >
-          {/* View interior que absorbe los toques para que no cierren el backdrop */}
-          <View onStartShouldSetResponder={() => true}>
+          {/* View interior */}
+          <View>
             {/* CUÁNDO — 3 botones compactos */}
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>{t('dashboard.filter.when')}</Text>
@@ -252,96 +253,107 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
               {/* Columna derecha: selector de usuario */}
               <View style={styles.userCol}>
                 <Text style={styles.sectionLabel}>{t('dashboard.filter.assignedTo') || "Asignado a"}</Text>
-                {/* Contenedor relativo para posicionar correctamente el desplegable respecto al botón */}
-                <View style={{ position: "relative", zIndex: 210 }}>
-                  {/* Botón del dropdown de usuario */}
-                  <TouchableOpacity
-                    style={[styles.userDropdownBtn, isUserFiltered && styles.userDropdownBtnActive]}
-                    onPress={() => setUserDropdownOpen(!userDropdownOpen)}
-                    hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
-                  >
-                    {isUserFiltered && (
-                      <Feather name="user" size={12} color={COLORS.primary} style={{ marginRight: 4 }} />
-                    )}
-                    <Text
-                      style={[styles.userDropdownBtnText, isUserFiltered && styles.userDropdownBtnTextActive]}
-                      numberOfLines={1}
-                    >
-                      {selectedUserLabel}
-                    </Text>
-                    <Feather
-                      name={userDropdownOpen ? "chevron-up" : "chevron-down"}
-                      size={14}
-                      color={isUserFiltered ? COLORS.primary : COLORS.secondary}
-                    />
-                  </TouchableOpacity>
-
-                  {/* Lista de usuarios */}
-                  {userDropdownOpen && (
-                    <Animated.View
-                      style={styles.userList}
-                      entering={FadeInDown.duration(200).reduceMotion(ReduceMotion.Never)}
-                      exiting={FadeOut.duration(150).reduceMotion(ReduceMotion.Never)}
-                    >
-                      <ScrollView
-                        nestedScrollEnabled
-                        showsVerticalScrollIndicator={true}
-                        style={{ maxHeight: 240 }}
-                      >
-                        {/* Opción "Todos" */}
-                        <TouchableOpacity
-                          style={[
-                            styles.userListItem,
-                            selectedUser === "all" && styles.userListItemActive,
-                          ]}
-                          onPress={() => handleUserSelect("all")}
-                        >
-                          <Text
-                            style={[
-                              styles.userListItemText,
-                              selectedUser === "all" && styles.userListItemTextActive,
-                            ]}
-                          >
-                            {t('dashboard.filter.allUsers') || "Todos"}
-                          </Text>
-                          {selectedUser === "all" && (
-                            <Feather name="check" size={12} color={COLORS.primary} />
-                          )}
-                        </TouchableOpacity>
-
-                        {/* Cada usuario único */}
-                        {uniqueUserNames.map((name) => (
-                          <TouchableOpacity
-                            key={name}
-                            style={[
-                              styles.userListItem,
-                              selectedUser === name && styles.userListItemActive,
-                            ]}
-                            onPress={() => handleUserSelect(name)}
-                          >
-                            <Text
-                              style={[
-                                styles.userListItemText,
-                                selectedUser === name && styles.userListItemTextActive,
-                              ]}
-                              numberOfLines={1}
-                            >
-                              {name}
-                            </Text>
-                            {selectedUser === name && (
-                              <Feather name="check" size={12} color={COLORS.primary} />
-                            )}
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    </Animated.View>
+                <TouchableOpacity
+                  style={[styles.userDropdownBtn, isUserFiltered && styles.userDropdownBtnActive]}
+                  onPress={() => setUserDropdownOpen(true)}
+                  hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
+                >
+                  {isUserFiltered && (
+                    <Feather name="user" size={12} color={COLORS.primary} style={{ marginRight: 4 }} />
                   )}
-                </View>
+                  <Text
+                    style={[styles.userDropdownBtnText, isUserFiltered && styles.userDropdownBtnTextActive]}
+                    numberOfLines={1}
+                  >
+                    {selectedUserLabel}
+                  </Text>
+                  <Feather
+                    name="chevron-down"
+                    size={14}
+                    color={isUserFiltered ? COLORS.primary : COLORS.secondary}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           </View>
         </Animated.View>
       )}
+
+      {/* Modal nativo de Android para seleccionar usuario */}
+      <Modal
+        visible={userDropdownOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setUserDropdownOpen(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setUserDropdownOpen(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContainer}>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>
+                    {t('dashboard.filter.assignedTo') || "Asignado a"}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setUserDropdownOpen(false)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Feather name="x" size={18} color={COLORS.secondary} />
+                  </TouchableOpacity>
+                </View>
+
+                <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={true}>
+                  {/* Opción "Todos" */}
+                  <TouchableOpacity
+                    style={[
+                      styles.userListItem,
+                      selectedUser === "all" && styles.userListItemActive,
+                    ]}
+                    onPress={() => handleUserSelect("all")}
+                  >
+                    <Text
+                      style={[
+                        styles.userListItemText,
+                        selectedUser === "all" && styles.userListItemTextActive,
+                      ]}
+                    >
+                      {t('dashboard.filter.allUsers') || "Todos"}
+                    </Text>
+                    {selectedUser === "all" && (
+                      <Feather name="check" size={14} color={COLORS.primary} />
+                    )}
+                  </TouchableOpacity>
+
+                  {/* Cada usuario único */}
+                  {uniqueUserNames.map((name) => (
+                    <TouchableOpacity
+                      key={name}
+                      style={[
+                        styles.userListItem,
+                        selectedUser === name && styles.userListItemActive,
+                      ]}
+                      onPress={() => handleUserSelect(name)}
+                    >
+                      <Text
+                        style={[
+                          styles.userListItemText,
+                          selectedUser === name && styles.userListItemTextActive,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {name}
+                      </Text>
+                      {selectedUser === name && (
+                        <Feather name="check" size={14} color={COLORS.primary} />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -539,37 +551,59 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
     color: COLORS.primary,
   },
-  userList: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    marginTop: 4,
+  /* Modal nativo selector de usuario */
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  modalContainer: {
+    width: "85%",
+    maxWidth: 340,
+    maxHeight: 340,
     backgroundColor: COLORS.inputBackground,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: COLORS.secondary + "20",
+    borderRadius: 16,
+    padding: 16,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 6,
-    zIndex: 200,
-    overflow: "hidden",
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.secondary + "20",
+  },
+  modalTitle: {
+    fontSize: 15,
+    fontFamily: FONTS.bold,
+    color: COLORS.secondary,
+  },
+  modalScrollView: {
+    maxHeight: 240,
   },
   userListItem: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginBottom: 2,
   },
   userListItemActive: {
     backgroundColor: COLORS.success,
   },
   userListItemText: {
     flex: 1,
-    fontSize: 12.5,
+    fontSize: 13,
     fontFamily: FONTS.regular,
     color: COLORS.secondary,
   },
