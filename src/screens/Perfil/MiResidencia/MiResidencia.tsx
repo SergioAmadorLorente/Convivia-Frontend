@@ -435,8 +435,15 @@ const MiResidencia: React.FC = () => {
                             {index + 1}
                           </Text>
                         </View>
-                        <View style={styles.participantIcon}>
-                          <Ionicons name="person" size={20} color={COLORS.primary} />
+                        <View style={styles.participantIconWrapper}>
+                          <View style={styles.participantIcon}>
+                            <Ionicons name="person" size={20} color={COLORS.primary} />
+                          </View>
+                          {participant?.rol === 'admin' && (
+                            <View style={styles.adminBadge}>
+                              <Text style={styles.adminBadgeText}>Admin</Text>
+                            </View>
+                          )}
                         </View>
                         <View style={styles.participantInfo}>
                           <Text style={styles.participantName}>
@@ -717,6 +724,10 @@ const styles = StyleSheet.create({
     color: '#CD7F32',
     fontSize: 17,
   },
+  participantIconWrapper: {
+    alignItems: 'center',
+    marginRight: 15,
+  },
   participantIcon: {
     width: 40,
     height: 40,
@@ -724,7 +735,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6ECDC',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15
+  },
+  adminBadge: {
+    marginTop: 3,
+    backgroundColor: COLORS.accent,
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  adminBadgeText: {
+    fontFamily: FONTS.bold,
+    fontSize: 9,
+    color: '#fff',
   },
   participantInfo: {
     flex: 1,

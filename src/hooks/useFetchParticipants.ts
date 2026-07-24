@@ -13,6 +13,7 @@ interface ParticipantWithKarma {
   karmaTotal: number;
   karmaMensual: number;
   karmaSemanal: number;
+  rol?: string;
 }
 
 const useFetchParticipants = () => {
@@ -70,6 +71,7 @@ const useFetchParticipants = () => {
           return {
             ...usuario,
             ...karma,
+            rol: r.rol ?? null,
           };
         } catch (e) {
           // Usuario no existe, lo ignoramos silenciosamente
