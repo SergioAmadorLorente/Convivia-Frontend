@@ -592,5 +592,9 @@
     "section4Body": "O Convivia reserva-se o direito de modificar estes termos e condições a qualquer momento. As alterações serão eficazes imediatamente após a publicação na plataforma. A sua utilização continuada da plataforma indica a sua aceitação das referidas modificações.",
     "section5Title": "Contacte-nos",
     "section5Body": "Se tiver dúvidas ou preocupações sobre estes termos, por favor contacte-nos através dos nossos canais de suporte."
+  },
+  "updates": {
+    "downloading": "A baixar uma atualização em segundo plano...",
+    "restartRequired": "Reinicie a aplicação para concluir a atualização."
   }
 }

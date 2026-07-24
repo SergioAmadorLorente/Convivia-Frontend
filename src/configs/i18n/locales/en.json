@@ -592,5 +592,9 @@
     "section4Body": "Convivia reserves the right to modify these terms and conditions at any time. Changes will be effective immediately upon posting on the platform. Your continued use of the platform indicates your acceptance of such modifications.",
     "section5Title": "Contact Us",
     "section5Body": "If you have questions or concerns about these terms, please contact us through our support channels."
+  },
+  "updates": {
+    "downloading": "Downloading update in the background...",
+    "restartRequired": "Restart the app to complete the update."
   }
 }

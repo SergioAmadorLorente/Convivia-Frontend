@@ -592,5 +592,9 @@
         "section4Body": "Convivia se réserve le droit de modifier les présentes conditions à tout moment. Les modifications prennent effet dès leur publication sur la plateforme. La poursuite de votre utilisation de Convivia vaut acceptation de ces modifications.",
         "section5Title": "Nous contacter",
         "section5Body": "Si vous avez des questions concernant ces conditions générales, veuillez nous contacter via nos canaux d'assistance."
+    },
+    "updates": {
+        "downloading": "Téléchargement d'une mise à jour en arrière-plan...",
+        "restartRequired": "Redémarrez l'application pour terminer la mise à jour."
     }
 }

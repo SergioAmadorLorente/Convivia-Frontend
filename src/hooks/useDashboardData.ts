@@ -212,23 +212,27 @@ export const useDashboardData = (newSpaceName?: string) => {
           const deudoresDict = f.deudores || f.Deudores || {};
           const relIds = Object.keys(deudoresDict);
 
-          const userNames = relIds.map((relId: string) => {
-            const cleanedRelId = cleanId(relId);
-            // Buscar en el mapa usando el ID limpio
-            const nameKey = Object.keys(userNamesMapRef.current).find(
-              (k) => cleanId(k) === cleanedRelId,
-            );
+          const userNames = relIds
+            .map((relId: string) => {
+              const cleanedRelId = cleanId(relId);
+              // Buscar en el mapa usando el ID limpio
+              const nameKey = Object.keys(userNamesMapRef.current).find(
+                (k) => cleanId(k) === cleanedRelId,
+              );
 
-            return {
-              id: relId,
-              name: nameKey
-                ? userNamesMapRef.current[nameKey]
-                : f.nombresDeudores?.[relId] ||
-                `Usuario (${relId.slice(0, 4)})`,
-              // en deudores: true = pendiente (no pagado), false = pagado
-              completed: deudoresDict[relId] === false,
-            };
-          });
+              if (!nameKey) {
+                // Si el usuario fue expulsado o abandonó el espacio, no pertenece a la residencia
+                return null;
+              }
+
+              return {
+                id: relId,
+                name: userNamesMapRef.current[nameKey],
+                // en deudores: true = pendiente (no pagado), false = pagado
+                completed: deudoresDict[relId] === false,
+              };
+            })
+            .filter((u): u is NonNullable<typeof u> => u !== null);
 
           return new FacturaModel({
             IdFactura: f.id || f.Id || f.IdFactura || "",

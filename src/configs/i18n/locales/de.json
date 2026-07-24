@@ -592,5 +592,9 @@
         "section4Body": "Convivia behält sich das Recht vor, diese Nutzungsbedingungen jederzeit zu ändern. Änderungen treten unmittelbar nach ihrer Veröffentlichung auf der Plattform in Kraft. Die fortgesetzte Nutzung der Plattform gilt als Zustimmung zu den geänderten Bedingungen.",
         "section5Title": "Kontakt",
         "section5Body": "Wenn du Fragen oder Anliegen zu diesen Nutzungsbedingungen hast, kontaktiere uns bitte über unsere Support-Kanäle."
+    },
+    "updates": {
+        "downloading": "Update wird im Hintergrund heruntergeladen...",
+        "restartRequired": "Starten Sie die App neu, um das Update abzuschließen."
     }
 }

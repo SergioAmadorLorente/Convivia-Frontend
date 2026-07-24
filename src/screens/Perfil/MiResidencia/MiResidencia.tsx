@@ -32,6 +32,7 @@ import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { obtenerTareasPorEspacio, eliminarTarea, obtenerDetalleTareaInstancia } from "../../../api/tarea";
+import { obtenerFacturasPorEspacio, editarFactura, FacturaPayload } from "../../../api/factura";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -148,6 +149,107 @@ const borrarTareasDelUsuario = async (
   }
 };
 
+const desasignarUsuarioDeFacturas = async (
+  espacioId: string,
+  usuarioEspacioRelacion: any,
+  participantUserObj?: any
+) => {
+  try {
+    const idsCandidatos = [
+      usuarioEspacioRelacion?.id,
+      usuarioEspacioRelacion?.id_UsuarioEspacio,
+      usuarioEspacioRelacion?.Id,
+      usuarioEspacioRelacion?.Id_UsuarioEspacio,
+      usuarioEspacioRelacion?.usuarioId,
+      usuarioEspacioRelacion?.UsuarioId,
+      participantUserObj?.id,
+      participantUserObj?.Id,
+      participantUserObj?.usuarioId,
+      participantUserObj?.uid,
+    ];
+
+    const userUidDirect = participantUserObj?.id || usuarioEspacioRelacion?.usuarioId;
+    if (userUidDirect && (!usuarioEspacioRelacion || !usuarioEspacioRelacion.id)) {
+      try {
+        const relFresca = await obtenerRelacionUsuarioEspacio(userUidDirect, espacioId);
+        if (relFresca) {
+          idsCandidatos.push(relFresca.id, relFresca.id_UsuarioEspacio, relFresca.Id, relFresca.usuarioId);
+        }
+      } catch {
+        // Ignorar si no se encuentra relación
+      }
+    }
+
+    const targetIds = new Set(
+      idsCandidatos
+        .filter((id) => id !== undefined && id !== null && String(id).trim() !== "")
+        .map((id) => cleanId(String(id)))
+    );
+
+    if (targetIds.size === 0) return;
+
+    console.log(" Desasignando usuario de facturas. Target IDs:", Array.from(targetIds));
+
+    const result = await obtenerFacturasPorEspacio(espacioId);
+    const facturasRaw = Array.isArray(result)
+      ? result
+      : (result as any)?.$values || [];
+
+    if (!Array.isArray(facturasRaw) || facturasRaw.length === 0) return;
+
+    for (const factura of facturasRaw) {
+      const facturaId = factura.id || factura.IdFactura || factura.id_Factura || factura.Id;
+      if (!facturaId) continue;
+
+      const deudoresDict = factura.deudores || factura.Deudores || {};
+      const keys = Object.keys(deudoresDict);
+
+      let usuarioEncontrado = false;
+      const nuevosDeudores: Record<string, boolean> = {};
+
+      for (const key of keys) {
+        const keyLimpia = cleanId(key);
+        if (targetIds.has(keyLimpia)) {
+          usuarioEncontrado = true;
+        } else {
+          nuevosDeudores[key] = deudoresDict[key];
+        }
+      }
+
+      if (usuarioEncontrado) {
+        console.log(` Desasignando usuario de la factura ${facturaId}`);
+        const precio = Number(factura.precio || factura.Precio || 0);
+        const numDeudores = Object.keys(nuevosDeudores).length;
+        const pagoMediano = numDeudores > 0 ? precio / numDeudores : precio;
+        const pagadoGlobal = numDeudores > 0
+          ? Object.values(nuevosDeudores).every((val) => val === false)
+          : true;
+
+        const payload: FacturaPayload = {
+          nombre: factura.nombre || factura.Nombre || "",
+          precio: precio,
+          pagoMediano: pagoMediano,
+          pagado: pagadoGlobal,
+          creadorFactura: factura.creadorFactura || factura.CreadorFactura || "",
+          deudores: nuevosDeudores,
+          fechaCompletada: pagadoGlobal
+            ? (factura.fechaCompletada || factura.FechaCompletada || new Date().toISOString())
+            : null,
+        };
+
+        try {
+          await editarFactura(espacioId, facturaId, payload);
+          console.log(` Factura ${facturaId} actualizada con éxito sin el usuario desasignado.`);
+        } catch (editErr) {
+          console.warn(` Error al desasignar usuario de factura ${facturaId}:`, editErr);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(" Error en desasignarUsuarioDeFacturas:", err);
+  }
+};
+
 const MiResidencia: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const user = useAuthListener();
@@ -184,6 +286,7 @@ const MiResidencia: React.FC = () => {
         // Eliminar todas las tareas asignadas al usuario antes de abandonar
         if (relacion.espacioId) {
           await borrarTareasDelUsuario(relacion.espacioId, relacion, { id: user.uid });
+          await desasignarUsuarioDeFacturas(relacion.espacioId, relacion, { id: user.uid });
         }
 
         await eliminarUsuarioEspacio(relacion.id);
@@ -305,6 +408,11 @@ const MiResidencia: React.FC = () => {
       // 1. Eliminar todas las tareas asignadas al usuario antes de eliminarlo
       if (residenciaData?.id && selectedParticipantRelacion) {
         await borrarTareasDelUsuario(
+          residenciaData.id,
+          selectedParticipantRelacion,
+          selectedParticipant
+        );
+        await desasignarUsuarioDeFacturas(
           residenciaData.id,
           selectedParticipantRelacion,
           selectedParticipant

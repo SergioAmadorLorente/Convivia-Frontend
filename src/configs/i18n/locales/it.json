@@ -592,5 +592,9 @@
         "section4Body": "Convivia si riserva il diritto di modificare i presenti termini in qualsiasi momento. Le modifiche entreranno in vigore al momento della pubblicazione sulla piattaforma. L'utilizzo continuato della piattaforma costituisce accettazione delle modifiche.",
         "section5Title": "Contattaci",
         "section5Body": "Per qualsiasi domanda o dubbio riguardo ai presenti termini e condizioni, contattaci tramite i nostri canali di assistenza."
+    },
+    "updates": {
+        "downloading": "Download dell'aggiornamento in corso in background...",
+        "restartRequired": "Riavvia l'app per completare l'aggiornamento."
     }
 }
