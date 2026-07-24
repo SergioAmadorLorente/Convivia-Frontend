@@ -12,13 +12,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "updates": {
-      "url": "https://u.expo.dev/bc3d062b-923e-4b28-997e-85c890dffecd",
-      "checkAutomatically": "NEVER"
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -34,8 +27,7 @@
       "favicon": "./src/assets/favicon.png"
     },
     "plugins": [
-      "expo-font",
-      "expo-updates"
+      "expo-font"
     ],
     "extra": {
       "eas": {
