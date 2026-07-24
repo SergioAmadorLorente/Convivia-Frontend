@@ -2,7 +2,7 @@
   "expo": {
     "name": "Convivia",
     "slug": "Convivia",
-    "version": "3.8.45",
+    "version": "3.8.47",
     "orientation": "portrait",
     "icon": "./src/assets/logoReal.png",
     "userInterfaceStyle": "light",
@@ -34,7 +34,8 @@
       "favicon": "./src/assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-updates"
     ],
     "extra": {
       "eas": {
