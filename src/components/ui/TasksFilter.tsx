@@ -302,7 +302,11 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
                   </TouchableOpacity>
                 </View>
 
-                <ScrollView style={styles.modalScrollView} showsVerticalScrollIndicator={true}>
+                <ScrollView
+                  style={styles.modalScrollView}
+                  showsVerticalScrollIndicator={true}
+                  indicatorStyle="black"
+                >
                   {/* Opción "Todos" */}
                   <TouchableOpacity
                     style={[
