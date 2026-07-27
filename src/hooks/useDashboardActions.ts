@@ -27,6 +27,7 @@ interface ActionsProps {
   activeTab: string;
   openDetalleTarea: (t: TaskModel) => void;
   t: (key: string) => string;
+  onTaskCompletedOnTime?: (coords: { x: number; y: number }, karmaAmount: number) => void;
 }
 
 export const useDashboardActions = ({
@@ -45,8 +46,9 @@ export const useDashboardActions = ({
   CURRENT_USER_ID,
   activeTab,
   openDetalleTarea,
+  onTaskCompletedOnTime,
 }: ActionsProps) => {
-  const handleToggleTask = async (id: string): Promise<boolean> => {
+  const handleToggleTask = async (id: string, coords?: { pageX?: number; pageY?: number }): Promise<boolean> => {
     if (activeTab === "tareas") {
       const task = tareas.find((t) => t.id === id);
       if (!task) return false;
@@ -149,6 +151,11 @@ export const useDashboardActions = ({
 
       if (!wasOverdue && userRelacionId) {
         const nuevoKarma = currentKarma + (task.karma || 0);
+        if ((task.karma || 0) > 0 && onTaskCompletedOnTime) {
+          const startX = coords?.pageX ?? 180;
+          const startY = coords?.pageY ?? 400;
+          onTaskCompletedOnTime({ x: startX, y: startY }, task.karma || 0);
+        }
         setCurrentKarma(nuevoKarma);
       }
 

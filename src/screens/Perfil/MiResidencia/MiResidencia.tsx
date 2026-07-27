@@ -718,7 +718,6 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   residenciaName: {
-    flex: 1,
     fontFamily: FONTS.bold,
     fontSize: 15,
     color: "#333",

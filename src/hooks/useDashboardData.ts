@@ -11,6 +11,7 @@ import TaskModel from "../types/Task";
 import type { PlantillaTarea, Tarea } from "../types/Task";
 import FacturaModel from "../types/Factura";
 import { obtenerFacturasPorDeudor } from "../api/factura";
+import { obtenerKarmaUsuario } from "../api/karma";
 
 export const useDashboardData = (newSpaceName?: string) => {
   const { user, authLoading } = useAuthListenerFull();
@@ -59,9 +60,10 @@ export const useDashboardData = (newSpaceName?: string) => {
             setEspacioId(result.espacioId);
             tieneEspacio = true;
 
-            setUserRelacionId(result.id || result.id_UsuarioEspacio);
+            const relId = result.id || result.id_UsuarioEspacio;
+            setUserRelacionId(relId);
 
-            setCurrentKarma(result.karma || 0);
+            cargarKarma(result.espacioId, relId);
 
             try {
               const espacioData = await obtenerEspacioPorId(result.espacioId);
@@ -182,6 +184,26 @@ export const useDashboardData = (newSpaceName?: string) => {
     userNamesMapRef.current = userNamesMap;
   }, [userNamesMap]);
 
+  const userRelacionIdRef = useRef(userRelacionId);
+  useEffect(() => {
+    userRelacionIdRef.current = userRelacionId;
+  }, [userRelacionId]);
+
+  const cargarKarma = async (targetEspacioId?: string, targetRelacionId?: string) => {
+    const currentEspacioId = targetEspacioId || espacioId || espacioIdRef.current;
+    const currentRelacionId = targetRelacionId || userRelacionId || userRelacionIdRef.current;
+    if (!currentEspacioId || !currentRelacionId) return;
+
+    try {
+      const karmaData = await obtenerKarmaUsuario(currentEspacioId, currentRelacionId);
+      if (karmaData && typeof karmaData.karmaTotal === "number") {
+        setCurrentKarma(karmaData.karmaTotal);
+      }
+    } catch (err) {
+      // console.error("Error al cargar karma:", err);
+    }
+  };
+
   const cargarFacturas = async (showLoading = true) => {
     const currentEspacioId = espacioIdRef.current;
     const currentUser = userRef.current;
@@ -277,9 +299,10 @@ export const useDashboardData = (newSpaceName?: string) => {
         currentNamesMap = await cargarNombresUsuario(currentEspacioId);
       }
 
-      // Paralelizar carga de tareas y facturas de forma sincronizada
+      // Paralelizar carga de tareas, facturas y karma de forma sincronizada
       await Promise.all([
         cargarFacturas(showLoading),
+        cargarKarma(currentEspacioId),
         (async () => {
           const tareasRaw = await obtenerTareasPorEspacio(currentEspacioId);
           if (!Array.isArray(tareasRaw)) return;

@@ -36,7 +36,7 @@ interface TaskItemProps {
   isCompleted: boolean;
 
   /** Toggle checkbox (para tareas, o toggle rápido en facturas si onQuickToggle no está definido) */
-  onToggle: () => any;
+  onToggle: (coords?: { pageX?: number; pageY?: number }) => any;
 
   /** (Opcional) Callback para toggle rápido sin abrir detalle (principalmente para facturas) */
   onQuickToggle?: () => void;
@@ -104,6 +104,8 @@ const TaskItem: React.FC<TaskItemProps> = ({
     });
   }, [isCompleted]);
 
+  const touchCoordsRef = useRef<{ pageX: number; pageY: number } | null>(null);
+
   const handlePressCheckbox = () => {
     console.log("[TaskItem] Checkbox pressed! isCompleted:", isCompleted, "title:", title, "variant:", variant);
     if (isTogglingRef.current) return;
@@ -111,16 +113,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
     if (!isCompleted) {
       if (isFactura) {
         // Factura: tiene modal de confirmación antes de marcar como pagada.
-        // Llamamos al callback inmediatamente para que abra el modal.
-        // La animación se ejecutará en el useEffect tras confirmar (aceptar) el modal.
         if (onQuickToggle) {
           onQuickToggle();
         } else {
           onToggle();
         }
       } else {
-        // Tarea: marcando como completada (optimista, no tiene modal de confirmación).
-        // Animamos localmente de inmediato para feedback instantáneo en "Pendientes".
+        // Tarea: marcando como completada (optimista).
         isTogglingRef.current = true;
 
         checkboxScale.value = withSpring(1, { damping: 12, stiffness: 150, reduceMotion: ReduceMotion.Never });
@@ -130,21 +129,17 @@ const TaskItem: React.FC<TaskItemProps> = ({
           scale.value = withSpring(1, { reduceMotion: ReduceMotion.Never });
         });
 
-        // Esperar 400ms a que termine el feedback y luego hacer la transición
+        // Esperar 400ms y luego hacer la transición, pasando coords del toque
         setTimeout(async () => {
-          const success = await onToggle();
+          const success = await onToggle(touchCoordsRef.current ?? undefined);
           isTogglingRef.current = false;
           if (success === false) {
-            // Revertir animación del checkbox si fue rechazado (ej. no asignada a mí)
             checkboxScale.value = withSpring(0, { damping: 12, stiffness: 150, reduceMotion: ReduceMotion.Never });
             checkboxBgColor.value = withTiming(0, { duration: 150, reduceMotion: ReduceMotion.Never });
           }
         }, 400);
       }
     } else {
-      // Desmarcando (tarea o factura): requiere confirmación por modal.
-      // Llamamos de inmediato al callback para que muestre el modal.
-      // Si el usuario acepta, se actualizará el estado y el useEffect animará de vuelta a desmarcado.
       if (isFactura && onQuickToggle) {
         onQuickToggle();
       } else {
@@ -273,6 +268,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
           {/* Checkbox Animado (Hermano de touchableContent, no hijo) - Oculto en facturas */}
           {!isFactura && (
             <TouchableOpacity
+              onPressIn={(e) => { touchCoordsRef.current = { pageX: e.nativeEvent.pageX, pageY: e.nativeEvent.pageY }; }}
               onPress={handlePressCheckbox}
               activeOpacity={0.8}
               style={CHECKBOX.touchArea}
