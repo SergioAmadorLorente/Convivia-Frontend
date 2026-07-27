@@ -272,6 +272,15 @@ const MiResidencia: React.FC = () => {
   const [userRol, setUserRol] = useState<string | null>(null);
   const { show: showToast } = useToast();
 
+  const isAdmin =
+    userRol === "admin" ||
+    userRol === "administrador" ||
+    participants.some(
+      (p: any) =>
+        (p.id === user?.uid || p.id === userData?.id) &&
+        (p.rol?.toLowerCase() === "admin" || p.rol?.toLowerCase() === "administrador")
+    );
+
   const handleAbandonarResidencia = () => {
     if (!user || !residenciaData) return;
     setIsAbandonPopupOpen(true);
@@ -332,7 +341,8 @@ const MiResidencia: React.FC = () => {
     try {
       const relacion = await obtenerEspacioPorUsuarioId(user.uid);
       if (relacion && relacion.espacioId) {
-        setUserRol(relacion.rol ?? null);
+        const rolNormalizado = (relacion.rol || relacion.Rol || relacion.role || relacion.Role || "").toLowerCase();
+        setUserRol(rolNormalizado);
         const espacio = await obtenerEspacioPorId(relacion.espacioId);
         if (espacio) {
           setResidenciaName(espacio.nombre);
@@ -468,20 +478,24 @@ const MiResidencia: React.FC = () => {
                   <Text style={[styles.residenciaName, { color: "#999" }]}>{t("common.loading")}</Text>
                 </View>
               ) : (
-                <Text style={styles.residenciaName} numberOfLines={2} adjustsFontSizeToFit>{residenciaName}</Text>
+                <View style={{ flex: 1, justifyContent: "center", marginRight: 10 }}>
+                  <Text style={styles.residenciaName} numberOfLines={2} adjustsFontSizeToFit>{residenciaName}</Text>
+                </View>
               )}
-              <TouchableOpacity
-                style={styles.editIcon}
-                onPress={() =>
-                  navigation.navigate("EditarResidencia", {
-                    espacioId: residenciaData?.id || "",
-                    nombreInicial: residenciaData?.nombre || "",
-                    ubicacionInicial: residenciaData?.direccion || "",
-                  })
-                }
-              >
-                <FontAwesome5 name="edit" size={20} color={COLORS.accent} />
-              </TouchableOpacity>
+              {isAdmin && (
+                <TouchableOpacity
+                  style={styles.editIcon}
+                  onPress={() =>
+                    navigation.navigate("EditarResidencia", {
+                      espacioId: residenciaData?.id || "",
+                      nombreInicial: residenciaData?.nombre || "",
+                      ubicacionInicial: residenciaData?.direccion || "",
+                    })
+                  }
+                >
+                  <FontAwesome5 name="edit" size={20} color={COLORS.accent} />
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Code Section */}
