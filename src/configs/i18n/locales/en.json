@@ -594,7 +594,7 @@
     "section5Body": "If you have questions or concerns about these terms, please contact us through our support channels."
   },
   "updates": {
-    "downloading": "Downloading update in the background...",
-    "restartRequired": "Restart the app to complete the update."
+    "downloading": "The app has a new update, downloading...",
+    "restarting": "App updated, restarting app in 5 seconds..."
   }
 }

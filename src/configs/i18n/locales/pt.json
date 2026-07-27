@@ -594,7 +594,7 @@
     "section5Body": "Se tiver dúvidas ou preocupações sobre estes termos, por favor contacte-nos através dos nossos canais de suporte."
   },
   "updates": {
-    "downloading": "A baixar uma atualização em segundo plano...",
-    "restartRequired": "Reinicie a aplicação para concluir a atualização."
+    "downloading": "O aplicativo tem uma nova atualização, baixando...",
+    "restarting": "Aplicativo atualizado, reiniciando o aplicativo em 5 segundos..."
   }
 }

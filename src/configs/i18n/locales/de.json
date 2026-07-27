@@ -594,7 +594,7 @@
         "section5Body": "Wenn du Fragen oder Anliegen zu diesen Nutzungsbedingungen hast, kontaktiere uns bitte über unsere Support-Kanäle."
     },
     "updates": {
-        "downloading": "Update wird im Hintergrund heruntergeladen...",
-        "restartRequired": "Starten Sie die App neu, um das Update abzuschließen."
+        "downloading": "Die App hat ein neues Update, wird heruntergeladen...",
+        "restarting": "App aktualisiert, App wird in 5 Sekunden neu gestartet..."
     }
 }

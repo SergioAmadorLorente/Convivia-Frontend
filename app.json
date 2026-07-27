@@ -4,7 +4,7 @@
     "slug": "Convivia",
     "version": "3.8.48",
     "orientation": "portrait",
-    "icon": "./src/assets/logoReal.png",
+    "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -26,8 +26,27 @@
     "web": {
       "favicon": "./src/assets/favicon.png"
     },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bc3d062b-923e-4b28-997e-85c890dffecd"
+    },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "abiFilters": ["arm64-v8a", "x86_64"],
+            "extraGradleProps": {
+              "org.gradle.jvmargs": "-Xmx4096m -XX:MaxMetaspaceSize=1024m",
+              "org.gradle.daemon": "false",
+              "org.gradle.parallel": "true"
+            }
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -6,16 +6,29 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "GRADLE_OPTS": "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=\"-Xmx4096m -XX:MaxMetaspaceSize=1024m\""
+      }
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
       "android": {
+        "buildType": "apk",
         "image": "latest"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.convivia.app",
+        "GRADLE_OPTS": "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=\"-Xmx4096m -XX:MaxMetaspaceSize=1024m\""
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production",
+      "env": {
+        "GRADLE_OPTS": "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=\"-Xmx4096m -XX:MaxMetaspaceSize=1024m\""
+      }
     }
   },
   "submit": {

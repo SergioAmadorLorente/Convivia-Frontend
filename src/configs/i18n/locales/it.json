@@ -594,7 +594,7 @@
         "section5Body": "Per qualsiasi domanda o dubbio riguardo ai presenti termini e condizioni, contattaci tramite i nostri canali di assistenza."
     },
     "updates": {
-        "downloading": "Download dell'aggiornamento in corso in background...",
-        "restartRequired": "Riavvia l'app per completare l'aggiornamento."
+        "downloading": "L'app ha un nuovo aggiornamento, download in corso...",
+        "restarting": "App aggiornata, riavvio dell'app in 5 secondi..."
     }
 }

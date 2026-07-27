@@ -594,7 +594,7 @@
         "section5Body": "Si vous avez des questions concernant ces conditions générales, veuillez nous contacter via nos canaux d'assistance."
     },
     "updates": {
-        "downloading": "Téléchargement d'une mise à jour en arrière-plan...",
-        "restartRequired": "Redémarrez l'application pour terminer la mise à jour."
+        "downloading": "L'application a une nouvelle mise à jour, téléchargement...",
+        "restarting": "Application mise à jour, redémarrage de l'application dans 5 secondes..."
     }
 }
