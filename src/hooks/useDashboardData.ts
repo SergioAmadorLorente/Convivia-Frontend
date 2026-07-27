@@ -22,6 +22,7 @@ export const useDashboardData = (newSpaceName?: string) => {
   const [espacioId, setEspacioId] = useState<string | null>(null);
   const [userRelacionId, setUserRelacionId] = useState<string | null>(null);
   const [currentKarma, setCurrentKarma] = useState<number>(0);
+  const [loadingKarma, setLoadingKarma] = useState<boolean>(true);
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
   const [userNamesMap, setUserNamesMap] = useState<Record<string, string>>({});
   const [tareas, setTareas] = useState<TaskModel[]>([]);
@@ -189,11 +190,15 @@ export const useDashboardData = (newSpaceName?: string) => {
     userRelacionIdRef.current = userRelacionId;
   }, [userRelacionId]);
 
-  const cargarKarma = async (targetEspacioId?: string, targetRelacionId?: string) => {
+  const cargarKarma = async (targetEspacioId?: string, targetRelacionId?: string, showLoading = false) => {
     const currentEspacioId = targetEspacioId || espacioId || espacioIdRef.current;
     const currentRelacionId = targetRelacionId || userRelacionId || userRelacionIdRef.current;
-    if (!currentEspacioId || !currentRelacionId) return;
+    if (!currentEspacioId || !currentRelacionId) {
+      setLoadingKarma(false);
+      return;
+    }
 
+    if (showLoading) setLoadingKarma(true);
     try {
       const karmaData = await obtenerKarmaUsuario(currentEspacioId, currentRelacionId);
       if (karmaData && typeof karmaData.karmaTotal === "number") {
@@ -201,6 +206,8 @@ export const useDashboardData = (newSpaceName?: string) => {
       }
     } catch (err) {
       // console.error("Error al cargar karma:", err);
+    } finally {
+      setLoadingKarma(false);
     }
   };
 
@@ -460,6 +467,7 @@ export const useDashboardData = (newSpaceName?: string) => {
     userRelacionId,
     currentKarma,
     setCurrentKarma,
+    loadingKarma,
     loadingEspacio,
     userNamesMap,
     tareas,

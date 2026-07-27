@@ -54,6 +54,7 @@ const DashBoardPersonal: React.FC = () => {
     userRelacionId,
     currentKarma,
     setCurrentKarma,
+    loadingKarma,
     loadingEspacio,
     userNamesMap,
     tareas,
@@ -256,6 +257,7 @@ const DashBoardPersonal: React.FC = () => {
   const fmtEUR = (n: number) => new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n || 0);
 
   return (
+    <View style={{ flex: 1 }}>
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -266,6 +268,7 @@ const DashBoardPersonal: React.FC = () => {
         date={new Date()}
         location={espacioNombre}
         karma={currentKarma}
+        loadingKarma={loadingKarma}
         onKarmaLayout={(coords) => setKarmaTargetCoords(coords)}
         isImpactAnimating={headerImpactAnimating}
       />
@@ -422,9 +425,9 @@ const DashBoardPersonal: React.FC = () => {
         />
       )}
 
-      <BottomBar />
+    </KeyboardAvoidingView>
 
-      {/* Karma Trail Overlay - rendered above everything */}
+      {/* Karma Trail Overlay — outside KeyboardAvoidingView so Android elevation works in Release APKs */}
       {karmaTrail && (
         <KarmaTrailOverlay
           key={karmaTrail.key}
@@ -437,7 +440,9 @@ const DashBoardPersonal: React.FC = () => {
           onAnimationEnd={() => setKarmaTrail(null)}
         />
       )}
-    </KeyboardAvoidingView>
+
+      <BottomBar />
+    </View>
   );
 };
 

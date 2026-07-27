@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, Dimensions, Text } from "react-native";
+import { View, StyleSheet, Dimensions, Text, Platform } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,6 +9,7 @@ import Animated, {
   withSpring,
   Easing,
   runOnJS,
+  ReduceMotion,
 } from "react-native-reanimated";
 import LogoKarma from "../../assets/logo_karma.svg";
 import { FONTS, COLORS } from "../../styles/theme";
@@ -34,6 +35,8 @@ interface ParticleConfig {
   size: number;
 }
 
+const REDUCE_MOTION_OPTS = { reduceMotion: ReduceMotion.Never } as const;
+
 const SingleParticle: React.FC<{
   config: ParticleConfig;
   startX: number;
@@ -49,26 +52,34 @@ const SingleParticle: React.FC<{
   const scale = useSharedValue(0.4);
 
   useEffect(() => {
-    opacity.value = withDelay(config.delay, withTiming(1, { duration: 80 }));
+    opacity.value = withDelay(
+      config.delay,
+      withTiming(1, { duration: 80, ...REDUCE_MOTION_OPTS })
+    );
+
     scale.value = withDelay(
       config.delay,
       withSequence(
-        withTiming(1.3, { duration: 120 }),
-        withTiming(0.8, { duration: 400 })
+        withTiming(1.3, { duration: 120, ...REDUCE_MOTION_OPTS }),
+        withTiming(0.8, { duration: 400, ...REDUCE_MOTION_OPTS })
       )
     );
 
     progress.value = withDelay(
       config.delay,
-      withTiming(1, { duration: 600, easing: Easing.bezier(0.25, 0.1, 0.25, 1) }, (finished) => {
-        if (finished) {
-          opacity.value = withTiming(0, { duration: 100 });
-          if (isLast) {
-            if (onImpact) runOnJS(onImpact)();
-            if (onAnimationEnd) runOnJS(onAnimationEnd)();
+      withTiming(
+        1,
+        { duration: 600, easing: Easing.bezier(0.25, 0.1, 0.25, 1), ...REDUCE_MOTION_OPTS },
+        (finished) => {
+          if (finished) {
+            opacity.value = withTiming(0, { duration: 100, ...REDUCE_MOTION_OPTS });
+            if (isLast) {
+              if (onImpact) runOnJS(onImpact)();
+              if (onAnimationEnd) runOnJS(onAnimationEnd)();
+            }
           }
         }
-      })
+      )
     );
   }, [config, isLast, onAnimationEnd, onImpact, opacity, progress, scale, startX, startY, targetX, targetY]);
 
@@ -78,8 +89,14 @@ const SingleParticle: React.FC<{
     const controlY = Math.min(startY, targetY) - 50 + config.arcFactorY;
 
     // Bezier formula: (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
-    const currentX = Math.pow(1 - p, 2) * startX + 2 * (1 - p) * p * controlX + Math.pow(p, 2) * targetX;
-    const currentY = Math.pow(1 - p, 2) * startY + 2 * (1 - p) * p * controlY + Math.pow(p, 2) * targetY;
+    const currentX =
+      Math.pow(1 - p, 2) * startX +
+      2 * (1 - p) * p * controlX +
+      Math.pow(p, 2) * targetX;
+    const currentY =
+      Math.pow(1 - p, 2) * startY +
+      2 * (1 - p) * p * controlY +
+      Math.pow(p, 2) * targetY;
 
     return {
       position: "absolute",
@@ -87,6 +104,9 @@ const SingleParticle: React.FC<{
       top: currentY - config.size / 2,
       opacity: opacity.value,
       transform: [{ scale: scale.value }],
+      // Elevation per-particle so each one renders above native layers on Android
+      elevation: Platform.OS === "android" ? 9999 : 0,
+      zIndex: 9999,
     };
   });
 
@@ -114,19 +134,19 @@ const ImpactFloatingText: React.FC<{
     opacity.value = withDelay(
       delay,
       withSequence(
-        withTiming(1, { duration: 150 }),
-        withDelay(700, withTiming(0, { duration: 300 }))
+        withTiming(1, { duration: 150, ...REDUCE_MOTION_OPTS }),
+        withDelay(700, withTiming(0, { duration: 300, ...REDUCE_MOTION_OPTS }))
       )
     );
 
     scale.value = withDelay(
       delay,
-      withSpring(1.2, { damping: 10, stiffness: 180 })
+      withSpring(1.2, { damping: 10, stiffness: 180, reduceMotion: ReduceMotion.Never })
     );
 
     translateY.value = withDelay(
       delay,
-      withTiming(-35, { duration: 1000, easing: Easing.out(Easing.cubic) })
+      withTiming(-35, { duration: 1000, easing: Easing.out(Easing.cubic), ...REDUCE_MOTION_OPTS })
     );
   }, [opacity, scale, translateY]);
 
@@ -137,6 +157,8 @@ const ImpactFloatingText: React.FC<{
       top: targetY - 15,
       transform: [{ translateY: translateY.value }, { scale: scale.value }],
       opacity: opacity.value,
+      zIndex: 99999,
+      elevation: Platform.OS === "android" ? 99999 : 0,
     };
   });
 
@@ -166,7 +188,10 @@ export const KarmaTrailOverlay: React.FC<KarmaTrailOverlayProps> = ({
   }, []);
 
   return (
-    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+    <View
+      style={styles.overlayContainer}
+      pointerEvents="none"
+    >
       {particles.map((p, idx) => (
         <SingleParticle
           key={idx}
@@ -190,6 +215,13 @@ export const KarmaTrailOverlay: React.FC<KarmaTrailOverlayProps> = ({
 };
 
 const styles = StyleSheet.create({
+  overlayContainer: {
+    ...StyleSheet.absoluteFillObject,
+    // Critical for Android Release builds: without elevation the overlay
+    // is rendered below native views and particles are invisible.
+    zIndex: 99999,
+    elevation: Platform.OS === "android" ? 99999 : 0,
+  },
   particleWrapper: {
     alignItems: "center",
     justifyContent: "center",
@@ -214,8 +246,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 6,
-    zIndex: 9999,
   },
   floatingBadgeText: {
     fontFamily: FONTS.bold,

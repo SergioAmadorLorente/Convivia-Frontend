@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withSequence,
+  ReduceMotion,
 } from "react-native-reanimated";
 import { COLORS, FONTS, SIZES } from "../../styles/theme";
 import { useTranslation } from "react-i18next";
@@ -16,6 +17,7 @@ interface HeaderProps {
   date: string | Date;   // Acepta string o Date
   location: string;
   karma?: number;
+  loadingKarma?: boolean;
   onKarmaLayout?: (coords: { x: number; y: number }) => void;
   isImpactAnimating?: boolean;
 }
@@ -50,6 +52,7 @@ const Header: React.FC<HeaderProps> = ({
   date,
   location,
   karma,
+  loadingKarma,
   onKarmaLayout,
   isImpactAnimating,
 }) => {
@@ -64,8 +67,8 @@ const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     if (isImpactAnimating) {
       karmaScale.value = withSequence(
-        withSpring(1.35, { damping: 8, stiffness: 200 }),
-        withSpring(1, { damping: 10, stiffness: 150 })
+        withSpring(1.35, { damping: 8, stiffness: 200, reduceMotion: ReduceMotion.Never }),
+        withSpring(1, { damping: 10, stiffness: 150, reduceMotion: ReduceMotion.Never })
       );
     }
   }, [isImpactAnimating, karmaScale]);
@@ -110,14 +113,23 @@ const Header: React.FC<HeaderProps> = ({
         <Text style={styles.location}>{location}</Text>
       )}
 
-      {typeof karma === "number" && (
+      {(loadingKarma || typeof karma === "number") && (
         <Animated.View
           ref={badgeRef}
           onLayout={measureBadge}
           style={[styles.karmaBadge, karmaAnimatedStyle]}
         >
-          <LogoKarma width={15} height={15} />
-          <Text style={styles.karmaText}>{karma} Karma</Text>
+          {loadingKarma ? (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, height: 18 }}>
+              <ActivityIndicator size="small" color={COLORS.primary} />
+              <Text style={[styles.karmaText, { color: "#888" }]}>{t("common.loading")}</Text>
+            </View>
+          ) : (
+            <>
+              <LogoKarma width={15} height={15} />
+              <Text style={styles.karmaText}>{karma} Karma</Text>
+            </>
+          )}
         </Animated.View>
       )}
     </View>
