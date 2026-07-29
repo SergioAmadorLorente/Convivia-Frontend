@@ -77,7 +77,7 @@ const TextField: React.FC<TextFieldProps> = ({
       <View style={[COMMON.INPUT_CONTAINER, error ? styles.inputError : null, { justifyContent: contenAlign, height: textAlign === 'center' ? moderateScale(60) : undefined }]}>
         <TextInput
           ref={textInputRef}
-          style={[COMMON.INPUT_BASE, { flex: 1, textAlign: textAlign, fontSize: fontSize || (textAlign === 'center' ? moderateScale(24) : SIZES.input), fontWeight: textAlign === 'center' ? '600' : 'normal', letterSpacing: textAlign === 'center' ? 4 : 0, paddingVertical: textAlign === 'center' ? moderateScale(12) : undefined }]}
+          style={[COMMON.INPUT_BASE, { flex: 1, textAlign: textAlign, fontSize: fontSize || (textAlign === 'center' ? moderateScale(24) : SIZES.input), fontWeight: textAlign === 'center' ? '600' : 'normal', letterSpacing: textAlign === 'center' ? 4 : 0, paddingVertical: textAlign === 'center' ? moderateScale(12) : undefined, color: COLORS.secondary }]}
           placeholder={placeholder}
           placeholderTextColor="rgba(0, 0, 0, 0.4)"
           keyboardType={keyboardType}

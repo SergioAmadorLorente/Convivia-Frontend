@@ -114,6 +114,7 @@ export const COMMON = {
     fontSize: SIZES.input,
     backgroundColor: COLORS.inputBackground,
     fontFamily: FONTS.regular,
+    color: COLORS.secondary,
   },
   INPUT_CONTAINER: {
     flexDirection: "row",

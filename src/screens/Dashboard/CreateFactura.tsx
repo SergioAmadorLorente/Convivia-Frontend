@@ -338,7 +338,7 @@ const CreateFactura: React.FC = () => {
                 nestedScrollEnabled
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
+                <View style={{ marginBottom: 15, alignItems: "center", width: "100%" }}>
                     <TextField
                         value={name}
                         onChangeText={(text: string) => setName(text)}
@@ -351,7 +351,7 @@ const CreateFactura: React.FC = () => {
                     />
                 </View>
 
-                <View style={{ width: "100%", gap: 20 }}>
+                <View style={{ width: "100%", gap: 10, }}>
                     <Desplegable
                         title={t('createInvoice.price')}
                         fontSize={SIZES.text16}
@@ -362,12 +362,15 @@ const CreateFactura: React.FC = () => {
                         <MoneyInput value={amount} onChange={(val) => setAmount(val)} />
                     </Desplegable>
 
+
                     <Desplegable
                         title={t('createInvoice.assignToCompanions')}
                         fontSize={SIZES.text16}
                         fontWeight="bold"
                         collapsible={false}
                         showIcon={false}
+                        lineStyle={{ marginBottom: 4 }}
+                        contentStyle={{ marginTop: -9 }}
                     >
                         <Button
                             style={[GLOBAL_STYLES.buttonSecondaryGrey, { marginBottom: 15 }]}
@@ -414,24 +417,26 @@ const CreateFactura: React.FC = () => {
                         )}
                     </Desplegable>
 
-                    <Desplegable
-                        title={t('createInvoice.photoOptional')}
-                        fontSize={SIZES.text16}
-                        fontWeight="bold"
-                        collapsible={false}
-                        showIcon={false}
-                    >
+                    <View style={{ marginTop: 5 }}>
+                        <Desplegable
+                            title={t('createInvoice.photoOptional')}
+                            fontSize={SIZES.text16}
+                            fontWeight="bold"
+                            collapsible={false}
+                            showIcon={false}
+                        >
 
-                        <UploadImage
-                            label={t('createInvoice.photoLabel')}
-                            initialImageUri={imageUri}
-                            editable={true}
-                            onImageSelected={(uri) => setImageUri(uri ?? undefined)}
-                        />
-                    </Desplegable>
+                            <UploadImage
+                                label={t('createInvoice.photoLabel')}
+                                initialImageUri={imageUri}
+                                editable={true}
+                                onImageSelected={(uri) => setImageUri(uri ?? undefined)}
+                            />
+                        </Desplegable>
+                    </View>
                 </View>
 
-                <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
+                <View style={{ width: "100%", marginTop: 5, alignItems: "center" }}>
 
 
                     <Button

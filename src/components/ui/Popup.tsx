@@ -65,6 +65,15 @@ const imageMap: Record<string, React.ElementType> = {
   goback: GobackSvg,
 };
 
+const cleanButtonStyle = (customStyle?: ViewStyle) => {
+  if (!customStyle) return {};
+  const flat = Array.isArray(customStyle)
+    ? Object.assign({}, ...customStyle)
+    : customStyle;
+  const { width, marginTop, alignSelf, ...rest } = flat;
+  return rest;
+};
+
 const Popup: React.FC<PopupProps> = ({
   visible,
   onClose,
@@ -195,7 +204,7 @@ const Popup: React.FC<PopupProps> = ({
           <View style={[styles.buttonsContainer, buttonsContainerStyle as any]}>
             {buttons.length === 1 ? (
               <TouchableOpacity
-                style={[styles.singleButton, buttons[0].style]}
+                style={[styles.singleButton, cleanButtonStyle(buttons[0].style)]}
                 onPress={handleButtonPress(buttons[0])}
               >
                 <Text style={[styles.buttonText, buttons[0].textStyle]}>{buttons[0].text}</Text>
@@ -207,8 +216,8 @@ const Popup: React.FC<PopupProps> = ({
                     key={idx}
                     style={[
                       styles.twoButton,
-                      idx === 0 ? { marginRight: 8 } : { marginLeft: 8 },
-                      btn.style,
+                      idx === 0 ? { marginRight: 6 } : { marginLeft: 6 },
+                      cleanButtonStyle(btn.style),
                     ]}
                     onPress={handleButtonPress(btn)}
                   >
@@ -309,24 +318,34 @@ const styles = StyleSheet.create({
   singleButton: {
     backgroundColor: "#E6ECDC",
     paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
     alignItems: "center",
+    justifyContent: "center",
+    minHeight: 44,
   },
   twoButtonsRow: {
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   twoButton: {
     flex: 1,
     backgroundColor: "#E6ECDC",
     paddingVertical: 10,
-    borderRadius: 8,
+    paddingHorizontal: 8,
+    borderRadius: 10,
     alignItems: "center",
+    justifyContent: "center",
+    minHeight: 44,
   },
   buttonText: {
     color: COLORS.primary,
     fontFamily: FONTS.bold,
+    fontSize: 13,
+    textAlign: "center",
+    includeFontPadding: false,
   },
 });
 

@@ -11,6 +11,7 @@ import {
 } from "@expo-google-fonts/montserrat";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import UpdateChecker from "./src/components/UpdateChecker";
 
 const App: React.FC = () => {
   const [fontsLoaded] = useFonts({
@@ -38,6 +39,7 @@ const App: React.FC = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <UserProvider>
         <ToastProvider position="top" maxToasts={3}>
+          <UpdateChecker />
           <AppNavigator />
         </ToastProvider>
       </UserProvider>

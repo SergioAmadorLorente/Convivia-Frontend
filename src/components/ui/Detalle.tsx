@@ -52,6 +52,7 @@ type Props =
     onClose: () => void;
     onEliminar: () => void;
     isCurrentUser?: boolean;
+    isAdmin?: boolean;
   };
 
 const Detalle: React.FC<Props> = (props) => {
@@ -76,7 +77,7 @@ const Detalle: React.FC<Props> = (props) => {
 
   // ---- PARTICIPANTE ----
   if (props.kind === "participante") {
-    const { participant, participantRelacion, residenciaName, onEliminar, isCurrentUser = false } = props;
+    const { participant, participantRelacion, residenciaName, onEliminar, isCurrentUser = false, isAdmin = true } = props;
 
     // Obtener karma del participante (viene del hook actualizado)
     const karmaPoints = participant?.karmaTotal ?? 0;
@@ -157,22 +158,26 @@ const Detalle: React.FC<Props> = (props) => {
                 GLOBAL_STYLES.buttonSecondaryGrey,
                 styles.deleteButtonFull,
                 {
-                  backgroundColor: isCurrentUser ? '#E5E5E5' : '#D9D9D9',
+                  backgroundColor: (isCurrentUser || !isAdmin) ? '#E5E5E5' : '#D9D9D9',
                   marginTop: HELPERS.hp("1%"),
-                  opacity: isCurrentUser ? 0.5 : 1
+                  opacity: (isCurrentUser || !isAdmin) ? 0.5 : 1
                 }
               ]}
               activeOpacity={0.85}
               onPress={onEliminar}
-              disabled={isCurrentUser}
+              disabled={isCurrentUser || !isAdmin}
             >
               <Text
                 style={[
                   GLOBAL_STYLES.textoBoton,
-                  { color: isCurrentUser ? '#999' : COLORS.error }
+                  { color: (isCurrentUser || !isAdmin) ? '#999' : COLORS.error }
                 ]}
               >
-                {isCurrentUser ? t('myResidence.errors.cannotRemoveSelf') : t('myResidence.removeParticipant')}
+                {isCurrentUser
+                  ? t('myResidence.errors.cannotRemoveSelf')
+                  : !isAdmin
+                  ? t('myResidence.errors.notAdminToKick')
+                  : t('myResidence.removeParticipant')}
               </Text>
             </TouchableOpacity>
           </View>

@@ -414,7 +414,9 @@
         "ofKarma": "de karma",
         "statsTitle": "Statistiques",
         "karmaKing": "Roi du Karma",
-        "taskStatus": "État des tâches"
+        "taskStatus": "État des tâches",
+        "infoModalTitle": "Points Karma",
+        "infoModalDescription": "Les points Karma servent à indiquer quel utilisateur a accompli le plus de tâches à temps et à le transformer en Roi du Karma."
     },
     "myResidence": {
         "title": "Mes Résidences",
@@ -432,7 +434,8 @@
             "memberNotFound": "Vos informations de membre sont introuvables.",
             "leaveError": "Une erreur est survenue lors de la tentative de quitter la résidence.",
             "deleteError": "Une erreur est survenue lors de la suppression de la résidence.",
-            "cannotRemoveSelf": "Vous ne pouvez pas vous supprimer vous-même."
+            "cannotRemoveSelf": "Vous ne pouvez pas vous supprimer vous-même.",
+            "notAdminToKick": "Vous devez être administrateur pour expulser"
         },
         "toasts": {
             "getMemberError": "Erreur lors de la récupération des données du participant",
@@ -589,5 +592,9 @@
         "section4Body": "Convivia se réserve le droit de modifier les présentes conditions à tout moment. Les modifications prennent effet dès leur publication sur la plateforme. La poursuite de votre utilisation de Convivia vaut acceptation de ces modifications.",
         "section5Title": "Nous contacter",
         "section5Body": "Si vous avez des questions concernant ces conditions générales, veuillez nous contacter via nos canaux d'assistance."
+    },
+    "updates": {
+        "downloading": "L'application a une nouvelle mise à jour, téléchargement...",
+        "restarting": "Application mise à jour, redémarrage de l'application dans 5 secondes..."
     }
 }

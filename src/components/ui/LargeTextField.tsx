@@ -46,8 +46,9 @@ const LargeTextField: React.FC<LargeTextFieldProps> = ({
 
             <View style={[COMMON.INPUT_CONTAINER, { height: 90, }, error ? styles.inputError : null]}>
                 <TextInput
-                    style={[COMMON.INPUT_BASE, { flex: 1, height: moderateScale(80), textAlignVertical: "top" }]}
+                    style={[COMMON.INPUT_BASE, { flex: 1, height: moderateScale(80), textAlignVertical: "top", color: COLORS.secondary }]}
                     placeholder={placeholder}
+                    placeholderTextColor="rgba(0, 0, 0, 0.4)"
                     keyboardType={keyboardType}
                     autoCapitalize={
                         keyboardType === "email-address" ? "none" : "sentences"

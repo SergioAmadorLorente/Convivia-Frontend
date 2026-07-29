@@ -11,6 +11,7 @@ import TaskModel from "../types/Task";
 import type { PlantillaTarea, Tarea } from "../types/Task";
 import FacturaModel from "../types/Factura";
 import { obtenerFacturasPorDeudor } from "../api/factura";
+import { obtenerKarmaUsuario } from "../api/karma";
 
 export const useDashboardData = (newSpaceName?: string) => {
   const { user, authLoading } = useAuthListenerFull();
@@ -21,6 +22,7 @@ export const useDashboardData = (newSpaceName?: string) => {
   const [espacioId, setEspacioId] = useState<string | null>(null);
   const [userRelacionId, setUserRelacionId] = useState<string | null>(null);
   const [currentKarma, setCurrentKarma] = useState<number>(0);
+  const [loadingKarma, setLoadingKarma] = useState<boolean>(true);
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
   const [userNamesMap, setUserNamesMap] = useState<Record<string, string>>({});
   const [tareas, setTareas] = useState<TaskModel[]>([]);
@@ -59,9 +61,10 @@ export const useDashboardData = (newSpaceName?: string) => {
             setEspacioId(result.espacioId);
             tieneEspacio = true;
 
-            setUserRelacionId(result.id || result.id_UsuarioEspacio);
+            const relId = result.id || result.id_UsuarioEspacio;
+            setUserRelacionId(relId);
 
-            setCurrentKarma(result.karma || 0);
+            cargarKarma(result.espacioId, relId);
 
             try {
               const espacioData = await obtenerEspacioPorId(result.espacioId);
@@ -182,6 +185,32 @@ export const useDashboardData = (newSpaceName?: string) => {
     userNamesMapRef.current = userNamesMap;
   }, [userNamesMap]);
 
+  const userRelacionIdRef = useRef(userRelacionId);
+  useEffect(() => {
+    userRelacionIdRef.current = userRelacionId;
+  }, [userRelacionId]);
+
+  const cargarKarma = async (targetEspacioId?: string, targetRelacionId?: string, showLoading = false) => {
+    const currentEspacioId = targetEspacioId || espacioId || espacioIdRef.current;
+    const currentRelacionId = targetRelacionId || userRelacionId || userRelacionIdRef.current;
+    if (!currentEspacioId || !currentRelacionId) {
+      setLoadingKarma(false);
+      return;
+    }
+
+    if (showLoading) setLoadingKarma(true);
+    try {
+      const karmaData = await obtenerKarmaUsuario(currentEspacioId, currentRelacionId);
+      if (karmaData && typeof karmaData.karmaTotal === "number") {
+        setCurrentKarma(karmaData.karmaTotal);
+      }
+    } catch (err) {
+      // console.error("Error al cargar karma:", err);
+    } finally {
+      setLoadingKarma(false);
+    }
+  };
+
   const cargarFacturas = async (showLoading = true) => {
     const currentEspacioId = espacioIdRef.current;
     const currentUser = userRef.current;
@@ -212,23 +241,27 @@ export const useDashboardData = (newSpaceName?: string) => {
           const deudoresDict = f.deudores || f.Deudores || {};
           const relIds = Object.keys(deudoresDict);
 
-          const userNames = relIds.map((relId: string) => {
-            const cleanedRelId = cleanId(relId);
-            // Buscar en el mapa usando el ID limpio
-            const nameKey = Object.keys(userNamesMapRef.current).find(
-              (k) => cleanId(k) === cleanedRelId,
-            );
+          const userNames = relIds
+            .map((relId: string) => {
+              const cleanedRelId = cleanId(relId);
+              // Buscar en el mapa usando el ID limpio
+              const nameKey = Object.keys(userNamesMapRef.current).find(
+                (k) => cleanId(k) === cleanedRelId,
+              );
 
-            return {
-              id: relId,
-              name: nameKey
-                ? userNamesMapRef.current[nameKey]
-                : f.nombresDeudores?.[relId] ||
-                `Usuario (${relId.slice(0, 4)})`,
-              // en deudores: true = pendiente (no pagado), false = pagado
-              completed: deudoresDict[relId] === false,
-            };
-          });
+              if (!nameKey) {
+                // Si el usuario fue expulsado o abandonó el espacio, no pertenece a la residencia
+                return null;
+              }
+
+              return {
+                id: relId,
+                name: userNamesMapRef.current[nameKey],
+                // en deudores: true = pendiente (no pagado), false = pagado
+                completed: deudoresDict[relId] === false,
+              };
+            })
+            .filter((u): u is NonNullable<typeof u> => u !== null);
 
           return new FacturaModel({
             IdFactura: f.id || f.Id || f.IdFactura || "",
@@ -273,9 +306,10 @@ export const useDashboardData = (newSpaceName?: string) => {
         currentNamesMap = await cargarNombresUsuario(currentEspacioId);
       }
 
-      // Paralelizar carga de tareas y facturas de forma sincronizada
+      // Paralelizar carga de tareas, facturas y karma de forma sincronizada
       await Promise.all([
         cargarFacturas(showLoading),
+        cargarKarma(currentEspacioId),
         (async () => {
           const tareasRaw = await obtenerTareasPorEspacio(currentEspacioId);
           if (!Array.isArray(tareasRaw)) return;
@@ -433,6 +467,7 @@ export const useDashboardData = (newSpaceName?: string) => {
     userRelacionId,
     currentKarma,
     setCurrentKarma,
+    loadingKarma,
     loadingEspacio,
     userNamesMap,
     tareas,

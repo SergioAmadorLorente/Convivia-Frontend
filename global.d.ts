@@ -17,3 +17,5 @@ interface HTMLElement {
  scrollTop?: number;
  getBoundingClientRect?: any;
 }
+
+declare module 'expo-updates';

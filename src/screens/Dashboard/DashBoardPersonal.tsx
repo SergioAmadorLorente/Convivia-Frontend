@@ -35,6 +35,7 @@ import Detalle from "../../components/ui/Detalle";
 import { useDashboardData } from "../../hooks/useDashboardData";
 import { useDashboardActions, useQuickToggleFactura } from "../../hooks/useDashboardActions";
 import { useToast } from "../../hooks/useToast";
+import { KarmaTrailOverlay } from "../../components/ui/KarmaTrailOverlay";
 
 const { hp } = HELPERS;
 
@@ -53,6 +54,7 @@ const DashBoardPersonal: React.FC = () => {
     userRelacionId,
     currentKarma,
     setCurrentKarma,
+    loadingKarma,
     loadingEspacio,
     userNamesMap,
     tareas,
@@ -84,6 +86,21 @@ const DashBoardPersonal: React.FC = () => {
   const showPopup = (opts: any) => { setPopupOptions(opts); setPopupVisible(true); };
   const handleClosePopup = () => setPopupVisible(false);
 
+  // -- Karma Trail Animation State --
+  const [karmaTrail, setKarmaTrail] = useState<{ x: number; y: number; amount: number; key: number } | null>(null);
+  const [karmaTargetCoords, setKarmaTargetCoords] = useState<{ x: number; y: number }>({ x: 200, y: 90 });
+  const [headerImpactAnimating, setHeaderImpactAnimating] = useState(false);
+
+  const handleTaskCompletedOnTime = (startCoords: { x: number; y: number }, karmaAmount: number) => {
+    setKarmaTrail({ x: startCoords.x, y: startCoords.y, amount: karmaAmount, key: Date.now() });
+  };
+
+  const handleKarmaImpact = () => {
+    setHeaderImpactAnimating(true);
+    setTimeout(() => setHeaderImpactAnimating(false), 600);
+    setKarmaTrail(null);
+  };
+
   const [detalleVisible, setDetalleVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
   const [selectedFactura, setSelectedFactura] = useState<FacturaModel | null>(null);
@@ -109,6 +126,7 @@ const DashBoardPersonal: React.FC = () => {
     CURRENT_USER_ID,
     activeTab,
     openDetalleTarea,
+    onTaskCompletedOnTime: handleTaskCompletedOnTime,
   });
 
   const { handleQuickToggleFactura } = useQuickToggleFactura(facturas, setFacturas, userRelacionId, espacioId, CURRENT_USER_ID);
@@ -239,12 +257,21 @@ const DashBoardPersonal: React.FC = () => {
   const fmtEUR = (n: number) => new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(n || 0);
 
   return (
+    <View style={{ flex: 1 }}>
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
-      <Header username={userName} date={new Date()} location={espacioNombre} />
+      <Header
+        username={userName}
+        date={new Date()}
+        location={espacioNombre}
+        karma={currentKarma}
+        loadingKarma={loadingKarma}
+        onKarmaLayout={(coords) => setKarmaTargetCoords(coords)}
+        isImpactAnimating={headerImpactAnimating}
+      />
       <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
 
       <ScrollView
@@ -307,7 +334,7 @@ const DashBoardPersonal: React.FC = () => {
                     subtitle={activeTab === "tareas" ? item.usuarioAsignado || undefined : undefined}
                     unassigned={activeTab === "tareas" ? !item.usuarioAsignado : undefined}
                     isCompleted={activeTab === "tareas" ? item.isCompleted : isFacturaPaidByMe(item)}
-                    onToggle={() => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura)}
+                    onToggle={(coords) => handleToggleTask(activeTab === "tareas" ? item.id : item.IdFactura, coords)}
                     onQuickToggle={activeTab === "facturas" ? () => handleQuickToggleFactura(item.IdFactura) : undefined}
                     onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                     time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
@@ -398,8 +425,24 @@ const DashBoardPersonal: React.FC = () => {
         />
       )}
 
-      <BottomBar />
     </KeyboardAvoidingView>
+
+      {/* Karma Trail Overlay — outside KeyboardAvoidingView so Android elevation works in Release APKs */}
+      {karmaTrail && (
+        <KarmaTrailOverlay
+          key={karmaTrail.key}
+          startX={karmaTrail.x}
+          startY={karmaTrail.y}
+          targetX={karmaTargetCoords.x}
+          targetY={karmaTargetCoords.y}
+          karmaAmount={karmaTrail.amount}
+          onImpact={handleKarmaImpact}
+          onAnimationEnd={() => setKarmaTrail(null)}
+        />
+      )}
+
+      <BottomBar />
+    </View>
   );
 };
 
