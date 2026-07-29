@@ -71,7 +71,7 @@ const Detalle: React.FC<Props> = (props) => {
           onClose();
         }
       },
-      onPanResponderTerminate: () => {},
+      onPanResponderTerminate: () => { },
     })
   ).current;
 
@@ -141,8 +141,8 @@ const Detalle: React.FC<Props> = (props) => {
               </View>
             </View>
 
-            {/* Gráfico de Tareas */}
-            <View style={styles.section}>
+            {/* Gráfico de Tareas LO OCULTO POR AHORA */}
+            {/* <View style={styles.section}>
               <Text style={[styles.sectionLabel, { color: '#6B705C' }]}>
                 {t('myKarma.taskStatus')}
               </Text>
@@ -150,7 +150,7 @@ const Detalle: React.FC<Props> = (props) => {
                 completedTasks={tareasCompletadas || 0}
                 lateTasks={tareasFueraPlazo || 0}
               />
-            </View>
+            </View> */}
 
             {/* Botón Eliminar */}
             <TouchableOpacity
@@ -176,8 +176,8 @@ const Detalle: React.FC<Props> = (props) => {
                 {isCurrentUser
                   ? t('myResidence.errors.cannotRemoveSelf')
                   : !isAdmin
-                  ? t('myResidence.errors.notAdminToKick')
-                  : t('myResidence.removeParticipant')}
+                    ? t('myResidence.errors.notAdminToKick')
+                    : t('myResidence.removeParticipant')}
               </Text>
             </TouchableOpacity>
           </View>

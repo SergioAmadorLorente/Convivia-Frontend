@@ -18,6 +18,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { useAuthListener } from '../../../hooks/useAuthListener';
 import { obtenerUsuarioPorId, actualizarUsuario } from '../../../api/usuario';
+import { useProfilePhoto } from '../../../hooks/useProfilePhoto';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import useLoadFonts from '../../../hooks/useLoadFonts';
@@ -37,6 +38,7 @@ const EditarPerfil = () => {
 	const navigation = useNavigation<any>();
 	const currentUser = useAuthListener();
 	const { t } = useTranslation();
+	const { photoUri, savePhoto } = useProfilePhoto(currentUser?.uid);
 	const [dbPassword, setDbPassword] = useState('');
 	const [foto, setFoto] = useState<string | null>(null);
 	const [nombre, setNombre] = useState('');
@@ -90,7 +92,6 @@ const EditarPerfil = () => {
 						setTelefono(userData.telefono || userData.Telefono || '');
 						setCorreo(userData.email || userData.Email || '');
 						setDbPassword(userData.password || userData.Password || '');
-						// Si tienes lógica para la foto, añádela aquí
 					}
 				} catch (error) {
 					// console.error("Error cargando perfil:", error);
@@ -102,6 +103,11 @@ const EditarPerfil = () => {
 		loadUserData();
 	}, [currentUser]);
 
+	// Sincroniza la foto cuando el hook la carga desde AsyncStorage
+	useEffect(() => {
+		if (photoUri) setFoto(photoUri);
+	}, [photoUri]);
+
 	if (!fontsLoaded) {
 		return null;
 	}
@@ -112,7 +118,9 @@ const EditarPerfil = () => {
 			quality: 1,
 		});
 		if (!result.canceled && result.assets && result.assets.length > 0) {
-			setFoto(result.assets[0].uri);
+			const uri = result.assets[0].uri;
+			setFoto(uri);
+			await savePhoto(uri); // Persiste en AsyncStorage
 		}
 	};
 

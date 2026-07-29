@@ -596,5 +596,13 @@
   "updates": {
     "downloading": "The app has a new update, downloading...",
     "restarting": "App updated, restarting app in 5 seconds..."
+  },
+  "taskCompletion": {
+    "toastOverdue": "Task completed late! (+0 karma)",
+    "toastOnTime": "Task completed! +{{karma}} karma",
+    "popupOverdueTitle": "Almost there!",
+    "popupOnTimeTitle": "Congratulations!",
+    "popupOverdueDesc": "You earned 0 Karma points.",
+    "popupOnTimeDesc": "You earned {{karma}} Karma points."
   }
 }
