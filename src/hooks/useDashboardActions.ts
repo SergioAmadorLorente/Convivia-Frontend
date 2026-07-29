@@ -26,7 +26,7 @@ interface ActionsProps {
   CURRENT_USER_ID: string;
   activeTab: string;
   openDetalleTarea: (t: TaskModel) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
   onTaskCompletedOnTime?: (coords: { x: number; y: number }, karmaAmount: number) => void;
 }
 
@@ -163,19 +163,19 @@ export const useDashboardActions = ({
         showToast({
           entity: "tarea",
           name: wasOverdue
-            ? `¡Tarea completada fuera de plazo! (+0 karma)`
-            : `¡Tarea completada! +${task.karma} karma`,
+            ? t("taskCompletion.toastOverdue")
+            : t("taskCompletion.toastOnTime", { karma: task.karma }),
           tone: (wasOverdue ? "warning" : "success") as Tone,
           autoHideMs: 3000,
         });
       } else {
         showPopup({
           imageType: "happy",
-          title: wasOverdue ? "¡Casi lo logras!" : "¡Felicidades!",
+          title: wasOverdue ? t("taskCompletion.popupOverdueTitle") : t("taskCompletion.popupOnTimeTitle"),
           description: wasOverdue
-            ? "Has ganado 0 puntos de Karma."
-            : `Has ganado ${task.karma} puntos de Karma.`,
-          buttons: [{ text: "Aceptar" }],
+            ? t("taskCompletion.popupOverdueDesc")
+            : t("taskCompletion.popupOnTimeDesc", { karma: task.karma }),
+          buttons: [{ text: t("common.accept") }],
         });
       }
 

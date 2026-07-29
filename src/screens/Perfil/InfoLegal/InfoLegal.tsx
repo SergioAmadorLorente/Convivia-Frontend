@@ -35,9 +35,7 @@ const InfoLegal: React.FC = () => {
                             {t('infoLegal.privacyButton')}
                         </Button>
                     </View>
-                    <Text style={{ marginTop: 150, width: "100%", marginRight: -300, bottom: 100, alignItems: "center", color: "green" }}>
-                        {"v3.8.50 APKDynamic"}
-                    </Text>
+
                 </View>
             </ScrollView>
             <BottomBar />

@@ -8,6 +8,7 @@ import {
   Platform,
   ActivityIndicator,
   Modal,
+  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "firebase/auth";
@@ -31,6 +32,7 @@ import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
 import { useToast } from "../../hooks/useToast";
+import { useProfilePhoto } from "../../hooks/useProfilePhoto";
 
 // Import SVG Assets
 import LogoKarma from "../../assets/logo_karma.svg";
@@ -50,6 +52,7 @@ const Perfil: React.FC = () => {
   const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
   const [userKarma, setUserKarma] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const { photoUri } = useProfilePhoto(user?.uid);
 
   // Easter egg: tap title 6 times
   const { show: showToast } = useToast();
@@ -176,9 +179,16 @@ const Perfil: React.FC = () => {
         {/* User Card */}
         <View style={styles.userCard}>
           <View style={styles.userInfoRow}>
-            {/* Avatar Placeholder */}
+            {/* Avatar */}
             <View style={styles.avatarContainer}>
-              <Ionicons name="person-outline" size={30} color={COLORS.primary} />
+              {photoUri ? (
+                <Image
+                  source={{ uri: photoUri }}
+                  style={{ width: 60, height: 60, borderRadius: 30 }}
+                />
+              ) : (
+                <Ionicons name="person-outline" size={30} color={COLORS.primary} />
+              )}
             </View>
 
             {/* User Details */}
@@ -276,6 +286,9 @@ const Perfil: React.FC = () => {
             onPress={() => setModalVisible(true)}
             icon={<LogoutSinFondo width={24} height={24} />}
           />
+          <Text style={{ textAlign: "right", color: "green", fontSize: 11, marginTop: 4, paddingRight: 12, opacity: 0.7 }}>
+            {"v3.8.53 APKDynamic"}
+          </Text>
 
         </View>
       </View>
