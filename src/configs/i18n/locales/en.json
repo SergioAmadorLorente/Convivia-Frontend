@@ -453,6 +453,11 @@
       "removeTitleWithName": "Are you sure you want to remove {{name}}?",
       "removeDescription": "They will be removed from the residence and lose access to all shared data.",
       "removeConfirm": "Remove"
+    },
+    "transferAdmin": {
+      "title": "Assign a new administrator",
+      "description": "You are the residence administrator. Before leaving, you must assign the admin role to another member.",
+      "confirm": "Assign & leave"
     }
   },
   "editResidence": {

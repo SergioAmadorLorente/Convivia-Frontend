@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  Modal,
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -29,7 +30,7 @@ import { useAuthListener } from "../../../hooks/useAuthListener";
 import { useUser } from "../../../hooks";
 import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
-import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio } from "../../../api/usuarioEspacio";
+import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio, actualizarUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
 import { obtenerTareasPorEspacio, eliminarTarea, obtenerDetalleTareaInstancia } from "../../../api/tarea";
 import { obtenerFacturasPorEspacio, editarFactura, FacturaPayload } from "../../../api/factura";
@@ -270,6 +271,9 @@ const MiResidencia: React.FC = () => {
   const [selectedParticipantRelacion, setSelectedParticipantRelacion] = useState<any>(null);
   const [isEliminandoParticipante, setIsEliminandoParticipante] = useState(false);
   const [userRol, setUserRol] = useState<string | null>(null);
+  // Transfer-admin flow
+  const [isTransferAdminOpen, setIsTransferAdminOpen] = useState(false);
+  const [newAdminCandidate, setNewAdminCandidate] = useState<any>(null);
   const { show: showToast } = useToast();
 
   const isAdmin =
@@ -283,7 +287,38 @@ const MiResidencia: React.FC = () => {
 
   const handleAbandonarResidencia = () => {
     if (!user || !residenciaData) return;
+
+    // Si el usuario es admin y hay otros miembros, debe transferir el rol antes de salir
+    const otrosMiembros = participants.filter(
+      (p: any) => p.id !== user.uid && p.id !== userData?.id
+    );
+    if (isAdmin && otrosMiembros.length > 0) {
+      setNewAdminCandidate(null);
+      setIsTransferAdminOpen(true);
+      return;
+    }
+
+    // Sin otros miembros o no es admin: salir directamente
     setIsAbandonPopupOpen(true);
+  };
+
+  const confirmTransferirAdmin = async () => {
+    if (!newAdminCandidate || !residenciaData?.id) return;
+    try {
+      // Obtener la relación UsuarioEspacio del candidato para actualizar su rol
+      const relacion = await obtenerRelacionUsuarioEspacio(newAdminCandidate.id, residenciaData.id);
+      if (!relacion?.id) {
+        Alert.alert(t('common.error'), t('myResidence.errors.memberNotFound'));
+        return;
+      }
+      await actualizarUsuarioEspacio(relacion.id, { rol: 'admin' });
+      setIsTransferAdminOpen(false);
+      setNewAdminCandidate(null);
+      // Ahora sí puede abrir el popup de abandonar
+      setIsAbandonPopupOpen(true);
+    } catch {
+      Alert.alert(t('common.error'), t('myResidence.errors.leaveError'));
+    }
   };
 
   const confirmAbandonarResidencia = async () => {
@@ -299,6 +334,24 @@ const MiResidencia: React.FC = () => {
         }
 
         await eliminarUsuarioEspacio(relacion.id);
+
+        // 2. Comprobar si quedan más miembros en la residencia
+        // Si era el último, eliminar el espacio para que no quede vacío
+        if (relacion.espacioId) {
+          try {
+            const todasRelaciones = await obtenerUsuarioEspacios();
+            const miembrosRestantes = Array.isArray(todasRelaciones)
+              ? todasRelaciones.filter((r: any) => r.espacioId === relacion.espacioId)
+              : [];
+            if (miembrosRestantes.length === 0) {
+              await eliminarEspacio(relacion.espacioId);
+              console.log('[MiResidencia] Residencia eliminada por quedarse sin miembros.');
+            }
+          } catch {
+            // Si falla la comprobación no bloqueamos al usuario
+          }
+        }
+
         setIsAbandonPopupOpen(false);
         // Redirigir a Bienvenida para que pueda crear o unirse a otra residencia
         navigation.reset({
@@ -606,16 +659,18 @@ const MiResidencia: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={handleEliminarResidencia}
-                >
-                  <Text
-                    style={[styles.actionButtonText, { color: COLORS.error }]}
+                {isAdmin && (
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={handleEliminarResidencia}
                   >
-                    {t('myResidence.deleteResidence')}
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      style={[styles.actionButtonText, { color: COLORS.error }]}
+                    >
+                      {t('myResidence.deleteResidence')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </Animated.View>
           </View>
@@ -623,6 +678,111 @@ const MiResidencia: React.FC = () => {
       </ScrollView>
 
       <BottomBar />
+
+      {/* Modal: seleccionar nuevo admin antes de abandonar */}
+      <Modal
+        visible={isTransferAdminOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsTransferAdminOpen(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 24,
+        }}>
+          <View style={{
+            backgroundColor: COLORS.background,
+            borderRadius: 16,
+            padding: 24,
+            width: '100%',
+            maxWidth: 400,
+          }}>
+            <Text style={{
+              fontFamily: FONTS.bold,
+              fontSize: 18,
+              color: COLORS.primary,
+              marginBottom: 8,
+            }}>
+              {t('myResidence.transferAdmin.title')}
+            </Text>
+            <Text style={{
+              fontFamily: FONTS.regular,
+              fontSize: 14,
+              color: '#666',
+              marginBottom: 20,
+            }}>
+              {t('myResidence.transferAdmin.description')}
+            </Text>
+
+            <ScrollView style={{ maxHeight: 240 }} showsVerticalScrollIndicator={false}>
+              {participants
+                .filter((p: any) => p.id !== user?.uid && p.id !== userData?.id)
+                .map((p: any) => {
+                  const selected = newAdminCandidate?.id === p.id;
+                  return (
+                    <TouchableOpacity
+                      key={p.id}
+                      onPress={() => setNewAdminCandidate(p)}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        padding: 12,
+                        borderRadius: 10,
+                        marginBottom: 8,
+                        backgroundColor: selected ? '#E6ECDC' : '#F5F5F5',
+                        borderWidth: selected ? 1.5 : 0,
+                        borderColor: selected ? COLORS.accent : 'transparent',
+                      }}
+                    >
+                      <View style={{
+                        width: 36, height: 36, borderRadius: 18,
+                        backgroundColor: selected ? COLORS.accent : '#D0D0D0',
+                        justifyContent: 'center', alignItems: 'center',
+                        marginRight: 12,
+                      }}>
+                        <Ionicons name="person" size={18} color={selected ? '#fff' : COLORS.primary} />
+                      </View>
+                      <Text style={{
+                        fontFamily: FONTS.bold,
+                        fontSize: 15,
+                        color: COLORS.primary,
+                        flex: 1,
+                      }}>
+                        {p.nombre || p.email || 'Usuario'}
+                      </Text>
+                      {selected && (
+                        <Ionicons name="checkmark-circle" size={20} color={COLORS.accent} />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+            </ScrollView>
+
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
+              <TouchableOpacity
+                onPress={() => { setIsTransferAdminOpen(false); setNewAdminCandidate(null); }}
+                style={[GLOBAL_STYLES.buttonSecondaryGrey, { flex: 1, paddingVertical: 12 }]}
+              >
+                <Text style={{ fontFamily: FONTS.regular, color: COLORS.primary, textAlign: 'center' }}>
+                  {t('common.cancel')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmTransferirAdmin}
+                disabled={!newAdminCandidate}
+                style={[GLOBAL_STYLES.buttonPrimaryGreen, { flex: 1, paddingVertical: 12, opacity: newAdminCandidate ? 1 : 0.4 }]}
+              >
+                <Text style={{ fontFamily: FONTS.bold, color: COLORS.primary, textAlign: 'center' }}>
+                  {t('myResidence.transferAdmin.confirm')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <Popup
         visible={isAbandonPopupOpen}

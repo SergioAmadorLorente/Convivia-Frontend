@@ -453,6 +453,11 @@
             "removeTitleWithName": "Êtes-vous sûr de vouloir supprimer {{name}} ?",
             "removeDescription": "Cette personne sera retirée de la résidence et perdra l'accès à toutes les données partagées.",
             "removeConfirm": "Supprimer"
+        },
+        "transferAdmin": {
+            "title": "Désigner un nouvel administrateur",
+            "description": "Vous êtes l'administrateur de la résidence. Avant de partir, vous devez attribuer le rôle d'admin à un autre membre.",
+            "confirm": "Désigner & partir"
         }
     },
     "editResidence": {

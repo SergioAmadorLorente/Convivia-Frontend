@@ -453,6 +453,11 @@
             "removeTitleWithName": "Möchtest du {{name}} wirklich entfernen?",
             "removeDescription": "Der Teilnehmer wird aus der Wohnung entfernt und verliert den Zugriff auf alle gemeinsamen Daten.",
             "removeConfirm": "Entfernen"
+        },
+        "transferAdmin": {
+            "title": "Neuen Administrator bestimmen",
+            "description": "Du bist der Administrator der Wohnung. Bevor du gehst, musst du die Admin-Rolle an ein anderes Mitglied übertragen.",
+            "confirm": "Bestimmen & verlassen"
         }
     },
     "editResidence": {
