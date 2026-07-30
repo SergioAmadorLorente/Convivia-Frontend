@@ -286,8 +286,8 @@ const Perfil: React.FC = () => {
             onPress={() => setModalVisible(true)}
             icon={<LogoutSinFondo width={24} height={24} />}
           />
-          <Text style={{ textAlign: "right", color: "green", fontSize: 11, marginTop: 4, paddingRight: 12, opacity: 0.7 }}>
-            {"v3.8.53 APKDynamic"}
+          <Text style={{ textAlign: "right", color: "green", fontSize: 11, marginTop: 3, paddingRight: 12, opacity: 0.7 }}>
+            {"v3.8.56 APKDynamic"}
           </Text>
 
         </View>

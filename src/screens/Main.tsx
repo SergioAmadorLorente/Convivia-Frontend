@@ -104,7 +104,7 @@ const Main: React.FC = () => {
         }}>
           <Logo />
         </Animated.View>
-        
+
         <View style={{
           position: "absolute",
           bottom: 80,
@@ -144,7 +144,18 @@ const Main: React.FC = () => {
 
       <Button
         style={GLOBAL_STYLES.buttonPrimaryGreen}
-        onPress={() => navigation.navigate("CrearCuenta")}
+        onPress={() => {
+          // Ya que el back tarda en levantarse no queiro que se itnente levantar con la petiion de crear cuenta o muy probable de error de creacion de usuasrio o se cree mal
+          fetch('https://convivia-backend-1ytr.onrender.com/health', {
+            method: 'GET',
+            headers: { accept: '*/*' },
+          })
+            .then((res) => res.text())
+            .then((text) => console.log('[Backend health]', text))
+            .catch((err) => console.log('[Backend health] error:', err));
+
+          navigation.navigate("CrearCuenta");
+        }}
       >
         {t('main.createAccount')}
       </Button>

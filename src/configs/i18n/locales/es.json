@@ -453,6 +453,11 @@
       "removeTitleWithName": "¿Estás seguro de que quieres eliminar a {{name}}?",
       "removeDescription": "Se eliminará de la residencia y perderá acceso a todos los datos compartidos.",
       "removeConfirm": "Eliminar"
+    },
+    "transferAdmin": {
+      "title": "Asigna un nuevo administrador",
+      "description": "Eres el administrador de la residencia. Antes de irte, debes asignar el rol de admin a otro miembro.",
+      "confirm": "Asignar y salir"
     }
   },
   "editResidence": {
