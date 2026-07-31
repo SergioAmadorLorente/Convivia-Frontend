@@ -262,7 +262,14 @@ const EditarPerfil = () => {
 				{/* Avatar Container */}
 				<TouchableOpacity style={editarPerfilStyles.avatarWrapper} onPress={pickImage}>
 					{foto ? (
-						<Image source={{ uri: foto }} style={editarPerfilStyles.foto} />
+						<Image
+							source={{ uri: foto }}
+							style={editarPerfilStyles.foto}
+							onError={() => {
+								console.warn('[EditarPerfil] Error al cargar imagen:', foto);
+								setFoto(null);
+							}}
+						/>
 					) : (
 						<View style={editarPerfilStyles.fotoPlaceholder}>
 							<Perfilicono width={100} height={100} />
