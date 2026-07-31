@@ -17,8 +17,9 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import { useAuthListener } from '../../../hooks/useAuthListener';
-import { obtenerUsuarioPorId, actualizarUsuario } from '../../../api/usuario';
+import { obtenerUsuarioPorId, actualizarUsuario, subirFotoUsuario, getFullFotoUrl } from '../../../api/usuario';
 import { useProfilePhoto } from '../../../hooks/useProfilePhoto';
+import { useUser } from '../../../hooks';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import useLoadFonts from '../../../hooks/useLoadFonts';
@@ -37,6 +38,7 @@ const { width } = Dimensions.get('window');
 const EditarPerfil = () => {
 	const navigation = useNavigation<any>();
 	const currentUser = useAuthListener();
+	const { refreshUserData } = useUser();
 	const { t } = useTranslation();
 	const { photoUri, savePhoto } = useProfilePhoto(currentUser?.uid);
 	const [dbPassword, setDbPassword] = useState('');
@@ -92,6 +94,10 @@ const EditarPerfil = () => {
 						setTelefono(userData.telefono || userData.Telefono || '');
 						setCorreo(userData.email || userData.Email || '');
 						setDbPassword(userData.password || userData.Password || '');
+						const backendPhotoUrl = getFullFotoUrl(userData.fotoUrl || userData.FotoUrl);
+						if (backendPhotoUrl) {
+							setFoto(backendPhotoUrl);
+						}
 					}
 				} catch (error) {
 					// console.error("Error cargando perfil:", error);
@@ -103,7 +109,7 @@ const EditarPerfil = () => {
 		loadUserData();
 	}, [currentUser]);
 
-	// Sincroniza la foto cuando el hook la carga desde AsyncStorage
+	// Sincroniza la foto si photoUri cambia desde el hook
 	useEffect(() => {
 		if (photoUri) setFoto(photoUri);
 	}, [photoUri]);
@@ -115,12 +121,11 @@ const EditarPerfil = () => {
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
-			quality: 1,
+			quality: 0.8,
 		});
 		if (!result.canceled && result.assets && result.assets.length > 0) {
 			const uri = result.assets[0].uri;
 			setFoto(uri);
-			await savePhoto(uri); // Persiste en AsyncStorage
 		}
 	};
 
@@ -174,6 +179,26 @@ const EditarPerfil = () => {
 
 		try {
 			setIsLoading(true);
+
+			let currentFotoUrl: string | null = foto;
+
+			// Subir foto si es una imagen local recién seleccionada
+			if (
+				foto &&
+				(foto.startsWith('file:') ||
+					foto.startsWith('content:') ||
+					foto.startsWith('ph:') ||
+					foto.startsWith('blob:'))
+			) {
+				console.log('Subiendo nueva foto de perfil al backend:', foto);
+				const uploadedUrl = await savePhoto(foto);
+				// Actualizar foto local con la URL del backend para que el display sea inmediato
+				if (uploadedUrl) {
+					setFoto(uploadedUrl);
+					currentFotoUrl = uploadedUrl;
+				}
+			}
+
 			const payload: any = {
 				nombre,
 				email: correo,
@@ -181,8 +206,15 @@ const EditarPerfil = () => {
 				password: finalPassword, // Siempre enviamos la contraseña (nueva o la actual)
 			};
 
+			if (currentFotoUrl && !currentFotoUrl.startsWith('file:')) {
+				payload.fotoUrl = currentFotoUrl;
+			}
+
 			console.log('Enviando actualización de perfil:', payload);
 			await actualizarUsuario(currentUser.uid, payload);
+
+			// Refrescar los datos globales del usuario en el contexto
+			await refreshUserData();
 
 			// Limpiar campos de contraseña tras éxito
 			setContrasenaActual('');

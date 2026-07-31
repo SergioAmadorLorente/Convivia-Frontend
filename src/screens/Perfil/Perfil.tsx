@@ -52,7 +52,7 @@ const Perfil: React.FC = () => {
   const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
   const [userKarma, setUserKarma] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const { photoUri } = useProfilePhoto(user?.uid);
+  const { photoUri, reloadPhoto } = useProfilePhoto(user?.uid);
 
   // Easter egg: tap title 6 times
   const { show: showToast } = useToast();
@@ -103,6 +103,8 @@ const Perfil: React.FC = () => {
     try {
       setLoading(true);
       if (user?.uid) {
+        // NOTA: reloadPhoto ya no se llama aquí para evitar race condition con Firestore.
+        // Se llama directamente en useFocusEffect.
         const userData = await obtenerUsuarioPorId(user.uid);
         if (userData) {
           const realName = userData.nombre || userData.Nombre || user.displayName || user.email?.split("@")[0] || "Usuario";
@@ -134,8 +136,10 @@ const Perfil: React.FC = () => {
     useCallback(() => {
       if (fontsLoaded && user) {
         fetchUserData();
+        // Recargar foto al volver a esta pantalla (separado de fetchUserData para evitar race condition)
+        reloadPhoto();
       }
-    }, [fetchUserData, fontsLoaded, user])
+    }, [fetchUserData, fontsLoaded, user, reloadPhoto])
   );
 
   useEffect(() => {
@@ -287,7 +291,7 @@ const Perfil: React.FC = () => {
             icon={<LogoutSinFondo width={24} height={24} />}
           />
           <Text style={{ textAlign: "right", color: "green", fontSize: 11, marginTop: 3, paddingRight: 12, opacity: 0.7 }}>
-            {"v3.8.56 APKDynamic"}
+            {"v3.9.6 APKDynamic"}
           </Text>
 
         </View>

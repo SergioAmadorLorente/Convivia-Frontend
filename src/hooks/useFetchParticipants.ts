@@ -3,8 +3,9 @@ import {
   obtenerUsuarioEspacios,
   obtenerEspacioPorUsuarioId,
 } from "../api/usuarioEspacio";
-import { obtenerUsuarioPorId } from "../api/usuario";
+import { obtenerUsuarioPorId, getFullFotoUrl } from "../api/usuario";
 import { obtenerRankingKarma } from "../api/karma";
+import { photoCache } from "./useProfilePhoto";
 
 interface ParticipantWithKarma {
   id: string;
@@ -14,6 +15,8 @@ interface ParticipantWithKarma {
   karmaMensual: number;
   karmaSemanal: number;
   rol?: string;
+  fotoUrl?: string | null;
+  FotoUrl?: string | null;
 }
 
 const useFetchParticipants = () => {
@@ -67,10 +70,20 @@ const useFetchParticipants = () => {
             karmaMensual: 0,
             karmaSemanal: 0,
           };
+
+          // Resolver la URL de la foto:
+          // 1. Intentar con la fotoUrl del backend (relativa → absoluta)
+          // 2. Si el backend devuelve null, usar el caché de useProfilePhoto (subida reciente)
+          const rawFotoUrl = usuario?.fotoUrl ?? usuario?.FotoUrl ?? null;
+          const resolvedFotoUrl =
+            getFullFotoUrl(rawFotoUrl) ??
+            photoCache.get(usuario?.id ?? r.usuarioId) ??
+            null;
           
           return {
             ...usuario,
             ...karma,
+            fotoUrl: resolvedFotoUrl, // sobrescribir con la URL resuelta y absoluta
             rol: r.rol ?? null,
           };
         } catch (e) {

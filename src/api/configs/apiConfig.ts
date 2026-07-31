@@ -1,10 +1,10 @@
 export const API_CONFIG = {
+  // MODO DESARROLLO LOCAL (HTTP - Abierto para red local en 0.0.0.0:5082)
+  // El puerto HTTP 5082 está escuchando en 0.0.0.0 y permite la conexión desde el dispositivo móvil.
+  //BASE_URL: "http://insertarIPAqui:5082/api",
 
-  //MODO CON BACKEND MANUAL
-  // y reemplaza la IP con la IP local de tu computadora (por ejemplo, 192.168.1.x)
-  //BASE_URL: "http://0.0.0.0:5082/api", // Reemplazar 0.0.0.0 por tu IP
-
-  //MODO CON BACKEND 24/7 ONLINE
+  // MODO DESARROLLO EN NUBE / RENDER (OPCIONAL)
   BASE_URL: "https://convivia-backend-1ytr.onrender.com/api",
-  timeout: 60000,// esto es para evitar la primera llamada de Render falle ya que levanta el srvicio
+
+  timeout: 60000,
 };

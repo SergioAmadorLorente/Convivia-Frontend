@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Platform,
   Modal,
+  Image,
 } from "react-native";
 import Animated, {
   FadeIn,
@@ -611,9 +612,16 @@ const MiResidencia: React.FC = () => {
                           </Text>
                         </View>
                         <View style={styles.participantIconWrapper}>
-                          <View style={styles.participantIcon}>
-                            <Ionicons name="person" size={20} color={COLORS.primary} />
-                          </View>
+                          {participant?.fotoUrl ? (
+                            <Image
+                              source={{ uri: participant.fotoUrl }}
+                              style={{ width: 40, height: 40, borderRadius: 20 }}
+                            />
+                          ) : (
+                            <View style={styles.participantIcon}>
+                              <Ionicons name="person" size={20} color={COLORS.primary} />
+                            </View>
+                          )}
                           {participant?.rol === 'admin' && (
                             <View style={styles.adminBadge}>
                               <Text style={styles.adminBadgeText}>Admin</Text>
