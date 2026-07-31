@@ -8,6 +8,7 @@ import {
     Dimensions,
     ActivityIndicator,
     Modal,
+    Image,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
@@ -28,11 +29,18 @@ import { useAuthListener } from "../../../hooks/useAuthListener";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../../api/usuarioEspacio";
 import { obtenerKarmaUsuario, obtenerRankingKarma } from "../../../api/karma";
 import { obtenerEstadisticasTareas } from "../../../api/espacio";
-import { obtenerUsuarios } from "../../../api/usuario";
+import { obtenerUsuarios, getFullFotoUrl } from "../../../api/usuario";
+import { photoCache } from "../../../hooks/useProfilePhoto";
 
 const { width } = Dimensions.get("window");
 
 // Tipo para los datos de karma
+interface KarmaParticipant {
+    name: string;
+    points: number;
+    fotoUrl?: string | null;
+}
+
 interface KarmaData {
     totalPoints: number;
     monthPoints: number;
@@ -40,7 +48,7 @@ interface KarmaData {
     completedTasks: number;
     pendingTasks: number;
     lateTasks: number;
-    participants: Array<{ name: string; points: number }>;
+    participants: KarmaParticipant[];
 }
 
 const MiKarma: React.FC = () => {
@@ -97,9 +105,9 @@ const MiKarma: React.FC = () => {
                 obtenerUsuarioEspacios(),
             ]);
 
-            // 3. Crear un mapa de usuarios para obtener nombres
-            const usuariosMap = new Map<string, string>(
-                usuarios.map((u: any) => [u.id, u.nombre || u.email || "Usuario"])
+            // 3. Crear un mapa de usuarios para obtener nombres y fotos
+            const usuariosMap = new Map<string, any>(
+                usuarios.map((u: any) => [u.id, u])
             );
 
             // Crear un mapa de relación usuarioEspacioId -> usuarioId (Firebase UID) sólo para el espacio actual
@@ -127,7 +135,7 @@ const MiKarma: React.FC = () => {
                 }
             };
 
-            const participants = ranking.ranking
+            const participants: KarmaParticipant[] = ranking.ranking
                 .filter((r: any) => {
                     const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
                     return uEspaciosMap.has(cleanKey); // Filtrar registros inactivos/huérfanos del espacio
@@ -135,10 +143,18 @@ const MiKarma: React.FC = () => {
                 .map((r: any) => {
                     const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
                     const firebaseUid = uEspaciosMap.get(cleanKey);
-                    const name = firebaseUid ? (usuariosMap.get(firebaseUid) ?? "Usuario") : "Usuario";
+                    const userObj = firebaseUid ? usuariosMap.get(firebaseUid) : null;
+                    const name = userObj ? (userObj.nombre || userObj.email || "Usuario") : "Usuario";
+                    // Resolver URL de foto: backend → caché como fallback
+                    const rawFotoUrl = userObj?.fotoUrl ?? userObj?.FotoUrl ?? null;
+                    const fotoUrl =
+                        getFullFotoUrl(rawFotoUrl) ??
+                        (firebaseUid ? photoCache.get(firebaseUid) : undefined) ??
+                        null;
                     return {
                         name,
                         points: getPoints(r),
+                        fotoUrl,
                     };
                 });
 
@@ -287,7 +303,14 @@ const MiKarma: React.FC = () => {
                                     {karmaData.participants[1] && (
                                         <View style={styles.podiumColumn}>
                                             <View style={styles.avatarContainer}>
-                                                <Ionicons name="person-outline" size={24} color="#999" />
+                                                {karmaData.participants[1].fotoUrl ? (
+                                                    <Image
+                                                        source={{ uri: karmaData.participants[1].fotoUrl }}
+                                                        style={{ width: 45, height: 45, borderRadius: 22.5 }}
+                                                    />
+                                                ) : (
+                                                    <Ionicons name="person-outline" size={24} color="#999" />
+                                                )}
                                             </View>
                                             <Text style={styles.podiumName} numberOfLines={1}>
                                                 {karmaData.participants[1].name}
@@ -305,7 +328,14 @@ const MiKarma: React.FC = () => {
                                         <View style={styles.podiumColumn}>
                                             <View style={styles.winnerAvatarWrapper}>
                                                 <View style={[styles.avatarContainer, styles.winnerAvatar]}>
-                                                    <Ionicons name="person-outline" size={28} color="#999" />
+                                                    {karmaData.participants[0].fotoUrl ? (
+                                                        <Image
+                                                            source={{ uri: karmaData.participants[0].fotoUrl }}
+                                                            style={{ width: 50, height: 50, borderRadius: 25 }}
+                                                        />
+                                                    ) : (
+                                                        <Ionicons name="person-outline" size={28} color="#999" />
+                                                    )}
                                                 </View>
                                                 <View style={styles.karmaBadge}>
                                                     <LogoKarma width={16} height={16} />
@@ -326,7 +356,14 @@ const MiKarma: React.FC = () => {
                                     {karmaData.participants[2] && (
                                         <View style={styles.podiumColumn}>
                                             <View style={styles.avatarContainer}>
-                                                <Ionicons name="person-outline" size={24} color="#999" />
+                                                {karmaData.participants[2].fotoUrl ? (
+                                                    <Image
+                                                        source={{ uri: karmaData.participants[2].fotoUrl }}
+                                                        style={{ width: 45, height: 45, borderRadius: 22.5 }}
+                                                    />
+                                                ) : (
+                                                    <Ionicons name="person-outline" size={24} color="#999" />
+                                                )}
                                             </View>
                                             <Text style={styles.podiumName} numberOfLines={1}>
                                                 {karmaData.participants[2].name}
@@ -342,7 +379,7 @@ const MiKarma: React.FC = () => {
                             ) : (
                                 /* Lista completa */
                                 <View style={styles.listContainer}>
-                                    {allParticipants.map((participant, index) => (
+                                    {allParticipants.map((participant: any, index) => (
                                         <View key={index} style={styles.listItem}>
                                             <View style={styles.listRankContainer}>
                                                 <Text style={[
@@ -355,7 +392,14 @@ const MiKarma: React.FC = () => {
                                                 </Text>
                                             </View>
                                             <View style={styles.listAvatarContainer}>
-                                                <Ionicons name="person-outline" size={20} color="#999" />
+                                                {participant.fotoUrl ? (
+                                                    <Image
+                                                        source={{ uri: participant.fotoUrl }}
+                                                        style={{ width: 35, height: 35, borderRadius: 17.5 }}
+                                                    />
+                                                ) : (
+                                                    <Ionicons name="person-outline" size={20} color="#999" />
+                                                )}
                                             </View>
                                             <Text style={styles.listName} numberOfLines={1}>
                                                 {participant.name}
