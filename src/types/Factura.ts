@@ -5,6 +5,8 @@ export type IFacturaUser = {
   name: string;
   /** true si ese usuario ya ha completado/pagado su parte */
   completed?: boolean;
+  /** URL de la foto de perfil del usuario (opcional) */
+  fotoUrl?: string | null;
 };
 
 export interface IFactura {

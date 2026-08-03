@@ -543,7 +543,7 @@ const Detalle: React.FC<Props> = (props) => {
             <Text style={styles.sectionLabel}>{t('facturaDetail.assignedUsers')}</Text>
             {usuarios.length > 0 ? (
               <UserList
-                users={usuarios.map((u) => ({ id: u.id, name: u.name }))}
+                users={usuarios.map((u) => ({ id: u.id, name: u.name, fotoUrl: u.fotoUrl ?? null }))}
                 maxHeight={160}
                 renderExtra={({ userId }) => {
                   const u = usuarios.find((x) => x.id === userId);

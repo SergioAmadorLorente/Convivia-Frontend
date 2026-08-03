@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES, HELPERS } from "../../styles/theme";
 
@@ -10,6 +10,8 @@ const { moderateScale, verticalScale } = HELPERS;
 export type UserListItem = {
   id: string;
   name: string;
+  /** URL de foto de perfil real (opcional) */
+  fotoUrl?: string | null;
 };
 
 export type UserRowExtraProps = {
@@ -62,9 +64,17 @@ const UserList: React.FC<UserListProps> = ({
         index < users.length - 1 && styles.rowBorder,
       ]}
     >
-      {/* Avatar icon */}
+      {/* Avatar: foto real si disponible, icono genérico si no */}
       <View style={styles.avatarContainer}>
-        <Feather name="user" size={moderateScale(18)} color={COLORS.accent} />
+        {user.fotoUrl ? (
+          <Image
+            source={{ uri: user.fotoUrl }}
+            style={styles.avatarImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <Feather name="user" size={moderateScale(18)} color={COLORS.accent} />
+        )}
       </View>
 
       {/* Name */}
@@ -123,6 +133,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.success,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+  },
+  avatarImage: {
+    width: moderateScale(32),
+    height: moderateScale(32),
+    borderRadius: moderateScale(16),
   },
   userName: {
     flex: 1,

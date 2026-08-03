@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuthListenerFull } from "./useAuthListener";
-import { obtenerUsuarioPorId, obtenerUsuarios } from "../api/usuario";
+import { obtenerUsuarioPorId, obtenerUsuarios, getFullFotoUrl } from "../api/usuario";
 import {
   obtenerEspacioPorUsuarioId,
   obtenerUsuarioEspacios,
@@ -24,7 +24,7 @@ export const useDashboardData = (newSpaceName?: string) => {
   const [currentKarma, setCurrentKarma] = useState<number>(0);
   const [loadingKarma, setLoadingKarma] = useState<boolean>(true);
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
-  const [userNamesMap, setUserNamesMap] = useState<Record<string, string>>({});
+  const [userNamesMap, setUserNamesMap] = useState<Record<string, { name: string; fotoUrl: string | null }>>({});
   const [tareas, setTareas] = useState<TaskModel[]>([]);
   const [loadingTareas, setLoadingTareas] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -115,7 +115,7 @@ export const useDashboardData = (newSpaceName?: string) => {
         });
 
         // Construir mapa solo con miembros de este espacio
-        const map: Record<string, string> = {};
+        const map: Record<string, { name: string; fotoUrl: string | null }> = {};
 
         // Cargar los usuarios del espacio en paralelo para resolver sus nombres
         await Promise.all(
@@ -128,23 +128,28 @@ export const useDashboardData = (newSpaceName?: string) => {
               const u = await obtenerUsuarioPorId(usuarioId);
               if (u) {
                 const nombre = u.nombre || u.email || u.id || "Miembro";
-                if (relId) map[relId] = nombre;
-                if (usuarioId) map[usuarioId] = nombre;
-                if (relId) map[cleanId(relId || "")] = nombre;
-                if (usuarioId) map[cleanId(usuarioId || "")] = nombre;
+                const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
+                const fotoUrl = getFullFotoUrl(rawFoto);
+                const entry = { name: nombre, fotoUrl };
+                if (relId) map[relId] = entry;
+                if (usuarioId) map[usuarioId] = entry;
+                if (relId) map[cleanId(relId || "")] = entry;
+                if (usuarioId) map[cleanId(usuarioId || "")] = entry;
               } else {
                 const fallback = `Usuario (${usuarioId.slice(0, 4)})`;
-                if (relId) map[relId] = fallback;
-                if (usuarioId) map[usuarioId] = fallback;
-                if (relId) map[cleanId(relId || "")] = fallback;
-                if (usuarioId) map[cleanId(usuarioId || "")] = fallback;
+                const entry = { name: fallback, fotoUrl: null };
+                if (relId) map[relId] = entry;
+                if (usuarioId) map[usuarioId] = entry;
+                if (relId) map[cleanId(relId || "")] = entry;
+                if (usuarioId) map[cleanId(usuarioId || "")] = entry;
               }
             } catch (err) {
               const fallback = `Usuario (${usuarioId.slice(0, 4)})`;
-              if (relId) map[relId] = fallback;
-              if (usuarioId) map[usuarioId] = fallback;
-              if (relId) map[cleanId(relId || "")] = fallback;
-              if (usuarioId) map[cleanId(usuarioId || "")] = fallback;
+              const entry = { name: fallback, fotoUrl: null };
+              if (relId) map[relId] = entry;
+              if (usuarioId) map[usuarioId] = entry;
+              if (relId) map[cleanId(relId || "")] = entry;
+              if (usuarioId) map[cleanId(usuarioId || "")] = entry;
             }
           })
         );
@@ -254,9 +259,14 @@ export const useDashboardData = (newSpaceName?: string) => {
                 return null;
               }
 
+              const entry = userNamesMapRef.current[nameKey];
+              if (!entry) return null;
+              const resolvedName = typeof entry === 'string' ? entry : entry.name;
+              const resolvedFoto = typeof entry === 'string' ? null : (entry.fotoUrl ?? null);
               return {
                 id: relId,
-                name: userNamesMapRef.current[nameKey],
+                name: resolvedName,
+                fotoUrl: resolvedFoto,
                 // en deudores: true = pendiente (no pagado), false = pagado
                 completed: deudoresDict[relId] === false,
               };
@@ -381,7 +391,10 @@ export const useDashboardData = (newSpaceName?: string) => {
                 null;
 
               const userNameResolved = activeInstanceUserId
-                ? currentNamesMap[activeInstanceUserId] || activeInstanceUserId
+                ? (() => {
+                    const entry = currentNamesMap[activeInstanceUserId];
+                    return entry ? (typeof entry === 'string' ? entry : entry.name) : activeInstanceUserId;
+                  })()
                 : null;
 
               // 2. Resolver mapa de usuarios por día (tareas repetitivas)
