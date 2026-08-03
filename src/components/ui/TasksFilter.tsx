@@ -27,7 +27,7 @@ interface TasksFilterProps {
     showCompleted: boolean;
   };
   currentUserFilter?: string;
-  userNamesMap?: Record<string, string>;
+  userNamesMap?: Record<string, string | { name: string; fotoUrl?: string | null }>;
   currentUserName?: string;
   onFilterChange: (filter: "today" | "week" | "all") => void;
   onVisibilityChange: (visibility: {
@@ -80,7 +80,12 @@ const TasksFilter: React.FC<TasksFilterProps> = ({
 
   // Derive unique user names from userNamesMap and include current user name if not present
   const uniqueUserNames = React.useMemo(() => {
-    const names = new Set(Object.values(userNamesMap));
+    // Support both string values and {name, fotoUrl} objects
+    const names = new Set(
+      Object.values(userNamesMap).map((v) =>
+        typeof v === "string" ? v : v.name
+      )
+    );
     if (currentUserName && currentUserName.trim() !== "") {
       names.add(currentUserName);
     }

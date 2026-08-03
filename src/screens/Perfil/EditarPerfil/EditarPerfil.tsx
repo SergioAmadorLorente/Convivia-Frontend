@@ -120,7 +120,7 @@ const EditarPerfil = () => {
 
 	const pickImage = async () => {
 		const result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			mediaTypes: ['images'],
 			quality: 0.8,
 		});
 		if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -260,22 +260,35 @@ const EditarPerfil = () => {
 			>
 
 				{/* Avatar Container */}
-				<TouchableOpacity style={editarPerfilStyles.avatarWrapper} onPress={pickImage}>
+				<View style={editarPerfilStyles.avatarOuterWrapper}>
+					<TouchableOpacity style={editarPerfilStyles.avatarWrapper} onPress={pickImage}>
+						{foto ? (
+							<Image
+								source={{ uri: foto }}
+								style={editarPerfilStyles.foto}
+								onError={() => {
+									console.warn('[EditarPerfil] Error al cargar imagen:', foto);
+									setFoto(null);
+								}}
+							/>
+						) : (
+							<View style={editarPerfilStyles.fotoPlaceholder}>
+								<Perfilicono width={100} height={100} />
+							</View>
+						)}
+					</TouchableOpacity>
+
+					{/* Botón quitar foto — solo visible cuando hay foto */}
 					{foto ? (
-						<Image
-							source={{ uri: foto }}
-							style={editarPerfilStyles.foto}
-							onError={() => {
-								console.warn('[EditarPerfil] Error al cargar imagen:', foto);
-								setFoto(null);
-							}}
-						/>
-					) : (
-						<View style={editarPerfilStyles.fotoPlaceholder}>
-							<Perfilicono width={100} height={100} />
-						</View>
-					)}
-				</TouchableOpacity>
+						<TouchableOpacity
+							style={editarPerfilStyles.removeFotoBadge}
+							onPress={() => setFoto(null)}
+							activeOpacity={0.8}
+						>
+							<Ionicons name="close" size={16} color="#fff" />
+						</TouchableOpacity>
+					) : null}
+				</View>
 
 				{/* Form Fields */}
 				<TextField
@@ -375,8 +388,13 @@ const EditarPerfil = () => {
 };
 
 const editarPerfilStyles = StyleSheet.create({
-	avatarWrapper: {
+	avatarOuterWrapper: {
 		marginBottom: hp('5%'),
+		alignItems: 'center',
+		justifyContent: 'center',
+		position: 'relative',
+	},
+	avatarWrapper: {
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
@@ -388,6 +406,24 @@ const editarPerfilStyles = StyleSheet.create({
 	fotoPlaceholder: {
 		alignItems: 'center',
 		justifyContent: 'center',
+	},
+	removeFotoBadge: {
+		position: 'absolute',
+		bottom: 4,
+		right: -4,
+		width: 30,
+		height: 30,
+		borderRadius: 15,
+		backgroundColor: '#C0392B',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderWidth: 2,
+		borderColor: '#fff',
+		elevation: 4,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 3,
 	},
 	submitButton: {
 		marginTop: hp('3%'),

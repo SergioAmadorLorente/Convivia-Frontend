@@ -42,6 +42,8 @@ export interface ITask {
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
   usuarioAsignadoId?: string | null;
+  /** URL de la foto de perfil del usuario asignado (opcional) */
+  usuarioAsignadoFotoUrl?: string | null;
   tareasId?: string[]; // IDs de las instancias hijas
   usuariosPorDia?: Record<number, string>; // Mapa de día (0-6) a usuario asignado
   overdue?: boolean;
@@ -64,6 +66,7 @@ export class TaskModel implements ITask {
   FechaCompletada?: Date | null;
   usuarioAsignado?: string | null;
   usuarioAsignadoId?: string | null;
+  usuarioAsignadoFotoUrl?: string | null;
   tareasId: string[];
   usuariosPorDia?: Record<number, string>;
   overdue?: boolean;
@@ -81,6 +84,7 @@ export class TaskModel implements ITask {
     this.FechaCompletada = props.FechaCompletada ? new Date(props.FechaCompletada) : null;
     this.usuarioAsignado = props.usuarioAsignado ?? null;
     this.usuarioAsignadoId = props.usuarioAsignadoId ?? null;
+    this.usuarioAsignadoFotoUrl = props.usuarioAsignadoFotoUrl ?? null;
     this.tareasId = props.tareasId ?? [];
     this.usuariosPorDia = props.usuariosPorDia ?? {};
     this.overdue = props.overdue ?? false;
@@ -175,6 +179,7 @@ export class TaskModel implements ITask {
       FechaCompletada: !this.isCompleted ? now : null,
       usuarioAsignado: this.usuarioAsignado,
       usuarioAsignadoId: this.usuarioAsignadoId,
+      usuarioAsignadoFotoUrl: this.usuarioAsignadoFotoUrl,
       tareasId: this.tareasId.slice(),
       overdue: this.isCompleted ? this.overdue : false, // Revertir a false si se pone pendiente, sino mantener
     });
