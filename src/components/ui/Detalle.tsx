@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
   PanResponder,
+  Image,
 } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../styles/theme";
@@ -120,37 +121,38 @@ const Detalle: React.FC<Props> = (props) => {
         <View style={styles.overlay}>
           <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
-          <View style={styles.sheet}>
+          <View style={[styles.sheet, { paddingBottom: HELPERS.verticalScale(24) }]}>
             <View style={styles.handle} />
 
-            {/* Header */}
-            <View style={styles.headerBlock}>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.title, { color: '#6B705C' }]}>
-                  {participant?.nombre || participant?.email || t('common.user', 'Usuario')}
-                </Text>
-                <Text style={[styles.subtitle, { color: '#ACBF8A' }]}>{residenciaName}</Text>
+            {/* Foto + Nombre + Residencia */}
+            <View style={styles.participantProfileBlock}>
+              {/* Avatar */}
+              <View style={styles.participantAvatarWrapper}>
+                {participant?.fotoUrl ? (
+                  <Image
+                    source={{ uri: participant.fotoUrl }}
+                    style={styles.participantAvatarImg}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.participantAvatarPlaceholder}>
+                    <Feather name="user" size={HELPERS.moderateScale(36)} color="#6B705C" />
+                  </View>
+                )}
               </View>
-            </View>
 
-            {/* Puntos de Karma */}
-            <View style={styles.section}>
-              <View style={[styles.karmaContainer, { paddingVertical: HELPERS.verticalScale(8) }]}>
+              {/* Nombre y residencia */}
+              <Text style={styles.participantNameLarge}>
+                {participant?.nombre || participant?.email || t('common.user', 'Usuario')}
+              </Text>
+              <Text style={styles.participantResidenciaLabel}>{residenciaName}</Text>
+
+              {/* Puntos de Karma */}
+              <View style={styles.karmaRow}>
                 <Text style={styles.karmaPoints}>{t('myKarma.pointsCount', { points: karmaPoints })}</Text>
                 <Text style={styles.karmaLabel}>{t('myKarma.ofKarma')}</Text>
               </View>
             </View>
-
-            {/* Gráfico de Tareas LO OCULTO POR AHORA */}
-            {/* <View style={styles.section}>
-              <Text style={[styles.sectionLabel, { color: '#6B705C' }]}>
-                {t('myKarma.taskStatus')}
-              </Text>
-              <TasksDonutChart
-                completedTasks={tareasCompletadas || 0}
-                lateTasks={tareasFueraPlazo || 0}
-              />
-            </View> */}
 
             {/* Botón Eliminar */}
             <TouchableOpacity
@@ -159,7 +161,7 @@ const Detalle: React.FC<Props> = (props) => {
                 styles.deleteButtonFull,
                 {
                   backgroundColor: (isCurrentUser || !isAdmin) ? '#E5E5E5' : '#D9D9D9',
-                  marginTop: HELPERS.hp("1%"),
+                  marginTop: HELPERS.hp("2%"),
                   opacity: (isCurrentUser || !isAdmin) ? 0.5 : 1
                 }
               ]}
@@ -880,6 +882,49 @@ const styles = StyleSheet.create({
   },
 
   // Estilos para participante
+  participantProfileBlock: {
+    alignItems: "center",
+    paddingTop: HELPERS.verticalScale(4),
+    paddingBottom: HELPERS.verticalScale(8),
+  },
+  participantAvatarWrapper: {
+    marginBottom: HELPERS.verticalScale(10),
+  },
+  participantAvatarImg: {
+    width: HELPERS.moderateScale(90),
+    height: HELPERS.moderateScale(90),
+    borderRadius: HELPERS.moderateScale(45),
+    borderWidth: 3,
+    borderColor: '#ACBF8A',
+  },
+  participantAvatarPlaceholder: {
+    width: HELPERS.moderateScale(90),
+    height: HELPERS.moderateScale(90),
+    borderRadius: HELPERS.moderateScale(45),
+    backgroundColor: '#E6ECDC',
+    borderWidth: 3,
+    borderColor: '#ACBF8A',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  participantNameLarge: {
+    fontFamily: FONTS.title,
+    fontSize: HELPERS.moderateScale(22),
+    color: '#6B705C',
+    textAlign: 'center',
+    marginBottom: HELPERS.verticalScale(2),
+  },
+  participantResidenciaLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: SIZES.text14,
+    color: '#ACBF8A',
+    textAlign: 'center',
+    marginBottom: HELPERS.verticalScale(8),
+  },
+  karmaRow: {
+    alignItems: 'center',
+    marginTop: HELPERS.verticalScale(4),
+  },
   karmaContainer: {
     alignItems: "center",
     paddingVertical: HELPERS.verticalScale(2),
