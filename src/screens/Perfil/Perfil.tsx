@@ -184,7 +184,11 @@ const Perfil: React.FC = () => {
         <View style={styles.userCard}>
           <View style={styles.userInfoRow}>
             {/* Avatar */}
-            <View style={styles.avatarContainer}>
+            <TouchableOpacity
+              style={styles.avatarContainer}
+              onPress={() => navigation.navigate("EditarPerfil")}
+              activeOpacity={0.7}
+            >
               {photoUri ? (
                 <Image
                   source={{ uri: photoUri }}
@@ -193,7 +197,7 @@ const Perfil: React.FC = () => {
               ) : (
                 <Ionicons name="person-outline" size={30} color={COLORS.primary} />
               )}
-            </View>
+            </TouchableOpacity>
 
             {/* User Details */}
             <View style={styles.userDetails}>
@@ -291,7 +295,7 @@ const Perfil: React.FC = () => {
             icon={<LogoutSinFondo width={24} height={24} />}
           />
           <Text style={{ textAlign: "right", color: "green", fontSize: 11, marginTop: 3, paddingRight: 12, opacity: 0.7 }}>
-            {"v3.9.12 APKDynamic"}
+            {"v3.9.13 APKDynamic"}
           </Text>
 
         </View>
