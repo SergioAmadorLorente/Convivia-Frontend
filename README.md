@@ -1,6 +1,7 @@
 **_### ESPAÑOL_**
 
 # Convivia
+![Logo](https://drive.google.com/uc?export=view&id=1so15OHqQq5aajitB4dvVLvT_QWf53RhJ)
 
 **Facilitar el reparto justo y organizado de tareas domésticas.**
 
@@ -12,11 +13,16 @@ Convivia es una app móvil diseñada para mejorar la convivencia en pisos compar
 - Diseño de interfaz: **Figma**
 - Base de datos: **Firebase**
 
+## DEMO Youtube
+[Ver DEMO](https://youtu.be/95pcDdHEY_I)
+
+[Ver DEMO Short 1/2](https://youtube.com/shorts/mfrMfA5f3WA)
+
+[Ver DEMO Short 2/2](https://youtube.com/shorts/dlhn_RZ2W3M)
+
 ##  Funcionalidades principales
 - Crear y gestionar **Residencias Compartidas**
-- Añadir y asignar **Tareas Domésticas**
-- Visualizar actividades en un **Calendario Integrado**
-- Recibir **Recordatorios** automáticos
+- Añadir y asignar **Tareas Domésticas y facturas**
 - Sistema de **Niveles “Karma”** que recompensa a quienes más contribuyen
 - Disponible idioma **Español, Íngles, Francés, Italiano , Alemán y Portugués**
 
@@ -27,8 +33,10 @@ Convivia es una app móvil diseñada para mejorar la convivencia en pisos compar
 ## Registro
 Para usar Convivia, los usuarios deben crear una cuenta. El registro permite acceder a funcionalidades personalizadas, sincronización de datos y seguimiento del Karma.
 
-##  Instalación (No disponible)
-Disponible en plataformas móviles como **Play Store** y **App Store**. Solo tienes que buscar “Convivia” e instalarla.
+##  Instalación GRATIS
+Solo tienes que descargarla e instalarla(Es APK Dynamic, solo se instala 1 vez y se actualiza sola al abrir la app si existe alguna update)
+
+[Descargar](https://drive.google.com/file/d/18DU81odgJFJyJUcyGd-qrx3Zk9GBTwXD/view)
 
 ##  Ejemplos de uso
 - _"Marta crea la residencia, asigna tareas semanales y consulta el calendario para ver quién está al día."_  
@@ -43,9 +51,12 @@ Commercial use, redistribution, sublicensing, selling, hosting as a service, or 
 See the LICENSE file for more information.
 
 
+
+
 **### _ENGLISH_**
 
 # Convivia
+![Logo](https://drive.google.com/uc?export=view&id=1so15OHqQq5aajitB4dvVLvT_QWf53RhJ)
 
 **Facilitating the fair and organized distribution of household chores.**
 
@@ -61,11 +72,16 @@ Convivia is a mobile app designed to improve cohabitation in shared apartments o
 - Interface Design: **Figma**
 - Database: **Firebase**
 
+## DEMO Youtube
+[Watch](https://youtu.be/95pcDdHEY_I)
+
+[Watch DEMO Short 1/2](https://youtube.com/shorts/mfrMfA5f3WA)
+
+[Watch DEMO Short 2/2](https://youtube.com/shorts/dlhn_RZ2W3M)
+
 ## Main Features
 - Create and manage **Shared Living Spaces**
-- Add and assign **Household Chores**
-- View activities in an **Integrated Calendar**
-- Receive automatic **Reminders**
+- Add and assign **Household Chores and Invoices**
 - **Karma Leveling** system that rewards top contributors
 -  Available **English, Spanish, French, Italian, German and Portuguese** Language
 
@@ -76,8 +92,10 @@ Convivia is a mobile app designed to improve cohabitation in shared apartments o
 ## Registration
 To use Convivia, users must create an account. Registration allows access to customized features, data synchronization, and Karma tracking.
 
-## Installation (Not Available)
-Available on mobile platforms such as the **Play Store** and **App Store**. Simply search for “Convivia” and install it.
+## Installation FREE
+Just download and install it (It's a Dynamic APK, it only needs to be installed once and it updates automatically when you open the app if there's an update).
+
+[Download](https://drive.google.com/file/d/18DU81odgJFJyJUcyGd-qrx3Zk9GBTwXD/view)
 
 ## Usage Examples
 - "Marta creates the residence, assigns weekly tasks, and checks the calendar to see who's on track."
@@ -90,6 +108,3 @@ This project is provided for educational, research, and portfolio purposes only.
 Commercial use, redistribution, sublicensing, selling, hosting as a service, or creating commercial derivative works is prohibited without the prior written permission of the author.
 
 See the LICENSE file for more information.
-
-
-
