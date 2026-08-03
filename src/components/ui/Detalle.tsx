@@ -338,7 +338,7 @@ const Detalle: React.FC<Props> = (props) => {
                     ? String(selectedDayIndex)
                     : task.usuarioAsignadoId || task.usuarioAsignado || "";
                 const users = assignedName
-                  ? [{ id: assignedId, name: assignedName }]
+                  ? [{ id: assignedId, name: assignedName, fotoUrl: task.usuarioAsignadoFotoUrl ?? null }]
                   : [];
                 return users.length > 0 ? (
                   <UserList users={users} />

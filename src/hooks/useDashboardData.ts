@@ -397,6 +397,13 @@ export const useDashboardData = (newSpaceName?: string) => {
                   })()
                 : null;
 
+              const userFotoUrlResolved = activeInstanceUserId
+                ? (() => {
+                    const entry = currentNamesMap[activeInstanceUserId];
+                    return entry && typeof entry !== 'string' ? (entry.fotoUrl ?? null) : null;
+                  })()
+                : null;
+
               // 2. Resolver mapa de usuarios por día (tareas repetitivas)
               const resolvedUsuariosPorDia: Record<number, string> = {};
               // Intentar leer desde la instancia si tiene el mapa, o construirlo
@@ -444,6 +451,7 @@ export const useDashboardData = (newSpaceName?: string) => {
                     : "Pendiente"),
                 usuarioAsignado: userNameResolved,
                 usuarioAsignadoId: activeInstanceUserId,
+                usuarioAsignadoFotoUrl: userFotoUrlResolved,
                 tareasId:
                   Array.isArray(plantilla.tareasId) && plantilla.tareasId.length > 0
                     ? plantilla.tareasId
