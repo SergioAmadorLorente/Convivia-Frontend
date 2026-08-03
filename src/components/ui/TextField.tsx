@@ -6,6 +6,8 @@ import {
   TextInputProps,
   TouchableOpacity,
   StyleSheet,
+  StyleProp,
+  ViewStyle,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
@@ -28,6 +30,7 @@ interface TextFieldProps {
   fontSize?: number;
   showClipboard?: boolean;
   onBlur?: () => void;
+  style?: StyleProp<ViewStyle>;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -45,6 +48,7 @@ const TextField: React.FC<TextFieldProps> = ({
   fontSize,
   showClipboard = false,
   onBlur,
+  style,
 }) => {
   const [show, setShow] = useState<boolean>(false);
   const isPassword = !!secureTextEntry;
@@ -67,7 +71,7 @@ const TextField: React.FC<TextFieldProps> = ({
   };
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, style]}>
       {label && (
         <Text style={[GLOBAL_STYLES.labelBase, GLOBAL_STYLES.labelMarginSmall]}>
           {label}

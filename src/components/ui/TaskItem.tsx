@@ -50,6 +50,9 @@ interface TaskItemProps {
   /** Factura: contador "pagados/total" para el lado derecho (ej: 3/4) */
   paidCount?: number;
   totalAssigned?: number;
+
+  /** Tarea en overdue (muestra la fecha en rojo) */
+  isOverdue?: boolean;
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({
@@ -67,6 +70,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onPressRow,
   paidCount,
   totalAssigned,
+  isOverdue = false,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const toggleTooltip = () => setShowTooltip(prev => !prev);
@@ -203,7 +207,11 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 // ---- TAREA: Hora + (opcional) Fecha ----
                 <View style={styles.leftTaskCol}>
                   {/* {time ? <Text style={styles.timeText}>{time}</Text> : null} */}
-                  {fechaLimite ? <Text style={styles.dateText}>{fechaLimite}</Text> : null}
+                  {fechaLimite ? (
+                    <Text style={[styles.dateText, isOverdue && styles.overdueDateText]}>
+                      {fechaLimite}
+                    </Text>
+                  ) : null}
                 </View>
               ) : (
                 // ---- FACTURA: Fecha (dd/mm) + Precio por persona debajo ----
@@ -338,6 +346,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.secondary,
     fontFamily: FONTS.regular,
+  },
+  overdueDateText: {
+    color: COLORS.error,
+    fontFamily: FONTS.bold,
   },
 
   // --- IZQUIERDA FACTURA ---

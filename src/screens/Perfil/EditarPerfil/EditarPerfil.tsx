@@ -319,6 +319,7 @@ const EditarPerfil = () => {
 					onChangeText={setContrasenaActual}
 					placeholder="• • • • • • • •"
 					secureTextEntry
+					style={{ marginTop: 4 }}
 				/>
 
 				<Text style={editarPerfilStyles.fieldLabel}>{t('editProfile.newPassword')}</Text>
@@ -327,8 +328,9 @@ const EditarPerfil = () => {
 					onChangeText={setNuevaContrasena}
 					placeholder="• • • • • • • •"
 					secureTextEntry
+					style={{ marginTop: 4 }}
 				/>
-				<Text style={[GLOBAL_STYLES.helperText, { marginTop: 5, paddingLeft: 5 }]}>
+				<Text style={[GLOBAL_STYLES.helperText, { marginTop: 3, paddingLeft: 5 }]}>
 					{t('editProfile.passwordHint')}
 				</Text>
 
@@ -338,6 +340,7 @@ const EditarPerfil = () => {
 					onChangeText={setRepetirContrasena}
 					placeholder="• • • • • • • •"
 					secureTextEntry
+					style={{ marginTop: 4 }}
 				/>
 
 				<Button
@@ -426,29 +429,29 @@ const editarPerfilStyles = StyleSheet.create({
 		shadowRadius: 3,
 	},
 	submitButton: {
-		marginTop: hp('3%'),
-		marginBottom: hp('8%'),
+		marginTop: hp('2.5%'),
+		marginBottom: hp('5%'),
 	},
 	sectionTitle: {
 		fontSize: 16,
 		color: '#6B705C',
 		fontFamily: FONTS.title,
-		marginTop: hp('4%'),
-		marginBottom: hp('2%'),
+		marginTop: hp('2%'),
+		marginBottom: hp('0.5%'),
 		textAlign: 'left',
 		width: '90%',
-		paddingBottom: hp('1%'),
+		paddingBottom: 4,
 		borderBottomWidth: 2,
 		borderBottomColor: '#6B705C',
 	},
 	fieldLabel: {
-		fontSize: 16,
+		fontSize: 14,
 		color: '#333',
 		fontFamily: FONTS.regular,
 		textAlign: 'left',
 		width: '90%',
-		marginTop: hp('2%'),
-		marginBottom: hp('0.5%'),
+		marginTop: 8,
+		marginBottom: 0,
 	},
 });
 

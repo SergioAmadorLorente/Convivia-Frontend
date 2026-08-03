@@ -279,8 +279,8 @@ const Detalle: React.FC<Props> = (props) => {
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>{t('createTask.dateTimeLimit')}</Text>
               <View style={styles.dateRow}>
-                <Text style={styles.dateText}>{fechaStr}</Text>
-                <Text style={styles.timeText}>{horaStr}</Text>
+                <Text style={[styles.dateText, task.overdue && { color: COLORS.error, fontFamily: FONTS.bold }]}>{fechaStr}</Text>
+                <Text style={[styles.timeText, task.overdue && { color: COLORS.error }]}>{horaStr}</Text>
               </View>
             </View>
 
