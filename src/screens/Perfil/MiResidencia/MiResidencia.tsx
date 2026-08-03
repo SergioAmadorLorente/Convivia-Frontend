@@ -43,6 +43,7 @@ import { useToast } from "../../../hooks/useToast";
 const { width } = Dimensions.get("window");
 
 import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
+import LogoKarma from "../../../assets/logo_karma.svg";
 import useFetchParticipants from "../../../hooks/useFetchParticipants";
 import Desplegable from "../../../components/ui/Desplegable";
 
@@ -629,9 +630,14 @@ const MiResidencia: React.FC = () => {
                           )}
                         </View>
                         <View style={styles.participantInfo}>
-                          <Text style={styles.participantName}>
-                            {participant?.nombre || participant?.email || "Usuario sin nombre"}
-                          </Text>
+                          <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <Text style={styles.participantName}>
+                              {participant?.nombre || participant?.email || "Usuario sin nombre"}
+                            </Text>
+                            {index === 0 && (
+                              <LogoKarma width={16} height={16} style={{ marginLeft: 6, marginBottom: 4 }} />
+                            )}
+                          </View>
                           <Text style={styles.participantKarma}>
                             {t('myResidence.karmaPointsCount', { points: participant?.karmaTotal || 0 })}
                           </Text>

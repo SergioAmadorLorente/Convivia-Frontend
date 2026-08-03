@@ -339,6 +339,7 @@ const DashBoardPersonal: React.FC = () => {
                     onPressRow={() => activeTab === "tareas" ? openDetalleTarea(item) : openDetalleFactura(item)}
                     time={activeTab === "tareas" ? item.formattedTime?.() : undefined}
                     fechaLimite={activeTab === "tareas" ? new Date(item.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" }) : undefined}
+                    isOverdue={activeTab === "tareas" ? !!item.overdue : false}
                     dateLabel={activeTab === "facturas" ? item.formattedDate?.(i18n.language === 'en' ? 'en-US' : 'es-ES') : undefined}
                     perPersonPrice={activeTab === "facturas" ? fmtEUR(item.perPersonPrice?.()) : undefined}
                     paidCount={activeTab === "facturas" ? item.paidUsersCount?.() : undefined}
@@ -358,6 +359,7 @@ const DashBoardPersonal: React.FC = () => {
                     subtitle={task.usuarioAsignado || undefined}
                     unassigned={!task.usuarioAsignado}
                     isCompleted={task.isCompleted}
+                    isOverdue={true}
                     onToggle={() => handleToggleTask(task.id)}
                     onPressRow={() => openDetalleTarea(task)}
                     time={task.formattedTime()}
