@@ -83,7 +83,7 @@ export const GLOBAL_STYLES = StyleSheet.create({
     fontFamily: FONTS.regular,
     color: COLORS.secondary,
     fontSize: moderateScale(11),
-    width: wp("80%"),
+    flexShrink: 1,
   },
 
   // Texto genérico de botón

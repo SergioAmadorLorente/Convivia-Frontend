@@ -14,7 +14,7 @@ const FAQ: React.FC = () => {
             <Text style={GLOBAL_STYLES.titulo}>{t('faq.title')}</Text>
 
             <View style={GLOBAL_STYLES.container}>
-                <View style={{ width: "85%", marginTop: 20 }}>
+                <View style={{ width: "100%", paddingHorizontal: "7.5%", marginTop: 20 }}>
                     <Text style={[GLOBAL_STYLES.subtitle, { marginBottom: 12 }]}>
                         {t('faq.subtitle')}
                     </Text>

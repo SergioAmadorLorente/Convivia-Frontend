@@ -102,7 +102,9 @@ const Desplegable: React.FC<DesplegableProps> = ({
           entering={FadeIn.duration(CONTENT_ANIM_DURATION).reduceMotion(ReduceMotion.Never)}
           exiting={FadeOut.duration(CONTENT_ANIM_DURATION).reduceMotion(ReduceMotion.Never)}
         >
-          {children}
+          <View style={styles.childrenWrapper}>
+            {children}
+          </View>
         </Animated.View>
       )}
     </Animated.View>
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
   titleText: {
     flex: 1,
     paddingRight: 10,
+    flexShrink: 1,
   },
   iconWrapper: {
     position: "absolute",
@@ -146,6 +149,11 @@ const styles = StyleSheet.create({
   content: {
     marginTop: 10,
     paddingHorizontal: 5,
+    alignSelf: "stretch",
+  },
+  childrenWrapper: {
+    flex: 1,
+    width: "100%",
   },
 });
 export default Desplegable;
