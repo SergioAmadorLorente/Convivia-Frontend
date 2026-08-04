@@ -49,7 +49,8 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange }) => 
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        padding: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
         gap: 17,
         width: "90%",
         alignSelf: "center",
