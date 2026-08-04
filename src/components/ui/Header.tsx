@@ -140,8 +140,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
 
-    paddingTop: SIZES.paddingVertical * 7.5,
-    paddingBottom: SIZES.paddingVertical * 0.6,
+    paddingTop: SIZES.paddingVertical * 1.8,
+    paddingBottom: SIZES.paddingVertical * 1,
     paddingHorizontal: SIZES.paddingHorizontal,
     backgroundColor: COLORS.inputBackground,
     width: "100%",

@@ -246,9 +246,9 @@ const DashBoardPersonal: React.FC = () => {
       .filter(i => !i.Pagado)
       .sort((a, b) => b.FechaCreacion.getTime() - a.FechaCreacion.getTime());
 
-    // Completadas: todas las pagadas, ordenadas por FechaCompletada descendente
+    // Completadas: todas las pagadas (dentro de los 20 días de visibilidad), ordenadas por FechaCompletada descendente
     completedItems = facturas
-      .filter(i => i.Pagado)
+      .filter(i => i.Pagado && i.isCompletedWithinDays(20))
       .sort((a, b) =>
         (b.FechaCompletada?.getTime() || 0) - (a.FechaCompletada?.getTime() || 0)
       );
@@ -275,14 +275,14 @@ const DashBoardPersonal: React.FC = () => {
       <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
 
       <ScrollView
-        contentContainerStyle={[GLOBAL_STYLES.scrollContainer2, { paddingBottom: hp("15%") }, Platform.OS === "web" ? WEB_FULL_VIEWPORT : {}]}
+        contentContainerStyle={[GLOBAL_STYLES.scrollContainer2, { paddingTop: hp("0.5%"), paddingBottom: hp("15%") }, Platform.OS === "web" ? WEB_FULL_VIEWPORT : {}]}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
         keyboardShouldPersistTaps="handled"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#8B5CF6"]} tintColor="#8B5CF6" />}
       >
         {activeTab === "tareas" && (
-          <View style={[GLOBAL_STYLES.fullWidth, { marginTop: 10, marginBottom: 15 }]}>
+          <View style={[GLOBAL_STYLES.fullWidth, { marginTop: 4, marginBottom: 12 }]}>
             <TasksFilter
               currentFilter={selectedFilter}
               currentVisibility={visibility}

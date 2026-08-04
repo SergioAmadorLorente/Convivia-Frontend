@@ -6,11 +6,11 @@ import {
   obtenerUsuarioEspacios,
 } from "../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../api/espacio";
-import { obtenerTareasPorEspacio, obtenerDetalleTareaInstancia } from "../api/tarea";
+import { obtenerTareasPorEspacio, obtenerDetalleTareaInstancia, eliminarTarea } from "../api/tarea";
 import TaskModel from "../types/Task";
 import type { PlantillaTarea, Tarea } from "../types/Task";
 import FacturaModel from "../types/Factura";
-import { obtenerFacturasPorDeudor } from "../api/factura";
+import { obtenerFacturasPorDeudor, eliminarFactura } from "../api/factura";
 import { obtenerKarmaUsuario } from "../api/karma";
 
 export const useDashboardData = (newSpaceName?: string) => {
@@ -288,11 +288,72 @@ export const useDashboardData = (newSpaceName?: string) => {
 
         console.log("Facturas mapeadas:", mapped.length);
         setFacturas(mapped);
+
+        // Eliminar del backend las facturas pagadas que superaron los 20 días de visibilidad
+        limpiarFacturasAntiguas(currentEspacioId, mapped).catch((error) => {
+          console.warn("Error en limpieza de facturas antiguas:", error);
+        });
       }
     } catch (err) {
       // console.error("Error cargando facturas:", err);
     } finally {
       setLoadingFacturas(false);
+    }
+  };
+
+  // Elimina automáticamente del backend las tareas completadas que superaron los 7 días de visibilidad
+  const limpiarTareasAntiguas = async (targetEspacioId: string, tareasMapeadas: TaskModel[]) => {
+    const tareasAntiguas = tareasMapeadas.filter(
+      (t) => t.isCompleted && !t.isCompletedWithinDays(7)
+    );
+
+    if (tareasAntiguas.length === 0) return;
+
+    // Eliminar en paralelo, sin bloquear la UI. Los errores se ignoran silenciosamente
+    // (p.ej. 404 si otro usuario ya eliminó la tarea).
+    const eliminadas = new Set<string>();
+    await Promise.all(
+      tareasAntiguas.map(async (task) => {
+        try {
+          await eliminarTarea(targetEspacioId, task.id);
+          eliminadas.add(task.id);
+        } catch (error) {
+          console.warn(`No se pudo eliminar la tarea antigua ${task.id}:`, error);
+        }
+      })
+    );
+
+    // Si alguna se eliminó correctamente, actualizar el estado local
+    if (eliminadas.size > 0) {
+      setTareas((prev) => prev.filter((t) => !eliminadas.has(t.id)));
+    }
+  };
+
+  // Elimina automáticamente del backend las facturas pagadas que superaron los 20 días de visibilidad
+  const limpiarFacturasAntiguas = async (targetEspacioId: string, facturasMapeadas: FacturaModel[]) => {
+    const facturasAntiguas = facturasMapeadas.filter(
+      (f) => f.Pagado && !f.isCompletedWithinDays(20)
+    );
+
+    if (facturasAntiguas.length === 0) return;
+
+    // Eliminar en paralelo, sin bloquear la UI. Los errores se ignoran silenciosamente
+    // (p.ej. 404 si otro usuario ya eliminó la factura).
+    const eliminadas = new Set<string>();
+    await Promise.all(
+      facturasAntiguas.map(async (factura) => {
+        try {
+          await eliminarFactura(targetEspacioId, factura.IdFactura);
+          eliminadas.add(factura.IdFactura);
+        } catch (error) {
+          console.warn(`No se pudo eliminar la factura antigua ${factura.IdFactura}:`, error);
+        }
+      })
+    );
+
+    // Si alguna se eliminó correctamente, actualizar el estado local
+    if (eliminadas.size > 0) {
+      setFacturas((prev) => prev.filter((f) => !eliminadas.has(f.IdFactura)));
     }
   };
 
@@ -466,6 +527,11 @@ export const useDashboardData = (newSpaceName?: string) => {
           );
 
           setTareas(mappedTasks);
+
+          // Eliminar del backend las tareas completadas que superaron los 7 días de visibilidad
+          limpiarTareasAntiguas(currentEspacioId, mappedTasks).catch((error) => {
+            console.warn("Error en limpieza de tareas antiguas:", error);
+          });
         })(),
       ]);
     } catch (error) {
