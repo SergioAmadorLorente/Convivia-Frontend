@@ -514,24 +514,22 @@ const MiResidencia: React.FC = () => {
   return (
     <>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 110 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={GLOBAL_STYLES.container}>
-          {/* Back Button */}
-
           <Text style={GLOBAL_STYLES.title}>{t('myResidence.title')}</Text>
 
-          <View style={{ width: "85%", marginTop: 20 }}>
-            {/* Residence Card */}
+          <View style={{ width: "100%", paddingHorizontal: 20, marginTop: 15 }}>
+            {/* Residence Hero Card */}
             <View style={styles.residenciaCard}>
               <View style={styles.iconContainer}>
-                <Ionicons name="home" size={30} color="#fff" />
+                <Ionicons name="home-sharp" size={26} color="#fff" />
               </View>
               {loadingResidencia ? (
                 <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8 }}>
                   <ActivityIndicator size="small" color={COLORS.primary} />
-                  <Text style={[styles.residenciaName, { color: "#999" }]}>{t("common.loading")}</Text>
+                  <Text style={[styles.residenciaName, { color: "#888" }]}>{t("common.loading")}</Text>
                 </View>
               ) : (
                 <View style={{ flex: 1, justifyContent: "center", marginRight: 10 }}>
@@ -540,7 +538,7 @@ const MiResidencia: React.FC = () => {
               )}
               {isAdmin && (
                 <TouchableOpacity
-                  style={styles.editIcon}
+                  style={styles.editIconBtn}
                   onPress={() =>
                     navigation.navigate("EditarResidencia", {
                       espacioId: residenciaData?.id || "",
@@ -548,8 +546,9 @@ const MiResidencia: React.FC = () => {
                       ubicacionInicial: residenciaData?.direccion || "",
                     })
                   }
+                  activeOpacity={0.8}
                 >
-                  <FontAwesome5 name="edit" size={20} color={COLORS.accent} />
+                  <FontAwesome5 name="pen" size={14} color={COLORS.primary} />
                 </TouchableOpacity>
               )}
             </View>
@@ -559,28 +558,33 @@ const MiResidencia: React.FC = () => {
               style={styles.section}
               layout={LinearTransition.duration(260).reduceMotion(ReduceMotion.Never)}
             >
-              <Text style={styles.sectionTitle}>{t('myResidence.codeLabel')}</Text>
-              <View style={styles.divider} />
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionHeaderAccent} />
+                <Text style={styles.sectionTitle}>{t('myResidence.codeLabel')}</Text>
+              </View>
 
               {generatedCode ? (
-                <TouchableOpacity onPress={handleCopyCode} activeOpacity={0.8} style={{ alignItems: 'center', width: '100%' }}>
+                <TouchableOpacity onPress={handleCopyCode} activeOpacity={0.85} style={{ alignItems: 'center', width: '100%' }}>
                   <View style={styles.codeContainer}>
                     {generatedCode.split("").map((digit, index) => (
                       <CodeBox key={index} digit={digit} />
                     ))}
                   </View>
-                  {copied && (
-                    <Text style={{ marginTop: 10, color: COLORS.primary, fontFamily: FONTS.bold, fontSize: 14 }}>
-                      {t('myResidence.codeCopied')}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, gap: 6 }}>
+                    <Ionicons name={copied ? "checkmark-circle" : "copy-outline"} size={16} color={copied ? COLORS.primary : "#888"} />
+                    <Text style={{ color: copied ? COLORS.primary : "#777", fontFamily: FONTS.bold, fontSize: 13 }}>
+                      {copied ? t('myResidence.codeCopied') : "Toca para copiar código"}
                     </Text>
-                  )}
+                  </View>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.generateButton}
                   onPress={handleGenerateCode}
                   disabled={loadingCode}
+                  activeOpacity={0.85}
                 >
+                  <Ionicons name="key-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
                   <Text style={styles.generateButtonText}>
                     {loadingCode ? t('common.loading') : t('myResidence.generateCode')}
                   </Text>
@@ -599,7 +603,12 @@ const MiResidencia: React.FC = () => {
                       layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
                     >
                       <TouchableOpacity
-                        style={styles.participantItem}
+                        style={[
+                          styles.participantItem,
+                          index === 0 && styles.participantItemGold,
+                          index === 1 && styles.participantItemSilver,
+                          index === 2 && styles.participantItemBronze,
+                        ]}
                         onPress={() => handleParticipantPress(participant)}
                         activeOpacity={0.7}
                       >
@@ -617,13 +626,23 @@ const MiResidencia: React.FC = () => {
                           {participant?.fotoUrl ? (
                             <Image
                               source={{ uri: participant.fotoUrl }}
-                              style={{ width: 40, height: 40, borderRadius: 20 }}
+                              style={[
+                                { width: 42, height: 42, borderRadius: 21 },
+                                index === 0 && styles.avatarGold,
+                                index === 1 && styles.avatarSilver,
+                                index === 2 && styles.avatarBronze,
+                              ]}
                               onError={() => {
                                 if (participant?.id) photoCache.delete(participant.id);
                               }}
                             />
                           ) : (
-                            <View style={styles.participantIcon}>
+                            <View style={[
+                              styles.participantIcon,
+                              index === 0 && styles.avatarGold,
+                              index === 1 && styles.avatarSilver,
+                              index === 2 && styles.avatarBronze,
+                            ]}>
                               <Ionicons name="person" size={20} color={COLORS.primary} />
                             </View>
                           )}
@@ -639,7 +658,7 @@ const MiResidencia: React.FC = () => {
                               {participant?.nombre || participant?.email || "Usuario sin nombre"}
                             </Text>
                             {index === 0 && (
-                              <LogoKarma width={16} height={16} style={{ marginLeft: 6, marginBottom: 4 }} />
+                              <LogoKarma width={16} height={16} style={{ marginLeft: 6, marginBottom: 2 }} />
                             )}
                           </View>
                           <Text style={styles.participantKarma}>
@@ -659,32 +678,34 @@ const MiResidencia: React.FC = () => {
 
             {/* Settings Section */}
             <Animated.View
-              style={styles.section}
+              style={[styles.section, { marginTop: 15 }]}
               layout={LinearTransition.duration(260).reduceMotion(ReduceMotion.Never)}
             >
-              <Text style={styles.sectionTitle}>{t('myResidence.settings')}</Text>
-              <View style={styles.divider} />
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionHeaderAccent} />
+                <Text style={styles.sectionTitle}>{t('myResidence.settings')}</Text>
+              </View>
 
               <View style={styles.buttonsContainer}>
                 <TouchableOpacity
-                  style={styles.actionButton}
+                  style={styles.actionButtonDanger}
                   onPress={handleAbandonarResidencia}
+                  activeOpacity={0.8}
                 >
-                  <Text
-                    style={[styles.actionButtonText, { color: COLORS.error }]}
-                  >
+                  <Ionicons name="log-out-outline" size={20} color="#DC2626" style={{ marginRight: 10 }} />
+                  <Text style={styles.actionButtonDangerText}>
                     {t('myResidence.leaveResidence')}
                   </Text>
                 </TouchableOpacity>
 
                 {isAdmin && (
                   <TouchableOpacity
-                    style={styles.actionButton}
+                    style={styles.actionButtonDelete}
                     onPress={handleEliminarResidencia}
+                    activeOpacity={0.8}
                   >
-                    <Text
-                      style={[styles.actionButtonText, { color: COLORS.error }]}
-                    >
+                    <Ionicons name="trash-outline" size={20} color="#DC2626" style={{ marginRight: 10 }} />
+                    <Text style={styles.actionButtonDeleteText}>
                       {t('myResidence.deleteResidence')}
                     </Text>
                   </TouchableOpacity>
@@ -885,162 +906,183 @@ const MiResidencia: React.FC = () => {
 const styles = StyleSheet.create({
   residenciaCard: {
     width: "100%",
-    backgroundColor: COLORS.background,
-    borderRadius: 15,
-    padding: 15,
+    backgroundColor: COLORS.success,
+    borderRadius: 24,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
-    ...Platform.select({
-      ios: { ...COMMON.SHADOW },
-      web: { ...COMMON.SHADOW },
-      android: {
-        borderWidth: 1,
-        borderColor: "#EAE9E6",
-      },
-    }),
-    marginBottom: 30,
+    ...COMMON.SHADOW,
+    marginBottom: 24,
   },
   iconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#C8C8C8", // Greyish from image
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
+    marginRight: 16,
+    ...COMMON.SHADOW,
   },
   residenciaName: {
-    fontFamily: FONTS.bold,
-    fontSize: 15,
-    color: "#333",
+    fontFamily: FONTS.title,
+    fontSize: 20,
+    color: COLORS.secondary,
   },
-  editIcon: {
-    padding: 5,
+  editIconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.background,
+    justifyContent: "center",
+    alignItems: "center",
+    ...COMMON.SHADOW,
   },
   section: {
     width: "100%",
-    marginBottom: 25,
+    marginBottom: 24,
   },
-  sectionHeaderClickable: {
+  sectionHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    gap: 10,
+    marginBottom: 16,
+  },
+  sectionHeaderAccent: {
+    width: 4,
+    height: 20,
+    backgroundColor: COLORS.accent,
+    borderRadius: 4,
   },
   sectionTitle: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: COLORS.accent,
-    marginBottom: 5,
+    fontFamily: FONTS.title,
+    fontSize: 18,
+    color: COLORS.secondary,
   },
   divider: {
-    height: 2,
-    backgroundColor: "#8F9B78", // Un greenish dark line
+    height: 1,
+    backgroundColor: "#E2E2E0",
     marginBottom: 15,
   },
   codeContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
+    width: "100%",
   },
   codeBox: {
-    width: 45,
-    height: 55,
-    backgroundColor: "#E6ECDC",
-    borderRadius: 10,
+    width: 46,
+    height: 56,
+    backgroundColor: COLORS.background,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
-    ...Platform.select({
-      ios: { ...COMMON.SHADOW },
-      web: { ...COMMON.SHADOW },
-      android: {
-        borderWidth: 1,
-        borderColor: "#D4DCB9",
-      },
-    }),
+    ...COMMON.SHADOW,
+    borderWidth: 1,
+    borderColor: "#E6ECDC",
   },
   codeText: {
     fontFamily: FONTS.title,
     fontSize: 24,
-    color: "#333",
+    color: COLORS.primary,
   },
   generateButton: {
-    backgroundColor: "#E6ECDC",
-    paddingVertical: 12,
-    borderRadius: 10,
+    flexDirection: "row",
+    backgroundColor: COLORS.success,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 16,
     alignItems: "center",
-    ...Platform.select({
-      ios: { ...COMMON.SHADOW },
-      web: { ...COMMON.SHADOW },
-      android: {
-        borderWidth: 1,
-        borderColor: "#D4DCB9",
-      },
-    }),
+    justifyContent: "center",
+    ...COMMON.SHADOW,
   },
   generateButtonText: {
     fontFamily: FONTS.bold,
     color: COLORS.primary,
-    fontSize: 16,
+    fontSize: 15,
   },
   participantsList: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 2,
+    gap: 8,
   },
   participantItem: {
-    ...Platform.select({
-      ios: { ...COMMON.SHADOW },
-      web: { ...COMMON.SHADOW },
-      android: {
-        borderWidth: 1,
-        borderColor: "#EAE9E6",
-      },
-    }),
     backgroundColor: COLORS.background,
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    ...COMMON.SHADOW,
+  },
+  participantItemGold: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#EAB308",
+    backgroundColor: COLORS.background,
+  },
+  participantItemSilver: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#94A3B8",
+    backgroundColor: COLORS.background,
+  },
+  participantItemBronze: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#D97706",
+    backgroundColor: COLORS.background,
   },
   participantRankContainer: {
-    width: 30,
+    width: 28,
     alignItems: 'center',
     marginRight: 10,
   },
   participantRank: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 15,
     color: '#999',
   },
   participantRankFirst: {
-    color: '#FFD700',
-    fontSize: 18,
+    color: '#EAB308',
+    fontSize: 17,
   },
   participantRankSecond: {
-    color: '#C0C0C0',
-    fontSize: 17,
+    color: '#94A3B8',
+    fontSize: 16,
   },
   participantRankThird: {
-    color: '#CD7F32',
-    fontSize: 17,
+    color: '#D97706',
+    fontSize: 16,
   },
   participantIconWrapper: {
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 14,
   },
   participantIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: '#E6ECDC',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  avatarGold: {
+    borderWidth: 2,
+    borderColor: '#EAB308',
+  },
+  avatarSilver: {
+    borderWidth: 2,
+    borderColor: '#94A3B8',
+  },
+  avatarBronze: {
+    borderWidth: 2,
+    borderColor: '#D97706',
+  },
   adminBadge: {
     marginTop: 3,
     backgroundColor: COLORS.accent,
-    borderRadius: 4,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
   },
   adminBadgeText: {
     fontFamily: FONTS.bold,
@@ -1052,36 +1094,49 @@ const styles = StyleSheet.create({
   },
   participantName: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 4,
+    fontSize: 15,
+    color: COLORS.secondary,
+    marginBottom: 2,
   },
   participantKarma: {
     fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.primary,
   },
   buttonsContainer: {
-    gap: 15,
+    gap: 12,
   },
-  actionButton: {
-    backgroundColor: "#D9D9D9", // Light grey button
-    paddingVertical: 15,
-    borderRadius: 15,
+  actionButtonDanger: {
+    flexDirection: "row",
+    backgroundColor: "rgba(220, 38, 38, 0.07)",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 16,
     alignItems: "center",
-    ...Platform.select({
-      ios: { ...COMMON.SHADOW },
-      web: { ...COMMON.SHADOW },
-      android: {
-        borderWidth: 1,
-        borderColor: "#CCCCCC",
-      },
-    }),
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(220, 38, 38, 0.25)",
   },
-  actionButtonText: {
-    fontFamily: FONTS.regular,
-    fontSize: 16,
-    color: "#333",
+  actionButtonDangerText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: "#DC2626",
+  },
+  actionButtonDelete: {
+    flexDirection: "row",
+    backgroundColor: "rgba(220, 38, 38, 0.12)",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(220, 38, 38, 0.35)",
+  },
+  actionButtonDeleteText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: "#DC2626",
   },
 });
 
