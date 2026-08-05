@@ -299,7 +299,7 @@ const Perfil: React.FC = () => {
             icon={<LogoutSinFondo width={24} height={24} />}
           />
           <Text style={{ textAlign: "right", color: "green", fontSize: 11, marginTop: 3, paddingRight: 12, opacity: 0.7 }}>
-            {"v3.9.17 APKDynamic"}
+            {"v3.10.3 APKDynamic"}
           </Text>
 
         </View>
