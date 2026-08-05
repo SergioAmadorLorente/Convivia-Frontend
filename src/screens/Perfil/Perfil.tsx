@@ -180,14 +180,15 @@ const Perfil: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      {/* Título fijo – siempre visible encima del scroll */}
+      <TouchableOpacity onPress={handleTitleTap} activeOpacity={1} style={styles.titleBar}>
+        <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
+      </TouchableOpacity>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Title */}
-        <TouchableOpacity onPress={handleTitleTap} activeOpacity={1} style={{ marginTop: 0 }}>
-          <Text style={[GLOBAL_STYLES.title, { marginTop: 0 }]}>{t("profile.title")}</Text>
-        </TouchableOpacity>
 
         {/* User Hero Card */}
         <View style={styles.userCard}>
@@ -472,11 +473,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5F4F2",
   },
+  titleBar: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    alignItems: "center",
+    backgroundColor: "#F5F4F2",
+  },
   scrollContent: {
     alignItems: "center",
     paddingBottom: 110,
     paddingHorizontal: 20,
-    paddingTop: 0,
   },
   userCard: {
     width: "100%",
