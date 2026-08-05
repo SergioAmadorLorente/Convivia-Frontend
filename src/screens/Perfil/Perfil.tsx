@@ -314,7 +314,7 @@ const Perfil: React.FC = () => {
             isDanger={true}
           />
           <Text style={styles.versionText}>
-            {"v3.10.5 APKDynamic"}
+            {"v3.10.6 APKDynamic"}
           </Text>
 
         </View>
@@ -475,7 +475,8 @@ const styles = StyleSheet.create({
   },
   titleBar: {
     paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingTop: 4,
+    paddingBottom: 4,
     alignItems: "center",
     backgroundColor: "#F5F4F2",
   },
