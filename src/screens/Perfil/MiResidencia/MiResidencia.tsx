@@ -45,6 +45,7 @@ const { width } = Dimensions.get("window");
 import useCodigoResidencia from "../../../hooks/useCodigoResidencia";
 import LogoKarma from "../../../assets/logo_karma.svg";
 import useFetchParticipants from "../../../hooks/useFetchParticipants";
+import { photoCache } from "../../../hooks/useProfilePhoto";
 import Desplegable from "../../../components/ui/Desplegable";
 
 const cleanId = (id?: string | null) => (id ? String(id).replace(/-/g, "").toLowerCase() : "");
@@ -617,6 +618,9 @@ const MiResidencia: React.FC = () => {
                             <Image
                               source={{ uri: participant.fotoUrl }}
                               style={{ width: 40, height: 40, borderRadius: 20 }}
+                              onError={() => {
+                                if (participant?.id) photoCache.delete(participant.id);
+                              }}
                             />
                           ) : (
                             <View style={styles.participantIcon}>

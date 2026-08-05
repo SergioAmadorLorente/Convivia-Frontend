@@ -29,7 +29,7 @@ import { useAuthListener } from "../../../hooks/useAuthListener";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../../api/usuarioEspacio";
 import { obtenerKarmaUsuario, obtenerRankingKarma } from "../../../api/karma";
 import { obtenerEstadisticasTareas } from "../../../api/espacio";
-import { obtenerUsuarios, getFullFotoUrl } from "../../../api/usuario";
+import { obtenerUsuarios, getFullFotoUrl, obtenerFotoUsuario, blobToBase64 } from "../../../api/usuario";
 import { photoCache } from "../../../hooks/useProfilePhoto";
 
 const { width } = Dimensions.get("window");
@@ -135,28 +135,31 @@ const MiKarma: React.FC = () => {
                 }
             };
 
-            const participants: KarmaParticipant[] = ranking.ranking
-                .filter((r: any) => {
-                    const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
-                    return uEspaciosMap.has(cleanKey); // Filtrar registros inactivos/huérfanos del espacio
-                })
-                .map((r: any) => {
-                    const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
-                    const firebaseUid = uEspaciosMap.get(cleanKey);
-                    const userObj = firebaseUid ? usuariosMap.get(firebaseUid) : null;
-                    const name = userObj ? (userObj.nombre || userObj.email || "Usuario") : "Usuario";
-                    // Resolver URL de foto: backend → caché como fallback
-                    const rawFotoUrl = userObj?.fotoUrl ?? userObj?.FotoUrl ?? null;
-                    const fotoUrl =
-                        getFullFotoUrl(rawFotoUrl) ??
-                        (firebaseUid ? photoCache.get(firebaseUid) : undefined) ??
-                        null;
-                    return {
-                        name,
-                        points: getPoints(r),
-                        fotoUrl,
-                    };
-                });
+            const participants: KarmaParticipant[] = await Promise.all(
+                ranking.ranking
+                    .filter((r: any) => {
+                        const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
+                        return uEspaciosMap.has(cleanKey); // Filtrar registros inactivos/huérfanos del espacio
+                    })
+                    .map(async (r: any) => {
+                        const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
+                        const firebaseUid = uEspaciosMap.get(cleanKey);
+                        const userObj = firebaseUid ? usuariosMap.get(firebaseUid) : null;
+                        const name = userObj ? (userObj.nombre || userObj.email || "Usuario") : "Usuario";
+
+                        const rawFotoUrl = userObj?.fotoUrl ?? userObj?.FotoUrl ?? null;
+                        const fotoUrl =
+                            (firebaseUid ? photoCache.get(firebaseUid) : null) ??
+                            getFullFotoUrl(rawFotoUrl) ??
+                            null;
+
+                        return {
+                            name,
+                            points: getPoints(r),
+                            fotoUrl,
+                        };
+                    })
+            );
 
             // 5. Actualizar estado
             setKarmaData({

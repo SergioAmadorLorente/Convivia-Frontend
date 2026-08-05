@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuthListenerFull } from "./useAuthListener";
-import { obtenerUsuarioPorId, obtenerUsuarios, getFullFotoUrl } from "../api/usuario";
+import { obtenerUsuarioPorId, obtenerUsuarios, getFullFotoUrl, obtenerFotoUsuario, blobToBase64 } from "../api/usuario";
+import { photoCache } from "./useProfilePhoto";
 import {
   obtenerEspacioPorUsuarioId,
   obtenerUsuarioEspacios,
@@ -129,7 +130,7 @@ export const useDashboardData = (newSpaceName?: string) => {
               if (u) {
                 const nombre = u.nombre || u.email || u.id || "Miembro";
                 const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
-                const fotoUrl = getFullFotoUrl(rawFoto);
+                const fotoUrl = (usuarioId ? photoCache.get(usuarioId) : null) ?? getFullFotoUrl(rawFoto) ?? null;
                 const entry = { name: nombre, fotoUrl };
                 if (relId) map[relId] = entry;
                 if (usuarioId) map[usuarioId] = entry;

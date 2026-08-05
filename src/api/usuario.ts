@@ -1,5 +1,6 @@
 import api from "./client";
 import { API_CONFIG } from "./configs/apiConfig";
+import * as ImageManipulator from "expo-image-manipulator";
 
 // Interfaz que refleja la entidad Usuario del backend
 export interface UsuarioPayload {
@@ -22,6 +23,13 @@ export const getFullFotoUrl = (fotoUrl?: string | null): string | null => {
     if (!fotoUrl || typeof fotoUrl !== "string") return null;
     const trimmed = fotoUrl.trim();
     if (!trimmed) return null;
+
+    // Las URLs antiguas que apuntan al almacenamiento efímero /uploads/perfiles/ en Render ya no existen (404).
+    // Se descartan inmediatamente para no causar parpadeos ni peticiones fallidas.
+    if (trimmed.includes("/uploads/perfiles/")) {
+        return null;
+    }
+
     if (
         trimmed.startsWith("http://") ||
         trimmed.startsWith("https://") ||
@@ -137,6 +145,63 @@ export const subirFotoUsuario = async (id: string, imageUri: string) => {
         });
         throw error;
     }
+};
+
+// Obtener foto de perfil de usuario como Blob binario (mismo sistema que facturas)
+export const obtenerFotoUsuario = async (id: string): Promise<Blob> => {
+    try {
+        const response = await api.get(`/Usuario/${id}/foto`, {
+            responseType: "blob",
+        });
+        const blob = response.data;
+        // Verificar que sea realmente una imagen binaria válida y no un JSON de error
+        if (blob && (blob.type?.startsWith("image/") || (blob.type === "" && blob.size > 100))) {
+            return blob;
+        }
+        throw new Error("El archivo devuelto no es una imagen de perfil válida");
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Comprime y redimensiona una imagen local y la convierte a Data URL Base64.
+// Máximo 600×600 px con calidad JPEG del 70% para mantener el tamaño manejable en Firestore.
+export const uriToBase64 = async (uri: string): Promise<string> => {
+    if (!uri) return "";
+    if (uri.startsWith("data:")) return uri;
+    try {
+        // 1. Comprimir y redimensionar con expo-image-manipulator
+        const manipulated = await ImageManipulator.manipulateAsync(
+            uri,
+            [{ resize: { width: 600 } }], // Máx 600px de ancho; alto se ajusta automáticamente
+            { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+        );
+
+        // 2. Convertir la URI comprimida a Base64
+        const response = await fetch(manipulated.uri);
+        const blob = await response.blob();
+        return await blobToBase64(blob);
+    } catch (e) {
+        console.warn("[uriToBase64] Error comprimiendo/convirtiendo imagen:", e);
+        // Fallback: intentar convertir la URI original sin comprimir
+        try {
+            const response = await fetch(uri);
+            const blob = await response.blob();
+            return await blobToBase64(blob);
+        } catch {
+            return uri;
+        }
+    }
+};
+
+// Convierte un Blob a una cadena Data URL Base64 para usar directamente en <Image source={{ uri }} />
+export const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 };
 
 // Eliminar un usuario

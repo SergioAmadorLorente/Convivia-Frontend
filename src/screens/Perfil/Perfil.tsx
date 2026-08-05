@@ -32,7 +32,7 @@ import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
 import { useToast } from "../../hooks/useToast";
-import { useProfilePhoto } from "../../hooks/useProfilePhoto";
+import { useProfilePhoto, photoCache } from "../../hooks/useProfilePhoto";
 
 // Import SVG Assets
 import LogoKarma from "../../assets/logo_karma.svg";
@@ -193,6 +193,10 @@ const Perfil: React.FC = () => {
                 <Image
                   source={{ uri: photoUri }}
                   style={{ width: 60, height: 60, borderRadius: 30 }}
+                  onError={() => {
+                    if (user?.uid) photoCache.delete(user.uid);
+                    reloadPhoto(true);
+                  }}
                 />
               ) : (
                 <Ionicons name="person-outline" size={30} color={COLORS.primary} />
