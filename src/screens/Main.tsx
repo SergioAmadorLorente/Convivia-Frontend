@@ -161,7 +161,17 @@ const Main: React.FC = () => {
       </Button>
       <Button
         style={GLOBAL_STYLES.buttonSecondaryGrey}
-        onPress={() => navigation.navigate("IniciarSesion")}
+        onPress={() => {
+          fetch('https://convivia-backend-1ytr.onrender.com/health', {
+            method: 'GET',
+            headers: { accept: '*/*' },
+          })
+            .then((res) => res.text())
+            .then((text) => console.log('[Backend health]', text))
+            .catch((err) => console.log('[Backend health] error:', err));
+
+          navigation.navigate("IniciarSesion");
+        }}
       >
         {t('main.login')}
       </Button>

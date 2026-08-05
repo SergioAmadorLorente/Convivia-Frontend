@@ -280,7 +280,10 @@ export const useDashboardData = (newSpaceName?: string) => {
             Precio: f.precio || f.Precio || 0,
             Pagado: f.pagado || f.Pagado || false,
             FechaCreacion: f.fechaCreacion || f.FechaCreacion || new Date(),
-            FechaCompletada: f.fechaCompletada || f.FechaCompletada || null,
+            // Si la factura llega como Pagado=true pero sin FechaCompletada (dato antiguo o
+            // incompleto del backend), usamos la fecha de hoy como fallback. Sin esto,
+            // isCompletedWithinDays(20) devuelve false → la factura se borraría al instante.
+            FechaCompletada: f.fechaCompletada || f.FechaCompletada || ((f.pagado || f.Pagado) ? new Date() : null),
             UsuariosAsignados: userNames,
             creadorFactura: f.creadorFactura || f.CreadorFactura || "",
           });
