@@ -3,7 +3,7 @@ import {
   obtenerUsuarioEspacios,
   obtenerEspacioPorUsuarioId,
 } from "../api/usuarioEspacio";
-import { obtenerUsuarioPorId, getFullFotoUrl } from "../api/usuario";
+import { obtenerUsuarioPorId, getFullFotoUrl, obtenerFotoUsuario, blobToBase64 } from "../api/usuario";
 import { obtenerRankingKarma } from "../api/karma";
 import { photoCache } from "./useProfilePhoto";
 
@@ -71,19 +71,18 @@ const useFetchParticipants = () => {
             karmaSemanal: 0,
           };
 
-          // Resolver la URL de la foto:
-          // 1. Intentar con la fotoUrl del backend (relativa → absoluta)
-          // 2. Si el backend devuelve null, usar el caché de useProfilePhoto (subida reciente)
+          // Resolver la foto del participante:
+          const targetUserId = usuario?.id || r.usuarioId;
           const rawFotoUrl = usuario?.fotoUrl ?? usuario?.FotoUrl ?? null;
           const resolvedFotoUrl =
+            (targetUserId ? photoCache.get(targetUserId) : null) ??
             getFullFotoUrl(rawFotoUrl) ??
-            photoCache.get(usuario?.id ?? r.usuarioId) ??
             null;
-          
+
           return {
             ...usuario,
             ...karma,
-            fotoUrl: resolvedFotoUrl, // sobrescribir con la URL resuelta y absoluta
+            fotoUrl: resolvedFotoUrl, // sobrescribir con la URL resuelta y absoluta o base64
             rol: r.rol ?? null,
           };
         } catch (e) {

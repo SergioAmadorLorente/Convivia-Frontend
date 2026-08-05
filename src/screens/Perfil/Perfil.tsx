@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Modal,
   Image,
+  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signOut } from "firebase/auth";
@@ -32,7 +33,7 @@ import { COLORS, FONTS, SIZES, HELPERS, COMMON } from "../../styles/theme";
 
 import GLOBAL_STYLES from "../../styles/styles";
 import { useToast } from "../../hooks/useToast";
-import { useProfilePhoto } from "../../hooks/useProfilePhoto";
+import { useProfilePhoto, photoCache } from "../../hooks/useProfilePhoto";
 
 // Import SVG Assets
 import LogoKarma from "../../assets/logo_karma.svg";
@@ -157,45 +158,58 @@ const Perfil: React.FC = () => {
     label,
     onPress,
     icon,
+    isDanger = false,
   }: {
     label: string;
     onPress?: () => void;
     icon: React.ReactNode;
+    isDanger?: boolean;
   }) => (
-    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-      <View style={styles.menuIconContainer}>
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <View style={[styles.menuIconContainer, isDanger && styles.menuIconContainerDanger]}>
         {icon}
       </View>
-      <Text style={styles.menuText}>{label}</Text>
+      <Text style={[styles.menuText, isDanger && styles.menuTextDanger]}>{label}</Text>
+      <Ionicons name="chevron-forward" size={18} color={isDanger ? "#EF4444" : "#BBB"} />
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <View
-        style={styles.scrollContent}
-      >
-        {/* Header Title */}
-        <TouchableOpacity onPress={handleTitleTap} activeOpacity={1}>
-          <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
-        </TouchableOpacity>
+      {/* Título fijo – siempre visible encima del scroll */}
+      <TouchableOpacity onPress={handleTitleTap} activeOpacity={1} style={styles.titleBar}>
+        <Text style={GLOBAL_STYLES.title}>{t("profile.title")}</Text>
+      </TouchableOpacity>
 
-        {/* User Card */}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+
+        {/* User Hero Card */}
         <View style={styles.userCard}>
           <View style={styles.userInfoRow}>
             {/* Avatar */}
             <TouchableOpacity
               style={styles.avatarContainer}
               onPress={() => navigation.navigate("EditarPerfil")}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
             >
               {photoUri ? (
                 <Image
                   source={{ uri: photoUri }}
-                  style={{ width: 60, height: 60, borderRadius: 30 }}
+                  style={{ width: 62, height: 62, borderRadius: 31 }}
+                  onError={() => {
+                    if (user?.uid) photoCache.delete(user.uid);
+                    reloadPhoto(true);
+                  }}
                 />
               ) : (
-                <Ionicons name="person-outline" size={30} color={COLORS.primary} />
+                <Ionicons name="person" size={28} color={COLORS.primary} />
               )}
             </TouchableOpacity>
 
@@ -204,27 +218,30 @@ const Perfil: React.FC = () => {
               {loading ? (
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                   <ActivityIndicator size="small" color={COLORS.primary} />
-                  <Text style={[styles.userName, { color: "#999" }]}>{t("common.loading")}</Text>
+                  <Text style={[styles.userName, { color: "#888" }]}>{t("common.loading")}</Text>
                 </View>
               ) : (
                 <>
-                  <Text style={styles.userName}>{userName}</Text>
-                  <Text style={styles.userKarma}>
-                    {t("profile.karmaPoints", { points: userKarma })}
-                    <LogoKarma width={14} height={14} style={{ marginLeft: 4 }} />
-                  </Text>
+                  <Text style={styles.userName} numberOfLines={1}>{userName}</Text>
+                  <View style={styles.karmaBadgePill}>
+                    <LogoKarma width={14} height={14} />
+                    <Text style={styles.userKarma}>
+                      {t("profile.karmaPoints", { points: userKarma })}
+                    </Text>
+                  </View>
                 </>
               )}
             </View>
 
             {/* Action Buttons */}
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               {/* Language Icon */}
               <TouchableOpacity
-                style={[styles.editButton, { marginRight: 5 }]}
+                style={styles.iconActionBtn}
                 onPress={() => setLangModalVisible(true)}
+                activeOpacity={0.8}
               >
-                <Text style={{ fontSize: 20 }}>
+                <Text style={{ fontSize: 18 }}>
                   {i18n.language.startsWith("es") ? "🇪🇸"
                     : i18n.language.startsWith("fr") ? "🇫🇷"
                       : i18n.language.startsWith("it") ? "🇮🇹"
@@ -236,23 +253,24 @@ const Perfil: React.FC = () => {
 
               {/* Edit Icon */}
               <TouchableOpacity
-                style={styles.editButton}
+                style={styles.iconActionBtn}
                 onPress={() => navigation.navigate('EditarPerfil')}
+                activeOpacity={0.8}
               >
-                <FontAwesome5 name="edit" size={18} color="#ACBF8A" />
+                <FontAwesome5 name="pen" size={14} color={COLORS.primary} />
               </TouchableOpacity>
             </View>
           </View>
         </View>
 
-        {/* Menu List Container (White box with rounded corners) */}
+        {/* Menu List Container */}
         <View style={styles.menuContainer}>
 
           {/* Mi Karma */}
           <MenuItem
             label={t("profile.menu.karma")}
             onPress={() => navigation.navigate("MiKarma")}
-            icon={<LogoKarma width={30} height={30} />}
+            icon={<LogoKarma width={24} height={24} />}
           />
           <View style={styles.divider} />
 
@@ -260,7 +278,7 @@ const Perfil: React.FC = () => {
           <MenuItem
             label={t("profile.menu.residences")}
             onPress={() => navigation.navigate("MiResidencia")}
-            icon={<Miresidencia width={24} height={24} />}
+            icon={<Miresidencia width={22} height={22} />}
           />
           <View style={styles.divider} />
 
@@ -268,7 +286,7 @@ const Perfil: React.FC = () => {
           <MenuItem
             label={t("profile.menu.faq")}
             onPress={() => navigation.navigate("FAQ")}
-            icon={<IconoFAQ width={24} height={24} />}
+            icon={<IconoFAQ width={22} height={22} />}
           />
           <View style={styles.divider} />
 
@@ -276,7 +294,7 @@ const Perfil: React.FC = () => {
           <MenuItem
             label={t("profile.menu.legal")}
             onPress={() => navigation.navigate("InfoLegal")}
-            icon={<Infolegal width={24} height={24} />}
+            icon={<Infolegal width={22} height={22} />}
           />
           <View style={styles.divider} />
 
@@ -284,7 +302,7 @@ const Perfil: React.FC = () => {
           <MenuItem
             label={t("profile.menu.pro")}
             onPress={() => navigation.navigate('ConviviaPro')}
-            icon={<IconoConviviaPRO width={24} height={24} />}
+            icon={<IconoConviviaPRO width={22} height={22} />}
           />
           <View style={styles.divider} />
 
@@ -292,14 +310,15 @@ const Perfil: React.FC = () => {
           <MenuItem
             label={t("profile.menu.logout")}
             onPress={() => setModalVisible(true)}
-            icon={<LogoutSinFondo width={24} height={24} />}
+            icon={<LogoutSinFondo width={22} height={22} />}
+            isDanger={true}
           />
-          <Text style={{ textAlign: "right", color: "green", fontSize: 11, marginTop: 3, paddingRight: 12, opacity: 0.7 }}>
-            {"v3.9.17 APKDynamic"}
+          <Text style={styles.versionText}>
+            {"v3.10.6 APKDynamic"}
           </Text>
 
         </View>
-      </View>
+      </ScrollView>
 
       <Popup
         visible={modalVisible}
@@ -452,82 +471,132 @@ const Perfil: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "#F5F4F2",
+  },
+  titleBar: {
+    paddingHorizontal: 20,
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignItems: "center",
+    backgroundColor: "#F5F4F2",
   },
   scrollContent: {
     alignItems: "center",
-    paddingBottom: HELPERS.hp("8%"),
-    backgroundColor: "#F5F4F2",
+    paddingBottom: 110,
+    paddingHorizontal: 20,
   },
   userCard: {
-    width: width * 0.9,
-    backgroundColor: COLORS.background,
-    borderRadius: 15,
-    padding: 15,
+    width: "100%",
+    backgroundColor: COLORS.success,
+    borderRadius: 24,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    marginTop: 12,
+    marginBottom: 20,
     ...COMMON.SHADOW,
-    marginTop: HELPERS.hp("4%"),
-    marginBottom: HELPERS.hp("4%"),
   },
   userInfoRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   avatarContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: COLORS.background,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
+    marginRight: 14,
+    borderWidth: 2.5,
+    borderColor: COLORS.primary,
+    ...COMMON.SHADOW,
   },
   userDetails: {
     flex: 1,
-    marginRight: 10,
+    marginRight: 8,
+    justifyContent: "center",
   },
   userName: {
-    fontFamily: FONTS.bold,
-    fontSize: SIZES.text16,
-    color: "#333",
+    fontFamily: FONTS.title,
+    fontSize: 19,
+    color: COLORS.secondary,
+    lineHeight: 22,
+  },
+  karmaBadgePill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 8,
+    backgroundColor: "rgba(107, 112, 92, 0.12)",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    alignSelf: "flex-start",
   },
   userKarma: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.smallText,
-    color: "#666",
-    marginTop: 4,
+    fontFamily: FONTS.bold,
+    fontSize: 11,
+    color: COLORS.primary,
   },
-  editButton: {
-    padding: 5,
+  iconActionBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.background,
+    justifyContent: "center",
+    alignItems: "center",
+    ...COMMON.SHADOW,
   },
   menuContainer: {
-    width: width,
+    width: "100%",
     backgroundColor: COLORS.background,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    minHeight: HELPERS.hp("50%"),
+    borderRadius: 24,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     ...COMMON.SHADOW,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 15,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderRadius: 14,
   },
   menuIconContainer: {
     width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#F5F4F2",
+    justifyContent: "center",
     alignItems: "center",
-    marginRight: 15,
+    marginRight: 14,
+  },
+  menuIconContainerDanger: {
+    backgroundColor: "rgba(239, 68, 68, 0.08)",
   },
   menuText: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.text16,
-    color: "#4B4741",
+    flex: 1,
+    fontFamily: FONTS.bold,
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
+  },
+  menuTextDanger: {
+    color: "#EF4444",
   },
   divider: {
     height: 1,
-    backgroundColor: "#E0E0E0",
-    marginLeft: 55,
+    backgroundColor: "#F0F0EE",
+    marginHorizontal: 8,
+  },
+  versionText: {
+    textAlign: "right",
+    color: "green",
+    fontSize: 11,
+    marginTop: 10,
+    marginBottom: 4,
+    paddingRight: 8,
+    opacity: 0.7,
+    fontFamily: FONTS.regular,
   },
   modalOverlay: {
     flex: 1,
@@ -536,8 +605,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: COLORS.background || "#FFF",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     padding: 24,
     paddingBottom: Platform.OS === "ios" ? 40 : 24,
     elevation: 5,
@@ -553,8 +622,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modalTitle: {
-    fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontFamily: FONTS.title,
+    fontSize: 20,
     color: COLORS.primary || "#333",
   },
   langOption: {
@@ -562,18 +631,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 12,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    marginBottom: 10,
     backgroundColor: "#F5F4F2",
   },
   langOptionSelected: {
     backgroundColor: "#E6ECDC",
+    borderWidth: 1,
+    borderColor: COLORS.accent,
   },
   langOptionText: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.text16,
-    color: "#4B4741",
+    fontFamily: FONTS.bold,
+    fontSize: SIZES.text14,
+    color: COLORS.secondary,
   },
 });
 

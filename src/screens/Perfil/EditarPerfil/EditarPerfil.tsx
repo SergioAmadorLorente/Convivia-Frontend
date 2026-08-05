@@ -40,7 +40,7 @@ const EditarPerfil = () => {
 	const currentUser = useAuthListener();
 	const { refreshUserData } = useUser();
 	const { t } = useTranslation();
-	const { photoUri, savePhoto } = useProfilePhoto(currentUser?.uid);
+	const { photoUri, savePhoto, removePhoto } = useProfilePhoto(currentUser?.uid);
 	const [dbPassword, setDbPassword] = useState('');
 	const [foto, setFoto] = useState<string | null>(null);
 	const [nombre, setNombre] = useState('');
@@ -94,6 +94,7 @@ const EditarPerfil = () => {
 						setTelefono(userData.telefono || userData.Telefono || '');
 						setCorreo(userData.email || userData.Email || '');
 						setDbPassword(userData.password || userData.Password || '');
+						// getFullFotoUrl ya filtra URLs /uploads/perfiles/ rotas → devuelve null
 						const backendPhotoUrl = getFullFotoUrl(userData.fotoUrl || userData.FotoUrl);
 						if (backendPhotoUrl) {
 							setFoto(backendPhotoUrl);
@@ -199,16 +200,22 @@ const EditarPerfil = () => {
 				}
 			}
 
+			// Usar cadena vacía (nunca null) para que Firestore PATCH sobrescriba el campo
+			// y borre URLs antiguas /uploads/perfiles/ que ya no existen en Render.
+			const fotoParaGuardar =
+				currentFotoUrl && !currentFotoUrl.startsWith('file:')
+					? currentFotoUrl
+					: '';
+
 			const payload: any = {
 				nombre,
 				email: correo,
 				telefono,
-				password: finalPassword, // Siempre enviamos la contraseña (nueva o la actual)
+				password: finalPassword,
+				// Ambas variantes de clave para garantizar que Firestore sobreescriba el campo
+				fotoUrl: fotoParaGuardar,
+				FotoUrl: fotoParaGuardar,
 			};
-
-			if (currentFotoUrl && !currentFotoUrl.startsWith('file:')) {
-				payload.fotoUrl = currentFotoUrl;
-			}
 
 			console.log('Enviando actualización de perfil:', payload);
 			await actualizarUsuario(currentUser.uid, payload);
@@ -282,7 +289,7 @@ const EditarPerfil = () => {
 					{foto ? (
 						<TouchableOpacity
 							style={editarPerfilStyles.removeFotoBadge}
-							onPress={() => setFoto(null)}
+							onPress={() => { setFoto(null); removePhoto(); }}
 							activeOpacity={0.8}
 						>
 							<Ionicons name="close" size={16} color="#fff" />
@@ -346,6 +353,8 @@ const EditarPerfil = () => {
 				<Button
 					onPress={handleSubmit}
 					style={editarPerfilStyles.submitButton}
+					loading={isLoading}
+					disabled={isLoading}
 				>
 					{t('editProfile.saveButton')}
 				</Button>

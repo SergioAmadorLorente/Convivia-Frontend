@@ -131,8 +131,7 @@ const AppNavigator: React.FC = () => {
             name="Perfil"
             component={Perfil}
             options={{
-              ...defaultScreenOptions,
-              headerLeft: () => null,
+              headerShown: false,
               gestureEnabled: false,
             }}
             listeners={({ navigation }) => ({

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuthListenerFull } from "./useAuthListener";
-import { obtenerUsuarioPorId, obtenerUsuarios, getFullFotoUrl } from "../api/usuario";
+import { obtenerUsuarioPorId, obtenerUsuarios, getFullFotoUrl, obtenerFotoUsuario, blobToBase64 } from "../api/usuario";
+import { photoCache } from "./useProfilePhoto";
 import {
   obtenerEspacioPorUsuarioId,
   obtenerUsuarioEspacios,
@@ -129,7 +130,7 @@ export const useDashboardData = (newSpaceName?: string) => {
               if (u) {
                 const nombre = u.nombre || u.email || u.id || "Miembro";
                 const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
-                const fotoUrl = getFullFotoUrl(rawFoto);
+                const fotoUrl = (usuarioId ? photoCache.get(usuarioId) : null) ?? getFullFotoUrl(rawFoto) ?? null;
                 const entry = { name: nombre, fotoUrl };
                 if (relId) map[relId] = entry;
                 if (usuarioId) map[usuarioId] = entry;
@@ -280,7 +281,10 @@ export const useDashboardData = (newSpaceName?: string) => {
             Precio: f.precio || f.Precio || 0,
             Pagado: f.pagado || f.Pagado || false,
             FechaCreacion: f.fechaCreacion || f.FechaCreacion || new Date(),
-            FechaCompletada: f.fechaCompletada || f.FechaCompletada || null,
+            // Si la factura llega como Pagado=true pero sin FechaCompletada (dato antiguo o
+            // incompleto del backend), usamos la fecha de hoy como fallback. Sin esto,
+            // isCompletedWithinDays(20) devuelve false → la factura se borraría al instante.
+            FechaCompletada: f.fechaCompletada || f.FechaCompletada || ((f.pagado || f.Pagado) ? new Date() : null),
             UsuariosAsignados: userNames,
             creadorFactura: f.creadorFactura || f.CreadorFactura || "",
           });

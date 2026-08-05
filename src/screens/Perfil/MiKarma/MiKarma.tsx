@@ -5,7 +5,6 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Dimensions,
     ActivityIndicator,
     Modal,
     Image,
@@ -20,7 +19,7 @@ import {
     Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 
-import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../../styles/theme";
+import { COLORS, FONTS, SIZES, COMMON } from "../../../styles/theme";
 import GLOBAL_STYLES from "../../../styles/styles";
 import BottomBar from "../../../components/ui/BottomBar";
 import TasksDonutChart from "../../../components/ui/TasksDonutChart";
@@ -32,7 +31,8 @@ import { obtenerEstadisticasTareas } from "../../../api/espacio";
 import { obtenerUsuarios, getFullFotoUrl } from "../../../api/usuario";
 import { photoCache } from "../../../hooks/useProfilePhoto";
 
-const { width } = Dimensions.get("window");
+
+
 
 // Tipo para los datos de karma
 interface KarmaParticipant {
@@ -135,28 +135,31 @@ const MiKarma: React.FC = () => {
                 }
             };
 
-            const participants: KarmaParticipant[] = ranking.ranking
-                .filter((r: any) => {
-                    const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
-                    return uEspaciosMap.has(cleanKey); // Filtrar registros inactivos/huérfanos del espacio
-                })
-                .map((r: any) => {
-                    const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
-                    const firebaseUid = uEspaciosMap.get(cleanKey);
-                    const userObj = firebaseUid ? usuariosMap.get(firebaseUid) : null;
-                    const name = userObj ? (userObj.nombre || userObj.email || "Usuario") : "Usuario";
-                    // Resolver URL de foto: backend → caché como fallback
-                    const rawFotoUrl = userObj?.fotoUrl ?? userObj?.FotoUrl ?? null;
-                    const fotoUrl =
-                        getFullFotoUrl(rawFotoUrl) ??
-                        (firebaseUid ? photoCache.get(firebaseUid) : undefined) ??
-                        null;
-                    return {
-                        name,
-                        points: getPoints(r),
-                        fotoUrl,
-                    };
-                });
+            const participants: KarmaParticipant[] = await Promise.all(
+                ranking.ranking
+                    .filter((r: any) => {
+                        const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
+                        return uEspaciosMap.has(cleanKey); // Filtrar registros inactivos/huérfanos del espacio
+                    })
+                    .map(async (r: any) => {
+                        const cleanKey = r.usuarioId?.replace(/-/g, "").toLowerCase();
+                        const firebaseUid = uEspaciosMap.get(cleanKey);
+                        const userObj = firebaseUid ? usuariosMap.get(firebaseUid) : null;
+                        const name = userObj ? (userObj.nombre || userObj.email || "Usuario") : "Usuario";
+
+                        const rawFotoUrl = userObj?.fotoUrl ?? userObj?.FotoUrl ?? null;
+                        const fotoUrl =
+                            (firebaseUid ? photoCache.get(firebaseUid) : null) ??
+                            getFullFotoUrl(rawFotoUrl) ??
+                            null;
+
+                        return {
+                            name,
+                            points: getPoints(r),
+                            fotoUrl,
+                        };
+                    })
+            );
 
             // 5. Actualizar estado
             setKarmaData({
@@ -200,7 +203,7 @@ const MiKarma: React.FC = () => {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Header Title */}
+                {/* ── Header ── */}
                 <View style={styles.titleRow}>
                     <Text style={GLOBAL_STYLES.titulo}>{t('myKarma.title')}</Text>
                     <TouchableOpacity
@@ -213,7 +216,7 @@ const MiKarma: React.FC = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* Info Modal */}
+                {/* ── Info Modal ── */}
                 <Modal
                     visible={infoModalVisible}
                     transparent
@@ -238,15 +241,16 @@ const MiKarma: React.FC = () => {
                         </View>
                     </TouchableOpacity>
                 </Modal>
- 
-                {/* Loading State */}
+
+                {/* ── Loading ── */}
                 {loading ? (
                     <View style={styles.loadingContainer}>
                         <ActivityIndicator size="large" color={COLORS.primary} />
                         <Text style={styles.loadingText}>{t('myKarma.loading')}</Text>
                     </View>
+
                 ) : !hasData ? (
-                    // Empty State
+                    /* ── Empty State ── */
                     <View style={styles.emptyStateContainer}>
                         <View style={styles.emptyIconContainer}>
                             <Ionicons name="stats-chart-outline" size={80} color={COLORS.accent} />
@@ -262,56 +266,60 @@ const MiKarma: React.FC = () => {
                             <Text style={styles.emptyStateButtonText}>{t('myKarma.backProfile')}</Text>
                         </TouchableOpacity>
                     </View>
+
                 ) : (
                     <>
-                        {/* Main Points Card */}
-                        <View style={styles.mainPointsCard}>
-                            <Text style={styles.mainPoints}>{t('myKarma.pointsCount', { points: karmaData.totalPoints })}</Text>
-                            <Text style={styles.subPoints}>{t('myKarma.ofKarma')}</Text>
-                        </View>
- 
-                        {/* Period Cards Row */}
-                        <View style={styles.periodCardsRow}>
-                            <View style={styles.periodCard}>
-                                <Text style={styles.cardValue}>{t('myKarma.pointsCount', { points: karmaData.monthPoints })}</Text>
-                                <Text style={styles.cardLabel}>{t('myKarma.monthPoints')}</Text>
+                        {/* ── Hero card: puntos totales ── */}
+                        <View style={styles.heroCard}>
+                            <View style={styles.heroLogoRow}>
+                                <LogoKarma width={28} height={28} />
+                                <Text style={styles.heroLabel}>{t('myKarma.ofKarma')}</Text>
                             </View>
-                            <View style={styles.periodCard}>
-                                <Text style={styles.cardValue}>{t('myKarma.pointsCount', { points: karmaData.weekPoints })}</Text>
-                                <Text style={styles.cardLabel}>{t('myKarma.weekPoints')}</Text>
-                            </View>
-                        </View>
-
-                        {/* Statistics Section */}
-                        <View style={styles.sectionContainer}>
-                            <Text style={styles.sectionTitle}>{t('myKarma.statsTitle')}</Text>
- 
-                            {/* Header con título y selector de tipo */}
-                            <View style={styles.subsectionHeader}>
-                                <View style={styles.headerRow}>
-                                    <Text style={styles.subsectionTitle}>{t('myKarma.karmaKing')}</Text>
+                            <Text style={styles.heroPoints}>
+                                {t('myKarma.pointsCount', { points: karmaData.totalPoints })}
+                            </Text>
+                            <View style={styles.heroDivider} />
+                            <View style={styles.heroPeriodRow}>
+                                <View style={styles.heroPeriodItem}>
+                                    <Text style={styles.heroPeriodValue}>
+                                        {t('myKarma.pointsCount', { points: karmaData.monthPoints })}
+                                    </Text>
+                                    <Text style={styles.heroPeriodLabel}>{t('myKarma.monthPoints')}</Text>
                                 </View>
-                                <View style={styles.underline} />
- 
+                                <View style={styles.heroPeriodDivider} />
+                                <View style={styles.heroPeriodItem}>
+                                    <Text style={styles.heroPeriodValue}>
+                                        {t('myKarma.pointsCount', { points: karmaData.weekPoints })}
+                                    </Text>
+                                    <Text style={styles.heroPeriodLabel}>{t('myKarma.weekPoints')}</Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        {/* ── Sección ranking ── */}
+                        <View style={styles.sectionContainer}>
+                            <View style={styles.sectionHeader}>
+                                <View style={styles.sectionHeaderAccent} />
+                                <Text style={styles.sectionTitle}>{t('myKarma.karmaKing')}</Text>
                             </View>
 
-                            {/* Podio o Lista según viewMode */}
+                            {/* Podio o Lista */}
                             {viewMode === 'podio' ? (
-                                /* Podium */
                                 <View style={styles.podiumContainer}>
-                                    {/* Position 2 - Left */}
+                                    {/* Posición 2 – plata */}
                                     {karmaData.participants[1] && (
                                         <View style={styles.podiumColumn}>
-                                            <View style={styles.avatarContainer}>
+                                            <View style={[styles.podiumAvatarRing, styles.podiumRingSilver]}>
                                                 {karmaData.participants[1].fotoUrl ? (
                                                     <Image
                                                         source={{ uri: karmaData.participants[1].fotoUrl }}
-                                                        style={{ width: 45, height: 45, borderRadius: 22.5 }}
+                                                        style={styles.podiumAvatarImg}
                                                     />
                                                 ) : (
-                                                    <Ionicons name="person-outline" size={24} color="#999" />
+                                                    <Ionicons name="person" size={22} color="#A8A8A8" />
                                                 )}
                                             </View>
+                                            <Text style={styles.podiumMedal}>🥈</Text>
                                             <Text style={styles.podiumName} numberOfLines={1}>
                                                 {karmaData.participants[1].name}
                                             </Text>
@@ -323,48 +331,48 @@ const MiKarma: React.FC = () => {
                                         </View>
                                     )}
 
-                                    {/* Position 1 - Center (Winner) */}
+                                    {/* Posición 1 – oro (centro, más alto) */}
                                     {karmaData.participants[0] && (
-                                        <View style={styles.podiumColumn}>
-                                            <View style={styles.winnerAvatarWrapper}>
-                                                <View style={[styles.avatarContainer, styles.winnerAvatar]}>
-                                                    {karmaData.participants[0].fotoUrl ? (
-                                                        <Image
-                                                            source={{ uri: karmaData.participants[0].fotoUrl }}
-                                                            style={{ width: 50, height: 50, borderRadius: 25 }}
-                                                        />
-                                                    ) : (
-                                                        <Ionicons name="person-outline" size={28} color="#999" />
-                                                    )}
-                                                </View>
-                                                <View style={styles.karmaBadge}>
-                                                    <LogoKarma width={16} height={16} />
-                                                </View>
+                                        <View style={[styles.podiumColumn, { zIndex: 2 }]}>
+                                            <View style={[styles.podiumAvatarRing, styles.podiumRingGold, styles.podiumAvatarRingLarge]}>
+                                                {karmaData.participants[0].fotoUrl ? (
+                                                    <Image
+                                                        source={{ uri: karmaData.participants[0].fotoUrl }}
+                                                        style={styles.podiumAvatarImgLarge}
+                                                    />
+                                                ) : (
+                                                    <Ionicons name="person" size={30} color="#FFD700" />
+                                                )}
                                             </View>
-                                            <Text style={styles.podiumName} numberOfLines={1}>
+                                            <View style={styles.karmaBadge}>
+                                                <LogoKarma width={13} height={13} />
+                                            </View>
+                                            <Text style={styles.podiumMedal}>🥇</Text>
+                                            <Text style={[styles.podiumName, styles.podiumNameWinner]} numberOfLines={1}>
                                                 {karmaData.participants[0].name}
                                             </Text>
                                             <View style={[styles.podiumBar, styles.podiumBar1]}>
-                                                <Text style={styles.podiumPoints}>
+                                                <Text style={[styles.podiumPoints, styles.podiumPointsWinner]}>
                                                     {t('myKarma.pointsCount', { points: karmaData.participants[0].points })}
                                                 </Text>
                                             </View>
                                         </View>
                                     )}
 
-                                    {/* Position 3 - Right */}
+                                    {/* Posición 3 – bronce */}
                                     {karmaData.participants[2] && (
                                         <View style={styles.podiumColumn}>
-                                            <View style={styles.avatarContainer}>
+                                            <View style={[styles.podiumAvatarRing, styles.podiumRingBronze]}>
                                                 {karmaData.participants[2].fotoUrl ? (
                                                     <Image
                                                         source={{ uri: karmaData.participants[2].fotoUrl }}
-                                                        style={{ width: 45, height: 45, borderRadius: 22.5 }}
+                                                        style={styles.podiumAvatarImg}
                                                     />
                                                 ) : (
-                                                    <Ionicons name="person-outline" size={24} color="#999" />
+                                                    <Ionicons name="person" size={22} color="#CD7F32" />
                                                 )}
                                             </View>
+                                            <Text style={styles.podiumMedal}>🥉</Text>
                                             <Text style={styles.podiumName} numberOfLines={1}>
                                                 {karmaData.participants[2].name}
                                             </Text>
@@ -380,34 +388,43 @@ const MiKarma: React.FC = () => {
                                 /* Lista completa */
                                 <View style={styles.listContainer}>
                                     {allParticipants.map((participant: any, index) => (
-                                        <View key={index} style={styles.listItem}>
-                                            <View style={styles.listRankContainer}>
-                                                <Text style={[
-                                                    styles.listRank,
-                                                    index === 0 && styles.listRankFirst,
-                                                    index === 1 && styles.listRankSecond,
-                                                    index === 2 && styles.listRankThird
-                                                ]}>
-                                                    {index + 1}
-                                                </Text>
-                                            </View>
-                                            <View style={styles.listAvatarContainer}>
+                                        <View
+                                            key={index}
+                                            style={[
+                                                styles.listItem,
+                                                index === 0 && styles.listItemGold,
+                                                index === 1 && styles.listItemSilver,
+                                                index === 2 && styles.listItemBronze,
+                                            ]}
+                                        >
+                                            <Text style={[
+                                                styles.listRank,
+                                                index === 0 && styles.listRankFirst,
+                                                index === 1 && styles.listRankSecond,
+                                                index === 2 && styles.listRankThird,
+                                            ]}>
+                                                {index + 1}
+                                            </Text>
+                                            <View style={[
+                                                styles.listAvatarContainer,
+                                                index === 0 && styles.listAvatarGold,
+                                                index === 1 && styles.listAvatarSilver,
+                                                index === 2 && styles.listAvatarBronze,
+                                            ]}>
                                                 {participant.fotoUrl ? (
                                                     <Image
                                                         source={{ uri: participant.fotoUrl }}
-                                                        style={{ width: 35, height: 35, borderRadius: 17.5 }}
+                                                        style={{ width: 33, height: 33, borderRadius: 16.5 }}
                                                     />
                                                 ) : (
-                                                    <Ionicons name="person-outline" size={20} color="#999" />
+                                                    <Ionicons name="person" size={18} color={COLORS.primary} />
                                                 )}
                                             </View>
                                             <Text style={styles.listName} numberOfLines={1}>
                                                 {participant.name}
                                             </Text>
                                             <View style={styles.listPointsContainer}>
-                                                <Text style={styles.listPoints}>
-                                                    {participant.points}
-                                                </Text>
+                                                <Text style={styles.listPoints}>{participant.points}</Text>
                                                 <Text style={styles.listPointsLabel}> {t('myKarma.points')}</Text>
                                             </View>
                                             {index === 0 && (
@@ -420,67 +437,46 @@ const MiKarma: React.FC = () => {
                                 </View>
                             )}
 
-                            {/* View Mode Selector - Debajo del podio/lista */}
-                            <View style={styles.viewModeContainerBottom}>
-                                {/* Ranking Type Selector */}
-                                <View style={styles.selectorContainerInline}>
-                                    <TouchableOpacity
-                                        style={[styles.selectorButtonInline, rankingType === 'total' && styles.selectorButtonActiveInline]}
-                                        onPress={() => setRankingType('total')}
-                                    >
-                                        <Text style={[styles.selectorButtonTextInline, rankingType === 'total' && styles.selectorButtonTextActiveInline]}>
-                                            {t('myKarma.rankingTotal')}
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={[styles.selectorButtonInline, rankingType === 'mensual' && styles.selectorButtonActiveInline]}
-                                        onPress={() => setRankingType('mensual')}
-                                    >
-                                        <Text style={[styles.selectorButtonTextInline, rankingType === 'mensual' && styles.selectorButtonTextActiveInline]}>
-                                            {t('myKarma.rankingMonthly')}
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={[styles.selectorButtonInline, rankingType === 'semanal' && styles.selectorButtonActiveInline]}
-                                        onPress={() => setRankingType('semanal')}
-                                    >
-                                        <Text style={[styles.selectorButtonTextInline, rankingType === 'semanal' && styles.selectorButtonTextActiveInline]}>
-                                            {t('myKarma.rankingWeekly')}
-                                        </Text>
-                                    </TouchableOpacity>
+                            {/* Controles: selector periodo + toggle vista */}
+                            <View style={styles.controlsRow}>
+                                <View style={styles.pillSelector}>
+                                    {(['total', 'mensual', 'semanal'] as const).map((type) => (
+                                        <TouchableOpacity
+                                            key={type}
+                                            style={[styles.pillBtn, rankingType === type && styles.pillBtnActive]}
+                                            onPress={() => setRankingType(type)}
+                                        >
+                                            <Text style={[styles.pillBtnText, rankingType === type && styles.pillBtnTextActive]}>
+                                                {t(`myKarma.ranking${type === 'total' ? 'Total' : type === 'mensual' ? 'Monthly' : 'Weekly'}`)}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
                                 </View>
- 
-                                {/* View Mode Button */}
                                 <TouchableOpacity
-                                    style={styles.viewModeButton}
+                                    style={styles.toggleViewBtn}
                                     onPress={() => setViewMode(viewMode === 'podio' ? 'lista' : 'podio')}
                                 >
                                     <Ionicons
                                         name={viewMode === 'podio' ? 'list' : 'podium'}
-                                        size={20}
-                                        color={COLORS.accent}
+                                        size={18}
+                                        color={COLORS.primary}
                                     />
-                                    <Text style={styles.viewModeButtonText}>
-                                        {viewMode === 'podio' ? t('myKarma.viewList') : t('myKarma.viewPodium')}
-                                    </Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
 
-                        {/* Tasks Section */}
+                        {/* ── Sección tareas ── */}
                         <View style={styles.sectionContainer}>
-                            <View style={styles.subsectionHeader}>
-                                <Text style={styles.subsectionTitle}>
-                                    {t('myKarma.taskStatus')}
-                                </Text>
-                                <View style={styles.underline} />
+                            <View style={styles.sectionHeader}>
+                                <View style={styles.sectionHeaderAccent} />
+                                <Text style={styles.sectionTitle}>{t('myKarma.taskStatus')}</Text>
                             </View>
-
-                            {/* Donut Chart Component */}
-                            <TasksDonutChart
-                                completedTasks={karmaData?.completedTasks || 0}
-                                lateTasks={karmaData?.lateTasks || 0}
-                            />
+                            <View style={styles.chartCard}>
+                                <TasksDonutChart
+                                    completedTasks={karmaData?.completedTasks || 0}
+                                    lateTasks={karmaData?.lateTasks || 0}
+                                />
+                            </View>
                         </View>
                     </>
                 )}
@@ -496,199 +492,211 @@ const styles = StyleSheet.create({
         backgroundColor: "#F5F4F2",
     },
     scrollContent: {
-        paddingBottom: 100,
+        paddingBottom: 110,
         alignItems: "center",
+        paddingHorizontal: 20,
+        paddingTop: 4,
     },
-    mainPointsCard: {
-        backgroundColor: COLORS.background,
-        width: width * 0.9,
+
+    // ── Header ──
+    titleRow: {
+        width: "100%",
+        flexDirection: "row",
         alignItems: "center",
-        paddingVertical: 30,
-        borderRadius: 20,
-        marginBottom: 20,
+        justifyContent: "center",
+        marginBottom: 24,
+    },
+    infoButton: {
+        marginTop: 8,
+        marginLeft: 6,
+        padding: 2,
+    },
+
+    // ── Hero card ──
+    heroCard: {
+        width: "100%",
+        backgroundColor: COLORS.success,
+        borderRadius: 24,
+        paddingVertical: 28,
+        paddingHorizontal: 24,
+        alignItems: "center",
+        marginBottom: 24,
         ...COMMON.SHADOW,
     },
-    mainPoints: {
+    heroLogoRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 6,
+    },
+    heroLabel: {
+        fontFamily: FONTS.regular,
+        fontSize: SIZES.text14,
+        color: COLORS.primary,
+        letterSpacing: 0.5,
+    },
+    heroPoints: {
         fontFamily: FONTS.title,
         fontSize: SIZES.largeTitle,
-        color: COLORS.primary,
+        color: COLORS.secondary,
+        marginBottom: 4,
     },
-    subPoints: {
-        fontFamily: FONTS.regular,
-        fontSize: SIZES.text16,
-        color: "#666",
-        marginTop: 4,
+    heroDivider: {
+        width: 60,
+        height: 2,
+        backgroundColor: COLORS.accent,
+        borderRadius: 2,
+        marginVertical: 16,
+        opacity: 0.7,
     },
-    periodCardsRow: {
+    heroPeriodRow: {
         flexDirection: "row",
-        justifyContent: "space-between",
-        width: width * 0.9,
-        marginBottom: 30,
+        width: "100%",
+        justifyContent: "center",
     },
-    periodCard: {
-        width: "48%",
-        backgroundColor: COLORS.background,
-        borderRadius: 15,
-        paddingVertical: 20,
+    heroPeriodItem: {
+        flex: 1,
         alignItems: "center",
-        ...COMMON.SHADOW,
     },
-    cardValue: {
+    heroPeriodDivider: {
+        width: 1,
+        backgroundColor: COLORS.accent,
+        opacity: 0.5,
+        marginVertical: 4,
+    },
+    heroPeriodValue: {
         fontFamily: FONTS.bold,
-        fontSize: 16,
+        fontSize: SIZES.text16,
         color: COLORS.secondary,
     },
-    cardLabel: {
+    heroPeriodLabel: {
         fontFamily: FONTS.regular,
         fontSize: SIZES.smallText,
-        color: "#666",
-        marginTop: 4,
+        color: COLORS.primary,
+        marginTop: 2,
     },
+
+    // ── Sección ──
     sectionContainer: {
-        width: width * 0.9,
-        marginBottom: 30,
+        width: "100%",
+        marginBottom: 28,
+    },
+    sectionHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+        marginBottom: 20,
+    },
+    sectionHeaderAccent: {
+        width: 4,
+        height: 22,
+        backgroundColor: COLORS.accent,
+        borderRadius: 4,
     },
     sectionTitle: {
         fontFamily: FONTS.title,
-        fontSize: 22,
+        fontSize: 20,
         color: COLORS.secondary,
-        marginBottom: 10,
     },
-    viewModeContainerBottom: {
-        alignItems: "center",
-        marginTop: 20,
-        gap: 12,
-    },
-    viewModeButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: COLORS.background,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 20,
-        ...COMMON.SHADOW,
-    },
-    viewModeButtonText: {
-        fontFamily: FONTS.bold,
-        fontSize: SIZES.text14,
-        color: COLORS.accent,
-        marginLeft: 6,
-    },
-    subsectionHeader: {
-        marginBottom: 20,
-    },
-    headerRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 5,
-        marginTop: 10,
-        flexWrap: "wrap",
-    },
-    subsectionTitle: {
-        fontFamily: FONTS.regular,
-        fontSize: SIZES.text16,
-        color: COLORS.accent,
-    },
-    selectorContainerInline: {
-        flexDirection: "row",
-        backgroundColor: COLORS.background,
-        borderRadius: 8,
-        padding: 2,
-        ...COMMON.SHADOW,
-    },
-    selectorButtonInline: {
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        borderRadius: 6,
-    },
-    selectorButtonActiveInline: {
-        backgroundColor: COLORS.accent,
-    },
-    selectorButtonTextInline: {
-        fontFamily: FONTS.bold,
-        fontSize: 11,
-        color: "#999",
-    },
-    selectorButtonTextActiveInline: {
-        color: COLORS.background,
-    },
-    underline: {
-        height: 1,
-        backgroundColor: COLORS.primary,
-        width: "100%",
-    },
+
+    // ── Podio ──
     podiumContainer: {
         flexDirection: "row",
         alignItems: "flex-end",
         justifyContent: "center",
-        height: 200,
-        marginTop: 20,
+        height: 240,
+        marginBottom: 8,
     },
     podiumColumn: {
         alignItems: "center",
-        marginHorizontal: 8,
+        marginHorizontal: 6,
         flex: 1,
     },
-    avatarContainer: {
-        width: 45,
-        height: 45,
-        borderRadius: 22.5,
-        backgroundColor: "#E0E0E0",
+    podiumAvatarRing: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        borderWidth: 2.5,
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 8,
+        backgroundColor: COLORS.background,
+        marginBottom: 2,
+        ...COMMON.SHADOW,
     },
-    winnerAvatarWrapper: {
-        position: "relative",
-        marginBottom: 8,
+    podiumAvatarRingLarge: {
+        width: 66,
+        height: 66,
+        borderRadius: 33,
+        borderWidth: 3,
     },
-    winnerAvatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+    podiumRingGold: { borderColor: "#EAB308" },
+    podiumRingSilver: { borderColor: "#94A3B8" },
+    podiumRingBronze: { borderColor: "#D97706" },
+    podiumAvatarImg: {
+        width: 46,
+        height: 46,
+        borderRadius: 23,
+    },
+    podiumAvatarImgLarge: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
     },
     karmaBadge: {
         position: "absolute",
-        top: -2,
-        right: -2,
+        top: 0,
+        right: 0,
         backgroundColor: COLORS.background,
-        borderRadius: 12,
-        width: 24,
-        height: 24,
+        borderRadius: 10,
+        width: 20,
+        height: 20,
         justifyContent: "center",
         alignItems: "center",
-        borderWidth: 1.5,
-        borderColor: COLORS.secondary,
+        borderWidth: 1,
+        borderColor: COLORS.accent,
+    },
+    podiumMedal: {
+        fontSize: 18,
+        marginTop: 2,
+        marginBottom: 2,
     },
     podiumName: {
         fontFamily: FONTS.bold,
-        fontSize: 11,
+        fontSize: 10,
         color: COLORS.secondary,
-        marginBottom: 8,
+        marginBottom: 6,
         textAlign: "center",
+    },
+    podiumNameWinner: {
+        fontSize: 11,
+        color: COLORS.primary,
     },
     podiumBar: {
         width: "100%",
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
         alignItems: "center",
         justifyContent: "center",
         paddingVertical: 10,
-        paddingHorizontal: 5,
-        ...COMMON.SHADOW,
+        paddingHorizontal: 4,
     },
     podiumBar1: {
-        height: 120,
-        backgroundColor: "#E6ECDC",
+        height: 130,
+        backgroundColor: "rgba(234,179,8,0.12)",
+        borderTopWidth: 3,
+        borderTopColor: "#EAB308",
     },
     podiumBar2: {
-        height: 100,
-        backgroundColor: COLORS.background,
+        height: 105,
+        backgroundColor: "rgba(148,163,184,0.12)",
+        borderTopWidth: 3,
+        borderTopColor: "#94A3B8",
     },
     podiumBar3: {
-        height: 80,
-        backgroundColor: COLORS.background,
+        height: 85,
+        backgroundColor: "rgba(217,119,6,0.12)",
+        borderTopWidth: 3,
+        borderTopColor: "#D97706",
     },
     podiumPoints: {
         fontFamily: FONTS.bold,
@@ -696,48 +704,63 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
         textAlign: "center",
     },
+    podiumPointsWinner: {
+        color: COLORS.primary,
+        fontSize: 11,
+    },
+
+    // ── Lista ──
     listContainer: {
-        marginTop: 20,
+        gap: 8,
     },
     listItem: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: COLORS.background,
-        borderRadius: 12,
-        padding: 12,
-        marginBottom: 10,
+        borderRadius: 14,
+        paddingVertical: 10,
+        paddingHorizontal: 14,
         ...COMMON.SHADOW,
     },
-    listRankContainer: {
-        width: 30,
-        alignItems: "center",
+    listItemGold: {
+        borderLeftWidth: 4,
+        borderLeftColor: "#EAB308",
+        backgroundColor: COLORS.background,
+    },
+    listItemSilver: {
+        borderLeftWidth: 4,
+        borderLeftColor: "#94A3B8",
+        backgroundColor: COLORS.background,
+    },
+    listItemBronze: {
+        borderLeftWidth: 4,
+        borderLeftColor: "#D97706",
+        backgroundColor: COLORS.background,
     },
     listRank: {
         fontFamily: FONTS.bold,
-        fontSize: 16,
+        fontSize: 15,
         color: "#999",
+        width: 28,
+        textAlign: "center",
     },
-    listRankFirst: {
-        color: "#FFD700",
-        fontSize: 18,
-    },
-    listRankSecond: {
-        color: "#C0C0C0",
-        fontSize: 17,
-    },
-    listRankThird: {
-        color: "#CD7F32",
-        fontSize: 17,
-    },
+    listRankFirst: { color: "#EAB308", fontSize: 17 },
+    listRankSecond: { color: "#94A3B8", fontSize: 16 },
+    listRankThird: { color: "#D97706", fontSize: 16 },
     listAvatarContainer: {
-        width: 35,
-        height: 35,
-        borderRadius: 17.5,
-        backgroundColor: "#E0E0E0",
+        width: 37,
+        height: 37,
+        borderRadius: 18.5,
+        backgroundColor: "#E8E8E8",
         justifyContent: "center",
         alignItems: "center",
         marginHorizontal: 10,
+        borderWidth: 2,
+        borderColor: "transparent",
     },
+    listAvatarGold: { borderColor: "#EAB308" },
+    listAvatarSilver: { borderColor: "#94A3B8" },
+    listAvatarBronze: { borderColor: "#D97706" },
     listName: {
         flex: 1,
         fontFamily: FONTS.regular,
@@ -747,22 +770,73 @@ const styles = StyleSheet.create({
     listPointsContainer: {
         flexDirection: "row",
         alignItems: "baseline",
-        marginRight: 5,
+        marginRight: 4,
     },
     listPoints: {
         fontFamily: FONTS.bold,
-        fontSize: 16,
+        fontSize: 15,
         color: COLORS.primary,
     },
     listPointsLabel: {
         fontFamily: FONTS.regular,
-        fontSize: 12,
+        fontSize: 11,
         color: "#999",
     },
-    listKarmaBadge: {
-        marginLeft: 5,
+    listKarmaBadge: { marginLeft: 4 },
+
+    // ── Controles ──
+    controlsRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: 20,
+        gap: 10,
     },
-    // Empty State Styles
+    pillSelector: {
+        flexDirection: "row",
+        backgroundColor: COLORS.background,
+        borderRadius: 20,
+        padding: 3,
+        ...COMMON.SHADOW,
+        flex: 1,
+    },
+    pillBtn: {
+        flex: 1,
+        paddingVertical: 7,
+        paddingHorizontal: 8,
+        borderRadius: 18,
+        alignItems: "center",
+    },
+    pillBtnActive: {
+        backgroundColor: COLORS.primary,
+    },
+    pillBtnText: {
+        fontFamily: FONTS.bold,
+        fontSize: 10,
+        color: "#aaa",
+    },
+    pillBtnTextActive: {
+        color: COLORS.background,
+    },
+    toggleViewBtn: {
+        backgroundColor: COLORS.background,
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        justifyContent: "center",
+        alignItems: "center",
+        ...COMMON.SHADOW,
+    },
+
+    // ── Tareas ──
+    chartCard: {
+        backgroundColor: COLORS.background,
+        borderRadius: 20,
+        padding: 8,
+        ...COMMON.SHADOW,
+    },
+
+    // ── Empty State ──
     emptyStateContainer: {
         flex: 1,
         alignItems: "center",
@@ -771,9 +845,7 @@ const styles = StyleSheet.create({
         paddingVertical: 60,
         minHeight: 400,
     },
-    emptyIconContainer: {
-        marginBottom: 30,
-    },
+    emptyIconContainer: { marginBottom: 30 },
     emptyStateTitle: {
         fontFamily: FONTS.title,
         fontSize: 24,
@@ -793,7 +865,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.success,
         paddingVertical: 12,
         paddingHorizontal: 30,
-        borderRadius: 10,
+        borderRadius: 12,
         ...COMMON.SHADOW,
     },
     emptyStateButtonText: {
@@ -801,7 +873,8 @@ const styles = StyleSheet.create({
         fontSize: SIZES.text16,
         color: COLORS.primary,
     },
-    // Loading State Styles
+
+    // ── Loading ──
     loadingContainer: {
         flex: 1,
         alignItems: "center",
@@ -815,23 +888,8 @@ const styles = StyleSheet.create({
         fontSize: SIZES.text16,
         color: "#666",
     },
-    switchAndButtonContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 10,
-    },
-    titleRow: {
-        width: "100%",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    infoButton: {
-        marginTop: 8,
-        marginLeft: 6,
-        padding: 2,
-    },
+
+    // ── Info Modal ──
     infoModalOverlay: {
         flex: 1,
         backgroundColor: "rgba(0,0,0,0.5)",
@@ -841,7 +899,7 @@ const styles = StyleSheet.create({
     },
     infoModalBox: {
         backgroundColor: COLORS.background,
-        borderRadius: 20,
+        borderRadius: 24,
         padding: 28,
         alignItems: "center",
         width: "100%",
@@ -867,7 +925,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.success,
         paddingVertical: 10,
         paddingHorizontal: 40,
-        borderRadius: 10,
+        borderRadius: 12,
         ...COMMON.SHADOW,
     },
     infoModalButtonText: {
