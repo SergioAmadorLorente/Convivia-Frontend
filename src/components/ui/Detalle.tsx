@@ -76,11 +76,10 @@ const Detalle: React.FC<Props> = (props) => {
     })
   ).current;
 
-  // ---- PARTICIPANTE ----
   if (props.kind === "participante") {
     const { participant, participantRelacion, residenciaName, onEliminar, isCurrentUser = false, isAdmin = true } = props;
 
-    // Obtener karma del participante (viene del hook actualizado)
+    // Obtener karma del participante
     const karmaPoints = participant?.karmaTotal ?? 0;
     const [estadisticas, setEstadisticas] = useState<any>(null);
     const [loadingStats, setLoadingStats] = useState(false);
@@ -94,11 +93,9 @@ const Detalle: React.FC<Props> = (props) => {
             const stats = await obtenerEstadisticasTareas(participantRelacion.espacioId, participant.id);
             setEstadisticas(stats);
           } catch (error) {
-            // console.error("Error al cargar estadísticas del participante:", error);
             setEstadisticas(null);
           } finally {
             setLoadingStats(false);
-            console.log(`Estadísticas cargadas del usuario ${participant?.id}  en el espacio ${participantRelacion?.espacioId}:`, estadisticas);
           }
         }
       };
@@ -110,6 +107,7 @@ const Detalle: React.FC<Props> = (props) => {
 
     const tareasCompletadas = estadisticas?.completadas ?? 0;
     const tareasFueraPlazo = estadisticas?.tardes ?? 0;
+    const isAdminUser = participant?.rol?.toLowerCase() === 'admin' || participant?.rol?.toLowerCase() === 'administrador';
 
     return (
       <Modal
@@ -121,13 +119,12 @@ const Detalle: React.FC<Props> = (props) => {
         <View style={styles.overlay}>
           <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
-          <View style={[styles.sheet, { paddingBottom: HELPERS.verticalScale(24) }]}>
+          <View style={styles.sheet}>
             <View style={styles.handle} />
 
-            {/* Foto + Nombre + Residencia */}
-            <View style={styles.participantProfileBlock}>
-              {/* Avatar */}
-              <View style={styles.participantAvatarWrapper}>
+            {/* Profile Hero Block */}
+            <View style={styles.participantHeroContainer}>
+              <View style={styles.participantAvatarRing}>
                 {participant?.fotoUrl ? (
                   <Image
                     source={{ uri: participant.fotoUrl }}
@@ -136,52 +133,86 @@ const Detalle: React.FC<Props> = (props) => {
                   />
                 ) : (
                   <View style={styles.participantAvatarPlaceholder}>
-                    <Feather name="user" size={HELPERS.moderateScale(36)} color="#6B705C" />
+                    <Feather name="user" size={38} color={COLORS.primary} />
+                  </View>
+                )}
+                {isAdminUser && (
+                  <View style={styles.participantAdminBadge}>
+                    <Text style={styles.participantAdminBadgeText}>Admin</Text>
                   </View>
                 )}
               </View>
 
-              {/* Nombre y residencia */}
               <Text style={styles.participantNameLarge}>
                 {participant?.nombre || participant?.email || t('common.user', 'Usuario')}
               </Text>
-              <Text style={styles.participantResidenciaLabel}>{residenciaName}</Text>
 
-              {/* Puntos de Karma */}
-              <View style={styles.karmaRow}>
-                <Text style={styles.karmaPoints}>{t('myKarma.pointsCount', { points: karmaPoints })}</Text>
-                <Text style={styles.karmaLabel}>{t('myKarma.ofKarma')}</Text>
+              <View style={styles.residenciaPill}>
+                <Ionicons name="home-outline" size={14} color={COLORS.primary} style={{ marginRight: 6 }} />
+                <Text style={styles.residenciaPillText}>{residenciaName}</Text>
               </View>
             </View>
 
-            {/* Botón Eliminar */}
-            <TouchableOpacity
-              style={[
-                GLOBAL_STYLES.buttonSecondaryGrey,
-                styles.deleteButtonFull,
-                {
-                  backgroundColor: (isCurrentUser || !isAdmin) ? '#E5E5E5' : '#D9D9D9',
-                  marginTop: HELPERS.hp("2%"),
-                  opacity: (isCurrentUser || !isAdmin) ? 0.5 : 1
-                }
-              ]}
-              activeOpacity={0.85}
-              onPress={onEliminar}
-              disabled={isCurrentUser || !isAdmin}
-            >
-              <Text
-                style={[
-                  GLOBAL_STYLES.textoBoton,
-                  { color: (isCurrentUser || !isAdmin) ? '#999' : COLORS.error }
-                ]}
+            {/* Karma Banner Card */}
+            <View style={styles.karmaHeroCard}>
+              <View style={styles.karmaIconWrapper}>
+                <Ionicons name="sparkles" size={22} color={COLORS.primary} />
+              </View>
+              <View style={styles.karmaTextContent}>
+                <Text style={styles.karmaNumber}>{karmaPoints}</Text>
+                <Text style={styles.karmaSubtitle}>{t('myKarma.ofKarma', 'Puntos de Karma')}</Text>
+              </View>
+              <View style={styles.karmaBadgeRight}>
+                <Ionicons name="ribbon-outline" size={24} color={COLORS.primary} />
+              </View>
+            </View>
+
+            {/* Stats Row */}
+            <View style={styles.participantStatsRow}>
+              <View style={styles.participantStatCard}>
+                <View style={styles.statIconSuccess}>
+                  <Ionicons name="checkmark-done-circle-outline" size={20} color="#3E5639" />
+                </View>
+                <View>
+                  <Text style={styles.statNumber}>{loadingStats ? "..." : tareasCompletadas}</Text>
+                  <Text style={styles.statLabel}>{t('dashboard.stats.completed', 'Completadas')}</Text>
+                </View>
+              </View>
+
+              <View style={styles.participantStatCard}>
+                <View style={styles.statIconDanger}>
+                  <Ionicons name="alert-circle-outline" size={20} color="#DC2626" />
+                </View>
+                <View>
+                  <Text style={styles.statNumber}>{loadingStats ? "..." : tareasFueraPlazo}</Text>
+                  <Text style={styles.statLabel}>{t('dashboard.stats.overdue', 'Fuera de plazo')}</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Botón Eliminar / Info */}
+            {!isCurrentUser && isAdmin ? (
+              <TouchableOpacity
+                style={styles.deleteParticipantBtn}
+                activeOpacity={0.8}
+                onPress={onEliminar}
               >
-                {isCurrentUser
-                  ? t('myResidence.errors.cannotRemoveSelf')
-                  : !isAdmin
-                    ? t('myResidence.errors.notAdminToKick')
-                    : t('myResidence.removeParticipant')}
-              </Text>
-            </TouchableOpacity>
+                <Feather name="user-x" size={18} color="#DC2626" style={{ marginRight: 8 }} />
+                <Text style={styles.deleteParticipantBtnText}>
+                  {t('myResidence.removeParticipant')}
+                </Text>
+              </TouchableOpacity>
+            ) : isCurrentUser ? (
+              <View style={styles.infoPillContainer}>
+                <Ionicons name="person-circle-outline" size={18} color={COLORS.primary} style={{ marginRight: 6 }} />
+                <Text style={styles.infoPillText}>{t('myResidence.errors.cannotRemoveSelf', 'Este es tu perfil')}</Text>
+              </View>
+            ) : (
+              <View style={styles.infoPillContainer}>
+                <Ionicons name="lock-closed-outline" size={16} color="#888" style={{ marginRight: 6 }} />
+                <Text style={styles.infoPillText}>{t('myResidence.errors.notAdminToKick', 'Solo administradores pueden expulsar miembros')}</Text>
+              </View>
+            )}
           </View>
         </View>
       </Modal>
@@ -1054,69 +1085,187 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFEBEE",
   },
 
-  // Estilos para participante
-  participantProfileBlock: {
+  // ---- Participante Hero ----
+  participantHeroContainer: {
     alignItems: "center",
-    paddingTop: HELPERS.verticalScale(4),
-    paddingBottom: HELPERS.verticalScale(8),
+    marginBottom: 16,
   },
-  participantAvatarWrapper: {
-    marginBottom: HELPERS.verticalScale(10),
+  participantAvatarRing: {
+    position: "relative",
+    marginBottom: 12,
   },
   participantAvatarImg: {
-    width: HELPERS.moderateScale(90),
-    height: HELPERS.moderateScale(90),
-    borderRadius: HELPERS.moderateScale(45),
-    borderWidth: 3,
-    borderColor: '#ACBF8A',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 3.5,
+    borderColor: COLORS.accent,
   },
   participantAvatarPlaceholder: {
-    width: HELPERS.moderateScale(90),
-    height: HELPERS.moderateScale(90),
-    borderRadius: HELPERS.moderateScale(45),
-    backgroundColor: '#E6ECDC',
-    borderWidth: 3,
-    borderColor: '#ACBF8A',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: COLORS.success,
+    borderWidth: 3.5,
+    borderColor: COLORS.accent,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  participantAdminBadge: {
+    position: "absolute",
+    bottom: -2,
+    alignSelf: "center",
+    backgroundColor: COLORS.accent,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderWidth: 1.5,
+    borderColor: "#FFF",
+  },
+  participantAdminBadgeText: {
+    fontFamily: FONTS.bold,
+    fontSize: 10,
+    color: "#FFF",
   },
   participantNameLarge: {
     fontFamily: FONTS.title,
-    fontSize: HELPERS.moderateScale(22),
-    color: '#6B705C',
-    textAlign: 'center',
-    marginBottom: HELPERS.verticalScale(2),
-  },
-  participantResidenciaLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.text14,
-    color: '#ACBF8A',
-    textAlign: 'center',
-    marginBottom: HELPERS.verticalScale(8),
-  },
-  karmaRow: {
-    alignItems: 'center',
-    marginTop: HELPERS.verticalScale(4),
-  },
-  karmaContainer: {
-    alignItems: "center",
-    paddingVertical: HELPERS.verticalScale(2),
-  },
-  karmaPoints: {
-    fontFamily: FONTS.bold,
-    fontSize: HELPERS.moderateScale(32),
-    color: "#4A5942",
-  },
-  karmaLabel: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.text16,
+    fontSize: 22,
     color: COLORS.secondary,
-    opacity: 0.7,
+    textAlign: "center",
+    marginBottom: 6,
   },
-  deleteButtonFull: {
-    marginTop: HELPERS.hp("2%"),
-    width: "85%",
-    alignSelf: "center",
+  residenciaPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.success,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D8E5D3",
+  },
+  residenciaPillText: {
+    fontFamily: FONTS.bold,
+    fontSize: 13,
+    color: COLORS.primary,
+  },
+
+  // ---- Karma Banner Card ----
+  karmaHeroCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8F9F5",
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E6ECDC",
+    marginBottom: 14,
+  },
+  karmaIconWrapper: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: COLORS.success,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 14,
+  },
+  karmaTextContent: {
+    flex: 1,
+  },
+  karmaNumber: {
+    fontFamily: FONTS.bold,
+    fontSize: 26,
+    color: "#4A5942",
+    lineHeight: 30,
+  },
+  karmaSubtitle: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: COLORS.primary,
+  },
+  karmaBadgeRight: {
+    opacity: 0.6,
+  },
+
+  // ---- Participant Stats Row ----
+  participantStatsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 16,
+  },
+  participantStatCard: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F8F9F5",
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#E6ECDC",
+    gap: 10,
+  },
+  statIconSuccess: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#E6ECDC",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statIconDanger: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(220, 38, 38, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statNumber: {
+    fontFamily: FONTS.bold,
+    fontSize: 18,
+    color: COLORS.secondary,
+  },
+  statLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 11,
+    color: "#666",
+  },
+
+  // ---- Botón Eliminar / Info ----
+  deleteParticipantBtn: {
+    flexDirection: "row",
+    backgroundColor: "rgba(220, 38, 38, 0.08)",
+    height: 50,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(220, 38, 38, 0.25)",
+    marginTop: 4,
+  },
+  deleteParticipantBtnText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: "#DC2626",
+  },
+  infoPillContainer: {
+    flexDirection: "row",
+    backgroundColor: "#F5F5F3",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#E2E2E0",
+    marginTop: 4,
+  },
+  infoPillText: {
+    fontFamily: FONTS.bold,
+    fontSize: 13,
+    color: "#777",
+    textAlign: "center",
   },
 });
 
