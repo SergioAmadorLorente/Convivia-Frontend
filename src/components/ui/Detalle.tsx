@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../styles/theme";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import TaskModel from "../../types/Task"; // export default
 import FacturaModel, { IFacturaUser } from "../../types/Factura";
 import TasksDonutChart from "./TasksDonutChart";
@@ -216,9 +216,7 @@ const Detalle: React.FC<Props> = (props) => {
       return `${hh}:${mm}`;
     }, [task.HoraLimite, task.FechaLimite]);
 
-    // DiasRepeticion es number[] con Lunes=0 .. Domingo=6
     const weekLabels = ["L", "M", "X", "J", "V", "S", "D"];
-    const weekFullNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
     const isDaySelected = (idx0: number) => {
       // Backend: Lunes=0 ... Domingo=6
       return Array.isArray(task.DiasRepeticion) && task.DiasRepeticion.includes(idx0);
@@ -251,42 +249,74 @@ const Detalle: React.FC<Props> = (props) => {
           <View style={styles.sheet}>
             <View style={styles.handle} />
 
-            {/* Header */}
-            <View style={styles.headerBlock}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.title}>{task.Nombre}</Text>
-                {task.Descripcion ? (
-                  <Text style={styles.subtitle}>{task.Descripcion}</Text>
-                ) : null}
-              </View>
-
-              {/* Puntos de karma y Botón Eliminar */}
-              <View style={{ alignItems: "flex-end", gap: 10 }}>
-                <View style={styles.pointsPill}>
-                  <Text style={styles.pointsText}>{t('taskDetail.pointsPill', { points: task.karma ?? 0 })}</Text>
+            {/* Header Block */}
+            <View style={styles.headerBlockContainer}>
+              <View style={styles.titleRow}>
+                <View style={styles.taskIconBadge}>
+                  <Ionicons name="clipboard-outline" size={22} color={COLORS.primary} />
                 </View>
+
+                <View style={styles.titleTextWrapper}>
+                  <Text style={styles.title}>{task.Nombre}</Text>
+                  <View style={styles.headerBadgesRow}>
+                    <View style={styles.pointsPill}>
+                      <Ionicons name="sparkles" size={13} color={COLORS.primary} style={{ marginRight: 4 }} />
+                      <Text style={styles.pointsText}>{t('taskDetail.pointsPill', { points: task.karma ?? 0 })}</Text>
+                    </View>
+                    {task.overdue && (
+                      <View style={styles.overdueBadge}>
+                        <Ionicons name="warning-outline" size={13} color="#DC2626" style={{ marginRight: 3 }} />
+                        <Text style={styles.overdueBadgeText}>{t('dashboard.tasks.overdue', 'Vencida')}</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+
                 <TouchableOpacity
                   onPress={onDelete}
                   activeOpacity={0.7}
-                  style={styles.deleteButton}
+                  style={styles.deleteIconBtn}
                 >
-                  <Feather name="trash-2" size={20} color={COLORS.error} />
+                  <Feather name="trash-2" size={18} color="#DC2626" />
                 </TouchableOpacity>
               </View>
+
+              {task.Descripcion ? (
+                <View style={styles.descriptionBox}>
+                  <Text style={styles.subtitle}>{task.Descripcion}</Text>
+                </View>
+              ) : null}
             </View>
 
-            {/* Fecha/Hora */}
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>{t('createTask.dateTimeLimit')}</Text>
-              <View style={styles.dateRow}>
-                <Text style={[styles.dateText, task.overdue && { color: COLORS.error, fontFamily: FONTS.bold }]}>{fechaStr}</Text>
-                <Text style={[styles.timeText, task.overdue && { color: COLORS.error }]}>{horaStr}</Text>
+            {/* Fecha/Hora Límite */}
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionAccent} />
+                <Text style={styles.sectionTitle}>{t('createTask.dateTimeLimit')}</Text>
+              </View>
+              <View style={[styles.cardBox, task.overdue && styles.cardBoxOverdue]}>
+                <View style={styles.dateTimeItem}>
+                  <Ionicons name="calendar-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+                  <Text style={[styles.dateText, task.overdue && { color: "#DC2626", fontFamily: FONTS.bold }]}>
+                    {fechaStr}
+                  </Text>
+                </View>
+                <View style={styles.dateTimeDivider} />
+                <View style={styles.dateTimeItem}>
+                  <Ionicons name="time-outline" size={18} color={COLORS.primary} style={{ marginRight: 8 }} />
+                  <Text style={[styles.timeText, task.overdue && { color: "#DC2626" }]}>
+                    {horaStr}
+                  </Text>
+                </View>
               </View>
             </View>
 
             {/* Repetición de la tarea */}
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>{t('createTask.repeat')}</Text>
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionAccent} />
+                <Text style={styles.sectionTitle}>{t('createTask.repeat')}</Text>
+              </View>
               <View style={styles.weekRow}>
                 {weekLabels.map((l, idx) => {
                   const selected = isDaySelected(idx);
@@ -314,6 +344,7 @@ const Detalle: React.FC<Props> = (props) => {
                           selected
                             ? styles.dayChipTextSelected
                             : styles.dayChipTextUnselected,
+                          isSelected && selected && { color: "#FFF" },
                         ]}
                       >
                         {l}
@@ -322,12 +353,14 @@ const Detalle: React.FC<Props> = (props) => {
                   );
                 })}
               </View>
-
             </View>
 
             {/* Usuario asignado */}
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>{t('taskDetail.assignedUser')}</Text>
+            <View style={styles.sectionContainer}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionAccent} />
+                <Text style={styles.sectionTitle}>{t('taskDetail.assignedUser')}</Text>
+              </View>
               {(() => {
                 const assignedName =
                   selectedDayIndex !== null && isDaySelected(selectedDayIndex)
@@ -343,35 +376,40 @@ const Detalle: React.FC<Props> = (props) => {
                 return users.length > 0 ? (
                   <UserList users={users} />
                 ) : (
-                  <Text style={styles.emptyUsers}>{t('taskDetail.unassigned')}</Text>
+                  <View style={styles.emptyUserCard}>
+                    <Ionicons name="person-outline" size={18} color="#999" style={{ marginRight: 8 }} />
+                    <Text style={styles.emptyUsersText}>{t('taskDetail.unassigned')}</Text>
+                  </View>
                 );
               })()}
             </View>
 
             {/* Botones: Editar + Completar */}
-            <View style={styles.actionsRow}>
+            <View style={styles.actionsRowNew}>
               <TouchableOpacity
-                style={[
-                  GLOBAL_STYLES.buttonSecondaryGrey,
-                  styles.btnHalf,
-                  { marginRight: HELPERS.wp("2%") },
-                ]}
-                activeOpacity={0.85}
+                style={styles.btnEditNew}
+                activeOpacity={0.8}
                 onPress={onEdit}
               >
-                <Text style={GLOBAL_STYLES.textoBoton}>{t('taskDetail.edit')}</Text>
+                <Feather name="edit-3" size={16} color={COLORS.secondary} style={{ marginRight: 6 }} />
+                <Text style={styles.btnEditNewText}>{t('taskDetail.edit')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
-                  GLOBAL_STYLES.buttonPrimaryGreen,
-                  styles.btnHalf,
-                  { marginLeft: HELPERS.wp("2%") },
+                  styles.btnCompleteNew,
+                  task.isCompleted && styles.btnCompleteDone,
                 ]}
-                activeOpacity={0.9}
+                activeOpacity={0.85}
                 onPress={onComplete}
               >
-                <Text style={GLOBAL_STYLES.textoBoton}>
+                <Ionicons
+                  name={task.isCompleted ? "refresh-outline" : "checkmark-circle-outline"}
+                  size={19}
+                  color={task.isCompleted ? COLORS.primary : "#FFF"}
+                  style={{ marginRight: 6 }}
+                />
+                <Text style={[styles.btnCompleteText, task.isCompleted && styles.btnCompleteDoneText]}>
                   {task.isCompleted ? t('taskDetail.unmark') : t('taskDetail.complete')}
                 </Text>
               </TouchableOpacity>
@@ -621,7 +659,6 @@ const Detalle: React.FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
   overlay: {
-    // reutiliza COMMON.OVERLAY y bottom-sheet
     ...(COMMON.OVERLAY as any),
     justifyContent: "flex-end",
   },
@@ -629,42 +666,278 @@ const styles = StyleSheet.create({
   sheet: {
     width: "100%",
     backgroundColor: COLORS.background,
-    borderTopLeftRadius: HELPERS.moderateScale(25),
-    borderTopRightRadius: HELPERS.moderateScale(25),
-    paddingHorizontal: HELPERS.wp("8%"),
-    paddingBottom: HELPERS.verticalScale(18),
-    paddingTop: HELPERS.verticalScale(10),
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 24,
+    paddingBottom: Platform.OS === "ios" ? 34 : 24,
+    paddingTop: 12,
   },
   handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.border,
+    width: 44,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: "#E2E2E0",
     alignSelf: "center",
-    marginBottom: HELPERS.verticalScale(4),
+    marginBottom: 16,
   },
+
+  // ---- Tarea: Header Nuevo ----
+  headerBlockContainer: {
+    marginBottom: 18,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  taskIconBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.success,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  titleTextWrapper: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 22,
+    color: COLORS.secondary,
+    fontFamily: FONTS.title,
+    lineHeight: 28,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.secondary,
+    fontFamily: FONTS.regular,
+    lineHeight: 20,
+  },
+  headerBadgesRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 6,
+  },
+  pointsPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: COLORS.success,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "#D8E5D3",
+  },
+  pointsText: {
+    fontSize: 12,
+    color: COLORS.primary,
+    fontFamily: FONTS.bold,
+  },
+  overdueBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(220, 38, 38, 0.08)",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "rgba(220, 38, 38, 0.2)",
+  },
+  overdueBadgeText: {
+    fontSize: 12,
+    color: "#DC2626",
+    fontFamily: FONTS.bold,
+  },
+  deleteIconBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "rgba(220, 38, 38, 0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(220, 38, 38, 0.2)",
+  },
+  descriptionBox: {
+    marginTop: 12,
+    backgroundColor: "#F7F9F5",
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#E6ECDC",
+  },
+
+  // ---- Secciones genéricas ----
+  sectionContainer: {
+    marginBottom: 18,
+    width: "100%",
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  sectionAccent: {
+    width: 4,
+    height: 16,
+    backgroundColor: COLORS.accent,
+    borderRadius: 2,
+    marginRight: 8,
+  },
+  sectionTitle: {
+    fontFamily: FONTS.title,
+    fontSize: 15,
+    color: COLORS.secondary,
+  },
+
+  // ---- Card Box Fecha/Hora ----
+  cardBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#F7F9F5",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#E6ECDC",
+  },
+  cardBoxOverdue: {
+    borderColor: "rgba(220, 38, 38, 0.3)",
+    backgroundColor: "rgba(220, 38, 38, 0.04)",
+  },
+  dateTimeItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dateTimeDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: "#E2E2E0",
+  },
+  dateText: {
+    fontSize: 14,
+    color: COLORS.secondary,
+    fontFamily: FONTS.bold,
+  },
+  timeText: {
+    fontSize: 18,
+    color: COLORS.secondary,
+    fontFamily: FONTS.bold,
+  },
+
+  // ---- Repetición ----
+  weekRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  dayChip: {
+    width: 40,
+    height: 44,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#E2E2E0",
+    backgroundColor: "#F8F9F5",
+  },
+  dayChipSelected: {
+    backgroundColor: COLORS.success,
+    borderColor: COLORS.accent,
+    borderWidth: 1.5,
+  },
+  dayChipUnselected: {
+    backgroundColor: "#F8F9F5",
+    borderColor: "#E2E2E0",
+  },
+  dayChipFocused: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.secondary,
+  },
+  dayChipText: {
+    fontSize: 14,
+    fontFamily: FONTS.bold,
+  },
+  dayChipTextSelected: {
+    color: COLORS.primary,
+  },
+  dayChipTextUnselected: {
+    color: "#888",
+  },
+
+  // ---- Usuario Asignado ----
+  emptyUserCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F7F9F5",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#E6ECDC",
+  },
+  emptyUsersText: {
+    fontFamily: FONTS.regular,
+    fontSize: 14,
+    color: "#888",
+  },
+
+  // ---- Botones Tarea ----
+  actionsRowNew: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 8,
+  },
+  btnEditNew: {
+    flex: 1,
+    height: 50,
+    borderRadius: 16,
+    backgroundColor: "#F5F4F2",
+    borderWidth: 1,
+    borderColor: "#E2E2E0",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnEditNewText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: COLORS.secondary,
+  },
+  btnCompleteNew: {
+    flex: 1.4,
+    height: 50,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnCompleteDone: {
+    backgroundColor: COLORS.success,
+    borderWidth: 1.5,
+    borderColor: COLORS.accent,
+  },
+  btnCompleteText: {
+    fontFamily: FONTS.bold,
+    fontSize: 15,
+    color: "#FFF",
+  },
+  btnCompleteDoneText: {
+    color: COLORS.primary,
+  },
+
+  // ---- Factura / Compatibilidad ----
   headerBlock: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: HELPERS.verticalScale(0),
+    marginBottom: HELPERS.verticalScale(10),
   },
-  title: {
-    fontSize: SIZES.welcomeTitle,
-    color: COLORS.secondary,
-    fontFamily: FONTS.title,
-    paddingHorizontal: HELPERS.wp("2%"),
-  },
-  subtitle: {
-    marginTop: HELPERS.verticalScale(4),
-    fontSize: SIZES.subtitle,
-    color: COLORS.secondary,
-    opacity: 0.7,
-    fontFamily: FONTS.regular,
-    paddingHorizontal: HELPERS.wp("2%"),
-  },
-
   section: {
-    marginTop: 0,
+    marginTop: 10,
     width: "100%",
   },
   sectionLabel: {
@@ -678,96 +951,6 @@ const styles = StyleSheet.create({
     paddingBottom: HELPERS.verticalScale(4),
     paddingHorizontal: HELPERS.wp("2%"),
   },
-
-  // ---- Tarea: fecha/hora ----
-
-  pointsPill: {
-    backgroundColor: COLORS.success,
-    borderRadius: HELPERS.moderateScale(12),
-    paddingHorizontal: HELPERS.wp("2.5%"),
-    paddingVertical: HELPERS.verticalScale(6),
-    marginLeft: HELPERS.wp("3%"),
-  },
-  pointsText: {
-    fontSize: SIZES.smallText,
-    color: COLORS.secondary,
-    fontFamily: FONTS.bold,
-  },
-
-  dateRow: {
-    flexDirection: "row",
-    alignItems: "baseline", // alinea por línea de base
-    justifyContent: "space-between",
-  },
-  dateText: {
-    fontSize: SIZES.text16,
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-    lineHeight: SIZES.text16,
-    ...(Platform.OS === "android" ? { includeFontPadding: false } : {}),
-  },
-  timeText: {
-    fontSize: HELPERS.moderateScale(28),
-    color: COLORS.secondary,
-    fontFamily: FONTS.bold,
-    lineHeight: HELPERS.moderateScale(28),
-    ...(Platform.OS === "android" ? { includeFontPadding: false } : {}),
-  },
-
-  // ---- Tarea: repetición (chips) ----
-  weekRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: HELPERS.verticalScale(6),
-  },
-  dayChip: {
-    paddingVertical: HELPERS.verticalScale(8),
-    paddingHorizontal: HELPERS.moderateScale(12),
-    borderRadius: HELPERS.moderateScale(12),
-    minWidth: HELPERS.moderateScale(36),
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#D8E5D3",
-  },
-  dayChipSelected: {
-    backgroundColor: COLORS.success,
-  },
-  dayChipUnselected: {
-    backgroundColor: "transparent",
-  },
-  dayChipText: {
-    fontSize: SIZES.text14,
-    fontFamily: FONTS.bold,
-  },
-  dayChipTextSelected: {
-    color: "#3E5639",
-  },
-  dayChipTextUnselected: {
-    color: COLORS.secondary,
-    opacity: 0.65,
-  },
-  dayChipFocused: {
-    borderWidth: 2,
-    borderColor: COLORS.accent,
-    shadowColor: COLORS.accent,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  daySelectionNote: {
-    marginTop: HELPERS.verticalScale(8),
-    alignItems: "center",
-  },
-  daySelectionNoteText: {
-    fontSize: SIZES.text14,
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-    opacity: 0.7,
-  },
-
-  // ---- Factura: precios ----
   priceDisplay: {
     marginTop: HELPERS.verticalScale(6),
     alignItems: "center",
@@ -783,8 +966,6 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     fontFamily: FONTS.bold,
   },
-
-  // ---- Factura: fotos ----
   imageSkeleton: {
     flexDirection: "row",
     alignItems: "center",
@@ -827,19 +1008,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
   },
-
-  input: {
-    ...(COMMON.INPUT_BASE as any),
-    width: "100%",
-  },
-
   emptyUsers: {
     fontFamily: FONTS.regular,
     fontSize: SIZES.text14,
     color: COLORS.border,
     paddingVertical: HELPERS.verticalScale(8),
   },
-
   metaRow: {
     marginTop: HELPERS.hp("1.5%"),
     flexDirection: "row",
@@ -862,7 +1036,6 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     fontFamily: FONTS.regular,
   },
-
   actionsRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -939,56 +1112,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.text16,
     color: COLORS.secondary,
     opacity: 0.7,
-  },
-  chartContainer: {
-    alignItems: "center",
-    marginTop: HELPERS.verticalScale(4),
-    paddingHorizontal: HELPERS.wp("2%"),
-  },
-  donutChart: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    marginBottom: HELPERS.verticalScale(12),
-    position: "relative",
-    backgroundColor: "#E6ECDC",
-  },
-  donutSegment: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    position: "absolute",
-    backgroundColor: "#4A5942",
-  },
-  donutHole: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: COLORS.background,
-    position: "absolute",
-    top: 35,
-    left: 35,
-  },
-  legendContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    paddingHorizontal: HELPERS.wp("2%"),
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 8,
-  },
-  legendText: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.text14,
-    color: COLORS.secondary,
   },
   deleteButtonFull: {
     marginTop: HELPERS.hp("2%"),
