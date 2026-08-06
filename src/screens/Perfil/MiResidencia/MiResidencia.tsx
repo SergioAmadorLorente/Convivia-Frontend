@@ -598,9 +598,9 @@ const MiResidencia: React.FC = () => {
                 {participants.length > 0 ? (
                   participants.map((participant, index) => (
                     <Animated.View
-                      key={index}
-                      entering={FadeInDown.delay(index * 50).duration(450).springify().damping(15).reduceMotion(ReduceMotion.Never)}
-                      layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
+                      key={participant.id || index}
+                      entering={FadeInDown.delay(index * 35).duration(300)}
+                      layout={LinearTransition.duration(200)}
                     >
                       <TouchableOpacity
                         style={[
@@ -1014,7 +1014,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    ...COMMON.SHADOW,
+    borderWidth: Platform.OS === 'android' ? 1 : 0,
+    borderColor: "#E6ECDC",
+    ...(Platform.OS === 'ios' ? COMMON.SHADOW : { elevation: 0 }),
   },
   participantItemGold: {
     borderLeftWidth: 4,
