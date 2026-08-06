@@ -4,10 +4,11 @@ import {
     Platform,
     KeyboardAvoidingView,
     TouchableOpacity,
+    StyleSheet,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
-import { HELPERS, SIZES } from "../../styles/theme";
+import { COLORS, FONTS, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
 import { Calendar } from "../../components/ui/Calendar";
@@ -15,7 +16,7 @@ import RepeatDaysSelector from "../../components/ui/RepeatDaysSelector";
 import KarmaSelector from "../../components/ui/KarmaSelector";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
@@ -482,7 +483,25 @@ const CreateTask: React.FC = () => {
                 nestedScrollEnabled
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={{ marginBottom: 40, alignItems: "center", width: "100%" }}>
+                {/* Hero Header */}
+                <View style={formStyles.heroHeader}>
+                    <View style={formStyles.heroIconRing}>
+                        <Ionicons name="checkbox-outline" size={26} color={COLORS.primary} />
+                    </View>
+                    <Text style={formStyles.heroTitle}>
+                        {isEditing ? t('createTask.titleEdit', 'Editar Tarea') : t('createTask.titleCreate', 'Nueva Tarea')}
+                    </Text>
+                    <Text style={formStyles.heroSubtitle}>
+                        {t('createTask.subtitle', 'Organiza las labores del hogar de forma justa y equitativa')}
+                    </Text>
+                </View>
+
+                {/* Form Section 1: Main Fields */}
+                <View style={formStyles.cardSection}>
+                    <View style={formStyles.cardHeaderRow}>
+                        <Ionicons name="create-outline" size={18} color={COLORS.primary} />
+                        <Text style={formStyles.cardHeaderTitle}>{t('createTask.sectionBasic', 'Información básica')}</Text>
+                    </View>
                     <TextField
                         value={name}
                         onChangeText={(text: string) => {
@@ -500,7 +519,7 @@ const CreateTask: React.FC = () => {
                     />
                 </View>
 
-                <View style={{ width: "100%", gap: 20 }}>
+                <View style={{ width: "100%", gap: 16, marginTop: 16 }}>
                     <Desplegable
                         title={t('createTask.dateTimeLimit')}
                         fontSize={SIZES.text16}
@@ -559,16 +578,26 @@ const CreateTask: React.FC = () => {
                     </Desplegable>
                 </View>
 
-                <View style={{ width: "100%", marginTop: 20, alignItems: "center" }}>
-
+                <View style={{ width: "100%", marginTop: 24, alignItems: "center" }}>
                     <Button
-                        style={GLOBAL_STYLES.buttonPrimaryGreen}
+                        style={[
+                            GLOBAL_STYLES.buttonPrimaryGreen,
+                            (!isButtonEnabled || loading) && { opacity: 0.6 }
+                        ]}
                         onPress={handleCrearTareaPress}
                         disabled={loading || !isButtonEnabled}
                     >
-                        <Text style={GLOBAL_STYLES.textoBoton}>
-                            {loading ? t('createTask.saving') : (isEditing ? t('createTask.buttonSave') : t('createTask.buttonCreate'))}
-                        </Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                            <Ionicons
+                                name={isEditing ? "checkmark-done-outline" : "add-circle-outline"}
+                                size={20}
+                                color={COLORS.primary}
+                                style={{ marginRight: 8 }}
+                            />
+                            <Text style={GLOBAL_STYLES.textoBoton}>
+                                {loading ? t('createTask.saving') : (isEditing ? t('createTask.buttonSave') : t('createTask.buttonCreate'))}
+                            </Text>
+                        </View>
                     </Button>
                 </View>
             </ScrollView>
@@ -642,5 +671,60 @@ const CreateTask: React.FC = () => {
         </KeyboardAvoidingView>
     );
 };
+
+const formStyles = StyleSheet.create({
+    heroHeader: {
+        alignItems: "center",
+        marginBottom: 20,
+        width: "100%",
+        paddingTop: 8,
+    },
+    heroIconRing: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: COLORS.success,
+        borderWidth: 2,
+        borderColor: COLORS.accent,
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 10,
+    },
+    heroTitle: {
+        fontFamily: FONTS.title,
+        fontSize: 24,
+        color: COLORS.secondary,
+        textAlign: "center",
+        marginBottom: 4,
+    },
+    heroSubtitle: {
+        fontFamily: FONTS.regular,
+        fontSize: SIZES.smallText,
+        color: COLORS.primary,
+        textAlign: "center",
+        opacity: 0.8,
+        paddingHorizontal: 20,
+    },
+    cardSection: {
+        width: "100%",
+        backgroundColor: "#F8F9F5",
+        borderRadius: 20,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: "#E6ECDC",
+        marginBottom: 4,
+    },
+    cardHeaderRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 12,
+    },
+    cardHeaderTitle: {
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.text14,
+        color: COLORS.secondary,
+    },
+});
 
 export default CreateTask;

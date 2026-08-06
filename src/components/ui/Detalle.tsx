@@ -534,9 +534,8 @@ const Detalle: React.FC<Props> = (props) => {
         month: "2-digit",
       });
     }
-  }, [factura]);
-  // Helper: la factura se considera "completada por mí" si está Pagada globalmente
-  // o si este usuario ya marcó su parte
+  }, [factura, i18n.language]);
+
   const isFacturaPaidByMe = (item: FacturaModel): boolean => {
     if (item.Pagado) return true;
     const relId = (userRelacionId || "").replace(/-/g, "").toLowerCase();
@@ -548,6 +547,10 @@ const Detalle: React.FC<Props> = (props) => {
       }) ?? false
     );
   };
+
+  const isFullyPaid = factura.Pagado || (usuarios.length > 0 && pagados === usuarios.length);
+  const isPaidByMe = isFacturaPaidByMe(factura);
+
   return (
     <Modal
       visible={visible}
@@ -574,67 +577,94 @@ const Detalle: React.FC<Props> = (props) => {
           />
           <View style={styles.handle} />
 
-          {/* Header */}
-          <View style={styles.headerBlock}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.title}>{factura.Nombre}</Text>
-              {factura.Descripcion ? (
-                <Text style={styles.subtitle}>{factura.Descripcion}</Text>
-              ) : null}
-            </View>
+          {/* Header Block */}
+          <View style={styles.headerBlockContainer}>
+            <View style={styles.titleRow}>
+              <View style={styles.taskIconBadge}>
+                <Ionicons name="receipt-outline" size={22} color={COLORS.primary} />
+              </View>
 
-            {/* Botón Eliminar */}
-            <View style={{ alignItems: "flex-end" }}>
+              <View style={styles.titleTextWrapper}>
+                <Text style={styles.title}>{factura.Nombre}</Text>
+                <View style={styles.headerBadgesRow}>
+                  <View style={[styles.pointsPill, isFullyPaid ? { backgroundColor: COLORS.success, borderColor: '#D8E5D3' } : { backgroundColor: '#FFF3CD', borderColor: '#FFE69C' }]}>
+                    <Ionicons name={isFullyPaid ? "checkmark-circle" : "time-outline"} size={13} color={isFullyPaid ? COLORS.primary : "#856404"} style={{ marginRight: 4 }} />
+                    <Text style={[styles.pointsText, { color: isFullyPaid ? COLORS.primary : "#856404" }]}>
+                      {isFullyPaid ? t('facturaDetail.paid', 'Pagada') : t('facturaDetail.pending', 'Pendiente')}
+                    </Text>
+                  </View>
+
+                  <View style={styles.pointsPill}>
+                    <Ionicons name="people-outline" size={13} color={COLORS.primary} style={{ marginRight: 4 }} />
+                    <Text style={styles.pointsText}>
+                      {t('facturaDetail.paidCounter', { pagados, total: usuarios.length })}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
               <TouchableOpacity
                 onPress={onDelete}
                 activeOpacity={0.7}
-                style={styles.deleteButton}
+                style={styles.deleteIconBtn}
               >
-                <Feather name="trash-2" size={20} color={COLORS.error} />
+                <Feather name="trash-2" size={18} color="#DC2626" />
               </TouchableOpacity>
             </View>
+
+            {factura.Descripcion ? (
+              <View style={styles.descriptionBox}>
+                <Text style={styles.subtitle}>{factura.Descripcion}</Text>
+              </View>
+            ) : null}
           </View>
 
-          {/* Precio total */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('facturaDetail.totalPrice')}</Text>
-            <View style={styles.priceDisplay}>
-              <Text style={styles.priceBig}>{totalStr}</Text>
+          {/* Price Twin Cards */}
+          <View style={styles.priceTwinCard}>
+            <View style={styles.priceCol}>
+              <Text style={styles.priceCardLabel}>{t('facturaDetail.totalPrice')}</Text>
+              <Text style={styles.priceCardValue}>{totalStr}</Text>
+            </View>
+            <View style={styles.priceDivider} />
+            <View style={styles.priceCol}>
+              <Text style={styles.priceCardLabel}>{t('facturaDetail.pricePerPerson')}</Text>
+              <Text style={[styles.priceCardValue, { color: COLORS.primary }]}>{perPersonStr}</Text>
             </View>
           </View>
 
-          {/* Precio por persona */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('facturaDetail.pricePerPerson')}</Text>
-            <View style={styles.priceDisplay}>
-              <Text style={styles.priceBig}>{perPersonStr}</Text>
+          {/* Imagen de la factura */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionAccent} />
+              <Text style={styles.sectionTitle}>{t('facturaDetail.photos')}</Text>
             </View>
-          </View>
-
-          {/* Fotos */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('facturaDetail.photos')}</Text>
             {loadingImage ? (
-              <View style={styles.imageSkeleton}>
+              <View style={styles.imageSkeletonNew}>
                 <ActivityIndicator size="small" color={COLORS.primary} />
-                <Text style={styles.imageSkeletonText}>Loading Photo...</Text>
+                <Text style={styles.imageSkeletonText}>{t('common.loading', 'Cargando imagen...')}</Text>
               </View>
             ) : facturaImageUri ? (
-              <UploadImage
-                label={t('facturaDetail.invoiceImage')}
-                initialImageUri={facturaImageUri}
-                editable={false}
-              />
+              <View style={styles.imageBoxContainer}>
+                <UploadImage
+                  label={t('facturaDetail.invoiceImage')}
+                  initialImageUri={facturaImageUri}
+                  editable={false}
+                />
+              </View>
             ) : (
-              <View style={styles.imageSkeleton}>
-                <Text style={styles.imageSkeletonText}>No photo</Text>
+              <View style={styles.emptyUserCard}>
+                <Ionicons name="image-outline" size={18} color="#999" style={{ marginRight: 8 }} />
+                <Text style={styles.emptyUsersText}>Sin imagen adjunta</Text>
               </View>
             )}
           </View>
 
           {/* Usuarios asignados */}
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>{t('facturaDetail.assignedUsers')}</Text>
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionAccent} />
+              <Text style={styles.sectionTitle}>{t('facturaDetail.assignedUsers')}</Text>
+            </View>
             {usuarios.length > 0 ? (
               <UserList
                 users={usuarios.map((u) => ({ id: u.id, name: u.name, fotoUrl: u.fotoUrl ?? null }))}
@@ -644,19 +674,22 @@ const Detalle: React.FC<Props> = (props) => {
                   const pagado = u?.completed ?? false;
                   return (
                     <View
-                      style={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 3,
-                        borderRadius: 12,
-                        backgroundColor: pagado ? "#E6ECDC" : "#FFF3CD",
-                      }}
+                      style={[
+                        styles.statusTag,
+                        pagado ? styles.statusTagPaid : styles.statusTagPending,
+                      ]}
                     >
+                      <Ionicons
+                        name={pagado ? "checkmark-circle-outline" : "time-outline"}
+                        size={12}
+                        color={pagado ? COLORS.primary : "#856404"}
+                        style={{ marginRight: 3 }}
+                      />
                       <Text
-                        style={{
-                          fontFamily: FONTS.bold,
-                          fontSize: 11,
-                          color: pagado ? "#4B4741" : "#856404",
-                        }}
+                        style={[
+                          styles.statusTagText,
+                          { color: pagado ? COLORS.primary : "#856404" },
+                        ]}
                       >
                         {pagado ? t('facturaDetail.paid') : t('facturaDetail.pending')}
                       </Text>
@@ -665,45 +698,48 @@ const Detalle: React.FC<Props> = (props) => {
                 }}
               />
             ) : (
-              <Text style={styles.emptyUsers}>{t('facturaDetail.noAssignedUsers')}</Text>
+              <View style={styles.emptyUserCard}>
+                <Ionicons name="people-outline" size={18} color="#999" style={{ marginRight: 8 }} />
+                <Text style={styles.emptyUsersText}>{t('facturaDetail.noAssignedUsers')}</Text>
+              </View>
             )}
           </View>
 
-          {/* Meta: contador y fecha */}
-          <View style={styles.metaRow}>
-            <View style={styles.counterPill}>
-              <Text style={styles.counterPillText}>
-                {t('facturaDetail.paidCounter', { pagados, total: usuarios.length })}
-              </Text>
-            </View>
-            <Text style={styles.metaDate}>{t('facturaDetail.createdDate', { date: fechaCreacionStr })}</Text>
+          {/* Fecha de Creación */}
+          <View style={styles.metaRowNew}>
+            <Ionicons name="calendar-outline" size={14} color="#888" style={{ marginRight: 6 }} />
+            <Text style={styles.metaDateNew}>
+              {t('facturaDetail.createdDate', { date: fechaCreacionStr })}
+            </Text>
           </View>
 
-          {/* Botones: Editar + Completar */}
-          <View style={styles.actionsRow}>
+          {/* Botones: Editar + Completar / Pagar */}
+          <View style={styles.actionsRowNew}>
             <TouchableOpacity
-              style={[
-                GLOBAL_STYLES.buttonSecondaryGrey,
-                styles.btnHalf,
-                { marginRight: HELPERS.wp("2%") },
-              ]}
-              activeOpacity={0.85}
+              style={styles.btnEditNew}
+              activeOpacity={0.8}
               onPress={onEdit}
             >
-              <Text style={GLOBAL_STYLES.textoBoton}>{t('taskDetail.edit')}</Text>
+              <Feather name="edit-3" size={16} color={COLORS.secondary} style={{ marginRight: 6 }} />
+              <Text style={styles.btnEditNewText}>{t('taskDetail.edit')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
-                GLOBAL_STYLES.buttonPrimaryGreen,
-                styles.btnHalf,
-                { marginLeft: HELPERS.wp("2%") },
+                styles.btnCompleteNew,
+                isPaidByMe && styles.btnCompleteDone,
               ]}
-              activeOpacity={0.9}
+              activeOpacity={0.85}
               onPress={onComplete}
             >
-              <Text style={GLOBAL_STYLES.textoBoton}>
-                {isFacturaPaidByMe(factura) ? t('taskDetail.unmark') : t('taskDetail.complete')}
+              <Ionicons
+                name={isPaidByMe ? "refresh-outline" : "card-outline"}
+                size={19}
+                color={isPaidByMe ? COLORS.primary : "#FFF"}
+                style={{ marginRight: 6 }}
+              />
+              <Text style={[styles.btnCompleteText, isPaidByMe && styles.btnCompleteDoneText]}>
+                {isPaidByMe ? t('taskDetail.unmark') : t('taskDetail.complete')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -1007,107 +1043,86 @@ const styles = StyleSheet.create({
     paddingBottom: HELPERS.verticalScale(4),
     paddingHorizontal: HELPERS.wp("2%"),
   },
-  priceDisplay: {
-    marginTop: HELPERS.verticalScale(6),
+  // ---- Factura: Twin Price Cards ----
+  priceTwinCard: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#F8F9F5",
+    borderRadius: 20,
+    padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: HELPERS.moderateScale(10),
-    paddingVertical: HELPERS.verticalScale(10),
-    backgroundColor: COLORS.inputBackground,
+    borderColor: "#E6ECDC",
+    marginBottom: 16,
   },
-  priceBig: {
-    fontSize: HELPERS.moderateScale(22),
-    color: COLORS.secondary,
+  priceCol: {
+    flex: 1,
+    alignItems: "center",
+  },
+  priceCardLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
+  priceCardValue: {
     fontFamily: FONTS.bold,
+    fontSize: 22,
+    color: "#4A5942",
   },
-  imageSkeleton: {
+  priceDivider: {
+    width: 1,
+    height: 36,
+    backgroundColor: "#E2E2E0",
+  },
+
+  // ---- Factura: Imagen & Status ----
+  imageSkeletonNew: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-    backgroundColor: COLORS.inputBackground,
-    borderRadius: HELPERS.moderateScale(10),
+    backgroundColor: "#F8F9F5",
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    paddingVertical: HELPERS.verticalScale(18),
-    marginBottom: HELPERS.verticalScale(4),
+    borderColor: "#E6ECDC",
+    paddingVertical: 18,
   },
   imageSkeletonText: {
     fontFamily: FONTS.regular,
-    fontSize: SIZES.text14,
+    fontSize: 14,
     color: COLORS.secondary,
     opacity: 0.6,
   },
-  downloadRow: {
+  imageBoxContainer: {
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  statusTag: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: HELPERS.verticalScale(6),
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: HELPERS.moderateScale(10),
-    paddingVertical: HELPERS.verticalScale(10),
-    paddingHorizontal: HELPERS.wp("3%"),
-    backgroundColor: COLORS.inputBackground,
-  },
-  downloadText: {
-    fontSize: SIZES.text14,
-    color: COLORS.accent,
-    fontFamily: FONTS.regular,
-    textDecorationLine: "underline",
-  },
-  downloadBtn: {
-    backgroundColor: "#E5ECE1",
     paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
   },
-  emptyUsers: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.text14,
-    color: COLORS.border,
-    paddingVertical: HELPERS.verticalScale(8),
+  statusTagPaid: {
+    backgroundColor: "#E6ECDC",
   },
-  metaRow: {
-    marginTop: HELPERS.hp("1.5%"),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  statusTagPending: {
+    backgroundColor: "#FFF3CD",
   },
-  counterPill: {
-    backgroundColor: "#E5ECE1",
-    borderRadius: HELPERS.moderateScale(12),
-    paddingHorizontal: HELPERS.wp("2.5%"),
-    paddingVertical: HELPERS.verticalScale(6),
-  },
-  counterPillText: {
-    fontSize: SIZES.smallText,
-    color: COLORS.secondary,
+  statusTagText: {
     fontFamily: FONTS.bold,
+    fontSize: 11,
   },
-  metaDate: {
-    fontSize: SIZES.text14,
-    color: COLORS.secondary,
-    fontFamily: FONTS.regular,
-  },
-  actionsRow: {
+  metaRowNew: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: HELPERS.hp("2%"),
-    width: "100%",
-    justifyContent: "space-between",
+    marginBottom: 14,
   },
-  btnHalf: {
-    width: "48%",
-    alignSelf: "auto",
-    marginTop: 0,
-  },
-  deleteButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: "#FFEBEE",
+  metaDateNew: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    color: "#777",
   },
 
   // ---- Participante Hero ----

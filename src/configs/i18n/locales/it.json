@@ -268,6 +268,8 @@
     "createTask": {
         "titleCreate": "Crea attività",
         "titleEdit": "Modifica attività",
+        "subtitle": "Organizza le faccende domestiche in modo giusto ed equo",
+        "sectionBasic": "Informazioni di base",
         "namePlaceholder": "Nome",
         "descriptionPlaceholder": "Descrizione (facoltativa)",
         "dateTimeLimit": "Data e ora di scadenza",
@@ -346,6 +348,8 @@
     "createInvoice": {
         "titleCreate": "Crea fattura",
         "titleEdit": "Modifica fattura",
+        "subtitle": "Registra le spese condivise e suddividi il pagamento con i coinquilini",
+        "sectionBasic": "Dettagli della fattura",
         "namePlaceholder": "Nome",
         "descriptionPlaceholder": "Descrizione",
         "price": "Prezzo",
@@ -486,6 +490,9 @@
     },
     "editProfile": {
         "title": "Modifica profilo",
+        "subtitle": "Aggiorna le tue informazioni personali e la password",
+        "sectionPersonal": "Dati personali",
+        "passwordSectionHint": "Lascia i campi vuoti se non vuoi cambiare la password.",
         "namePlaceholder": "Nome",
         "phonePlaceholder": "Telefono",
         "emailPlaceholder": "Indirizzo e-mail",

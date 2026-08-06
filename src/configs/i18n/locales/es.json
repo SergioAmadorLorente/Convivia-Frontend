@@ -268,6 +268,8 @@
   "createTask": {
     "titleCreate": "Crear Tarea",
     "titleEdit": "Editar Tarea",
+    "subtitle": "Organiza las labores del hogar de forma justa y equitativa",
+    "sectionBasic": "Información básica",
     "namePlaceholder": "Nombre",
     "descriptionPlaceholder": "Descripción (opcional)",
     "dateTimeLimit": "Fecha y hora límite",
@@ -346,6 +348,8 @@
   "createInvoice": {
     "titleCreate": "Crear Factura",
     "titleEdit": "Editar Factura",
+    "subtitle": "Registra los gastos compartidos y reparte el pago con tu piso",
+    "sectionBasic": "Datos de la factura",
     "namePlaceholder": "Nombre",
     "descriptionPlaceholder": "Descripción",
     "price": "Precio",
@@ -486,6 +490,9 @@
   },
   "editProfile": {
     "title": "Editar Perfil",
+    "subtitle": "Actualiza tu información personal y contraseña",
+    "sectionPersonal": "Datos personales",
+    "passwordSectionHint": "Deja los campos vacíos si no quieres cambiar la contraseña.",
     "namePlaceholder": "Nombre",
     "phonePlaceholder": "Teléfono",
     "emailPlaceholder": "Correo electrónico",

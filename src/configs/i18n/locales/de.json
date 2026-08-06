@@ -268,6 +268,8 @@
     "createTask": {
         "titleCreate": "Aufgabe erstellen",
         "titleEdit": "Aufgabe bearbeiten",
+        "subtitle": "Organisiert Haushaltsaufgaben fair und gerecht",
+        "sectionBasic": "Grundlegende Informationen",
         "namePlaceholder": "Name",
         "descriptionPlaceholder": "Beschreibung (optional)",
         "dateTimeLimit": "Fälligkeitsdatum und Uhrzeit",
@@ -346,6 +348,8 @@
     "createInvoice": {
         "titleCreate": "Rechnung erstellen",
         "titleEdit": "Rechnung bearbeiten",
+        "subtitle": "Gemeinsame Ausgaben erfassen und die Zahlung mit den Mitbewohnern aufteilen",
+        "sectionBasic": "Rechnungsdetails",
         "namePlaceholder": "Name",
         "descriptionPlaceholder": "Beschreibung",
         "price": "Preis",
@@ -486,6 +490,9 @@
     },
     "editProfile": {
         "title": "Profil bearbeiten",
+        "subtitle": "Aktualisiere deine persönlichen Daten und dein Passwort",
+        "sectionPersonal": "Persönliche Daten",
+        "passwordSectionHint": "Lasse die Felder leer, wenn du das Passwort nicht ändern möchtest.",
         "namePlaceholder": "Name",
         "phonePlaceholder": "Telefon",
         "emailPlaceholder": "E-Mail-Adresse",

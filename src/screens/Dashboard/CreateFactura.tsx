@@ -4,17 +4,18 @@ import {
     Platform,
     KeyboardAvoidingView,
     TouchableOpacity,
+    StyleSheet,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import GLOBAL_STYLES, { WEB_FULL_VIEWPORT } from "../../styles/styles";
-import { CHECKBOX, COLORS, HELPERS, SIZES } from "../../styles/theme";
+import { CHECKBOX, COLORS, FONTS, HELPERS, SIZES } from "../../styles/theme";
 import { Desplegable, TextField } from "../../components";
 import BottomBar from "../../components/ui/BottomBar";
 import UploadImage from "../../components/ui/UploadImage";
 import MoneyInput from "../../components/ui/MoneyInput";
 import LargeTextField from "../../components/ui/LargeTextField";
 import Button from "../../components/ui/Button";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
@@ -338,7 +339,25 @@ const CreateFactura: React.FC = () => {
                 nestedScrollEnabled
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={{ marginBottom: 15, alignItems: "center", width: "100%" }}>
+                {/* Hero Header */}
+                <View style={facturaFormStyles.heroHeader}>
+                    <View style={facturaFormStyles.heroIconRing}>
+                        <Ionicons name="receipt-outline" size={26} color={COLORS.primary} />
+                    </View>
+                    <Text style={facturaFormStyles.heroTitle}>
+                        {isEditing ? t('createInvoice.titleEdit', 'Editar Factura') : t('createInvoice.titleCreate', 'Nueva Factura')}
+                    </Text>
+                    <Text style={facturaFormStyles.heroSubtitle}>
+                        {t('createInvoice.subtitle', 'Registra los gastos compartidos y reparte el pago con tu piso')}
+                    </Text>
+                </View>
+
+                {/* Form Section 1: Main info */}
+                <View style={facturaFormStyles.cardSection}>
+                    <View style={facturaFormStyles.cardHeaderRow}>
+                        <Ionicons name="document-text-outline" size={18} color={COLORS.primary} />
+                        <Text style={facturaFormStyles.cardHeaderTitle}>{t('createInvoice.sectionBasic', 'Datos de la factura')}</Text>
+                    </View>
                     <TextField
                         value={name}
                         onChangeText={(text: string) => setName(text)}
@@ -351,7 +370,7 @@ const CreateFactura: React.FC = () => {
                     />
                 </View>
 
-                <View style={{ width: "100%", gap: 10, }}>
+                <View style={{ width: "100%", gap: 14, marginTop: 14 }}>
                     <Desplegable
                         title={t('createInvoice.price')}
                         fontSize={SIZES.text16}
@@ -361,7 +380,6 @@ const CreateFactura: React.FC = () => {
                     >
                         <MoneyInput value={amount} onChange={(val) => setAmount(val)} />
                     </Desplegable>
-
 
                     <Desplegable
                         title={t('createInvoice.assignToCompanions')}
@@ -376,11 +394,13 @@ const CreateFactura: React.FC = () => {
                             style={[GLOBAL_STYLES.buttonSecondaryGrey, { marginBottom: 15 }]}
                             onPress={() => setAssignPopupVisible(true)}
                         >
-                            <Text style={GLOBAL_STYLES.textoBoton}>
-                                {t('createInvoice.assignButton')}
-                            </Text>
+                            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                                <Ionicons name="person-add-outline" size={18} color={COLORS.secondary} style={{ marginRight: 6 }} />
+                                <Text style={GLOBAL_STYLES.textoBoton}>
+                                    {t('createInvoice.assignButton')}
+                                </Text>
+                            </View>
                         </Button>
-
 
                         {assignedUsers.length > 0 && (
                             <UserList
@@ -417,36 +437,39 @@ const CreateFactura: React.FC = () => {
                         )}
                     </Desplegable>
 
-                    <View style={{ marginTop: 5 }}>
-                        <Desplegable
-                            title={t('createInvoice.photoOptional')}
-                            fontSize={SIZES.text16}
-                            fontWeight="bold"
-                            collapsible={false}
-                            showIcon={false}
-                        >
-
-                            <UploadImage
-                                label={t('createInvoice.photoLabel')}
-                                initialImageUri={imageUri}
-                                editable={true}
-                                onImageSelected={(uri) => setImageUri(uri ?? undefined)}
-                            />
-                        </Desplegable>
-                    </View>
+                    <Desplegable
+                        title={t('createInvoice.photoOptional')}
+                        fontSize={SIZES.text16}
+                        fontWeight="bold"
+                        collapsible={false}
+                        showIcon={false}
+                    >
+                        <UploadImage
+                            label={t('createInvoice.photoLabel')}
+                            initialImageUri={imageUri}
+                            editable={true}
+                            onImageSelected={(uri) => setImageUri(uri ?? undefined)}
+                        />
+                    </Desplegable>
                 </View>
 
-                <View style={{ width: "100%", marginTop: 5, alignItems: "center" }}>
-
-
+                <View style={{ width: "100%", marginTop: 24, alignItems: "center" }}>
                     <Button
-                        style={GLOBAL_STYLES.buttonPrimaryGreen}
+                        style={[GLOBAL_STYLES.buttonPrimaryGreen, saving && { opacity: 0.6 }]}
                         onPress={handleSave}
                         disabled={saving}
                     >
-                        <Text style={GLOBAL_STYLES.textoBoton}>
-                            {saving ? t('common.loading') : (isEditing ? t('common.save') : t('createInvoice.createButton'))}
-                        </Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                            <Ionicons
+                                name={isEditing ? "checkmark-done-outline" : "receipt-outline"}
+                                size={20}
+                                color={COLORS.primary}
+                                style={{ marginRight: 8 }}
+                            />
+                            <Text style={GLOBAL_STYLES.textoBoton}>
+                                {saving ? t('common.loading') : (isEditing ? t('common.save') : t('createInvoice.createButton'))}
+                            </Text>
+                        </View>
                     </Button>
                 </View>
             </ScrollView>
@@ -494,8 +517,63 @@ const CreateFactura: React.FC = () => {
             />
 
             <BottomBar />
-        </KeyboardAvoidingView >
+        </KeyboardAvoidingView>
     );
 };
+
+const facturaFormStyles = StyleSheet.create({
+    heroHeader: {
+        alignItems: "center",
+        marginBottom: 20,
+        width: "100%",
+        paddingTop: 8,
+    },
+    heroIconRing: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: COLORS.success,
+        borderWidth: 2,
+        borderColor: COLORS.accent,
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 10,
+    },
+    heroTitle: {
+        fontFamily: FONTS.title,
+        fontSize: 24,
+        color: COLORS.secondary,
+        textAlign: "center",
+        marginBottom: 4,
+    },
+    heroSubtitle: {
+        fontFamily: FONTS.regular,
+        fontSize: SIZES.smallText,
+        color: COLORS.primary,
+        textAlign: "center",
+        opacity: 0.8,
+        paddingHorizontal: 20,
+    },
+    cardSection: {
+        width: "100%",
+        backgroundColor: "#F8F9F5",
+        borderRadius: 20,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: "#E6ECDC",
+        marginBottom: 4,
+    },
+    cardHeaderRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 12,
+    },
+    cardHeaderTitle: {
+        fontFamily: FONTS.bold,
+        fontSize: SIZES.text14,
+        color: COLORS.secondary,
+    },
+});
 
 export default CreateFactura;
