@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import GLOBAL_STYLES from "../../styles/styles";
 import { COLORS, FONTS, SIZES, COMMON, HELPERS } from "../../styles/theme";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import ImageViewing from "react-native-image-viewing";
 import TaskModel from "../../types/Task"; // export default
 import FacturaModel, { IFacturaUser } from "../../types/Factura";
 import TasksDonutChart from "./TasksDonutChart";
@@ -21,6 +22,7 @@ import { obtenerEstadisticasTareas } from "../../api/espacio";
 import UploadImage from "./UploadImage";
 import { obtenerImagenFactura } from "../../api/factura";
 import { obtenerEspacioPorUsuarioId } from "../../api/usuarioEspacio";
+import { blobToBase64 } from "../../api/usuario";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import UserList from "./UserList";
 import { useTranslation } from "react-i18next";
@@ -483,6 +485,7 @@ const Detalle: React.FC<Props> = (props) => {
   const [facturaImageUri, setFacturaImageUri] = useState<string | null>(null);
   const [loadingImage, setLoadingImage] = useState(false);
   const [userRelacionId, setUserRelacionId] = useState<string | null>(null);
+  const [viewerVisible, setViewerVisible] = useState(false);
 
   useEffect(() => {
     if (!visible || !facturaUser?.uid) return;
@@ -495,12 +498,9 @@ const Detalle: React.FC<Props> = (props) => {
         setUserRelacionId(relacion?.id || null);
         if (!eId) { setLoadingImage(false); return; }
         const blob = await obtenerImagenFactura(eId, factura.IdFactura);
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          setFacturaImageUri(reader.result as string);
-          setLoadingImage(false);
-        };
+        const base64 = await blobToBase64(blob);
+        setFacturaImageUri(base64);
+        setLoadingImage(false);
       } catch {
         setFacturaImageUri(null);
         setLoadingImage(false);
@@ -644,19 +644,37 @@ const Detalle: React.FC<Props> = (props) => {
                 <Text style={styles.imageSkeletonText}>{t('common.loading', 'Cargando imagen...')}</Text>
               </View>
             ) : facturaImageUri ? (
-              <View style={styles.imageBoxContainer}>
-                <UploadImage
-                  label={t('facturaDetail.invoiceImage')}
-                  initialImageUri={facturaImageUri}
-                  editable={false}
+              <TouchableOpacity
+                style={styles.facturaPhotoCard}
+                onPress={() => setViewerVisible(true)}
+                activeOpacity={0.88}
+              >
+                <Image
+                  source={{ uri: facturaImageUri }}
+                  style={styles.facturaPhotoImage}
+                  resizeMode="cover"
+                  fadeDuration={0}
                 />
-              </View>
+                <View style={styles.zoomBadge}>
+                  <MaterialIcons name="zoom-in" size={18} color="#FFF" />
+                  <Text style={styles.zoomBadgeText}>{t('facturaDetail.invoiceImage', 'Ampliar')}</Text>
+                </View>
+              </TouchableOpacity>
             ) : (
               <View style={styles.emptyUserCard}>
                 <Ionicons name="image-outline" size={18} color="#999" style={{ marginRight: 8 }} />
                 <Text style={styles.emptyUsersText}>Sin imagen adjunta</Text>
               </View>
             )}
+
+            <ImageViewing
+              images={facturaImageUri ? [{ uri: facturaImageUri }] : []}
+              imageIndex={0}
+              visible={viewerVisible}
+              onRequestClose={() => setViewerVisible(false)}
+              swipeToCloseEnabled={true}
+              doubleTapToZoomEnabled={true}
+            />
           </View>
 
           {/* Usuarios asignados */}
@@ -1306,6 +1324,42 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#777",
     textAlign: "center",
+  },
+
+  // ---- Foto factura en detalle ----
+  facturaPhotoCard: {
+    width: "100%",
+    height: 220,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "#F0F4EC",
+    marginTop: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  facturaPhotoImage: {
+    width: "100%",
+    height: 220,
+  },
+  zoomBadge: {
+    position: "absolute",
+    bottom: 12,
+    right: 12,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  zoomBadgeText: {
+    color: "#FFF",
+    fontSize: 12,
+    fontFamily: FONTS.bold,
   },
 });
 

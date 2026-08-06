@@ -20,23 +20,37 @@ interface UploadImageProps {
 
 const { width, height } = Dimensions.get("window");
 
+const formatUri = (uri: string | null): string | null => {
+    if (!uri) return null;
+    let clean = uri;
+    if (clean.startsWith("data:")) {
+        if (clean.startsWith("data:application/octet-stream") || clean.startsWith("data:;")) {
+            clean = clean.replace(/^data:(application\/octet-stream|);?/, "data:image/jpeg;");
+        }
+        clean = clean.replace(/;;+/g, ";");
+    }
+    return clean;
+};
+
 const UploadImage: React.FC<UploadImageProps> = ({
     label = "Subir imagen",
     onImageSelected,
     editable = true,
     initialImageUri = null,
 }) => {
-    const [imageUri, setImageUri] = useState<string | null>(initialImageUri);
-    const [expanded, setExpanded] = useState<boolean>(false);
+    const [imageUri, setImageUri] = useState<string | null>(formatUri(initialImageUri));
+    const [expanded, setExpanded] = useState<boolean>(!editable && !!initialImageUri);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
     const showLabel = !imageUri || expanded;
 
     // Efecto para actualizar la imagen cuando cambia initialImageUri
     useEffect(() => {
-        if (initialImageUri) {
-            setImageUri(initialImageUri);
+        const formatted = formatUri(initialImageUri);
+        setImageUri(formatted);
+        if (formatted && !editable) {
+            setExpanded(true);
         }
-    }, [initialImageUri]);
+    }, [initialImageUri, editable]);
 
     const pickImage = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -131,11 +145,17 @@ const UploadImage: React.FC<UploadImageProps> = ({
                      <TouchableOpacity 
                         style={styles.previewContainer} 
                         onPress={() => setIsModalVisible(true)}
-                        activeOpacity={0.8}
+                        activeOpacity={0.85}
                      >
-                        <Image source={{ uri: imageUri }} style={styles.preview} />
-                        <View style={styles.overlay}>
-                            <MaterialIcons name="zoom-in" size={30} color="#FFF" />
+                        <Image
+                            source={{ uri: imageUri }}
+                            style={styles.preview}
+                            resizeMode="cover"
+                            fadeDuration={0}
+                        />
+                        <View style={styles.zoomBadge}>
+                            <MaterialIcons name="zoom-in" size={18} color="#FFF" />
+                            <Text style={styles.zoomBadgeText}>Ampliar</Text>
                         </View>
                     </TouchableOpacity>
 
@@ -173,7 +193,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         elevation: 4,
         marginBottom: 12,
-        overflow: "hidden",
     },
     checkIcon: {
         marginLeft: 8,
@@ -183,8 +202,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: 18,
-        paddingVertical: 14, // Ajustado para que se vea bien como barra
+        paddingVertical: 14,
         backgroundColor: COLORS.background,
+        borderTopLeftRadius: 14,
+        borderTopRightRadius: 14,
     },
     headerContent: {
         flexDirection: "row",
@@ -208,27 +229,37 @@ const styles = StyleSheet.create({
         paddingHorizontal: 18,
         paddingBottom: 20,
         backgroundColor: COLORS.background,
+        borderBottomLeftRadius: 14,
+        borderBottomRightRadius: 14,
     },
-    // Elimino estilos antiguos no usados o los reutilizo si coincide
     previewContainer: {
-        marginTop: 0, // Ya tiene padding el content
-        alignSelf: "center",
+        marginTop: 0,
+        alignSelf: "stretch",
         width: "100%",
-        height: 200,
-        borderRadius: 12,
-        overflow: "hidden",
+        height: 220,
         position: "relative",
     },
     preview: {
         width: "100%",
-        height: "100%",
-        resizeMode: "cover",
+        height: 220,
+        borderRadius: 12,
     },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0,0,0,0.2)",
+    zoomBadge: {
+        position: "absolute",
+        bottom: 10,
+        right: 10,
+        backgroundColor: "rgba(0,0,0,0.6)",
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 16,
+        flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
+        gap: 4,
+    },
+    zoomBadgeText: {
+        color: "#FFF",
+        fontSize: 12,
+        fontFamily: FONTS.bold,
     },
     modalBackground: {
         flex: 1,
@@ -255,12 +286,10 @@ const styles = StyleSheet.create({
         borderRadius: 25,
     },
     imagePreview: {
-        marginLeft: 25,
-        width: 90,
-        height: 90,
-        borderRadius: 10,
-        marginTop: 10,
-        alignSelf: "flex-start",
+        width: 44,
+        height: 44,
+        borderRadius: 8,
+        resizeMode: "cover",
     },
     buttonContainer: {
         flexDirection: "row",
