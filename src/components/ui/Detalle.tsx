@@ -87,10 +87,35 @@ const Detalle: React.FC<Props> = (props) => {
     // Cargar estadísticas del participante
     useEffect(() => {
       const cargarEstadisticas = async () => {
-        if (participantRelacion?.espacioId && participant?.id) {
+        const eId = participantRelacion?.espacioId || participant?.espacioId;
+        const targetRelId =
+          participantRelacion?.id ||
+          participantRelacion?.id_UsuarioEspacio ||
+          participantRelacion?.Id ||
+          participant?.usuarioEspacioId;
+        const targetUserId = participant?.id || participantRelacion?.usuarioId;
+
+        if (eId && (targetRelId || targetUserId)) {
           try {
             setLoadingStats(true);
-            const stats = await obtenerEstadisticasTareas(participantRelacion.espacioId, participant.id);
+            let stats: any = null;
+            if (targetRelId) {
+              try {
+                stats = await obtenerEstadisticasTareas(eId, targetRelId);
+              } catch (e) {
+                // Ignore fallback error
+              }
+            }
+            if ((!stats || (stats.completadas === 0 && stats.pendientes === 0 && stats.tardes === 0)) && targetUserId && targetUserId !== targetRelId) {
+              try {
+                const statsUser = await obtenerEstadisticasTareas(eId, targetUserId);
+                if (statsUser && (statsUser.completadas > 0 || statsUser.tardes > 0 || statsUser.pendientes > 0)) {
+                  stats = statsUser;
+                }
+              } catch {
+                // Ignore fallback error
+              }
+            }
             setEstadisticas(stats);
           } catch (error) {
             setEstadisticas(null);
@@ -103,7 +128,7 @@ const Detalle: React.FC<Props> = (props) => {
       if (visible) {
         cargarEstadisticas();
       }
-    }, [visible, participantRelacion?.espacioId, participant?.id]);
+    }, [visible, participantRelacion, participant]);
 
     const tareasCompletadas = estadisticas?.completadas ?? 0;
     const tareasFueraPlazo = estadisticas?.tardes ?? 0;
