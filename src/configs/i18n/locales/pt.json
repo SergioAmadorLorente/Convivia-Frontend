@@ -268,6 +268,8 @@
   "createTask": {
     "titleCreate": "Criar Tarefa",
     "titleEdit": "Editar Tarefa",
+    "subtitle": "Organiza as tarefas domésticas de forma justa e equitativa",
+    "sectionBasic": "Informações básicas",
     "namePlaceholder": "Nome",
     "descriptionPlaceholder": "Descrição (opcional)",
     "dateTimeLimit": "Data e hora limite",
@@ -346,6 +348,8 @@
   "createInvoice": {
     "titleCreate": "Criar Fatura",
     "titleEdit": "Editar Fatura",
+    "subtitle": "Regista as despesas partilhadas e divide o pagamento com os teus companheiros de casa",
+    "sectionBasic": "Dados da fatura",
     "namePlaceholder": "Nome",
     "descriptionPlaceholder": "Descrição",
     "price": "Preço",
@@ -486,6 +490,9 @@
   },
   "editProfile": {
     "title": "Editar Perfil",
+    "subtitle": "Atualiza as tuas informações pessoais e palavra-passe",
+    "sectionPersonal": "Dados pessoais",
+    "passwordSectionHint": "Deixa os campos vazios se não quiseres alterar a palavra-passe.",
     "namePlaceholder": "Nome",
     "phonePlaceholder": "Telefone",
     "emailPlaceholder": "E-mail",

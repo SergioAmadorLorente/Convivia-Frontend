@@ -198,7 +198,16 @@ export const uriToBase64 = async (uri: string): Promise<string> => {
 export const blobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
+        reader.onloadend = () => {
+            let res = reader.result as string;
+            if (res && res.startsWith("data:")) {
+                if (res.startsWith("data:application/octet-stream") || res.startsWith("data:;")) {
+                    res = res.replace(/^data:(application\/octet-stream|);?/, "data:image/jpeg;");
+                }
+                res = res.replace(/;;+/g, ";");
+            }
+            resolve(res);
+        };
         reader.onerror = reject;
         reader.readAsDataURL(blob);
     });

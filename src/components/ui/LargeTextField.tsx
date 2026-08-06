@@ -89,7 +89,8 @@ export default LargeTextField;
 
 const styles = StyleSheet.create({
     wrapper: {
-        width: "90%",
+        alignSelf: "stretch",
+        width: "100%",
         marginTop: 12,
     },
     inputError: {
