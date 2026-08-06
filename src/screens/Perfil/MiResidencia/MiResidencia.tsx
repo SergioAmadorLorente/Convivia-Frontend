@@ -599,8 +599,8 @@ const MiResidencia: React.FC = () => {
                   participants.map((participant, index) => (
                     <Animated.View
                       key={participant.id || index}
-                      entering={FadeInDown.delay(index * 35).duration(300)}
-                      layout={LinearTransition.duration(200)}
+                      entering={FadeInDown.delay(index * 40).duration(450).springify().damping(15).reduceMotion(ReduceMotion.Never)}
+                      layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
                     >
                       <TouchableOpacity
                         style={[
