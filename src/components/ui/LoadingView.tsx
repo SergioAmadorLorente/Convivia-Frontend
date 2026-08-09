@@ -8,7 +8,6 @@ import Animated, {
   withSequence,
   Easing,
   ReduceMotion,
-  interpolateColor,
 } from "react-native-reanimated";
 import { Feather } from "@expo/vector-icons";
 import { COLORS, FONTS, SIZES } from "../../styles/theme";
@@ -24,7 +23,6 @@ const LoadingView: React.FC<LoadingViewProps> = ({
 }) => {
   const pulse = useSharedValue(0);
   const rotate = useSharedValue(0);
-  const shimmer = useSharedValue(0);
 
   useEffect(() => {
     pulse.value = withRepeat(
@@ -44,11 +42,6 @@ const LoadingView: React.FC<LoadingViewProps> = ({
       -1,
       false
     );
-    shimmer.value = withRepeat(
-      withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.sin), reduceMotion: ReduceMotion.Never }),
-      -1,
-      false
-    );
   }, []);
 
   const iconAnimatedStyle = useAnimatedStyle(() => ({
@@ -60,14 +53,6 @@ const LoadingView: React.FC<LoadingViewProps> = ({
     opacity: 0.35 + 0.3 * pulse.value,
   }));
 
-  const shimmerAnimatedStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      shimmer.value,
-      [0, 1],
-      ["rgba(172, 191, 138, 0.25)", "rgba(172, 191, 138, 0.55)"]
-    ),
-  }));
-
   const dotGlow = useAnimatedStyle(() => ({
     opacity: 0.3 + 0.7 * pulse.value,
     transform: [{ scale: 0.85 + 0.3 * pulse.value }],
@@ -77,9 +62,6 @@ const LoadingView: React.FC<LoadingViewProps> = ({
     <View style={styles.container}>
       {/* Card con borde redondeado */}
       <View style={styles.card}>
-        {/* Pista pulida (shimmer) en la parte superior */}
-        <Animated.View style={[styles.shimmerTrack, shimmerAnimatedStyle]} />
-
         {/* Icono central con anillo rotatorio */}
         <View style={styles.iconWrapper}>
           <Animated.View style={[styles.ring, ringAnimatedStyle]} />
@@ -140,13 +122,6 @@ const styles = StyleSheet.create({
         boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
       },
     }),
-  },
-  shimmerTrack: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 4,
   },
   iconWrapper: {
     width: 96,
