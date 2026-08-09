@@ -300,6 +300,14 @@ export const useDashboardData = (newSpaceName?: string) => {
         ? result
         : result?.$values || [];
 
+      // Garantizar que los nombres de usuario estén cargados antes de mapear
+      // los deudores. Sin esto, en la primera carga puede haber una carrera
+      // entre cargarNombresUsuario() y cargarFacturas(), haciendo que todos
+      // los deudores se filtren -> contador "0/0" / detalle sin miembros.
+      if (Object.keys(userNamesMapRef.current).length === 0) {
+        await cargarNombresUsuario(currentEspacioId);
+      }
+
       if (Array.isArray(facturasRaw)) {
         // Función para limpiar GUIDs y comparar sin guiones
         const cleanId = (id: string) =>
@@ -438,7 +446,15 @@ export const useDashboardData = (newSpaceName?: string) => {
       setLoadingTareas(dashboardCache.tareas === null);
     }
     try {
-      // Paralelizar carga de tareas, facturas, nombres y karma.
+      // Asegurar que los nombres de usuario están resueltos ANTES de lanzar
+      // cargarFacturas() en paralelo: si ambos se lanzan a la vez, la primera
+      // carga de facturas puede ejecutarse con userNamesMapRef vacío y descartar
+      // a todos los deudores (contador "0/0" hasta hacer pull-to-refresh).
+      if (Object.keys(userNamesMapRef.current).length === 0) {
+        await cargarNombresUsuario(currentEspacioId);
+      }
+
+      // Paralelizar carga de tareas, facturas y karma.
       // Cada sección finaliza de forma independiente (no se esperan entre sí).
       await Promise.all([
         cargarFacturas(showLoading),
