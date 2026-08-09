@@ -321,10 +321,20 @@ const Detalle: React.FC<Props> = (props) => {
                       <Ionicons name="sparkles" size={13} color={COLORS.primary} style={{ marginRight: 4 }} />
                       <Text style={styles.pointsText}>{t('taskDetail.pointsPill', { points: task.karma ?? 0 })}</Text>
                     </View>
-                    {task.overdue && (
+                    {task.isCompleted ? (
+                      <View style={styles.statusBadgeCompleted}>
+                        <Ionicons name="checkmark-circle-outline" size={13} color="#16A34A" style={{ marginRight: 3 }} />
+                        <Text style={styles.statusBadgeCompletedText}>{t('taskDetail.status.completed')}</Text>
+                      </View>
+                    ) : task.overdue ? (
                       <View style={styles.overdueBadge}>
                         <Ionicons name="warning-outline" size={13} color="#DC2626" style={{ marginRight: 3 }} />
-                        <Text style={styles.overdueBadgeText}>{t('dashboard.tasks.overdue', 'Vencida')}</Text>
+                        <Text style={styles.overdueBadgeText}>{t('taskDetail.status.overdue')}</Text>
+                      </View>
+                    ) : (
+                      <View style={styles.statusBadgePending}>
+                        <Ionicons name="time-outline" size={13} color="#856404" style={{ marginRight: 3 }} />
+                        <Text style={styles.statusBadgePendingText}>{t('taskDetail.status.pending')}</Text>
                       </View>
                     )}
                   </View>
@@ -851,6 +861,36 @@ const styles = StyleSheet.create({
   overdueBadgeText: {
     fontSize: 12,
     color: "#DC2626",
+    fontFamily: FONTS.bold,
+  },
+  statusBadgeCompleted: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(22, 163, 74, 0.08)",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "rgba(22, 163, 74, 0.25)",
+  },
+  statusBadgeCompletedText: {
+    fontSize: 12,
+    color: "#16A34A",
+    fontFamily: FONTS.bold,
+  },
+  statusBadgePending: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF3CD",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "#FFE69C",
+  },
+  statusBadgePendingText: {
+    fontSize: 12,
+    color: "#856404",
     fontFamily: FONTS.bold,
   },
   deleteIconBtn: {

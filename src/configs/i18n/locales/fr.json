@@ -545,7 +545,12 @@
         "unassigned": "Non attribuée",
         "edit": "Modifier",
         "unmark": "Décocher",
-        "complete": "Terminer"
+        "complete": "Terminer",
+        "status": {
+            "pending": "En attente",
+            "overdue": "En retard",
+            "completed": "Terminée"
+        }
     },
     "facturaDetail": {
         "totalPrice": "Prix total",
