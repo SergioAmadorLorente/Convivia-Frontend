@@ -454,20 +454,17 @@ const Detalle: React.FC<Props> = (props) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[
-                  styles.btnCompleteNew,
-                  task.isCompleted && styles.btnCompleteDone,
-                ]}
+                style={styles.btnCompleteNew}
                 activeOpacity={0.85}
                 onPress={onComplete}
               >
                 <Ionicons
                   name={task.isCompleted ? "refresh-outline" : "checkmark-circle-outline"}
                   size={19}
-                  color={task.isCompleted ? COLORS.primary : "#FFF"}
+                  color={COLORS.primary}
                   style={{ marginRight: 6 }}
                 />
-                <Text style={[styles.btnCompleteText, task.isCompleted && styles.btnCompleteDoneText]}>
+                <Text style={[styles.btnCompleteText, styles.btnCompleteDoneText]}>
                   {task.isCompleted ? t('taskDetail.unmark') : t('taskDetail.complete')}
                 </Text>
               </TouchableOpacity>
@@ -743,20 +740,17 @@ const Detalle: React.FC<Props> = (props) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
-                styles.btnCompleteNew,
-                isPaidByMe && styles.btnCompleteDone,
-              ]}
+              style={styles.btnCompleteNew}
               activeOpacity={0.85}
               onPress={onComplete}
             >
               <Ionicons
                 name={isPaidByMe ? "refresh-outline" : "card-outline"}
                 size={19}
-                color={isPaidByMe ? COLORS.primary : "#FFF"}
+                color={COLORS.primary}
                 style={{ marginRight: 6 }}
               />
-              <Text style={[styles.btnCompleteText, isPaidByMe && styles.btnCompleteDoneText]}>
+              <Text style={[styles.btnCompleteText, styles.btnCompleteDoneText]}>
                 {isPaidByMe ? t('taskDetail.unmark') : t('taskDetail.complete')}
               </Text>
             </TouchableOpacity>
@@ -1021,7 +1015,9 @@ const styles = StyleSheet.create({
     flex: 1.4,
     height: 50,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.success,
+    borderWidth: 1.5,
+    borderColor: COLORS.accent,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
