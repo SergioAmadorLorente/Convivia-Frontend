@@ -94,10 +94,7 @@ const handleLogin = async () => {
         return;
       }
 
-      // OK login
-      setShowConfetti(true);
-
-      // Trigger confetti only after successful login
+      // OK login - confetti only after successful login
       setShowConfetti(true);
 
       // Guardar flag de "Recuérdame" si el checkbox estaba marcado
@@ -235,9 +232,9 @@ const handleLogin = async () => {
             </Animated.View>
             {/* BOTÓN LOGIN */}
             <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(460)}>
-<ConfettiButton
+              <ConfettiButton
                 onPress={handleLogin}
-                disabled={!isButtonEnabled}
+                disabled={!isButtonEnabled || loading}
                 loading={loading}
                 style={[
                   GLOBAL_STYLES.buttonPrimaryGreen,

@@ -230,6 +230,8 @@
         },
         "noInvoices": "Deinem Benutzer sind keine Rechnungen zugewiesen.",
         "noTasks": "Deinem Benutzer sind keine Aufgaben zugewiesen.",
+        "loadingTasks": "Lade deine Aufgaben…",
+        "loadingInvoices": "Lade deine Rechnungen…",
         "filter": {
             "title": "Filtern",
             "accessibilityOpen": "Filter öffnen",
