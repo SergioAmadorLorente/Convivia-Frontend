@@ -230,6 +230,8 @@
         },
         "noInvoices": "Aucune facture n'est attribuée à votre utilisateur",
         "noTasks": "Aucune tâche n'est attribuée à votre utilisateur",
+        "loadingTasks": "Chargement de vos tâches…",
+        "loadingInvoices": "Chargement de vos factures…",
         "filter": {
             "title": "Filtrer",
             "accessibilityOpen": "Ouvrir les filtres",
@@ -545,7 +547,12 @@
         "unassigned": "Non attribuée",
         "edit": "Modifier",
         "unmark": "Décocher",
-        "complete": "Terminer"
+        "complete": "Terminer",
+        "status": {
+            "pending": "En attente",
+            "overdue": "En retard",
+            "completed": "Terminée"
+        }
     },
     "facturaDetail": {
         "totalPrice": "Prix total",

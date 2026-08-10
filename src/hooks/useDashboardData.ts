@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { useAuthListenerFull } from "./useAuthListener";
 import { obtenerUsuarioPorId, obtenerUsuarios, getFullFotoUrl, obtenerFotoUsuario, blobToBase64 } from "../api/usuario";
 import { photoCache } from "./useProfilePhoto";
@@ -13,6 +13,7 @@ import type { PlantillaTarea, Tarea } from "../types/Task";
 import FacturaModel from "../types/Factura";
 import { obtenerFacturasPorDeudor, eliminarFactura } from "../api/factura";
 import { obtenerKarmaUsuario } from "../api/karma";
+import { dashboardCache } from "./dashboardCache";
 
 export const useDashboardData = (newSpaceName?: string) => {
   const { user, authLoading } = useAuthListenerFull();
@@ -26,11 +27,29 @@ export const useDashboardData = (newSpaceName?: string) => {
   const [loadingKarma, setLoadingKarma] = useState<boolean>(true);
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
   const [userNamesMap, setUserNamesMap] = useState<Record<string, { name: string; fotoUrl: string | null }>>({});
-  const [tareas, setTareas] = useState<TaskModel[]>([]);
-  const [loadingTareas, setLoadingTareas] = useState(true);
+  // Inicializar desde caché en memoria (stale-while-revalidate):
+  // si hay datos previos, se muestran al instante mientras se refrescan en segundo plano
+  const [tareas, setTareasState] = useState<TaskModel[]>(() => dashboardCache.tareas ?? []);
+  const [loadingTareas, setLoadingTareas] = useState(() => dashboardCache.tareas === null);
+  const [facturas, setFacturasState] = useState<FacturaModel[]>(() => dashboardCache.facturas ?? []);
+  const [loadingFacturas, setLoadingFacturas] = useState(() => dashboardCache.facturas === null);
   const [refreshing, setRefreshing] = useState(false);
-  const [facturas, setFacturas] = useState<FacturaModel[]>([]);
-  const [loadingFacturas, setLoadingFacturas] = useState(true);
+
+  // Setters que mantienen la caché sincronizada (compatibles con setter funcional o valor)
+  const setTareas = (updater: SetStateAction<TaskModel[]>) => {
+    setTareasState((prev) => {
+      const next = typeof updater === "function" ? (updater as (p: TaskModel[]) => TaskModel[])(prev) : updater;
+      dashboardCache.tareas = next;
+      return next;
+    });
+  };
+  const setFacturas = (updater: SetStateAction<FacturaModel[]>) => {
+    setFacturasState((prev) => {
+      const next = typeof updater === "function" ? (updater as (p: FacturaModel[]) => FacturaModel[])(prev) : updater;
+      dashboardCache.facturas = next;
+      return next;
+    });
+  };
 
 
   // Cargar información del espacio del usuario
@@ -95,69 +114,116 @@ export const useDashboardData = (newSpaceName?: string) => {
     cargarEspacio();
   }, [user, authLoading, newSpaceName]);
 
-  // Nombres de usuario — carga miembros del mismo espacio usando la misma lógica probada de useFetchParticipants
+  // Nombres de usuario — carga todos los miembros del espacio en 1-2 llamadas de red
+  // (antes hacía 1 llamada por miembro = N+1). Usa obtenerUsuarios() en batch.
+  const nombresLoadingRef = useRef<Promise<Record<string, { name: string; fotoUrl: string | null }>> | null>(null);
+
   const cargarNombresUsuario = async (targetEspacioId?: string) => {
     try {
       const currentEspacioId = targetEspacioId || espacioId || espacioIdRef.current;
       if (!currentEspacioId) return {};
 
-      // Obtener todas las relaciones usuario-espacio
-      const uEspacios = await obtenerUsuarioEspacios();
-      const uEspaciosRaw = Array.isArray(uEspacios) ? uEspacios : uEspacios?.$values || [];
+      // Si ya hay una carga de nombres en curso, reutilizarla (evita duplicar peticiones)
+      if (nombresLoadingRef.current) {
+        try {
+          return await nombresLoadingRef.current;
+        } catch {
+          // Si falló la anterior, reintentamos
+        }
+      }
 
-      if (Array.isArray(uEspaciosRaw)) {
+      const promise = (async () => {
         const cleanId = (id: string) => id?.replace(/-/g, "").toLowerCase() || "";
-        const targetClean = cleanId(currentEspacioId);
 
-        // Filtrar relaciones por espacioId de forma estricta (idéntica a useFetchParticipants)
-        // y con fallback de cleanId por si acaso
-        const relacionesDelEspacio = uEspaciosRaw.filter((rel: any) => {
-          return rel.espacioId === currentEspacioId || cleanId(rel.espacioId || "") === targetClean;
+        // Obtener relaciones y TODOS los usuarios en paralelo (solo 2 llamadas)
+        const [uEspacios, usuariosRaw] = await Promise.all([
+          obtenerUsuarioEspacios().catch(() => null),
+          obtenerUsuarios().catch(() => null),
+        ]);
+
+        const uEspaciosRaw = Array.isArray(uEspacios) ? uEspacios : uEspacios?.$values || [];
+        const usuariosList = Array.isArray(usuariosRaw) ? usuariosRaw : (usuariosRaw as any)?.$values || [];
+
+        // Indexar usuarios por id y por id limpio para búsqueda O(1)
+        const usuariosPorId: Record<string, any> = {};
+        (usuariosList || []).forEach((u: any) => {
+          const uid = u.id || u.Id;
+          if (uid) {
+            usuariosPorId[uid] = u;
+            usuariosPorId[cleanId(uid)] = u;
+          }
         });
 
-        // Construir mapa solo con miembros de este espacio
+        // Fallback seguro: si el batch no trajo algún miembro (u falló obtenerUsuarios),
+        // resolverlo individualmente solo en ese caso
+        const faltantes = (uEspaciosRaw || []).filter((rel: any) => {
+          const usuarioId = rel.usuarioId;
+          if (!usuarioId) return false;
+          return !usuariosPorId[usuarioId] && !usuariosPorId[cleanId(usuarioId)];
+        });
+
+        if (faltantes.length > 0) {
+          await Promise.all(
+            faltantes.map(async (rel: any) => {
+              const usuarioId = rel.usuarioId;
+              try {
+                const u = await obtenerUsuarioPorId(usuarioId);
+                if (u) {
+                  usuariosPorId[usuarioId] = u;
+                  usuariosPorId[cleanId(usuarioId)] = u;
+                }
+              } catch {
+                // Silenciar
+              }
+            })
+          );
+        }
+
         const map: Record<string, { name: string; fotoUrl: string | null }> = {};
 
-        // Cargar los usuarios del espacio en paralelo para resolver sus nombres
-        await Promise.all(
-          relacionesDelEspacio.map(async (rel: any) => {
+        if (Array.isArray(uEspaciosRaw)) {
+          const targetClean = cleanId(currentEspacioId);
+
+          // Filtrar relaciones por espacioId de forma estricta (idéntica a useFetchParticipants)
+          const relacionesDelEspacio = uEspaciosRaw.filter((rel: any) => {
+            return rel.espacioId === currentEspacioId || cleanId(rel.espacioId || "") === targetClean;
+          });
+
+          relacionesDelEspacio.forEach((rel: any) => {
             const relId = rel.id || rel.id_UsuarioEspacio;
             const usuarioId = rel.usuarioId;
             if (!usuarioId) return;
 
-            try {
-              const u = await obtenerUsuarioPorId(usuarioId);
-              if (u) {
-                const nombre = u.nombre || u.email || u.id || "Miembro";
-                const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
-                const fotoUrl = (usuarioId ? photoCache.get(usuarioId) : null) ?? getFullFotoUrl(rawFoto) ?? null;
-                const entry = { name: nombre, fotoUrl };
-                if (relId) map[relId] = entry;
-                if (usuarioId) map[usuarioId] = entry;
-                if (relId) map[cleanId(relId || "")] = entry;
-                if (usuarioId) map[cleanId(usuarioId || "")] = entry;
-              } else {
-                const fallback = `Usuario (${usuarioId.slice(0, 4)})`;
-                const entry = { name: fallback, fotoUrl: null };
-                if (relId) map[relId] = entry;
-                if (usuarioId) map[usuarioId] = entry;
-                if (relId) map[cleanId(relId || "")] = entry;
-                if (usuarioId) map[cleanId(usuarioId || "")] = entry;
-              }
-            } catch (err) {
+            const u = usuariosPorId[usuarioId] || usuariosPorId[cleanId(usuarioId)];
+            let entry: { name: string; fotoUrl: string | null };
+            if (u) {
+              const nombre = u.nombre || u.email || u.id || "Miembro";
+              const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
+              const fotoUrl = (usuarioId ? photoCache.get(usuarioId) : null) ?? getFullFotoUrl(rawFoto) ?? null;
+              entry = { name: nombre, fotoUrl };
+            } else {
               const fallback = `Usuario (${usuarioId.slice(0, 4)})`;
-              const entry = { name: fallback, fotoUrl: null };
-              if (relId) map[relId] = entry;
-              if (usuarioId) map[usuarioId] = entry;
-              if (relId) map[cleanId(relId || "")] = entry;
-              if (usuarioId) map[cleanId(usuarioId || "")] = entry;
+              entry = { name: fallback, fotoUrl: null };
             }
-          })
-        );
+            if (relId) map[relId] = entry;
+            if (usuarioId) map[usuarioId] = entry;
+            if (relId) map[cleanId(relId || "")] = entry;
+            if (usuarioId) map[cleanId(usuarioId || "")] = entry;
+          });
+        }
 
         setUserNamesMap(map);
         userNamesMapRef.current = map;
         return map;
+      })();
+
+      nombresLoadingRef.current = promise;
+      try {
+        return await promise;
+      } finally {
+        if (nombresLoadingRef.current === promise) {
+          nombresLoadingRef.current = null;
+        }
       }
     } catch (error) {
       console.error("Error al cargar nombres de usuario del espacio:", error);
@@ -224,18 +290,23 @@ export const useDashboardData = (newSpaceName?: string) => {
       setLoadingFacturas(false);
       return;
     }
-    if (showLoading) setLoadingFacturas(true);
+    // Solo mostrar loading si no hay datos previos en caché (refresco silencioso en segundo plano)
+    if (showLoading && dashboardCache.facturas === null) setLoadingFacturas(true);
     try {
       const result = await obtenerFacturasPorDeudor(currentEspacioId, currentUser.uid);
-      // console.log(
-      //   "Facturas Recibidas (raw):",
-      //   JSON.stringify(result, null, 2),
-      // );
 
       // Manejar tanto array directo como objeto con $values (común en .NET)
       const facturasRaw = Array.isArray(result)
         ? result
         : result?.$values || [];
+
+      // Garantizar que los nombres de usuario estén cargados antes de mapear
+      // los deudores. Sin esto, en la primera carga puede haber una carrera
+      // entre cargarNombresUsuario() y cargarFacturas(), haciendo que todos
+      // los deudores se filtren -> contador "0/0" / detalle sin miembros.
+      if (Object.keys(userNamesMapRef.current).length === 0) {
+        await cargarNombresUsuario(currentEspacioId);
+      }
 
       if (Array.isArray(facturasRaw)) {
         // Función para limpiar GUIDs y comparar sin guiones
@@ -371,22 +442,33 @@ export const useDashboardData = (newSpaceName?: string) => {
       return;
     }
     if (showLoading) {
-      setLoadingTareas(true);
-      setLoadingFacturas(true);
+      // Solo mostrar loading si no hay datos previos en caché (refresco silencioso)
+      setLoadingTareas(dashboardCache.tareas === null);
     }
     try {
-      // Asegurarse de tener el mapa de nombres cargado para evitar mostrar IDs
-      let currentNamesMap = userNamesMapRef.current;
-      if (Object.keys(currentNamesMap).length === 0) {
-        currentNamesMap = await cargarNombresUsuario(currentEspacioId);
+      // Asegurar que los nombres de usuario están resueltos ANTES de lanzar
+      // cargarFacturas() en paralelo: si ambos se lanzan a la vez, la primera
+      // carga de facturas puede ejecutarse con userNamesMapRef vacío y descartar
+      // a todos los deudores (contador "0/0" hasta hacer pull-to-refresh).
+      if (Object.keys(userNamesMapRef.current).length === 0) {
+        await cargarNombresUsuario(currentEspacioId);
       }
 
-      // Paralelizar carga de tareas, facturas y karma de forma sincronizada
+      // Paralelizar carga de tareas, facturas y karma.
+      // Cada sección finaliza de forma independiente (no se esperan entre sí).
       await Promise.all([
         cargarFacturas(showLoading),
         cargarKarma(currentEspacioId),
         (async () => {
-          const tareasRaw = await obtenerTareasPorEspacio(currentEspacioId);
+          // Obtener tareas y nombres de usuario en paralelo (elimina el bloqueo secuencial
+          // que retrasaba toda la carga hasta resolver los nombres)
+          const [currentNamesMap, tareasRaw] = await Promise.all([
+            Object.keys(userNamesMapRef.current).length === 0
+              ? cargarNombresUsuario(currentEspacioId)
+              : Promise.resolve(userNamesMapRef.current),
+            obtenerTareasPorEspacio(currentEspacioId),
+          ]);
+
           if (!Array.isArray(tareasRaw)) return;
 
           const plantillas = tareasRaw as PlantillaTarea[];
@@ -543,7 +625,6 @@ export const useDashboardData = (newSpaceName?: string) => {
     } finally {
       if (showLoading) {
         setLoadingTareas(false);
-        setLoadingFacturas(false);
       }
       setRefreshing(false);
     }

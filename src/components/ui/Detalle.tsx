@@ -321,10 +321,20 @@ const Detalle: React.FC<Props> = (props) => {
                       <Ionicons name="sparkles" size={13} color={COLORS.primary} style={{ marginRight: 4 }} />
                       <Text style={styles.pointsText}>{t('taskDetail.pointsPill', { points: task.karma ?? 0 })}</Text>
                     </View>
-                    {task.overdue && (
+                    {task.isCompleted ? (
+                      <View style={styles.statusBadgeCompleted}>
+                        <Ionicons name="checkmark-circle-outline" size={13} color="#16A34A" style={{ marginRight: 3 }} />
+                        <Text style={styles.statusBadgeCompletedText}>{t('taskDetail.status.completed')}</Text>
+                      </View>
+                    ) : task.overdue ? (
                       <View style={styles.overdueBadge}>
                         <Ionicons name="warning-outline" size={13} color="#DC2626" style={{ marginRight: 3 }} />
-                        <Text style={styles.overdueBadgeText}>{t('dashboard.tasks.overdue', 'Vencida')}</Text>
+                        <Text style={styles.overdueBadgeText}>{t('taskDetail.status.overdue')}</Text>
+                      </View>
+                    ) : (
+                      <View style={styles.statusBadgePending}>
+                        <Ionicons name="time-outline" size={13} color="#856404" style={{ marginRight: 3 }} />
+                        <Text style={styles.statusBadgePendingText}>{t('taskDetail.status.pending')}</Text>
                       </View>
                     )}
                   </View>
@@ -454,20 +464,17 @@ const Detalle: React.FC<Props> = (props) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[
-                  styles.btnCompleteNew,
-                  task.isCompleted && styles.btnCompleteDone,
-                ]}
+                style={styles.btnCompleteNew}
                 activeOpacity={0.85}
                 onPress={onComplete}
               >
                 <Ionicons
                   name={task.isCompleted ? "refresh-outline" : "checkmark-circle-outline"}
                   size={19}
-                  color={task.isCompleted ? COLORS.primary : "#FFF"}
+                  color={COLORS.primary}
                   style={{ marginRight: 6 }}
                 />
-                <Text style={[styles.btnCompleteText, task.isCompleted && styles.btnCompleteDoneText]}>
+                <Text style={[styles.btnCompleteText, styles.btnCompleteDoneText]}>
                   {task.isCompleted ? t('taskDetail.unmark') : t('taskDetail.complete')}
                 </Text>
               </TouchableOpacity>
@@ -743,20 +750,17 @@ const Detalle: React.FC<Props> = (props) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
-                styles.btnCompleteNew,
-                isPaidByMe && styles.btnCompleteDone,
-              ]}
+              style={styles.btnCompleteNew}
               activeOpacity={0.85}
               onPress={onComplete}
             >
               <Ionicons
                 name={isPaidByMe ? "refresh-outline" : "card-outline"}
                 size={19}
-                color={isPaidByMe ? COLORS.primary : "#FFF"}
+                color={COLORS.primary}
                 style={{ marginRight: 6 }}
               />
-              <Text style={[styles.btnCompleteText, isPaidByMe && styles.btnCompleteDoneText]}>
+              <Text style={[styles.btnCompleteText, styles.btnCompleteDoneText]}>
                 {isPaidByMe ? t('taskDetail.unmark') : t('taskDetail.complete')}
               </Text>
             </TouchableOpacity>
@@ -857,6 +861,36 @@ const styles = StyleSheet.create({
   overdueBadgeText: {
     fontSize: 12,
     color: "#DC2626",
+    fontFamily: FONTS.bold,
+  },
+  statusBadgeCompleted: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(22, 163, 74, 0.08)",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "rgba(22, 163, 74, 0.25)",
+  },
+  statusBadgeCompletedText: {
+    fontSize: 12,
+    color: "#16A34A",
+    fontFamily: FONTS.bold,
+  },
+  statusBadgePending: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF3CD",
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: "#FFE69C",
+  },
+  statusBadgePendingText: {
+    fontSize: 12,
+    color: "#856404",
     fontFamily: FONTS.bold,
   },
   deleteIconBtn: {
@@ -1021,7 +1055,9 @@ const styles = StyleSheet.create({
     flex: 1.4,
     height: 50,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.success,
+    borderWidth: 1.5,
+    borderColor: COLORS.accent,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

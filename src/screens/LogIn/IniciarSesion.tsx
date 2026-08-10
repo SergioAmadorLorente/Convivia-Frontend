@@ -68,7 +68,7 @@ const IniciarSesion: React.FC = () => {
       </View>
     );
   }
-  const handleLogin = async () => {
+const handleLogin = async () => {
     setShowConfetti(false);
     setLoading(true);
     try {
@@ -94,7 +94,7 @@ const IniciarSesion: React.FC = () => {
         return;
       }
 
-      // OK login
+      // OK login - confetti only after successful login
       setShowConfetti(true);
 
       // Guardar flag de "Recuérdame" si el checkbox estaba marcado
@@ -234,7 +234,8 @@ const IniciarSesion: React.FC = () => {
             <Animated.View style={{ alignSelf: "stretch", alignItems: "center" }} entering={ANIM(460)}>
               <ConfettiButton
                 onPress={handleLogin}
-                disabled={!isButtonEnabled}
+                disabled={!isButtonEnabled || loading}
+                loading={loading}
                 style={[
                   GLOBAL_STYLES.buttonPrimaryGreen,
                   { backgroundColor: COLORS.success },

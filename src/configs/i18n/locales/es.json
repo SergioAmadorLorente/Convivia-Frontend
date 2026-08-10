@@ -230,6 +230,8 @@
     },
     "noInvoices": "No hay facturas asignadas a tu usuario",
     "noTasks": "No hay tareas asignadas a tu usuario",
+    "loadingTasks": "Trayendo tus tareas…",
+    "loadingInvoices": "Cargando tus facturas…",
     "filter": {
       "title": "Filtrar",
       "accessibilityOpen": "Abrir filtros",
@@ -545,7 +547,12 @@
     "unassigned": "Sin asignar",
     "edit": "Editar",
     "unmark": "Desmarcar",
-    "complete": "Completar"
+    "complete": "Completar",
+    "status": {
+      "pending": "Pendiente",
+      "overdue": "Vencida",
+      "completed": "Completada"
+    }
   },
   "facturaDetail": {
     "totalPrice": "Precio total",

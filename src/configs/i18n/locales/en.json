@@ -230,6 +230,8 @@
     },
     "noInvoices": "No invoices assigned to your user",
     "noTasks": "No tasks assigned to your user",
+    "loadingTasks": "Fetching your tasks…",
+    "loadingInvoices": "Loading your invoices…",
     "filter": {
       "title": "Filter",
       "accessibilityOpen": "Open filters",
@@ -545,7 +547,12 @@
     "unassigned": "Unassigned",
     "edit": "Edit",
     "unmark": "Unmark",
-    "complete": "Complete"
+    "complete": "Complete",
+    "status": {
+      "pending": "Pending",
+      "overdue": "Overdue",
+      "completed": "Completed"
+    }
   },
   "facturaDetail": {
     "totalPrice": "Total price",

@@ -230,6 +230,8 @@
     },
     "noInvoices": "Não existem faturas atribuídas ao seu utilizador",
     "noTasks": "Não existem tarefas atribuídas ao seu utilizador",
+    "loadingTasks": "A carregar as suas tarefas…",
+    "loadingInvoices": "A carregar as suas faturas…",
     "filter": {
       "title": "Filtrar",
       "accessibilityOpen": "Abrir filtros",
@@ -545,7 +547,12 @@
     "unassigned": "Sem atribuição",
     "edit": "Editar",
     "unmark": "Desmarcar",
-    "complete": "Concluir"
+    "complete": "Concluir",
+    "status": {
+      "pending": "Pendente",
+      "overdue": "Fora do prazo",
+      "completed": "Concluída"
+    }
   },
   "facturaDetail": {
     "totalPrice": "Preço total",

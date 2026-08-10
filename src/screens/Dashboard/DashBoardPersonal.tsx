@@ -32,6 +32,7 @@ import Desplegable from "../../components/ui/Desplegable";
 import TasksFilter from "../../components/ui/TasksFilter";
 import Popup from "../../components/ui/Popup";
 import Detalle from "../../components/ui/Detalle";
+import LoadingView from "../../components/ui/LoadingView";
 import { useDashboardData } from "../../hooks/useDashboardData";
 import { useDashboardActions, useQuickToggleFactura } from "../../hooks/useDashboardActions";
 import { useToast } from "../../hooks/useToast";
@@ -297,12 +298,10 @@ const DashBoardPersonal: React.FC = () => {
         )}
 
         {isLoading ? (
-          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 60, minHeight: 300 }}>
-            <ActivityIndicator size="large" color={COLORS.primary} />
-            <Text style={{ marginTop: 20, fontFamily: FONTS.regular, fontSize: SIZES.text16, color: "#666" }}>
-              {t('common.loading')}
-            </Text>
-          </View>
+          <LoadingView
+            message={activeTab === "tareas" ? t('dashboard.loadingTasks') : t('dashboard.loadingInvoices')}
+            icon={activeTab === "tareas" ? "check-circle" : "file-text"}
+          />
         ) : (
           <Animated.View
             layout={LinearTransition.springify().damping(15).mass(0.8).reduceMotion(ReduceMotion.Never)}
