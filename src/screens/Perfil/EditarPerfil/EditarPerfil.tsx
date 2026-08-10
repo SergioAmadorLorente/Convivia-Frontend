@@ -187,7 +187,7 @@ const EditarPerfil = () => {
             <ScrollView
                 contentContainerStyle={[
                     GLOBAL_STYLES.scrollContainer2,
-                    { paddingBottom: hp('15%') },
+                    { paddingBottom: hp('5%') },
                     Platform.OS === 'web' ? WEB_FULL_VIEWPORT : {},
                     { alignItems: 'center' },
                 ]}
@@ -486,7 +486,7 @@ const epStyles = StyleSheet.create({
     buttonWrapper: {
         width: '92%',
         marginTop: 4,
-        marginBottom: hp('3%'),
+        marginBottom: hp('2%'),
     },
 });
 

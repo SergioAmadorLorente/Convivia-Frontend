@@ -5,6 +5,13 @@ export interface Tarea {
   usuarioEspacioId?: string | null;
   completada?: boolean;
   fechaRealizacion?: Date | string | null;
+  /**
+   * Fecha en la que se ejecuta la tarea en la semana en curso.
+   * Para tareas de repetición, el backend siempre devuelve la fecha correcta
+   * de la semana actual, independientemente de cuándo se creó la plantilla.
+   */
+  fechaEjecutada?: Date | string | null;
+  FechaEjecutada?: Date | string | null;
   [key: string]: unknown;
 }
 
