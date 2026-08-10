@@ -33,7 +33,7 @@ import Popup from "../../../components/ui/Popup";
 import Detalle from "../../../components/ui/Detalle";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios, eliminarUsuarioEspacio, obtenerRelacionUsuarioEspacio, actualizarUsuarioEspacio } from "../../../api/usuarioEspacio";
 import { obtenerEspacioPorId, eliminarEspacio } from "../../../api/espacio";
-import { obtenerTareasPorEspacio, eliminarTarea, obtenerDetalleTareaInstancia } from "../../../api/tarea";
+import { obtenerTareasPorEspacio, eliminarTarea } from "../../../api/tarea";
 import { obtenerFacturasPorEspacio, editarFactura, FacturaPayload } from "../../../api/factura";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
@@ -101,21 +101,10 @@ const borrarTareasDelUsuario = async (
         }
       }
 
-      // 3. Revisar instanciaActiva (embebida o remota nivel 3)
+      // 3. Revisar instanciaActiva (el backend la devuelve embebida en cada
+      // plantilla vía GetAllByEspacioConInstanciaActivaAsync, sin N+1)
       if (!estaAsignada) {
-        let instancia = plantilla.instanciaActiva ?? plantilla.InstanciaActiva ?? null;
-
-        if (!instancia && Array.isArray(plantilla.tareasId) && plantilla.tareasId.length > 0) {
-          try {
-            instancia = await obtenerDetalleTareaInstancia(
-              espacioId,
-              String(plantilla.id),
-              String(plantilla.tareasId[0])
-            );
-          } catch {
-            // Ignorar error si falla al traer detalle de instancia
-          }
-        }
+        const instancia = plantilla.instanciaActiva ?? plantilla.InstanciaActiva ?? null;
 
         if (instancia) {
           const instUserIds = [

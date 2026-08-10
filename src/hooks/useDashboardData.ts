@@ -7,7 +7,7 @@ import {
   obtenerUsuarioEspacios,
 } from "../api/usuarioEspacio";
 import { obtenerEspacioPorId } from "../api/espacio";
-import { obtenerTareasPorEspacio, obtenerDetalleTareaInstancia, eliminarTarea } from "../api/tarea";
+import { obtenerTareasPorEspacio, eliminarTarea } from "../api/tarea";
 import TaskModel from "../types/Task";
 import type { PlantillaTarea, Tarea } from "../types/Task";
 import FacturaModel from "../types/Factura";
@@ -283,7 +283,10 @@ export const useDashboardData = (newSpaceName?: string) => {
     }
   };
 
-  const cargarFacturas = async (showLoading = true) => {
+  const cargarFacturas = async (
+    showLoading = true,
+    nombresPromise?: Promise<Record<string, { name: string; fotoUrl: string | null }>>,
+  ) => {
     const currentEspacioId = espacioIdRef.current;
     const currentUser = userRef.current;
     if (!currentEspacioId || !currentUser?.uid) {
@@ -304,9 +307,14 @@ export const useDashboardData = (newSpaceName?: string) => {
       // los deudores. Sin esto, en la primera carga puede haber una carrera
       // entre cargarNombresUsuario() y cargarFacturas(), haciendo que todos
       // los deudores se filtren -> contador "0/0" / detalle sin miembros.
-      if (Object.keys(userNamesMapRef.current).length === 0) {
-        await cargarNombresUsuario(currentEspacioId);
-      }
+      // Se espera la promesa compartida SIN bloquear al resto de cargas en
+      // paralelo (cargarTareas la crea y la pasa como parámetro).
+      const names =
+        nombresPromise ??
+        (Object.keys(userNamesMapRef.current).length === 0
+          ? cargarNombresUsuario(currentEspacioId)
+          : Promise.resolve(userNamesMapRef.current));
+      await names;
 
       if (Array.isArray(facturasRaw)) {
         // Función para limpiar GUIDs y comparar sin guiones
@@ -446,26 +454,27 @@ export const useDashboardData = (newSpaceName?: string) => {
       setLoadingTareas(dashboardCache.tareas === null);
     }
     try {
-      // Asegurar que los nombres de usuario están resueltos ANTES de lanzar
-      // cargarFacturas() en paralelo: si ambos se lanzan a la vez, la primera
-      // carga de facturas puede ejecutarse con userNamesMapRef vacío y descartar
-      // a todos los deudores (contador "0/0" hasta hacer pull-to-refresh).
-      if (Object.keys(userNamesMapRef.current).length === 0) {
-        await cargarNombresUsuario(currentEspacioId);
-      }
+      // Crear (NO esperar) la promesa compartida de nombres de usuario:
+      // se lanza en paralelo con las tareas, facturas y karma. Gracias a
+      // nombresLoadingRef, cargarFacturas y el bloque de tareas reutilizan
+      // esta misma promesa sin duplicar llamadas de red.
+      // Esto mantiene el fix del bug "0/0" (las facturas esperan a los nombres
+      // antes de mapear deudores) SIN bloquear secuencialmente la carga.
+      const nombresPromise =
+        Object.keys(userNamesMapRef.current).length === 0
+          ? cargarNombresUsuario(currentEspacioId)
+          : Promise.resolve(userNamesMapRef.current);
 
       // Paralelizar carga de tareas, facturas y karma.
       // Cada sección finaliza de forma independiente (no se esperan entre sí).
       await Promise.all([
-        cargarFacturas(showLoading),
+        cargarFacturas(showLoading, nombresPromise),
         cargarKarma(currentEspacioId),
         (async () => {
-          // Obtener tareas y nombres de usuario en paralelo (elimina el bloqueo secuencial
-          // que retrasaba toda la carga hasta resolver los nombres)
+          // Obtener tareas y nombres en paralelo: la promesa de nombres ya está
+          // en curso (o resuelta), y obtenerTareasPorEspacio se lanza al instante.
           const [currentNamesMap, tareasRaw] = await Promise.all([
-            Object.keys(userNamesMapRef.current).length === 0
-              ? cargarNombresUsuario(currentEspacioId)
-              : Promise.resolve(userNamesMapRef.current),
+            nombresPromise,
             obtenerTareasPorEspacio(currentEspacioId),
           ]);
 
@@ -473,27 +482,12 @@ export const useDashboardData = (newSpaceName?: string) => {
 
           const plantillas = tareasRaw as PlantillaTarea[];
 
-          // Para cada plantilla, buscar la instancia activa en paralelo
-          // El endpoint de lista NO devuelve instanciaActiva, hay que ir al nivel 3
           const mappedTasks = await Promise.all(
             plantillas.map(async (plantilla) => {
-              // instanciaActiva puede ya venir embebida (algunos backends la incluyen)
+              // El backend devuelve la instanciaActiva embebida en cada plantilla
+              // (GetAllByEspacioConInstanciaActivaAsync). No hay que hacer N+1.
               let instanciaActiva: any =
                 plantilla.instanciaActiva ?? plantilla.InstanciaActiva ?? null;
-
-              // Si no viene embebida, buscar la primera instancia del array tareasId
-              if (!instanciaActiva && Array.isArray(plantilla.tareasId) && plantilla.tareasId.length > 0) {
-                const primerInstanciaId = plantilla.tareasId[0];
-                try {
-                  instanciaActiva = await obtenerDetalleTareaInstancia(
-                    currentEspacioId,
-                    String(plantilla.id),
-                    primerInstanciaId,
-                  );
-                } catch {
-                  // Silenciar error si la instancia no existe
-                }
-              }
 
               const esRepetida =
                 (plantilla.diasRepeticion && plantilla.diasRepeticion.length > 0) ||
@@ -574,11 +568,23 @@ export const useDashboardData = (newSpaceName?: string) => {
                 instanciaActiva?.fechaRealizacion ??
                 (instanciaActiva?.FechaRealizacion as string | Date | null | undefined);
 
-              const fechaCompletada = fechaRealizacionRaw
-                ? new Date(fechaRealizacionRaw as string | Date)
-                : completedState
-                  ? new Date()
-                  : null;
+              // Para tareas de repetición, el backend expone fechaEjecutada con la
+              // fecha correcta de la semana en curso. Se prefiere sobre fechaRealizacion
+              // para usar siempre la fecha real de ejecución de la semana actual,
+              // independientemente de cuándo se creó la plantilla.
+              const fechaEjecutadaRaw =
+                instanciaActiva?.fechaEjecutada ??
+                instanciaActiva?.FechaEjecutada ??
+                null;
+
+              // fechaCompletada solo tiene sentido si la tarea está completada.
+              // Si está completada, se usa la fechaEjecutada (semana en curso) y
+              // como fallback fechaRealizacion; si tampoco existe, hoy.
+              const fechaCompletada = completedState
+                ? (fechaEjecutadaRaw ?? fechaRealizacionRaw)
+                  ? new Date((fechaEjecutadaRaw ?? fechaRealizacionRaw) as string | Date)
+                  : new Date()
+                : null;
 
               return new TaskModel({
                 id: String(plantilla.id),

@@ -53,7 +53,7 @@ const Perfil: React.FC = () => {
   const [userName, setUserName] = useState<string>(user?.displayName || user?.email?.split("@")[0] || "Usuario");
   const [userKarma, setUserKarma] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const { photoUri, reloadPhoto } = useProfilePhoto(user?.uid);
+  const { photoUri, photoLoading, reloadPhoto } = useProfilePhoto(user?.uid);
 
   // Easter egg: tap title 6 times
   const { show: showToast } = useToast();
@@ -199,7 +199,9 @@ const Perfil: React.FC = () => {
               onPress={() => navigation.navigate("EditarPerfil")}
               activeOpacity={0.8}
             >
-              {photoUri ? (
+              {photoLoading ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : photoUri ? (
                 <Image
                   source={{ uri: photoUri }}
                   style={{ width: 62, height: 62, borderRadius: 31 }}
@@ -314,7 +316,7 @@ const Perfil: React.FC = () => {
             isDanger={true}
           />
           <Text style={styles.versionText}>
-            {"v3.12.1 APKDynamic"}
+            {"v3.12.5 APKDynamic"}
           </Text>
 
         </View>

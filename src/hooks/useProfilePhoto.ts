@@ -15,9 +15,16 @@ export const useProfilePhoto = (uid: string | undefined) => {
     return uid ? (photoCache.get(uid) ?? null) : null;
   });
 
+  // Indica si la foto de perfil se está cargando (descarga desde el backend).
+  // Inicialmente true si no hay foto en caché (se va a cargar).
+  const [photoLoading, setPhotoLoading] = useState<boolean>(() => {
+    return uid ? !photoCache.has(uid) : false;
+  });
+
   const loadPhoto = useCallback(async (forceOverride = false) => {
     if (!uid) {
       setPhotoUri(null);
+      setPhotoLoading(false);
       return;
     }
     try {
@@ -25,8 +32,11 @@ export const useProfilePhoto = (uid: string | undefined) => {
       const cached = photoCache.get(uid);
       if (cached && !forceOverride) {
         setPhotoUri(cached);
+        setPhotoLoading(false);
         return;
       }
+
+      setPhotoLoading(true);
 
       // 2. Obtener datos del usuario desde la BD
       const user = await obtenerUsuarioPorId(uid);
@@ -43,6 +53,8 @@ export const useProfilePhoto = (uid: string | undefined) => {
     } catch (e) {
       const cached = uid ? (photoCache.get(uid) ?? null) : null;
       setPhotoUri(cached);
+    } finally {
+      setPhotoLoading(false);
     }
   }, [uid]);
 
@@ -85,5 +97,5 @@ export const useProfilePhoto = (uid: string | undefined) => {
     setPhotoUri(null);
   }, [uid]);
 
-  return { photoUri, savePhoto, removePhoto, reloadPhoto: loadPhoto };
+  return { photoUri, photoLoading, savePhoto, removePhoto, reloadPhoto: loadPhoto };
 };
