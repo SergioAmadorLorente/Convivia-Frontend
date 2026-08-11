@@ -15,9 +15,7 @@ Convivia es una app móvil diseñada para mejorar la convivencia en pisos compar
 
 ## DEMO Youtube
 
-[Ver DEMO 1/2](https://youtu.be/GR9N9eZo45k)
-
-[Ver DEMO 2/2](https://youtube.com/shorts/FuV88gTu29A)
+[Ver DEMO](https://youtu.be/hWP5XzAgejk)
 
 ##  Funcionalidades principales
 - Crear y gestionar **Residencias Compartidas**
@@ -72,9 +70,7 @@ Convivia is a mobile app designed to improve cohabitation in shared apartments o
 - Database: **Firebase**
 
 ## DEMO Youtube
-[Watch DEMO 1/2](https://youtu.be/GR9N9eZo45k)
-
-[Watch DEMO 2/2](https://youtube.com/shorts/FuV88gTu29A)
+[Watch DEMO](https://youtu.be/hWP5XzAgejk)
 
 ## Main Features
 - Create and manage **Shared Living Spaces**
