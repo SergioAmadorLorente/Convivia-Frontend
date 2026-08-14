@@ -149,15 +149,22 @@ export const useDashboardActions = ({
         prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
       );
 
-      if (!wasOverdue && userRelacionId) {
-        const nuevoKarma = currentKarma + (task.karma || 0);
-        if ((task.karma || 0) > 0 && onTaskCompletedOnTime) {
-          const startX = coords?.pageX ?? 180;
-          const startY = coords?.pageY ?? 400;
-          onTaskCompletedOnTime({ x: startX, y: startY }, task.karma || 0);
-        }
-        setCurrentKarma(nuevoKarma);
-      }
+if (userRelacionId) {
+  if (!wasOverdue) {
+    // A tiempo → suma
+    const nuevoKarma = currentKarma + (task.karma || 0);
+    if ((task.karma || 0) > 0 && onTaskCompletedOnTime) {
+      const startX = coords?.pageX ?? 180;
+      const startY = coords?.pageY ?? 400;
+      onTaskCompletedOnTime({ x: startX, y: startY }, task.karma || 0);
+    }
+    setCurrentKarma(nuevoKarma);
+  } else {
+    // Fuera de plazo → resta el karma de la tarea
+    const nuevoKarma = Math.max(0, currentKarma - (task.karma || 0));
+    setCurrentKarma(nuevoKarma);
+  }
+}
 
       if (showToast) {
         showToast({
