@@ -173,6 +173,13 @@ export class TaskModel implements ITask {
 
   toggleComplete() {
     const now = new Date();
+    const willBeCompleted = !this.isCompleted;
+    const wasOverdue = Boolean(this.overdue) || (typeof this.estado === "string" && (
+      this.estado.toLowerCase().includes("fuera") ||
+      this.estado.toLowerCase().includes("plazo") ||
+      this.estado.toLowerCase().includes("overdue")
+    ));
+
     return new TaskModel({
       id: this.id,
       Nombre: this.Nombre,
@@ -181,14 +188,17 @@ export class TaskModel implements ITask {
       DiasRepeticion: this.DiasRepeticion.slice(),
       FechaLimite: new Date(this.FechaLimite),
       HoraLimite: this.HoraLimite,
-      isCompleted: !this.isCompleted,
-      estado: this.isCompleted ? "Pendiente" : "Completada",
-      FechaCompletada: !this.isCompleted ? now : null,
+      isCompleted: willBeCompleted,
+      estado: willBeCompleted
+        ? (wasOverdue ? "Completada Fuera de Plazo" : "Completada")
+        : "Pendiente",
+      FechaCompletada: willBeCompleted ? now : null,
       usuarioAsignado: this.usuarioAsignado,
       usuarioAsignadoId: this.usuarioAsignadoId,
       usuarioAsignadoFotoUrl: this.usuarioAsignadoFotoUrl,
       tareasId: this.tareasId.slice(),
-      overdue: this.isCompleted ? this.overdue : false, // Revertir a false si se pone pendiente, sino mantener
+      overdue: willBeCompleted ? wasOverdue : false,
+      usuariosPorDia: this.usuariosPorDia ? { ...this.usuariosPorDia } : {},
     });
   }
 }

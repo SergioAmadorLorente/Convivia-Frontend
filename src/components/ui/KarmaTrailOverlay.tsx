@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { View, StyleSheet, Dimensions, Text, Platform } from "react-native";
 import Animated, {
   useSharedValue,
@@ -43,10 +43,10 @@ const SingleParticle: React.FC<{
   startY: number;
   targetX: number;
   targetY: number;
+  isNegative: boolean;
   isLast: boolean;
-  onAnimationEnd?: () => void;
   onImpact?: () => void;
-}> = ({ config, startX, startY, targetX, targetY, isLast, onAnimationEnd, onImpact }) => {
+}> = ({ config, startX, startY, targetX, targetY, isNegative, isLast, onImpact }) => {
   const progress = useSharedValue(0);
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0.4);
@@ -69,19 +69,18 @@ const SingleParticle: React.FC<{
       config.delay,
       withTiming(
         1,
-        { duration: 600, easing: Easing.bezier(0.25, 0.1, 0.25, 1), ...REDUCE_MOTION_OPTS },
+        { duration: 550, easing: Easing.bezier(0.25, 0.1, 0.25, 1), ...REDUCE_MOTION_OPTS },
         (finished) => {
           if (finished) {
-            opacity.value = withTiming(0, { duration: 100, ...REDUCE_MOTION_OPTS });
-            if (isLast) {
-              if (onImpact) runOnJS(onImpact)();
-              if (onAnimationEnd) runOnJS(onAnimationEnd)();
+            opacity.value = 0;
+            if (isLast && onImpact) {
+              runOnJS(onImpact)();
             }
           }
         }
       )
     );
-  }, [config, isLast, onAnimationEnd, onImpact, opacity, progress, scale, startX, startY, targetX, targetY]);
+  }, [config, isLast, onImpact, opacity, progress, scale, startX, startY, targetX, targetY]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const p = progress.value;
@@ -89,14 +88,15 @@ const SingleParticle: React.FC<{
     const controlY = Math.min(startY, targetY) - 50 + config.arcFactorY;
 
     // Bezier formula: (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
-const currentX =
-  Math.pow(1 - p, 2) * targetX +
-  2 * (1 - p) * p * controlX +
-  Math.pow(p, 2) * startX;
-const currentY =
-  Math.pow(1 - p, 2) * targetY +
-  2 * (1 - p) * p * controlY +
-  Math.pow(p, 2) * startY;
+    // Particles travel from start position (task card) to target position (header karma badge)
+    const currentX =
+      Math.pow(1 - p, 2) * startX +
+      2 * (1 - p) * p * controlX +
+      Math.pow(p, 2) * targetX;
+    const currentY =
+      Math.pow(1 - p, 2) * startY +
+      2 * (1 - p) * p * controlY +
+      Math.pow(p, 2) * targetY;
 
     return {
       position: "absolute",
@@ -104,7 +104,6 @@ const currentY =
       top: currentY - config.size / 2,
       opacity: opacity.value,
       transform: [{ scale: scale.value }],
-      // Elevation per-particle so each one renders above native layers on Android
       elevation: Platform.OS === "android" ? 9999 : 0,
       zIndex: 9999,
     };
@@ -113,7 +112,17 @@ const currentY =
   return (
     <Animated.View style={animatedStyle}>
       <View style={styles.particleWrapper}>
-        <View style={[styles.glowTrail, { width: config.size * 1.6, height: config.size * 1.6 }]} />
+        <View
+          style={[
+            styles.glowTrail,
+            {
+              width: config.size * 1.6,
+              height: config.size * 1.6,
+              backgroundColor: isNegative ? "rgba(229, 62, 62, 0.4)" : "rgba(245, 166, 35, 0.4)",
+              shadowColor: isNegative ? "#E53E3E" : "#FFD700",
+            },
+          ]}
+        />
         <LogoKarma width={config.size} height={config.size} />
       </View>
     </Animated.View>
@@ -130,25 +139,28 @@ const ImpactFloatingText: React.FC<{
   const scale = useSharedValue(0.5);
 
   useEffect(() => {
-    const delay = 480;
+    // Opacity: fade in at 450ms, hold for 550ms, fade out over 300ms
     opacity.value = withDelay(
-      delay,
+      450,
       withSequence(
         withTiming(1, { duration: 150, ...REDUCE_MOTION_OPTS }),
-        withDelay(700, withTiming(0, { duration: 300, ...REDUCE_MOTION_OPTS }))
+        withDelay(550, withTiming(0, { duration: 300, ...REDUCE_MOTION_OPTS }))
       )
     );
 
     scale.value = withDelay(
-      delay,
-      withSpring(1.2, { damping: 10, stiffness: 180, reduceMotion: ReduceMotion.Never })
+      450,
+      withSequence(
+        withSpring(1.15, { damping: 10, stiffness: 180, reduceMotion: ReduceMotion.Never }),
+        withTiming(1, { duration: 200, ...REDUCE_MOTION_OPTS })
+      )
     );
 
     translateY.value = withDelay(
-      delay,
-      withTiming(-35, { duration: 1000, easing: Easing.out(Easing.cubic), ...REDUCE_MOTION_OPTS })
+      450,
+      withTiming(-35, { duration: 900, easing: Easing.out(Easing.cubic), ...REDUCE_MOTION_OPTS })
     );
-  }, [opacity, scale, translateY]);
+  }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -166,7 +178,7 @@ const ImpactFloatingText: React.FC<{
   const isNegative = karmaAmount < 0;
   const displayAmount = Math.abs(karmaAmount);
   const badgeColor = isNegative ? "#E53E3E" : (COLORS.accent || "#7CA042");
-  const textColor = isNegative ? "#FFFFFF" : "#FFFFFF";
+  const textColor = "#FFFFFF";
   const prefix = isNegative ? "-" : "+";
 
   return (
@@ -185,13 +197,33 @@ export const KarmaTrailOverlay: React.FC<KarmaTrailOverlayProps> = ({
   onAnimationEnd,
   onImpact,
 }) => {
+  const isNegative = karmaAmount < 0;
+
+  // Use refs so callbacks never cause effects to re-run
+  const onAnimationEndRef = useRef(onAnimationEnd);
+  const onImpactRef = useRef(onImpact);
+  useEffect(() => { onAnimationEndRef.current = onAnimationEnd; }, [onAnimationEnd]);
+  useEffect(() => { onImpactRef.current = onImpact; }, [onImpact]);
+
   const particles = React.useMemo<ParticleConfig[]>(() => {
     return Array.from({ length: PARTICLE_COUNT }).map((_, i) => ({
-      delay: i * 55,
+      delay: i * 50,
       arcFactorX: (Math.random() - 0.5) * 60,
       arcFactorY: (Math.random() - 0.5) * 40,
       size: 14 + (i % 3) * 4,
     }));
+  }, []);
+
+  useEffect(() => {
+    // Master timer: fires exactly once, 1500ms after mount, regardless of re-renders
+    const timer = setTimeout(() => {
+      onAnimationEndRef.current?.();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []); // Empty deps — runs once on mount, cleans up on unmount
+
+  const stableOnImpact = useCallback(() => {
+    onImpactRef.current?.();
   }, []);
 
   return (
@@ -207,9 +239,9 @@ export const KarmaTrailOverlay: React.FC<KarmaTrailOverlayProps> = ({
           startY={startY}
           targetX={targetX}
           targetY={targetY}
+          isNegative={isNegative}
           isLast={idx === PARTICLE_COUNT - 1}
-          onAnimationEnd={onAnimationEnd}
-          onImpact={onImpact}
+          onImpact={stableOnImpact}
         />
       ))}
       <ImpactFloatingText

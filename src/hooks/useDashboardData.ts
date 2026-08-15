@@ -597,6 +597,25 @@ export const useDashboardData = (newSpaceName?: string) => {
                   : new Date()
                 : null;
 
+              const isOverdueFromInstance =
+                Boolean(instanciaActiva?.overdue ?? instanciaActiva?.Overdue) ||
+                (typeof rawState === "string" && (
+                  rawState.toLowerCase().includes("fuera") ||
+                  rawState.toLowerCase().includes("plazo") ||
+                  rawState.toLowerCase().includes("overdue")
+                )) ||
+                Boolean(
+                  fechaRealizacionRaw && fechaEjecutadaRaw &&
+                  new Date(fechaRealizacionRaw).getTime() > new Date(fechaEjecutadaRaw).getTime()
+                ) ||
+                (!esRepetida && fechaLimiteObj.getFullYear() < 2900 && (() => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  const limit = new Date(fechaLimiteObj);
+                  limit.setHours(0, 0, 0, 0);
+                  return limit.getTime() < today.getTime();
+                })());
+
               return new TaskModel({
                 id: String(plantilla.id),
                 Nombre: plantilla.nombre || plantilla.Nombre || "Tarea sin nombre",
@@ -610,8 +629,12 @@ export const useDashboardData = (newSpaceName?: string) => {
                   rawState ||
                   (instanciaActiva
                     ? completedState
-                      ? "Completada"
-                      : "Pendiente"
+                      ? isOverdueFromInstance
+                        ? "Completada Fuera de Plazo"
+                        : "Completada"
+                      : isOverdueFromInstance
+                        ? "Fuera de Plazo"
+                        : "Pendiente"
                     : "Pendiente"),
                 usuarioAsignado: userNameResolved,
                 usuarioAsignadoId: activeInstanceUserId,
@@ -623,7 +646,7 @@ export const useDashboardData = (newSpaceName?: string) => {
                       ? [String(instanciaId)]
                       : [],
                 FechaCompletada: fechaCompletada,
-                overdue: ((instanciaActiva?.overdue ?? instanciaActiva?.Overdue) as boolean | undefined) ?? false,
+                overdue: isOverdueFromInstance,
                 usuariosPorDia: resolvedUsuariosPorDia,
               });
             })
