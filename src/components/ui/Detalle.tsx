@@ -35,6 +35,7 @@ type Props =
     onComplete: () => void; // misma lógica que en dashboard
     onEdit: () => void;
     onDelete: () => void;
+    isAdmin?: boolean;
   }
   | {
     visible: boolean;
@@ -246,8 +247,8 @@ const Detalle: React.FC<Props> = (props) => {
     );
   }
 
-  if (props.kind === "tarea") {
-    const { task, onComplete, onEdit, onDelete } = props;
+if (props.kind === "tarea") {
+    const { task, onComplete, onEdit, onDelete, isAdmin } = props;
     const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
 
     const fechaStr = useMemo(() => {
@@ -292,6 +293,9 @@ const Detalle: React.FC<Props> = (props) => {
       // Sino, usar el usuario general
       return task.usuarioAsignado ?? "";
     };
+
+    const isTaskOverdue = Boolean(task.overdue && !task.isCompleted);
+    const canDelete = Boolean(isAdmin || !isTaskOverdue);
 
     return (
       <Modal
@@ -340,13 +344,15 @@ const Detalle: React.FC<Props> = (props) => {
                   </View>
                 </View>
 
-                <TouchableOpacity
-                  onPress={onDelete}
-                  activeOpacity={0.7}
-                  style={styles.deleteIconBtn}
-                >
-                  <Feather name="trash-2" size={18} color="#DC2626" />
-                </TouchableOpacity>
+                {canDelete && (
+                  <TouchableOpacity
+                    onPress={onDelete}
+                    activeOpacity={0.7}
+                    style={styles.deleteIconBtn}
+                  >
+                    <Feather name="trash-2" size={18} color="#DC2626" />
+                  </TouchableOpacity>
+                )}
               </View>
 
               {task.Descripcion ? (

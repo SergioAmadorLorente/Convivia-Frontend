@@ -378,39 +378,49 @@ if (userRelacionId) {
     return false;
   };
 
-  const handleDeleteTask = async (id: string | number) => {
-
-
+// Restrict deletion of overdue tasks to admins
+const handleDeleteTask = async (id: string | number, isAdmin: boolean, isOverdue: boolean) => {
     if (!espacioId) return;
+
+    // Check if the user is allowed to delete overdue tasks
+    if (isOverdue && !isAdmin) {
+        showToast?.({
+            entity: "tarea",
+            name: t("createTask.popups.notAuthorized"),
+            tone: "error",
+            autoHideMs: 3000,
+        });
+        return;
+    }
+
     showPopup({
-      imageType: "goback",
-      title: t("createTask.popups.successTaskDeleted.deleteTaskQuestion"),
-      buttons: [
-        { text: t("common.cancel") },
-        {
-          text: t("common.delete"),
-          onPress: async () => {
-            try {
-              await eliminarTarea(espacioId, id);
-              setTareas((prev) => prev.filter((t) => t.id !== id.toString()));
-              closeDetalle();
+        imageType: "goback",
+        title: t("createTask.popups.successTaskDeleted.deleteTaskQuestion"),
+        buttons: [
+            { text: t("common.cancel") },
+            {
+                text: t("common.delete"),
+                onPress: async () => {
+                    try {
+                        await eliminarTarea(espacioId, id);
+                        setTareas((prev) => prev.filter((t) => t.id !== id.toString()));
+                        closeDetalle();
 
-              showToast?.({
-                entity: "tarea",
-                name: t("createTask.popups.successTaskDeleted.title"),
-                tone: "success",
-                autoHideMs: 3000,
-              });
+                        showToast?.({
+                            entity: "tarea",
+                            name: t("createTask.popups.successTaskDeleted.title"),
+                            tone: "success",
+                            autoHideMs: 3000,
+                        });
 
-
-            } catch (error) {
-              Alert.alert("Error", "No se pudo eliminar.");
-            }
-          },
-        },
-      ],
+                    } catch (error) {
+                        Alert.alert("Error", "No se pudo eliminar.");
+                    }
+                },
+            },
+        ],
     });
-  };
+};
 
   const handleDeleteFactura = async (id: string) => {
     if (!espacioId) return;

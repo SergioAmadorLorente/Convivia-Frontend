@@ -58,6 +58,7 @@ const DashBoardPersonal: React.FC = () => {
     loadingKarma,
     loadingEspacio,
     userNamesMap,
+    currentUserRole,
     tareas,
     setTareas,
     loadingTareas,
@@ -71,6 +72,7 @@ const DashBoardPersonal: React.FC = () => {
 
   const CURRENT_USER_ID = user?.uid || "u2";
   const CURRENT_USER_RELACION_ID = userRelacionId;
+  const isAdmin = currentUserRole === 'admin' || currentUserRole === 'administrador';
 
   const [activeTab, setActiveTab] = useState<"tareas" | "facturas">("tareas");
   const isLoading = authLoading || loadingEspacio || (activeTab === "tareas" ? loadingTareas : loadingFacturas);
@@ -410,7 +412,8 @@ const DashBoardPersonal: React.FC = () => {
           onClose={closeDetalle}
           onComplete={() => { handleToggleTask(selectedTask.id); closeDetalle(); }}
           onEdit={() => handleEditTask(selectedTask)}
-          onDelete={() => handleDeleteTask(selectedTask.id)}
+          onDelete={() => handleDeleteTask(selectedTask.id, isAdmin, !!(selectedTask.overdue && !selectedTask.isCompleted))}
+          isAdmin={isAdmin}
         />
       )}
 
