@@ -616,9 +616,10 @@
         "downloading": "L'app ha un nuovo aggiornamento, download in corso...",
         "restarting": "App aggiornata, riavvio dell'app in 5 secondi..."
     },
-    "taskCompletion": {
+"taskCompletion": {
         "toastOverdue": "Attività completata in ritardo! (+0 karma)",
         "toastOnTime": "Attività completata! +{{karma}} karma",
+        "toastOverdueKarmaDeducted": "Attività completata in ritardo! -{{karma}} karma",
         "popupOverdueTitle": "Quasi riuscito!",
         "popupOnTimeTitle": "Congratulazioni!",
         "popupOverdueDesc": "Hai guadagnato 0 punti Karma.",

@@ -26,7 +26,8 @@ export const useDashboardData = (newSpaceName?: string) => {
   const [currentKarma, setCurrentKarma] = useState<number>(0);
   const [loadingKarma, setLoadingKarma] = useState<boolean>(true);
   const [loadingEspacio, setLoadingEspacio] = useState<boolean>(true);
-  const [userNamesMap, setUserNamesMap] = useState<Record<string, { name: string; fotoUrl: string | null }>>({});
+  const [userNamesMap, setUserNamesMap] = useState<Record<string, { name: string; fotoUrl: string | null; rol?: string }>>({});
+  const [currentUserRole, setCurrentUserRole] = useState<string | undefined>(undefined);
   // Inicializar desde caché en memoria (stale-while-revalidate):
   // si hay datos previos, se muestran al instante mientras se refrescan en segundo plano
   const [tareas, setTareasState] = useState<TaskModel[]>(() => dashboardCache.tareas ?? []);
@@ -83,6 +84,10 @@ export const useDashboardData = (newSpaceName?: string) => {
 
             const relId = result.id || result.id_UsuarioEspacio;
             setUserRelacionId(relId);
+            const userRole = (result.rol || result.Rol || "").toLowerCase();
+            if (userRole) {
+              setCurrentUserRole(userRole);
+            }
 
             cargarKarma(result.espacioId, relId);
 
@@ -179,7 +184,7 @@ export const useDashboardData = (newSpaceName?: string) => {
           );
         }
 
-        const map: Record<string, { name: string; fotoUrl: string | null }> = {};
+        const map: Record<string, { name: string; fotoUrl: string | null; rol?: string }> = {};
 
         if (Array.isArray(uEspaciosRaw)) {
           const targetClean = cleanId(currentEspacioId);
@@ -195,20 +200,26 @@ export const useDashboardData = (newSpaceName?: string) => {
             if (!usuarioId) return;
 
             const u = usuariosPorId[usuarioId] || usuariosPorId[cleanId(usuarioId)];
-            let entry: { name: string; fotoUrl: string | null };
+            let entry: { name: string; fotoUrl: string | null; rol?: string };
             if (u) {
               const nombre = u.nombre || u.email || u.id || "Miembro";
               const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
               const fotoUrl = (usuarioId ? photoCache.get(usuarioId) : null) ?? getFullFotoUrl(rawFoto) ?? null;
-              entry = { name: nombre, fotoUrl };
+              entry = { name: nombre, fotoUrl, rol: rel.rol };
             } else {
               const fallback = `Usuario (${usuarioId.slice(0, 4)})`;
-              entry = { name: fallback, fotoUrl: null };
+              entry = { name: fallback, fotoUrl: null, rol: rel.rol };
             }
             if (relId) map[relId] = entry;
             if (usuarioId) map[usuarioId] = entry;
             if (relId) map[cleanId(relId || "")] = entry;
             if (usuarioId) map[cleanId(usuarioId || "")] = entry;
+
+            // Set current user's role if this is the current user
+            if (user?.uid && (cleanId(usuarioId) === cleanId(user.uid) || cleanId(relId || "") === cleanId(userRelacionId || ""))) {
+              const r = (rel.rol || rel.Rol || "").toLowerCase();
+              if (r) setCurrentUserRole(r);
+            }
           });
         }
 
@@ -648,6 +659,7 @@ export const useDashboardData = (newSpaceName?: string) => {
     loadingKarma,
     loadingEspacio,
     userNamesMap,
+    currentUserRole,
     tareas,
     setTareas,
     loadingTareas,

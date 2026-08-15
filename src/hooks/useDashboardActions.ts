@@ -115,13 +115,13 @@ export const useDashboardActions = ({
                       false,
                     );
                   }
-                  if (userRelacionId) {
-                    const nuevoKarma = Math.max(
-                      0,
-                      currentKarma - (task.karma || 0),
-                    );
-                    setCurrentKarma(nuevoKarma);
-                  }
+                   if (userRelacionId) {
+                     const wasOverdue = new Date(task.FechaLimite).getTime() < new Date().getTime();
+                     const nuevoKarma = wasOverdue
+                       ? currentKarma + (task.karma || 0) // Fuera de plazo → devolver karma
+                       : Math.max(0, currentKarma - (task.karma || 0)); // A tiempo → restar karma
+                     setCurrentKarma(nuevoKarma);
+                   }
                   setTareas((prev) =>
                     prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
                   );
@@ -149,21 +149,34 @@ export const useDashboardActions = ({
         prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
       );
 
-      if (!wasOverdue && userRelacionId) {
-        const nuevoKarma = currentKarma + (task.karma || 0);
-        if ((task.karma || 0) > 0 && onTaskCompletedOnTime) {
-          const startX = coords?.pageX ?? 180;
-          const startY = coords?.pageY ?? 400;
-          onTaskCompletedOnTime({ x: startX, y: startY }, task.karma || 0);
-        }
-        setCurrentKarma(nuevoKarma);
-      }
+if (userRelacionId) {
+  if (!wasOverdue) {
+    // A tiempo → suma
+    const nuevoKarma = currentKarma + (task.karma || 0);
+    if ((task.karma || 0) > 0 && onTaskCompletedOnTime) {
+      const startX = coords?.pageX ?? 180;
+      const startY = coords?.pageY ?? 400;
+      onTaskCompletedOnTime({ x: startX, y: startY }, task.karma || 0);
+    }
+    setCurrentKarma(nuevoKarma);
+  } else {
+    // Fuera de plazo → resta el karma de la tarea
+    const nuevoKarma = Math.max(0, currentKarma - (task.karma || 0));
+    if ((task.karma || 0) > 0 && onTaskCompletedOnTime) {
+      const startX = coords?.pageX ?? 180;
+      const startY = coords?.pageY ?? 400;
+      // Pasamos karma negativo para indicar que se resta
+      onTaskCompletedOnTime({ x: startX, y: startY }, -(task.karma || 0));
+    }
+    setCurrentKarma(nuevoKarma);
+  }
+}
 
       if (showToast) {
         showToast({
           entity: "tarea",
           name: wasOverdue
-            ? t("taskCompletion.toastOverdue")
+            ? t("taskCompletion.toastOverdueKarmaDeducted", { karma: task.karma })
             : t("taskCompletion.toastOnTime", { karma: task.karma }),
           tone: (wasOverdue ? "warning" : "success") as Tone,
           autoHideMs: 3000,
@@ -365,39 +378,49 @@ export const useDashboardActions = ({
     return false;
   };
 
-  const handleDeleteTask = async (id: string | number) => {
-
-
+// Restrict deletion of overdue tasks to admins
+const handleDeleteTask = async (id: string | number, isAdmin: boolean, isOverdue: boolean) => {
     if (!espacioId) return;
+
+    // Check if the user is allowed to delete overdue tasks
+    if (isOverdue && !isAdmin) {
+        showToast?.({
+            entity: "tarea",
+            name: t("createTask.popups.notAuthorized"),
+            tone: "error",
+            autoHideMs: 3000,
+        });
+        return;
+    }
+
     showPopup({
-      imageType: "goback",
-      title: t("createTask.popups.successTaskDeleted.deleteTaskQuestion"),
-      buttons: [
-        { text: t("common.cancel") },
-        {
-          text: t("common.delete"),
-          onPress: async () => {
-            try {
-              await eliminarTarea(espacioId, id);
-              setTareas((prev) => prev.filter((t) => t.id !== id.toString()));
-              closeDetalle();
+        imageType: "goback",
+        title: t("createTask.popups.successTaskDeleted.deleteTaskQuestion"),
+        buttons: [
+            { text: t("common.cancel") },
+            {
+                text: t("common.delete"),
+                onPress: async () => {
+                    try {
+                        await eliminarTarea(espacioId, id);
+                        setTareas((prev) => prev.filter((t) => t.id !== id.toString()));
+                        closeDetalle();
 
-              showToast?.({
-                entity: "tarea",
-                name: t("createTask.popups.successTaskDeleted.title"),
-                tone: "success",
-                autoHideMs: 3000,
-              });
+                        showToast?.({
+                            entity: "tarea",
+                            name: t("createTask.popups.successTaskDeleted.title"),
+                            tone: "success",
+                            autoHideMs: 3000,
+                        });
 
-
-            } catch (error) {
-              Alert.alert("Error", "No se pudo eliminar.");
-            }
-          },
-        },
-      ],
+                    } catch (error) {
+                        Alert.alert("Error", "No se pudo eliminar.");
+                    }
+                },
+            },
+        ],
     });
-  };
+};
 
   const handleDeleteFactura = async (id: string) => {
     if (!espacioId) return;

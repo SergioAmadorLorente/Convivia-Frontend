@@ -89,14 +89,14 @@ const SingleParticle: React.FC<{
     const controlY = Math.min(startY, targetY) - 50 + config.arcFactorY;
 
     // Bezier formula: (1-t)^2 * P0 + 2(1-t)t * P1 + t^2 * P2
-    const currentX =
-      Math.pow(1 - p, 2) * startX +
-      2 * (1 - p) * p * controlX +
-      Math.pow(p, 2) * targetX;
-    const currentY =
-      Math.pow(1 - p, 2) * startY +
-      2 * (1 - p) * p * controlY +
-      Math.pow(p, 2) * targetY;
+const currentX =
+  Math.pow(1 - p, 2) * targetX +
+  2 * (1 - p) * p * controlX +
+  Math.pow(p, 2) * startX;
+const currentY =
+  Math.pow(1 - p, 2) * targetY +
+  2 * (1 - p) * p * controlY +
+  Math.pow(p, 2) * startY;
 
     return {
       position: "absolute",
@@ -162,9 +162,16 @@ const ImpactFloatingText: React.FC<{
     };
   });
 
+  // Determinar el signo y color basado en si el karma es positivo o negativo
+  const isNegative = karmaAmount < 0;
+  const displayAmount = Math.abs(karmaAmount);
+  const badgeColor = isNegative ? "#E53E3E" : (COLORS.accent || "#7CA042");
+  const textColor = isNegative ? "#FFFFFF" : "#FFFFFF";
+  const prefix = isNegative ? "-" : "+";
+
   return (
-    <Animated.View style={[styles.floatingBadge, animatedStyle]}>
-      <Text style={styles.floatingBadgeText}>+{karmaAmount} Karma!</Text>
+    <Animated.View style={[styles.floatingBadge, animatedStyle, { backgroundColor: badgeColor }]}>
+      <Text style={[styles.floatingBadgeText, { color: textColor }]}>{prefix}{displayAmount} Karma!</Text>
     </Animated.View>
   );
 };
