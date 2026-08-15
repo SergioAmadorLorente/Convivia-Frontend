@@ -30,6 +30,70 @@ interface ActionsProps {
   onTaskCompletedOnTime?: (coords: { x: number; y: number }, karmaAmount: number) => void;
 }
 
+const checkIfTaskIsOverdue = (task: TaskModel): boolean => {
+  // 1. Estado explícito que contiene fuera de plazo / overdue
+  const estadoStr = (task.estado || "").toLowerCase();
+  if (
+    estadoStr.includes("fuera") ||
+    estadoStr.includes("plazo") ||
+    estadoStr.includes("overdue") ||
+    estadoStr.includes("late")
+  ) {
+    return true;
+  }
+
+  // 2. Bandera overdue activa
+  if (task.overdue) {
+    return true;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 3. Comparar fecha límite con hoy (si no es fecha dummy de repetición año 3000)
+  if (task.FechaLimite) {
+    const due = new Date(task.FechaLimite);
+    if (due.getFullYear() < 2900) {
+      const dueDay = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+      if (dueDay.getTime() < today.getTime()) {
+        return true;
+      }
+      if (dueDay.getTime() === today.getTime() && task.HoraLimite) {
+        const [h, m] = task.HoraLimite.split(":").map(Number);
+        if (!isNaN(h) && !isNaN(m)) {
+          const now = new Date();
+          if (now.getHours() > h || (now.getHours() === h && now.getMinutes() > m)) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  // 4. Si la tarea ya estaba completada, comprobar si FechaCompletada fue posterior a FechaLimite
+  if (task.isCompleted && task.FechaCompletada && task.FechaLimite) {
+    const limit = new Date(task.FechaLimite);
+    if (limit.getFullYear() < 2900) {
+      const completed = new Date(task.FechaCompletada);
+      if (task.HoraLimite) {
+        const [h, m] = task.HoraLimite.split(":").map(Number);
+        if (!isNaN(h) && !isNaN(m)) {
+          limit.setHours(h, m, 0, 0);
+        } else {
+          limit.setHours(23, 59, 59, 999);
+        }
+      } else {
+        limit.setHours(23, 59, 59, 999);
+      }
+      if (completed.getTime() > limit.getTime()) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
 export const useDashboardActions = ({
   espacioId,
   userRelacionId,
@@ -53,12 +117,7 @@ export const useDashboardActions = ({
       const task = tareas.find((t) => t.id === id);
       if (!task) return false;
 
-      const due = new Date(task.FechaLimite);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const wasOverdue =
-        new Date(due.getFullYear(), due.getMonth(), due.getDate()).getTime() <
-        today.getTime();
+      const wasOverdue = checkIfTaskIsOverdue(task);
 
       if (!task.isCompleted) {
         if (!task.usuarioAsignado) {
@@ -116,9 +175,9 @@ export const useDashboardActions = ({
                     );
                   }
                    if (userRelacionId) {
-                     const wasOverdue = new Date(task.FechaLimite).getTime() < new Date().getTime();
-                     const nuevoKarma = wasOverdue
-                       ? currentKarma + (task.karma || 0) // Fuera de plazo → devolver karma
+                     const isTaskOverdue = checkIfTaskIsOverdue(task);
+                     const nuevoKarma = isTaskOverdue
+                       ? currentKarma + (task.karma || 0) // Fuera de plazo → devolver karma (SUMAR)
                        : Math.max(0, currentKarma - (task.karma || 0)); // A tiempo → restar karma
                      setCurrentKarma(nuevoKarma);
                    }
@@ -146,7 +205,15 @@ export const useDashboardActions = ({
       const oldKarma = currentKarma;
 
       setTareas((prev) =>
-        prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
+        prev.map((t) => {
+          if (t.id !== id) return t;
+          const toggled = t.toggleComplete();
+          // Si era vencida, marcamos el estado para que el uncheck sepa que hubo penalización
+          if (wasOverdue) {
+            toggled.estado = "Completada Fuera de Plazo";
+          }
+          return toggled;
+        }),
       );
 
 if (userRelacionId) {

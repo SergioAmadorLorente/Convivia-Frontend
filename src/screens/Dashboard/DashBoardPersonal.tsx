@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -94,15 +94,18 @@ const DashBoardPersonal: React.FC = () => {
   const [karmaTargetCoords, setKarmaTargetCoords] = useState<{ x: number; y: number }>({ x: 200, y: 90 });
   const [headerImpactAnimating, setHeaderImpactAnimating] = useState(false);
 
-  const handleTaskCompletedOnTime = (startCoords: { x: number; y: number }, karmaAmount: number) => {
+  const handleTaskCompletedOnTime = useCallback((startCoords: { x: number; y: number }, karmaAmount: number) => {
     setKarmaTrail({ x: startCoords.x, y: startCoords.y, amount: karmaAmount, key: Date.now() });
-  };
+  }, []);
 
-  const handleKarmaImpact = () => {
+  const handleKarmaImpact = useCallback(() => {
     setHeaderImpactAnimating(true);
     setTimeout(() => setHeaderImpactAnimating(false), 600);
+  }, []);
+
+  const handleKarmaAnimationEnd = useCallback(() => {
     setKarmaTrail(null);
-  };
+  }, []);
 
   const [detalleVisible, setDetalleVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskModel | null>(null);
@@ -361,7 +364,7 @@ const DashBoardPersonal: React.FC = () => {
                     unassigned={!task.usuarioAsignado}
                     isCompleted={task.isCompleted}
                     isOverdue={true}
-                    onToggle={() => handleToggleTask(task.id)}
+                    onToggle={(coords) => handleToggleTask(task.id, coords)}
                     onPressRow={() => openDetalleTarea(task)}
                     time={task.formattedTime()}
                     fechaLimite={new Date(task.FechaLimite).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES', { day: "2-digit", month: "2-digit" })}
@@ -441,7 +444,7 @@ const DashBoardPersonal: React.FC = () => {
           targetY={karmaTargetCoords.y}
           karmaAmount={karmaTrail.amount}
           onImpact={handleKarmaImpact}
-          onAnimationEnd={() => setKarmaTrail(null)}
+          onAnimationEnd={handleKarmaAnimationEnd}
         />
       )}
 
