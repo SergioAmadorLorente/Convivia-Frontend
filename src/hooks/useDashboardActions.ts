@@ -115,13 +115,13 @@ export const useDashboardActions = ({
                       false,
                     );
                   }
-                  if (userRelacionId) {
-                    const nuevoKarma = Math.max(
-                      0,
-                      currentKarma - (task.karma || 0),
-                    );
-                    setCurrentKarma(nuevoKarma);
-                  }
+                   if (userRelacionId) {
+                     const wasOverdue = new Date(task.FechaLimite).getTime() < new Date().getTime();
+                     const nuevoKarma = wasOverdue
+                       ? currentKarma + (task.karma || 0) // Fuera de plazo → devolver karma
+                       : Math.max(0, currentKarma - (task.karma || 0)); // A tiempo → restar karma
+                     setCurrentKarma(nuevoKarma);
+                   }
                   setTareas((prev) =>
                     prev.map((t) => (t.id === id ? t.toggleComplete() : t)),
                   );
