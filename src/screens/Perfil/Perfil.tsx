@@ -316,7 +316,7 @@ const Perfil: React.FC = () => {
             isDanger={true}
           />
           <Text style={styles.versionText}>
-            {"v3.13.0 APKDynamic"}
+            {"v3.13.1 APKDynamic"}
           </Text>
 
         </View>

@@ -616,12 +616,13 @@
     "downloading": "O aplicativo tem uma nova atualização, baixando...",
     "restarting": "Aplicativo atualizado, reiniciando o aplicativo em 5 segundos..."
   },
-  "taskCompletion": {
+"taskCompletion": {
     "toastOverdue": "Tarefa concluída com atraso! (+0 karma)",
     "toastOnTime": "Tarefa concluída! +{{karma}} karma",
+    "toastOverdueKarmaDeducted": "Tarefa concluída com atraso! -{{karma}} karma",
     "popupOverdueTitle": "Quase lá!",
     "popupOnTimeTitle": "Parabéns!",
     "popupOverdueDesc": "Você ganhou 0 pontos de Karma.",
-    "popupOnTimeDesc": "Você ganhou {{karma}} pontos de Karma."
+    "popupOnTimeDesc": "Você ganhou {{karma}} puntos de Karma."
   }
 }

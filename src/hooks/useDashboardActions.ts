@@ -162,6 +162,12 @@ if (userRelacionId) {
   } else {
     // Fuera de plazo → resta el karma de la tarea
     const nuevoKarma = Math.max(0, currentKarma - (task.karma || 0));
+    if ((task.karma || 0) > 0 && onTaskCompletedOnTime) {
+      const startX = coords?.pageX ?? 180;
+      const startY = coords?.pageY ?? 400;
+      // Pasamos karma negativo para indicar que se resta
+      onTaskCompletedOnTime({ x: startX, y: startY }, -(task.karma || 0));
+    }
     setCurrentKarma(nuevoKarma);
   }
 }
@@ -170,7 +176,7 @@ if (userRelacionId) {
         showToast({
           entity: "tarea",
           name: wasOverdue
-            ? t("taskCompletion.toastOverdue")
+            ? t("taskCompletion.toastOverdueKarmaDeducted", { karma: task.karma })
             : t("taskCompletion.toastOnTime", { karma: task.karma }),
           tone: (wasOverdue ? "warning" : "success") as Tone,
           autoHideMs: 3000,
