@@ -545,7 +545,7 @@ const CreateTask: React.FC = () => {
                                 style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 8 }}
                             >
                                 <Text style={{ fontSize: 22 }}>🕐</Text>
-                                <Text style={{ fontSize: 16, color: COLORS.text, fontFamily: FONTS.regular }}>
+                                <Text style={{ fontSize: 16, color: COLORS.primary, fontFamily: FONTS.regular }}>
                                     {selectedTime || "12:00"}
                                 </Text>
                                 <Text style={{ fontSize: 12, color: COLORS.secondary, marginLeft: 4 }}>
@@ -566,8 +566,13 @@ const CreateTask: React.FC = () => {
                             initialValue={repeatDays}
                             onChange={(days: string[]) => {
                                 setRepeatDays(days);
-                                // Al seleccionar un día de repetición limpiar la fecha puntual
-                                if (days.length > 0) setSelectedDate(null);
+                                if (days.length > 0) {
+                                    // Al seleccionar un día de repetición limpiar la fecha puntual
+                                    setSelectedDate(null);
+                                } else {
+                                    // Al deseleccionar, volver a marcar hoy en el calendario
+                                    setSelectedDate(new Date());
+                                }
                                 setDayUserAssignments((prev) => {
                                     const updated: Record<string, UserItem | null> = {};
                                     days.forEach((day) => {
