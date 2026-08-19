@@ -12,6 +12,8 @@ export interface Tarea {
    */
   fechaEjecutada?: Date | string | null;
   FechaEjecutada?: Date | string | null;
+  fechaLimite?: Date | string | null;
+  FechaLimite?: Date | string | null;
   [key: string]: unknown;
 }
 

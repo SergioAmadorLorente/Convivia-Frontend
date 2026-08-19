@@ -74,8 +74,8 @@ const CreateTask: React.FC = () => {
                 0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
                 4: 'Viernes', 5: 'Sábado', 6: 'Domingo'
             };
-            // t.repeatDays viene como array de números
-            const mappedDays = (t.repeatDays || []).map((d: number) => reverseDaysMap[d]).filter(Boolean);
+            // t.repeatDays viene como array de números (aseguramos máximo 1 día)
+            const mappedDays = (t.repeatDays || []).slice(0, 1).map((d: number) => reverseDaysMap[d]).filter(Boolean);
 
             // 2. Cargar en hooks (text inputs, selectores)
             loadTask({

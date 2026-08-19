@@ -23,12 +23,11 @@ const RepeatDaysSelector: React.FC<RepeatDaysSelectorProps> = ({ onChange, initi
     const [selected, setSelected] = useState<string[]>(initialValue);
 
     React.useEffect(() => {
-        if (initialValue.length > 0) setSelected(initialValue);
+        setSelected(initialValue.slice(0, 1));
     }, [initialValue]);
     const toggleDay = (day: string) => {
-        let updated = selected.includes(day)
-            ? selected.filter(d => d !== day)
-            : [...selected, day];
+        // Permitir seleccionar un solo día (toggle: si ya está seleccionado se desmarca, si no, se selecciona únicamente ese día)
+        const updated = selected.includes(day) ? [] : [day];
         setSelected(updated);
         onChange(updated);
     };
