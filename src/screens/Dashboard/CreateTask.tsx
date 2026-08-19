@@ -74,8 +74,8 @@ const CreateTask: React.FC = () => {
                 0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves',
                 4: 'Viernes', 5: 'Sábado', 6: 'Domingo'
             };
-            // t.repeatDays viene como array de números
-            const mappedDays = (t.repeatDays || []).map((d: number) => reverseDaysMap[d]).filter(Boolean);
+            // t.repeatDays viene como array de números (aseguramos máximo 1 día)
+            const mappedDays = (t.repeatDays || []).slice(0, 1).map((d: number) => reverseDaysMap[d]).filter(Boolean);
 
             // 2. Cargar en hooks (text inputs, selectores)
             loadTask({
@@ -527,15 +527,32 @@ const CreateTask: React.FC = () => {
                         collapsible={false}
                         showIcon={false}
                     >
-                        <Calendar
-                            time={selectedTime}
-                            onTimeClick={() => setTimePopupVisible(true)}
-                            onDateSelect={(date) => {
-                                console.log(" Calendario seleccionó fecha (Local):", date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : "null");
-                                setSelectedDate(date);
-                            }}
-                            selectedDate={selectedDate}
-                        />
+                        {/* El calendario solo se muestra cuando NO hay día de repetición seleccionado */}
+                        {repeatDays.length === 0 ? (
+                            <Calendar
+                                time={selectedTime}
+                                onTimeClick={() => setTimePopupVisible(true)}
+                                onDateSelect={(date) => {
+                                    console.log(" Calendario seleccionó fecha (Local):", date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : "null");
+                                    setSelectedDate(date);
+                                }}
+                                selectedDate={selectedDate}
+                            />
+                        ) : (
+                            // Tarea repetitiva: solo mostrar el selector de hora (sin calendario)
+                            <TouchableOpacity
+                                onPress={() => setTimePopupVisible(true)}
+                                style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 8 }}
+                            >
+                                <Text style={{ fontSize: 22 }}>🕐</Text>
+                                <Text style={{ fontSize: 16, color: COLORS.primary, fontFamily: FONTS.regular }}>
+                                    {selectedTime || "12:00"}
+                                </Text>
+                                <Text style={{ fontSize: 12, color: COLORS.secondary, marginLeft: 4 }}>
+                                    {t('createTask.timePicker.hour', 'Hora límite')}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                     </Desplegable>
 
                     <Desplegable
@@ -549,6 +566,13 @@ const CreateTask: React.FC = () => {
                             initialValue={repeatDays}
                             onChange={(days: string[]) => {
                                 setRepeatDays(days);
+                                if (days.length > 0) {
+                                    // Al seleccionar un día de repetición limpiar la fecha puntual
+                                    setSelectedDate(null);
+                                } else {
+                                    // Al deseleccionar, volver a marcar hoy en el calendario
+                                    setSelectedDate(new Date());
+                                }
                                 setDayUserAssignments((prev) => {
                                     const updated: Record<string, UserItem | null> = {};
                                     days.forEach((day) => {

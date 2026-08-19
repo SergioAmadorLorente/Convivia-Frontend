@@ -579,13 +579,15 @@ export const useDashboardData = (newSpaceName?: string) => {
                 instanciaActiva?.fechaRealizacion ??
                 (instanciaActiva?.FechaRealizacion as string | Date | null | undefined);
 
-              // Para tareas de repetición, el backend expone fechaEjecutada con la
+              // Para tareas de repetición, el backend expone fechaEjecutada / fechaLimite con la
               // fecha correcta de la semana en curso. Se prefiere sobre fechaRealizacion
               // para usar siempre la fecha real de ejecución de la semana actual,
               // independientemente de cuándo se creó la plantilla.
               const fechaEjecutadaRaw =
                 instanciaActiva?.fechaEjecutada ??
                 instanciaActiva?.FechaEjecutada ??
+                instanciaActiva?.fechaLimite ??
+                instanciaActiva?.FechaLimite ??
                 null;
 
               // fechaCompletada solo tiene sentido si la tarea está completada.
