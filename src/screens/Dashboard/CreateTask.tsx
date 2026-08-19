@@ -527,15 +527,32 @@ const CreateTask: React.FC = () => {
                         collapsible={false}
                         showIcon={false}
                     >
-                        <Calendar
-                            time={selectedTime}
-                            onTimeClick={() => setTimePopupVisible(true)}
-                            onDateSelect={(date) => {
-                                console.log(" Calendario seleccionó fecha (Local):", date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : "null");
-                                setSelectedDate(date);
-                            }}
-                            selectedDate={selectedDate}
-                        />
+                        {/* El calendario solo se muestra cuando NO hay día de repetición seleccionado */}
+                        {repeatDays.length === 0 ? (
+                            <Calendar
+                                time={selectedTime}
+                                onTimeClick={() => setTimePopupVisible(true)}
+                                onDateSelect={(date) => {
+                                    console.log(" Calendario seleccionó fecha (Local):", date ? `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}` : "null");
+                                    setSelectedDate(date);
+                                }}
+                                selectedDate={selectedDate}
+                            />
+                        ) : (
+                            // Tarea repetitiva: solo mostrar el selector de hora (sin calendario)
+                            <TouchableOpacity
+                                onPress={() => setTimePopupVisible(true)}
+                                style={{ flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 8 }}
+                            >
+                                <Text style={{ fontSize: 22 }}>🕐</Text>
+                                <Text style={{ fontSize: 16, color: COLORS.text, fontFamily: FONTS.regular }}>
+                                    {selectedTime || "12:00"}
+                                </Text>
+                                <Text style={{ fontSize: 12, color: COLORS.secondary, marginLeft: 4 }}>
+                                    {t('createTask.timePicker.hour', 'Hora límite')}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                     </Desplegable>
 
                     <Desplegable
@@ -549,6 +566,8 @@ const CreateTask: React.FC = () => {
                             initialValue={repeatDays}
                             onChange={(days: string[]) => {
                                 setRepeatDays(days);
+                                // Al seleccionar un día de repetición limpiar la fecha puntual
+                                if (days.length > 0) setSelectedDate(null);
                                 setDayUserAssignments((prev) => {
                                     const updated: Record<string, UserItem | null> = {};
                                     days.forEach((day) => {
