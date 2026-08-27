@@ -177,14 +177,11 @@ const CreateFactura: React.FC = () => {
 
     const { show: showToast } = useToast();
 
+    const parsedAmount = parseFloat((amount || '').replace(',', '.'));
+    const isButtonEnabled = name.trim().length > 0 && !isNaN(parsedAmount) && parsedAmount > 0;
+
     const handleSave = async () => {
-        if (!name || !amount) {
-            showToast({
-                entity: "factura",
-                name: name || t('createInvoice.namePlaceholder'),
-                tone: "error",
-                autoHideMs: 3000
-            });
+        if (!isButtonEnabled) {
             return;
         }
 
@@ -217,7 +214,7 @@ const CreateFactura: React.FC = () => {
             });
 
             const numDeudores = Object.keys(deudoresDict).length || 1;
-            const precioTotal = parseFloat(amount);
+            const precioTotal = parsedAmount;
             // La factura está pagada globalmente solo si todos los deudores están en false (pagado)
             const esPagadoGlobal = Object.values(deudoresDict).every(val => val === false);
 
@@ -455,9 +452,12 @@ const CreateFactura: React.FC = () => {
 
                 <View style={{ width: "100%", marginTop: 24, alignItems: "center" }}>
                     <Button
-                        style={[GLOBAL_STYLES.buttonPrimaryGreen, saving && { opacity: 0.6 }]}
+                        style={[
+                            GLOBAL_STYLES.buttonPrimaryGreen,
+                            (!isButtonEnabled || saving) && { opacity: 0.6 }
+                        ]}
                         onPress={handleSave}
-                        disabled={saving}
+                        disabled={saving || !isButtonEnabled}
                     >
                         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
                             <Ionicons
