@@ -360,11 +360,6 @@ const CreateFactura: React.FC = () => {
                         onChangeText={(text: string) => setName(text)}
                         placeholder={t('createInvoice.namePlaceholder')}
                     />
-                    <LargeTextField
-                        value={description}
-                        onChangeText={(text: string) => setDescription(text)}
-                        placeholder={t('createInvoice.descriptionPlaceholder')}
-                    />
                 </View>
 
                 <View style={{ width: "100%", gap: 14, marginTop: 14 }}>
