@@ -771,7 +771,18 @@ const MiResidencia: React.FC = () => {
                         justifyContent: 'center', alignItems: 'center',
                         marginRight: 12,
                       }}>
-                        <Ionicons name="person" size={18} color={selected ? '#fff' : COLORS.primary} />
+                        {p?.fotoUrl ? (
+                          <Image
+                            source={{ uri: p.fotoUrl }}
+                            style={[
+                              { width: 36, height: 36, borderRadius: 18 },
+                              selected && styles.avatarGold,
+                            ]}
+                            onError={() => { if (p?.id) photoCache.delete(p.id); }}
+                          />
+                        ) : (
+                          <Ionicons name="person" size={18} color={selected ? '#fff' : COLORS.primary} />
+                        )}
                       </View>
                       <Text style={{
                         fontFamily: FONTS.bold,
