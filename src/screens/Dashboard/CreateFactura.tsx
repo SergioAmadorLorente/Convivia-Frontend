@@ -21,7 +21,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTranslation } from 'react-i18next';
 import AssignUsersPopup from "../../components/ui/AssignUsersPopup";
 import { useAuthListener } from "../../hooks/useAuthListener";
-import { obtenerUsuarioPorId, obtenerUsuarios } from "../../api/usuario";
+import { obtenerUsuarioPorId, obtenerUsuarios, getFullFotoUrl } from "../../api/usuario";
+import { photoCache } from "../../hooks/useProfilePhoto";
 import { obtenerEspacioPorUsuarioId, obtenerUsuarioEspacios } from "../../api/usuarioEspacio";
 import { useEditFactura } from "../../hooks/useEditFactura";
 import { crearFacturaEnEspacio, editarFactura, subirImagenFactura, actualizarImagenFactura, eliminarImagenFactura, obtenerImagenFactura, FacturaPayload } from "../../api/factura";
@@ -131,9 +132,15 @@ const CreateFactura: React.FC = () => {
                     ]);
 
                     const userMap: Record<string, string> = {};
+                    const userFotoMap: Record<string, string | null> = {};
                     if (Array.isArray(todosUsuarios)) {
                         todosUsuarios.forEach((u: any) => {
                             userMap[u.id] = u.nombre || u.Nombre || u.email || u.id;
+                            const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
+                            userFotoMap[u.id] =
+                                (u.id ? photoCache.get(u.id) : null) ??
+                                getFullFotoUrl(rawFoto) ??
+                                null;
                         });
                     }
 
@@ -143,7 +150,8 @@ const CreateFactura: React.FC = () => {
                             .map((r: any) => ({
                                 id: r.usuarioId,
                                 relacionId: r.id || r.id_UsuarioEspacio,
-                                name: userMap[r.usuarioId] || "Miembro"
+                                name: userMap[r.usuarioId] || "Miembro",
+                                fotoUrl: userFotoMap[r.usuarioId] ?? null
                             }));
                         setAvailableUsers(misMiembros);
 
@@ -403,6 +411,7 @@ const CreateFactura: React.FC = () => {
                                 users={assignedUsers.map((u: any) => ({
                                     id: u.id || u.relacionId || "",
                                     name: u.name || u.Nombre || `Usuario (${(u.id || u.relacionId || "").slice(0, 8)})`,
+                                    fotoUrl: u.fotoUrl ?? null,
                                 }))}
                                 renderExtra={({ userId }) => {
                                     if (!(userId in deudoresRaw)) return null;

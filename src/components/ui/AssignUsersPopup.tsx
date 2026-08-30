@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Modal,
   View,
@@ -10,14 +10,22 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { FONTS, COLORS } from "../../styles/styles";
-import ConviviaSvg from "../../assets/Convivia.svg";
 import { CHECKBOX } from "../../styles/theme"; // estilo global del checkbox
 import { Feather } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  interpolateColor,
+  ReduceMotion,
+} from "react-native-reanimated";
 
 type UserItem = {
   id: string;
   name: string;
+  fotoUrl?: string | null;
 };
 
 type AssignUsersPopupProps = {
@@ -30,6 +38,85 @@ type AssignUsersPopupProps = {
   confirmLabel?: string;
   onConfirm: (selected: UserItem[]) => void | Promise<void>;
   loadingUsers?: boolean;
+};
+
+// Fila individual de usuario con un checkbox animado, replicando el mismo
+// estilo que el checkbox de "completar tarea" del Dashboard (ver TaskItem.tsx).
+const UserRow: React.FC<{
+  item: UserItem;
+  checked: boolean;
+  onToggle: () => void;
+}> = ({ item, checked, onToggle }) => {
+  const checkboxScale = useSharedValue(checked ? 1 : 0);
+  const checkboxBgColor = useSharedValue(checked ? 1 : 0);
+  const isFirstRenderRef = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      checkboxScale.value = checked ? 1 : 0;
+      checkboxBgColor.value = checked ? 1 : 0;
+      return;
+    }
+    checkboxScale.value = withSpring(checked ? 1 : 0, { damping: 12, stiffness: 150, reduceMotion: ReduceMotion.Never });
+    checkboxBgColor.value = withTiming(checked ? 1 : 0, { duration: 200, reduceMotion: ReduceMotion.Never });
+  }, [checked]);
+
+  const checkboxAnimatedStyle = useAnimatedStyle(() => {
+    const bgColor = interpolateColor(
+      checkboxBgColor.value,
+      [0, 1],
+      ["transparent", COLORS.accent]
+    );
+    const borderColor = interpolateColor(
+      checkboxBgColor.value,
+      [0, 1],
+      [COLORS.secondary, COLORS.accent]
+    );
+    return {
+      backgroundColor: bgColor,
+      borderColor: borderColor,
+    };
+  });
+
+  const checkmarkAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: checkboxScale.value }],
+      opacity: checkboxScale.value,
+    };
+  });
+
+  return (
+    <TouchableOpacity
+      onPress={onToggle}
+      activeOpacity={0.8}
+      style={styles.item}
+    >
+      <View style={styles.userAvatar}>
+        {item.fotoUrl ? (
+          <Image
+            source={{ uri: item.fotoUrl }}
+            style={styles.userAvatarImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <Feather name="user" size={15} color={COLORS.primary} />
+        )}
+      </View>
+      <Text style={styles.itemText}>{item.name}</Text>
+      <TouchableOpacity
+        onPress={onToggle}
+        activeOpacity={0.8}
+        style={CHECKBOX.touchArea}
+      >
+        <Animated.View style={[styles.customCheckbox, checkboxAnimatedStyle]}>
+          <Animated.View style={checkmarkAnimatedStyle}>
+            <Feather name="check" size={14} color="#FFF" />
+          </Animated.View>
+        </Animated.View>
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
 };
 
 const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
@@ -81,37 +168,18 @@ const AssignUsersPopup: React.FC<AssignUsersPopupProps> = ({
     }
   };
 
-  const renderItem = ({ item }: { item: UserItem }) => {
-    const checked = selectedIds.has(item.id);
-    return (
-      <TouchableOpacity
-        onPress={() => toggleSelect(item.id)}
-        activeOpacity={0.8}
-        style={styles.item}
-      >
-        <Text style={styles.itemText}>{item.name}</Text>
-        <TouchableOpacity
-          onPress={() => toggleSelect(item.id)}
-          activeOpacity={0.8}
-          style={CHECKBOX.touchArea}
-        >
-          <Feather
-            name={checked ? "check-square" : "square"}
-            size={CHECKBOX.iconSize}
-            color={
-              checked ? CHECKBOX.colors.checked : CHECKBOX.colors.unchecked
-            }
-          />
-        </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  };
+  const renderItem = ({ item }: { item: UserItem }) => (
+    <UserRow
+      item={item}
+      checked={selectedIds.has(item.id)}
+      onToggle={() => toggleSelect(item.id)}
+    />
+  );
 
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.popup}>
-          <ConviviaSvg style={styles.image} width={150} height={150} />
           <Text style={styles.title}>{title || t('createTask.assignUsers.title')}</Text>
 
           <View style={{ maxHeight: 320, width: "100%" }}>
@@ -166,12 +234,6 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: "center",
   },
-  image: {
-    width: 150,
-    height: 150,
-    marginTop: 8,
-    marginBottom: 8,
-  },
   title: {
     fontSize: 26,
     color: COLORS.primary,
@@ -206,9 +268,33 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   itemText: {
+    flex: 1,
+    marginLeft: 10,
     color: "#333",
     fontSize: 14,
     fontFamily: FONTS.regular,
+  },
+  userAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#E6ECDC",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  userAvatarImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+  },
+  customCheckbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   // Botón confirmar
