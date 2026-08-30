@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 type UserItem = {
     id: string;
     name: string;
+    fotoUrl?: string | null;
 };
 
 type DayUserAssignment = {
@@ -122,7 +123,13 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
     };
 
     const randomizeAssignments = () => {
-        if (users.length === 0 || days.length === 0) return;
+        if (users.length === 0) return;
+        if (days.length === 0) {
+            // Modo usuario único: asignar un usuario aleatorio
+            const randomIndex = Math.floor(Math.random() * users.length);
+            setSelectedSingleUserId(users[randomIndex].id);
+            return;
+        }
         const randomized: Record<string, string | null> = {};
         days.forEach((day) => {
             const randomIndex = Math.floor(Math.random() * users.length);
@@ -171,6 +178,17 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                                 onPress={() => selectUserForDay(day, user.id)}
                                 activeOpacity={0.8}
                             >
+                                <View style={styles.userAvatar}>
+                                    {user.fotoUrl ? (
+                                        <Image
+                                            source={{ uri: user.fotoUrl }}
+                                            style={styles.userAvatarImage}
+                                            resizeMode="cover"
+                                        />
+                                    ) : (
+                                        <Feather name="user" size={15} color={COLORS.primary} />
+                                    )}
+                                </View>
                                 <Text
                                     style={[
                                         styles.userItemText,
@@ -197,7 +215,7 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                     <LogoReal style={styles.image} width={120} height={120} />
                     <Text style={styles.title}>{title || t('createTask.assignUsers.title')}</Text>
 
-                    {days.length > 0 && !loadingUsers && (
+                    {users.length > 0 && !loadingUsers && (
                         <TouchableOpacity
                             onPress={randomizeAssignments}
                             style={styles.randomizeButton}
@@ -232,6 +250,17 @@ const AssignUsersByDayPopup: React.FC<AssignUsersByDayPopupProps> = ({
                                         )}
                                         activeOpacity={0.8}
                                     >
+                                        <View style={styles.userAvatar}>
+                                            {user.fotoUrl ? (
+                                                <Image
+                                                    source={{ uri: user.fotoUrl }}
+                                                    style={styles.userAvatarImage}
+                                                    resizeMode="cover"
+                                                />
+                                            ) : (
+                                                <Feather name="user" size={15} color={COLORS.primary} />
+                                            )}
+                                        </View>
                                         <Text
                                             style={[
                                                 styles.userItemText,
@@ -401,6 +430,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#E6ECDC",
     },
     userItemText: {
+        flex: 1,
+        marginLeft: 10,
         fontSize: 14,
         fontFamily: FONTS.regular,
         color: "#333",
@@ -408,6 +439,20 @@ const styles = StyleSheet.create({
     userItemTextSelected: {
         fontFamily: FONTS.bold,
         color: COLORS.primary,
+    },
+    userAvatar: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: "#E6ECDC",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+    },
+    userAvatarImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
     },
     loadingBox: {
         width: "100%",
