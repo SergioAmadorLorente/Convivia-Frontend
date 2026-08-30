@@ -26,7 +26,8 @@ import { useEditTask } from "../../hooks/useEditTask";
 import { useAuthListener } from "../../hooks/useAuthListener";
 import { obtenerEspacioPorUsuarioId, actualizarUsuarioEspacio, obtenerUsuarioEspacios, obtenerUsuarioEspacioPorId } from "../../api/usuarioEspacio";
 import { crearTarea, editarTarea, TareaPayload } from "../../api/tarea";
-import { obtenerUsuarios } from "../../api/usuario";
+import { obtenerUsuarios, getFullFotoUrl } from "../../api/usuario";
+import { photoCache } from "../../hooks/useProfilePhoto";
 import Popup from "../../components/ui/Popup";
 import { useToast } from "../../hooks/useToast";
 
@@ -37,6 +38,7 @@ const CURRENT_USER = { id: "0", name: "Yo" };
 type UserItem = {
     id: string;
     name: string;
+    fotoUrl?: string | null;
 };
 
 const CreateTask: React.FC = () => {
@@ -216,9 +218,13 @@ const CreateTask: React.FC = () => {
                     .filter((u: any) => userIdsInSpace.includes(u.id))
                     .map((u: any) => {
                         const rel = spaceRelations.find((r: any) => r.usuarioId === u.id);
+                        // Resolver la foto igual que en useFetchParticipants: caché primero, luego URL resuelta
+                        const rawFoto = u?.fotoUrl ?? u?.FotoUrl ?? null;
+                        const fotoUrl = (u.id ? photoCache.get(u.id) : null) ?? getFullFotoUrl(rawFoto) ?? null;
                         return {
                             id: rel ? (rel.id || rel.id_UsuarioEspacio) : u.id,
-                            name: u.nombre || u.email || "Usuario sin nombre"
+                            name: u.nombre || u.email || "Usuario sin nombre",
+                            fotoUrl
                         };
                     });
 
