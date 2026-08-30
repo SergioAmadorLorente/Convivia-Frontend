@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../navigation/RootStackParamList";
 import { Ionicons } from "@expo/vector-icons";
-import { COLORS } from "../../styles/theme";
+import { COLORS, FONTS } from "../../styles/theme";
 import { useTabColor } from "../../hooks/useTabColor";
 import { useTranslation } from "react-i18next";
 const BottomBar = () => {
@@ -13,20 +13,63 @@ const BottomBar = () => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
+  const itemAnims = useRef([
+    new Animated.Value(0),
+    new Animated.Value(0),
+  ]).current;
+
+  /** Rotación del "+": 0° cuando cerrado, 45° (a ×) cuando abierto */
+  const plusRotation = scaleAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "45deg"],
+  });
+
   const toggleMenu = () => {
     if (open) {
-      Animated.timing(scaleAnim, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }).start(() => setOpen(false));
+      // Cerrar: todo en paralelo (rápido y limpio)
+      Animated.parallel([
+        Animated.timing(scaleAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(itemAnims[0], {
+          toValue: 0,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(itemAnims[1], {
+          toValue: 0,
+          duration: 100,
+          useNativeDriver: true,
+        }),
+      ]).start(() => setOpen(false));
     } else {
       setOpen(true);
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        useNativeDriver: true,
-        friction: 6,
-      }).start();
+      // Abrir: escalonado pero ágil (el segundo ítem entra casi a la vez que
+      // el primero, con un delay corto, sin esperar al final del primer spring)
+      Animated.parallel([
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 220,
+          useNativeDriver: true,
+        }),
+        Animated.spring(itemAnims[0], {
+          toValue: 1,
+          friction: 7,
+          tension: 60,
+          useNativeDriver: true,
+        }),
+        Animated.sequence([
+          Animated.delay(100),
+          Animated.spring(itemAnims[1], {
+            toValue: 1,
+            friction: 8,
+            tension: 90,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
     }
   };
   const homeColor = useTabColor("DashBoardPersonal");
@@ -66,36 +109,60 @@ const BottomBar = () => {
         style={[
           styles.floatingMenu,
           {
-            bottom: open ? 120 : -300,
+            bottom: open ? 115 : -300,
             transform: [{ scale: scaleAnim }],
             opacity: scaleAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 1] }),
           }
         ]}
       >
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            toggleMenu();
-            navigation.navigate("CreateFactura");
-          }}
+        <Animated.View
+          style={[
+            styles.menuItemShadow,
+            {
+              transform: [
+                { translateY: itemAnims[0].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) },
+              ],
+              opacity: itemAnims[0],
+            },
+          ]}
         >
-          <View style={styles.circleIcon}>
-            <Text style={styles.circleIconText}>€</Text>
-          </View>
-          <Text style={styles.menuText}>{t('bottomBar.createInvoice')}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            toggleMenu();
-            navigation.navigate("CreateTask");
-          }}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              toggleMenu();
+              navigation.navigate("CreateFactura");
+            }}
+          >
+            <View style={[styles.circleIcon, { backgroundColor: COLORS.accent }]}>
+              <Ionicons name="receipt-outline" size={14} color="#fff" />
+            </View>
+            <Text style={styles.menuText}>{t('bottomBar.createInvoice')}</Text>
+          </TouchableOpacity>
+        </Animated.View>
+        <Animated.View
+          style={[
+            styles.menuItemShadow,
+            {
+              transform: [
+                { translateY: itemAnims[1].interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) },
+              ],
+              opacity: itemAnims[1],
+            },
+          ]}
         >
-          <View style={styles.circleIcon}>
-            <Text style={styles.circleIconText}>T</Text>
-          </View>
-          <Text style={styles.menuText}>{t('bottomBar.createTask')}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              toggleMenu();
+              navigation.navigate("CreateTask");
+            }}
+          >
+            <View style={[styles.circleIcon, { backgroundColor: COLORS.primary }]}>
+              <Ionicons name="checkbox-outline" size={14} color="#fff" />
+            </View>
+            <Text style={styles.menuText}>{t('bottomBar.createTask')}</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </Animated.View>
       {/** BOTTOM BAR */}
       <View style={styles.bottomBar}>
@@ -105,7 +172,9 @@ const BottomBar = () => {
         </TouchableOpacity>
         <View style={styles.plusContainer}>
           <TouchableOpacity style={styles.plusButton} onPress={toggleMenu}>
-            <Ionicons name="add-outline" size={40} color={COLORS.primary} />
+            <Animated.View style={{ transform: [{ rotate: plusRotation }] }}>
+              <Ionicons name="add-outline" size={40} color={COLORS.primary} />
+            </Animated.View>
           </TouchableOpacity>
           <Text style={[styles.label, styles.createLabel]}>{t('bottomBar.create')}</Text>
         </View>
@@ -130,30 +199,47 @@ const styles = StyleSheet.create({
   },
   floatingMenu: {
     position: "absolute",
-    left: 85,
+    left: 0,
+    right: 0,
+    bottom: -300,
     zIndex: 2,
+    alignItems: "center",
+  },
+  menuItemShadow: {
+    // La sombra y el borde viven en el contenedor que se anima (viajan con la
+    // píldora). El marginBottom aplica aquí, entre botones, para que el hueco
+    // no hinche el interior del botón.
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#EDEAE4",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 5,
+    marginBottom: 18,
   },
   menuItem: {
     flexDirection: "row",
-    backgroundColor: "#DDE6D4",
-    padding: 10,
-    paddingHorizontal: 18,
-    borderRadius: 25,
     alignItems: "center",
-    marginBottom: 12,
-    elevation: 3,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   circleIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: "#fff",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
   },
-  circleIconText: { fontSize: 16 },
-  menuText: { fontSize: 15, color: "#4B4741" },
+  menuText: {
+    fontSize: 13,
+    color: COLORS.secondary,
+    fontFamily: FONTS.bold,
+    letterSpacing: 0.2,
+  },
   bottomBar: {
     position: "absolute",
     bottom: 0,
@@ -179,6 +265,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 6,
     zIndex: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
   },
   createLabel: { marginTop: 30 },
 });
