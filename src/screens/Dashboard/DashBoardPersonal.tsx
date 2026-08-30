@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -140,6 +140,16 @@ const DashBoardPersonal: React.FC = () => {
   const onRefresh = React.useCallback(() => { setRefreshing(true); cargarTareas(false); }, [cargarTareas, setRefreshing]);
 
   useFocusEffect(React.useCallback(() => { cargarTareas(); }, [espacioId]));
+
+  // Cambio de pestaña automático al volver de crear una tarea/factura.
+  // Leer y limpiar el param cada vez que cambia (robusto ante `popTo`, que
+  // actualiza los params de la ruta aunque el callback del focus esté memoizado).
+  useEffect(() => {
+    if (route.params?.activeTab) {
+      setActiveTab(route.params.activeTab);
+      navigation.setParams({ activeTab: undefined });
+    }
+  }, [route.params?.activeTab, navigation, setActiveTab]);
 
   const handleEditTask = (task: TaskModel) => {
     navigation.navigate("CreateTask", {

@@ -4,7 +4,7 @@ export type RootStackParamList = {
   CrearCuenta: undefined;
   IniciarSesion: undefined;
   RecuperarPassword: undefined;
-  DashBoardPersonal: undefined;
+  DashBoardPersonal: { activeTab?: "tareas" | "facturas" } | undefined;
   NuevaResidencia: undefined;
   UnirResidencia: undefined;
   PoliticaCookiesPrivacidad: undefined;

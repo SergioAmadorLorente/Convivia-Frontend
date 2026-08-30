@@ -280,7 +280,11 @@ const CreateFactura: React.FC = () => {
             }
 
             isSavingRef.current = true;
-            navigation.goBack();
+            if (isEditing) {
+                navigation.goBack();
+            } else {
+                navigation.popTo("DashBoardPersonal", { activeTab: "facturas" });
+            }
         } catch (err) {
             // console.error("Error al guardar factura:", err);
             showToast({

@@ -446,7 +446,11 @@ const CreateTask: React.FC = () => {
                 autoHideMs: 3000,
             });
             isSavingRef.current = true;
-            navigation.goBack();
+            if (isEditing) {
+                navigation.goBack();
+            } else {
+                navigation.popTo("DashBoardPersonal", { activeTab: "tareas" });
+            }
 
         } catch (error: any) {
             // console.error('Error al crear tarea:', error);
